@@ -1,4 +1,5 @@
 # TaskanaAdapter
+
 Adapter to sync tasks between TASKANA and an external workflow system, e.g. Camunda BPM
 ## Components
 The Taskana Adapter repository consists of the taskana adapter plus sample connectors to camunda and taskana.
