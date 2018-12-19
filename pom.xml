@@ -1,0 +1,21 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        <modelVersion>4.0.0</modelVersion>
+        <groupId>pro.taskana</groupId>
+        <artifactId>taskana-camunda-adapter-parent</artifactId>
+        <version>1.0.6-SNAPSHOT</version>
+        <packaging>pom</packaging>
+
+        <description>This pom is parent to all taskana-camunda-adapter modules and serves the common build.</description>
+
+        <properties>
+                <java.version>1.8</java.version>
+        </properties>
+
+        <modules>
+                <module>taskana-camunda-adapter</module>
+                <module>taskana-camunda-system-connector</module>
+                <module>taskana-taskana-system-connector</module>
+                <module>taskana-camunda-adapter-sample</module>
+        </modules>
+</project>
