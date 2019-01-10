@@ -3,12 +3,10 @@ package pro.taskana.camunda.camundasystemconnector.api.impl;
 import java.time.Instant;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-
 import pro.taskana.camunda.camundasystemconnector.api.CamundaResponse;
 import pro.taskana.camunda.camundasystemconnector.api.CamundaSystemConnector;
 import pro.taskana.camunda.camundasystemconnector.api.CamundaTask;
+import pro.taskana.camunda.configuration.SpringContextProvider;
 
 /**
  * Sample Implementation of CamundaSystemConnector.
@@ -24,13 +22,10 @@ public class CamundaSystemConnectorImpl implements CamundaSystemConnector {
     private String camundaSystemURL;
     
     private CamundaTaskRetriever taskRetriever;
-    
-    public CamundaSystemConnectorImpl() {
-        taskRetriever = new CamundaTaskRetriever(new RestTemplateBuilder());
-    }
-    
+       
     public CamundaSystemConnectorImpl(String camundaSystemURL) {
         this.camundaSystemURL = camundaSystemURL;
+        taskRetriever = SpringContextProvider.getBean(CamundaTaskRetriever.class);
     }
     
     @Override

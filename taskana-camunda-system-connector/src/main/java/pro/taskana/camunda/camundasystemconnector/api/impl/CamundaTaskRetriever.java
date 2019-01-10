@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import pro.taskana.camunda.camundasystemconnector.api.CamundaTask;
 
+@Component
 public class CamundaTaskRetriever {
 
     private RestTemplate restTemplate;

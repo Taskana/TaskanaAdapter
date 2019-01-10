@@ -31,13 +31,16 @@ import pro.taskana.exceptions.WorkbasketAlreadyExistException;
 import pro.taskana.exceptions.WorkbasketNotFoundException;
 import pro.taskana.impl.TaskImpl;
 
+@Component
 public class TaskInformationMapper {
     
-    private TaskanaEngine taskanaEngine;
+	@Autowired
     private WorkbasketService workbasketService;
     
+	@Autowired
     private TaskService taskService;
     
+	@Autowired
     private ClassificationService classificationService;
     
     private static final String DEFAULT_WORKBASKET = "DEFAULT_WORKBASKET";
@@ -51,14 +54,7 @@ public class TaskInformationMapper {
     private static final String DEFAULT_VALUE = "DEFAULT_VALUE";
     private static final String CAMUNDA_TASK_ID = "camunda_task_id";
     private static final String CAMUNDA_SYSTEM_URL = "camunda_system_url";
-    
-    public TaskInformationMapper(TaskanaEngine taskanaEngine) {
-        this.taskanaEngine = taskanaEngine;
-        this.workbasketService = taskanaEngine.getWorkbasketService();
-        this.taskService = taskanaEngine.getTaskService();
-        this.classificationService = taskanaEngine.getClassificationService();
-    }
-    
+       
     
     public Task convertToTaskanaTask(CamundaTask camundaTask) 
         throws DomainNotFoundException, InvalidWorkbasketException, NotAuthorizedException,
