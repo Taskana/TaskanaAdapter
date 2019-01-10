@@ -8,12 +8,12 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import pro.taskana.Task;
 import pro.taskana.TaskService;
 import pro.taskana.TaskState;
 import pro.taskana.TaskSummary;
-import pro.taskana.TaskanaEngine;
 import pro.taskana.TimeInterval;
 import pro.taskana.camunda.camundasystemconnector.api.CamundaTask;
 import pro.taskana.camunda.exceptions.TaskConversionFailedException;
@@ -32,28 +32,23 @@ import pro.taskana.exceptions.TaskNotFoundException;
 import pro.taskana.exceptions.WorkbasketAlreadyExistException;
 import pro.taskana.exceptions.WorkbasketNotFoundException;
 
-
+@Component
 public class TaskanaSystemConnectorImpl implements TaskanaSystemConnector {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(Scheduler.class);
 
-    private TaskanaEngine taskanaEngine;
+    @Autowired    
     private TaskService taskService;
+    
+    @Autowired
     private TaskInformationMapper taskInformationMapper;
-
-    public TaskanaSystemConnectorImpl() throws SQLException {
-        TaskanaSystemConnectorConfiguration configuration = new TaskanaSystemConnectorConfiguration();
-        taskanaEngine = configuration.getTaskanaEngine();
-        taskService = taskanaEngine.getTaskService();
-        taskInformationMapper = new TaskInformationMapper(taskanaEngine);
-    }    
 
     @Override
     public List<CamundaTask> retrieveCompletedTaskanaTasks(Instant completedAfter) {
         Instant now = Instant.now();
         TimeInterval completedIn = new TimeInterval(completedAfter, now);
 
-        List<TaskSummary> completedTasks = taskanaEngine.getTaskService().createTaskQuery()
+        List<TaskSummary> completedTasks = taskService.createTaskQuery()
                                            .stateIn(TaskState.COMPLETED)
                                            .completedWithin(completedIn)
                                            .list();

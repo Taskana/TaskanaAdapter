@@ -1,33 +1,31 @@
 package pro.taskana.camunda.camundasystemconnector.config;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.web.client.RestTemplate;
 
-import pro.taskana.camunda.camundasystemconnector.spi.impl.CamundaSystemConnectorProviderImpl;
+import pro.taskana.camunda.camundasystemconnector.api.impl.CamundaTaskRetriever;
 
 @Configuration
+@DependsOn(value= {"springContextProvider"})
 public class CamundaSystemConnectorConfiguration {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CamundaSystemConnectorConfiguration.class);
-            
+
     @Bean
     CamundaSystemUrls camundaSystemUrls(@Value("${taskana-camunda-camundasystemconnector.camundaSystemURLs}") final String strCamundaSystemurls) {
-    	LOGGER.error("CamundaSystemConnectorConfiguration.camundaSystemUrls called. strCamundaSystemurls = {}, exc = {}", 
-    			strCamundaSystemurls, new Exception("debug") );
-    	return new CamundaSystemUrls(strCamundaSystemurls);
+        return new CamundaSystemUrls(strCamundaSystemurls);
     }
 
-
-    public CamundaSystemConnectorConfiguration() {
-//    	LOGGER.error("CamundaSystemConnectorConfiguration ctor. strCamundaSystemurls = {}, exc = {}", strCamundaSystemurls,
-//    			new Exception("debug"));
+    @Bean
+    CamundaTaskRetriever camundaTaskRetriever(RestTemplateBuilder builder) {
+        return new CamundaTaskRetriever(builder);
     }
-    
+
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
+    }
+
 }
