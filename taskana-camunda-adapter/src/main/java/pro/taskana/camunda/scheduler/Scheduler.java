@@ -56,9 +56,15 @@ public class Scheduler {
     public void createTaskanaTasksFromCamundaTasks() {
         LOGGER.error("----------createTaskanaTasksFromCamundaTasks started----------------------------");
         for (CamundaSystemConnector connector : (camundaSystemConnectors.values())) {
-            Instant lastCreatedRetrieved = timestampMapper.getLatestCompletedTimestamp();
-            Instant createdAfterMinusTransactionDuration = lastCreatedRetrieved.minus(Duration.ofSeconds(TOTAL_TRANSACTON_LIFE_TIME));
-            List<CamundaTask> candidateTasks = connector.retrieveCamundaTasks(createdAfterMinusTransactionDuration);
+            Instant lastRetrieved = timestampMapper.getLatestCompletedTimestamp();
+            
+            Instant lastRetrievedMinusTransactionDuration; 
+            if (lastRetrieved != null) {
+            	lastRetrievedMinusTransactionDuration = lastRetrieved.minus(Duration.ofSeconds(TOTAL_TRANSACTON_LIFE_TIME));
+            } else {
+            	lastRetrievedMinusTransactionDuration = Instant.now().minus(Duration.ofDays(1));
+            }
+            List<CamundaTask> candidateTasks = connector.retrieveCamundaTasks(lastRetrievedMinusTransactionDuration);
             List<CamundaTask> tasksToStart = findNewTasksInListOfCandidateTasks(connector.getCamundaSystemURL(), candidateTasks);
             for (CamundaTask camundaTask : tasksToStart) {
                 camundaTask.setCamundaSystemURL(connector.getCamundaSystemURL());
@@ -95,14 +101,14 @@ public class Scheduler {
 
         Assert.assertion(taskanaSystemConnectors.size() == 1, "taskanaSystemConnectors.size() == 1");
         Instant now = Instant.now();
-        Instant completedAfterWithTransactionDurationConsidered = timestampMapper.getLatestCompletedTimestamp();
-        if (completedAfterWithTransactionDurationConsidered == null) {
-            completedAfterWithTransactionDurationConsidered = now.minus(Duration.ofDays(1));
+        Instant lastRetrievedMinusTransactionDuration = timestampMapper.getLatestCompletedTimestamp();
+        if (lastRetrievedMinusTransactionDuration == null) {
+            lastRetrievedMinusTransactionDuration = now.minus(Duration.ofDays(1));
         } else {
-            completedAfterWithTransactionDurationConsidered = completedAfterWithTransactionDurationConsidered.minus(Duration.ofSeconds(TOTAL_TRANSACTON_LIFE_TIME));
+            lastRetrievedMinusTransactionDuration = lastRetrievedMinusTransactionDuration.minus(Duration.ofSeconds(TOTAL_TRANSACTON_LIFE_TIME));
         }
         TaskanaSystemConnector taskanaSystemConnector = taskanaSystemConnectors.get(0);
-        List<CamundaTask> candidateTasksCompletedByTaskana = taskanaSystemConnector.retrieveCompletedTaskanaTasks(completedAfterWithTransactionDurationConsidered);
+        List<CamundaTask> candidateTasksCompletedByTaskana = taskanaSystemConnector.retrieveCompletedTaskanaTasks(lastRetrievedMinusTransactionDuration);
         List<CamundaTask> tasksToBeCompletedInCamunda = findTasksToBeCompletedInCamunda(candidateTasksCompletedByTaskana);
         for (CamundaTask camundaTask : tasksToBeCompletedInCamunda) {
             completeCamundaTask(camundaTask);
