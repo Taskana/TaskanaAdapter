@@ -86,17 +86,16 @@ public class TaskanaSystemConnectorConfiguration {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public SpringTaskanaEngineConfiguration taskanaEngineConfiguration(DataSource dataSource,
-        @Value("${taskana.domains}") final String domainNames,
-        @Value("${taskana.classification.types}") final String classificationTypeNames,
-        @Value("${taskana.classification.categories}") final String categoryNames) throws SQLException {
-        List<String> domains = initDomains(domainNames);
-        List<String> classificationTypes = initClassificationTypes(classificationTypeNames);
-        List<String> classificationCategories = initClassificationCategories(categoryNames);
+    public SpringTaskanaEngineConfiguration taskanaEngineConfiguration(DataSource dataSource) throws SQLException {
+//        ,
+//        @Value("${taskana.domains}") final String domainNames,
+//        @Value("${taskana.classification.types}") final String classificationTypeNames,
+//        @Value("${taskana.classification.categories}") final String categoryNames) throws SQLException {
+//        List<String> domains = initDomains(domainNames);
+//        List<String> classificationTypes = initClassificationTypes(classificationTypeNames);
         SpringTaskanaEngineConfiguration configuration = new SpringTaskanaEngineConfiguration(dataSource, true, false, "TASKANA");
-        configuration.setDomains(domains);
-        configuration.setClassificationTypes(classificationTypes);
-        configuration.setClassificationCategories(classificationCategories);
+//        configuration.setDomains(domains);
+//        configuration.setClassificationTypes(classificationTypes);
         return configuration;
     }
 

@@ -1,5 +1,6 @@
 package pro.taskana.camunda.taskanasystemconnector.api.impl;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -8,6 +9,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.HashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +19,6 @@ import pro.taskana.ClassificationService;
 import pro.taskana.ObjectReference;
 import pro.taskana.Task;
 import pro.taskana.TaskService;
-import pro.taskana.TaskanaEngine;
 import pro.taskana.Workbasket;
 import pro.taskana.WorkbasketService;
 import pro.taskana.WorkbasketType;
@@ -43,6 +45,7 @@ public class TaskInformationMapper {
 	@Autowired
     private ClassificationService classificationService;
     
+	 private static final Logger LOGGER = LoggerFactory.getLogger(TaskInformationMapper.class);
     private static final String DEFAULT_WORKBASKET = "DEFAULT_WORKBASKET";
     private static final String DEFAULT_CLASSIFICATION = "DEFAULT_CLASSIFICATION";
     private static final String DEFAULT_DOMAIN = "DOMAIN_A";
@@ -66,15 +69,16 @@ public class TaskInformationMapper {
         ObjectReference objectReference = createObjectReference();
 
         TaskImpl taskanaTask = (TaskImpl) taskService.newTask(workbasket.getId());
-
         HashMap<String, String> callbackInfo = new HashMap<>();
         callbackInfo.put(CAMUNDA_TASK_ID, camundaTask.getId());
         callbackInfo.put(CAMUNDA_SYSTEM_URL, camundaTask.getCamundaSystemURL());
         taskanaTask.setCallbackInfo(callbackInfo);
+        taskanaTask.setExternalId(camundaTask.getId());
 
         taskanaTask.setName(camundaTask.getName());
         taskanaTask.setDescription(camundaTask.getDescription());
-        taskanaTask.setDue(parseDate(camundaTask.getDue()));
+        setTimestampsInTaskanaTask(taskanaTask, camundaTask);
+        
         taskanaTask.setOwner(camundaTask.getAssignee());
         taskanaTask.setBusinessProcessId(camundaTask.getProcessInstanceId());
         taskanaTask.setClassificationKey(classification.getKey());
@@ -83,7 +87,27 @@ public class TaskInformationMapper {
         return taskanaTask;
     }
 
-    public CamundaTask convertToCamundaTask(Task taskanaTask) {
+    private void setTimestampsInTaskanaTask(TaskImpl taskanaTask, CamundaTask camundaTask) {
+    	Instant created = convertStringToInstant(camundaTask.getCreated(), Instant.now());
+    	taskanaTask.setCreated(created);
+    	Instant due = convertStringToInstant(camundaTask.getDue(),created.plus(Duration.ofDays(3)));
+    	taskanaTask.setDue(due);    	
+	}
+
+	private Instant convertStringToInstant(String strTimestamp, Instant defaultTimestamp) {
+		if (strTimestamp == null || strTimestamp.isEmpty()) {
+    		return defaultTimestamp;
+    	} else { 
+    		try {
+    			return parseDate(strTimestamp);
+    		} catch (RuntimeException e) {
+    			LOGGER.error("Caught {} when attemptin to parse date {} ", e, strTimestamp);
+    			return defaultTimestamp;
+    		}
+    	}
+	}
+
+	public CamundaTask convertToCamundaTask(Task taskanaTask) {
         CamundaTask camundaTask = new CamundaTask();
         camundaTask.setCamundaSystemURL(taskanaTask.getCallbackInfo().get(CAMUNDA_SYSTEM_URL));
         camundaTask.setId(taskanaTask.getCallbackInfo().get(CAMUNDA_TASK_ID));
@@ -95,6 +119,9 @@ public class TaskInformationMapper {
     }
 
     private Instant parseDate(String date) {
+    	if (date == null || date.isEmpty()) {
+    		return null;
+    	}
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         TemporalAccessor temporalAccessor = formatter.parse(date);
         LocalDateTime localDateTime = LocalDateTime.from(temporalAccessor);

@@ -5,7 +5,7 @@
 
         <groupId>pro.taskana</groupId>
         <artifactId>taskana-camunda-adapter</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.1</version>
         <packaging>jar</packaging>
 
         <name>taskana-camunda-adapter</name>
@@ -64,7 +64,7 @@
               <dependency>
                    <groupId>pro.taskana</groupId>
                    <artifactId>taskana-spring</artifactId>
-                   <version>1.0.2</version>
+                   <version>1.0.6-SNAPSHOT</version>
               </dependency>
 
               <dependency>
@@ -77,6 +77,19 @@
 
         <!-- build>
                 <plugins>
+
+                        <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <version>3.5.1</version>
+                                <configuration>
+                                        <showWarnings>true</showWarnings>
+                                        <debug>true</debug>
+                                        <compilerArgs>
+                                                <arg>-Xlint:all</arg>
+                                        </compilerArgs>
+                                </configuration>
+                        </plugin>
                         <plugin>
                                 <groupId>org.springframework.boot</groupId>
                                 <artifactId>spring-boot-maven-plugin</artifactId>
