@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -15,9 +17,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import pro.taskana.camunda.camundasystemconnector.api.CamundaTask;
+import pro.taskana.camunda.scheduler.Scheduler;
 
 @Component
 public class CamundaTaskRetriever {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskRetriever.class);
 
     private RestTemplate restTemplate;
 

@@ -5,7 +5,7 @@
 
         <groupId>pro.taskana</groupId>
         <artifactId>taskana-taskana-system-connector</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.1</version>
         <packaging>jar</packaging>
 
         <name>taskana-taskana-system-connector</name>
@@ -61,16 +61,22 @@
             <scope>test</scope>
          </dependency>
 
+         <dependency>
+            <groupId>com.ibm.db2.jcc</groupId>
+            <artifactId>db2jcc4</artifactId>
+            <version>11.1.1.1</version>
+         </dependency>
+
         <dependency>
              <groupId>pro.taskana</groupId>
              <artifactId>taskana-spring</artifactId>
-             <version>1.0.2</version>
+             <version>1.0.6-SNAPSHOT</version>
         </dependency>
 
         <dependency>
              <groupId>pro.taskana</groupId>
              <artifactId>taskana-camunda-adapter</artifactId>
-             <version>0.0.1-SNAPSHOT</version>
+             <version>0.0.1</version>
         </dependency>
 
         <dependency>
@@ -81,20 +87,15 @@
 
         </dependencies>
 
-        <!--
         <build>
                 <plugins>
-                        <plugin>
-                                <groupId>org.springframework.boot</groupId>
-                                <artifactId>spring-boot-maven-plugin</artifactId>
-                                <version>2.1.0.RELEASE</version>
-                        </plugin>
                         <plugin>
                                 <groupId>org.apache.maven.plugins</groupId>
                                 <artifactId>maven-compiler-plugin</artifactId>
                                 <version>3.5.1</version>
                                 <configuration>
                                         <showWarnings>true</showWarnings>
+                                        <debug>true</debug>
                                         <compilerArgs>
                                                 <arg>-Xlint:all</arg>
                                         </compilerArgs>
@@ -102,6 +103,15 @@
                         </plugin>
                 </plugins>
         </build>
-       -->
 
+        <!--
+          this repository is needed to fetch com.ibm.db2.jcc
+        -->
+        <repositories>
+                <repository>
+                        <id>novatec public</id>
+                        <name>novatec-repository</name>
+                        <url>https://repository.novatec-gmbh.de/content/repositories/novatec/</url>
+                </repository>
+        </repositories>
 </project>
