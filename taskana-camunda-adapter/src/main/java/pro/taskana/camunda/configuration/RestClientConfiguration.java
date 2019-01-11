@@ -18,9 +18,10 @@ public class RestClientConfiguration {
     @Primary
     @ConfigurationProperties(prefix = "datasource")
     public DataSourceProperties dataSourceProperties() {
-        DataSourceProperties props = new DataSourceProperties();
-        props.setUrl("jdbc:h2:mem:taskana;IGNORECASE=TRUE;LOCK_MODE=0;INIT=CREATE SCHEMA IF NOT EXISTS TASKANA");
-        return props;
+        return  new DataSourceProperties();
+//        DataSourceProperties props = new DataSourceProperties();
+//        props.setUrl("jdbc:h2:mem:taskana;IGNORECASE=TRUE;LOCK_MODE=0;INIT=CREATE SCHEMA IF NOT EXISTS TASKANA");
+//        return props;
     }
 
     @Bean

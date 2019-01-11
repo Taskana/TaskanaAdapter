@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import pro.taskana.Task;
 import pro.taskana.camunda.camundasystemconnector.api.CamundaSystemConnector;
@@ -30,6 +31,7 @@ import pro.taskana.camunda.mappings.TimestampMapper;
 import pro.taskana.camunda.taskanasystemconnector.api.TaskanaSystemConnector;
 import pro.taskana.camunda.taskanasystemconnector.spi.TaskanaSystemConnectorProvider;
 import pro.taskana.camunda.util.Assert;
+import pro.taskana.impl.util.LoggerUtils;
 
 /**
  * Scheduler for receiving Camunda tasks and completing Taskana tasks.
@@ -56,16 +58,25 @@ public class Scheduler {
     public void createTaskanaTasksFromCamundaTasks() {
         LOGGER.error("----------createTaskanaTasksFromCamundaTasks started----------------------------");
         for (CamundaSystemConnector connector : (camundaSystemConnectors.values())) {
-            Instant lastRetrieved = timestampMapper.getLatestCompletedTimestamp();
-            
-            Instant lastRetrievedMinusTransactionDuration; 
+            Instant lastRetrieved = timestampMapper.getLatestCreatedTimestamp(connector.getCamundaSystemURL());
+            LOGGER.info("lastRetrieved is {}", lastRetrieved);
+
+            Instant lastRetrievedMinusTransactionDuration;
             if (lastRetrieved != null) {
-            	lastRetrievedMinusTransactionDuration = lastRetrieved.minus(Duration.ofSeconds(TOTAL_TRANSACTON_LIFE_TIME));
+                lastRetrievedMinusTransactionDuration = lastRetrieved.minus(Duration.ofSeconds(TOTAL_TRANSACTON_LIFE_TIME));
             } else {
-            	lastRetrievedMinusTransactionDuration = Instant.now().minus(Duration.ofDays(1));
+                lastRetrievedMinusTransactionDuration = Instant.now().minus(Duration.ofDays(365));
             }
+            LOGGER.info("searching for tasks started after {}", lastRetrievedMinusTransactionDuration);
+
             List<CamundaTask> candidateTasks = connector.retrieveCamundaTasks(lastRetrievedMinusTransactionDuration);
+            LOGGER.info("Candidate tasks retrieved from camunda: {}", LoggerUtils.listToString(candidateTasks));
+
             List<CamundaTask> tasksToStart = findNewTasksInListOfCandidateTasks(connector.getCamundaSystemURL(), candidateTasks);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("About to create taskana tasks for {} ", LoggerUtils.listToString(tasksToStart.stream().map(CamundaTask::getId)
+                                                                                .collect(Collectors.toList())));
+            }
             for (CamundaTask camundaTask : tasksToStart) {
                 camundaTask.setCamundaSystemURL(connector.getCamundaSystemURL());
                 createTaskanaTask(camundaTask);
@@ -73,29 +84,38 @@ public class Scheduler {
         }
     }
 
+    @Transactional
     private void createTaskanaTask(CamundaTask camundaTask) {
         Assert.assertion(taskanaSystemConnectors.size() == 1, "taskanaSystemConnectors.size() == 1");
         TaskanaSystemConnector connector = taskanaSystemConnectors.get(0);
         try {
             Task taskanaTask = connector.convertToTaskanaTask(camundaTask);
             connector.createTaskanaTask(taskanaTask);
-            timestampMapper.insertCreatedTask(camundaTask.getId(), Instant.now(), camundaTask.getCamundaSystemURL());
+            timestampMapper.registerCreatedTask(camundaTask.getId(), Instant.now(), camundaTask.getCamundaSystemURL());
         } catch (TaskCreationFailedException | TaskConversionFailedException e) {
             LOGGER.error("Caught {} when creating a task in taskana for camunda task {}", e, camundaTask);
         }
     }
 
-    private List<CamundaTask> findNewTasksInListOfCandidateTasks(String camundaSystemName, List<CamundaTask> candidateTasks) {
+    private List<CamundaTask> findNewTasksInListOfCandidateTasks(String camundaSystemURL, List<CamundaTask> candidateTasks) {
+        if (candidateTasks == null || candidateTasks.isEmpty()) {
+            return candidateTasks;
+        }
         List<String> candidateTaskIds = candidateTasks.stream().map(CamundaTask::getId).collect(Collectors.toList());
-        List<String> existingTaskIds = timestampMapper.findExistingTaskIds(camundaSystemName, candidateTaskIds);
+        List<String> existingTaskIds = timestampMapper.findExistingTaskIds(camundaSystemURL, candidateTaskIds);
+        LOGGER.info("findNewTasks: candidate Tasks = \n {}", LoggerUtils.listToString(candidateTaskIds));
+        LOGGER.info("findNewTasks: existing  Tasks = \n {}", LoggerUtils.listToString(existingTaskIds));
+
         List<String> newTaskIds = candidateTaskIds;
         newTaskIds.removeAll(existingTaskIds);
+        LOGGER.info("findNewTasks: to create Tasks = \n {}", LoggerUtils.listToString(newTaskIds));
+
         return candidateTasks.stream()
             .filter(t -> newTaskIds.contains(t.getId()))
             .collect(Collectors.toList());
     }
 
-    @Scheduled(fixedRate = 5000)
+    //  @Scheduled(fixedRate = 5000)
     public void completeCamundaTasks() {
         LOGGER.error("----------completeCamundaTasks started----------------------------");
 

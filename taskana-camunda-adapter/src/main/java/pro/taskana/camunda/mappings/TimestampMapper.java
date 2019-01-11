@@ -22,17 +22,18 @@ public interface TimestampMapper {
     @Select("<script>"
         + "SELECT MAX(CREATED) "
         + "FROM TASKS_CREATED "
-        + "WHERE CAMUNDA_SYSTEM_NAME = #{camundaSystemName}"
+        + "WHERE CAMUNDA_SYSTEM_URL = #{camundaSystemUrl}"
         + "</script>")
-    Instant getLatestCreatedTimestamp(@Param("camundaSystemName") String camundaSystemName);
+    Instant getLatestCreatedTimestamp(@Param("camundaSystemUrl") String camundaSystemUrl);
 
     @Select("<script>"
         + "SELECT ID "
         + "FROM TASKS_CREATED "
-        + "WHERE ID IN (<foreach item='item' collection='taskIdsIn' separator=',' >#{item}</foreach>)"
+        + "WHERE (CAMUNDA_SYSTEM_URL = #{camundaSystemUrl} "
+        + "AND  ID IN (<foreach item='item' collection='taskIdsIn' separator=',' >#{item}</foreach>))"
         + "</script>")
     @Results(value = {@Result(property = "taskId", column = "ID")})
-    List<String> findExistingTaskIds(@Param("camundaSystemName") String camundaSystemName, @Param("taskIdsIn") List<String> taskIdsIn);
+    List<String> findExistingTaskIds(@Param("camundaSystemUrl") String camundaSystemUrl, @Param("taskIdsIn") List<String> taskIdsIn);
 
     @Select("<script>"
         + "SELECT ID "
@@ -42,16 +43,16 @@ public interface TimestampMapper {
     @Results(value = {@Result(property = "taskId", column = "ID")})
     List<String> findAlreadyCompletedTaskIds(@Param("taskIdsIn") List<String> taskIdsIn);
 
-    @Insert("INSERT INTO TASKS_CREATED (ID, CREATED, CAMUNDA_SYSTEM_NAME) VALUES (#{id}, #{created}, #{camundaSystemName})")
-    void insertCreatedTask(@Param("id") String id,
+    @Insert("INSERT INTO TASKS_CREATED (ID, CREATED, CAMUNDA_SYSTEM_URL) VALUES (#{id}, #{created}, #{camundaSystemUrl})")
+    void registerCreatedTask(@Param("id") String id,
         @Param("created") Instant created,
-        @Param("camundaSystemName") String camundaSystemName);
+        @Param("camundaSystemUrl") String camundaSystemUrl);
 
     @Delete("<script>"
         + "DELETE FROM TASKS_CREATED "
-        + "WHERE CAMUNDA_SYSTEM_NAME = #{camundaSystemName}"
+        + "WHERE CAMUNDA_SYSTEM_URL = #{camundaSystemUrl}"
         + "</script>")
-    void removeLatestCreatedTimestamp(@Param("camundaSystemName") String camundaSystemName);
+    void removeLatestCreatedTimestamp(@Param("camundaSystemUrl") String camundaSystemUrl);
 
     @Select("<script>SELECT MAX(COMPLETED) FROM TASKS_COMPLETED </script>")
     Instant getLatestCompletedTimestamp();
