@@ -20,11 +20,18 @@ import org.apache.ibatis.annotations.Select;
 public interface TimestampMapper {
 
     @Select("<script>"
+        + "SELECT MAX(QUERY_TIMESTAMP) "
+        + "FROM LAST_QUERY_TIME "
+        + "WHERE CAMUNDA_SYSTEM_URL = #{camundaSystemUrl}"
+        + "</script>")
+    Instant getLatestQueryTimestamp(@Param("camundaSystemUrl") String camundaSystemUrl);
+
+    @Select("<script>"
         + "SELECT MAX(CREATED) "
         + "FROM TASKS_CREATED "
         + "WHERE CAMUNDA_SYSTEM_URL = #{camundaSystemUrl}"
         + "</script>")
-    Instant getLatestCreatedTimestamp(@Param("camundaSystemUrl") String camundaSystemUrl);
+    Instant getLatestCreatedTaskCreationTimestamp(@Param("camundaSystemUrl") String camundaSystemUrl);
 
     @Select("<script>"
         + "SELECT ID "
@@ -46,6 +53,11 @@ public interface TimestampMapper {
     @Insert("INSERT INTO TASKS_CREATED (ID, CREATED, CAMUNDA_SYSTEM_URL) VALUES (#{id}, #{created}, #{camundaSystemUrl})")
     void registerCreatedTask(@Param("id") String id,
         @Param("created") Instant created,
+        @Param("camundaSystemUrl") String camundaSystemUrl);
+
+    @Insert("INSERT INTO LAST_QUERY_TIME (ID, QUERY_TIMESTAMP, CAMUNDA_SYSTEM_URL) VALUES (#{id}, #{queryTimestamp}, #{camundaSystemUrl})")
+    void rememberCamundaQueryTime(@Param("id") String id,
+        @Param("queryTimestamp") Instant queryTimestamp,
         @Param("camundaSystemUrl") String camundaSystemUrl);
 
     @Delete("<script>"
