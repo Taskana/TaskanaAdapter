@@ -37,10 +37,10 @@ package pro.taskana.camunda.configuration;
         private StringWriter errorWriter = new StringWriter();
         private PrintWriter errorLogWriter = new PrintWriter(errorWriter);
 
-        public AdapterSchemaCreator(DataSource dataSource, String schema) {
+        public AdapterSchemaCreator(DataSource dataSource, String schemaName) {
             super();
             this.dataSource = dataSource;
-            this.schemaName = schema;
+            this.schemaName = schemaName;
         }
 
         private static String selectDbScriptFileName(String dbProductName) {
