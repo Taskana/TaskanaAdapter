@@ -2,6 +2,7 @@ package pro.taskana.camunda.camundasystemconnector.api.impl;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -31,14 +32,17 @@ public class CamundaTaskRetriever {
     }
 
     public List<CamundaTask> retrieveCamundaTasks(String camundaSystemURL, Instant createdAfter) {
+        LOGGER.debug("entry to retrieveCamundaTasks. CamundSystemURL = {}, createdAfter = {} ",camundaSystemURL, createdAfter );
         String requestUrl = camundaSystemURL + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS ;
         String requestBody;
         if (createdAfter == null) {
             requestBody = CamundaSystemConnectorImpl.EMPTY_REQUEST_BODY;
         } else {
-            Date date = Date.from(createdAfter);
+            // Instant is in UTC time, Camunda uses local time. Need to adjust ...
+            Date date = java.sql.Timestamp.valueOf(createdAfter.atZone(ZoneId.systemDefault()).toLocalDateTime());
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
             requestBody = "{\"createdAfter\": \"" + formatter.format(date) + "\"}";
+            LOGGER.info("retrieving camunda tasks with request body {}", requestBody);
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

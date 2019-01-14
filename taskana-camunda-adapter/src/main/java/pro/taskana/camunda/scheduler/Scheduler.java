@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.ibatis.session.SqlSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ import pro.taskana.camunda.mappings.TimestampMapper;
 import pro.taskana.camunda.taskanasystemconnector.api.TaskanaSystemConnector;
 import pro.taskana.camunda.taskanasystemconnector.spi.TaskanaSystemConnectorProvider;
 import pro.taskana.camunda.util.Assert;
+import pro.taskana.exceptions.SystemException;
+import pro.taskana.impl.util.IdGenerator;
 import pro.taskana.impl.util.LoggerUtils;
 
 /**
@@ -42,7 +45,8 @@ import pro.taskana.impl.util.LoggerUtils;
 public class Scheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Scheduler.class);
-    private static final int TOTAL_TRANSACTON_LIFE_TIME = 125;
+    private static final int TOTAL_TRANSACTON_LIFE_TIME = 120;
+    private boolean isRunningCreateTaskanaTasksFromCamundaTasks = false;
 
     @Autowired
     private RestClientConfiguration clientCfg;
@@ -50,37 +54,81 @@ public class Scheduler {
     @Autowired
     private TimestampMapper timestampMapper;
 
+    @Autowired
+    private String schemaName;
+
+    @Autowired
+    private  SqlSessionManager sqlSessionManager;
+
     private Map<String, CamundaSystemConnector> camundaSystemConnectors;
     private List<TaskanaSystemConnector> taskanaSystemConnectors;
 
+    private void openConnection() {
+        initSqlSession();
+        try {
+            this.sqlSessionManager.getConnection().setSchema(schemaName);
+        } catch (SQLException e) {
+            throw new SystemException(
+                "Method openConnection() could not open a connection to the database. No schema has been created.",
+                e.getCause());
+        }
+    }
+
+    private void initSqlSession() {
+       if (!this.sqlSessionManager.isManagedSessionStarted()) {
+            this.sqlSessionManager.startManagedSession();
+        }
+    }
+
+    private void returnConnection() {
+        if (this.sqlSessionManager.isManagedSessionStarted()) {
+                this.sqlSessionManager.close();
+        }
+    }
 
     @Scheduled(fixedRate = 5000)
     public void createTaskanaTasksFromCamundaTasks() {
         LOGGER.error("----------createTaskanaTasksFromCamundaTasks started----------------------------");
-        for (CamundaSystemConnector connector : (camundaSystemConnectors.values())) {
-            Instant lastRetrieved = timestampMapper.getLatestCreatedTimestamp(connector.getCamundaSystemURL());
-            LOGGER.info("lastRetrieved is {}", lastRetrieved);
+        if (isRunningCreateTaskanaTasksFromCamundaTasks) {
+            LOGGER.error("----------createTaskanaTasksFromCamundaTasks stopped - another instance is already running ----------------------------");
+            return;
+        }
+        try {
+            isRunningCreateTaskanaTasksFromCamundaTasks = true;
+            for (CamundaSystemConnector connector : (camundaSystemConnectors.values())) {
+                openConnection();
+                try {
+                    Instant lastRetrieved = timestampMapper.getLatestQueryTimestamp(connector.getCamundaSystemURL());
+                    LOGGER.info("lastRetrieved is {}", lastRetrieved);
+                    Instant lastRetrievedMinusTransactionDuration;
+                    if (lastRetrieved != null) {
+                        lastRetrievedMinusTransactionDuration = lastRetrieved.minus(Duration.ofSeconds(TOTAL_TRANSACTON_LIFE_TIME));
+                    } else {
+                        lastRetrievedMinusTransactionDuration = Instant.now().minus(Duration.ofDays(365));
+                    }
+                    LOGGER.info("searching for tasks started after {}", lastRetrievedMinusTransactionDuration);
 
-            Instant lastRetrievedMinusTransactionDuration;
-            if (lastRetrieved != null) {
-                lastRetrievedMinusTransactionDuration = lastRetrieved.minus(Duration.ofSeconds(TOTAL_TRANSACTON_LIFE_TIME));
-            } else {
-                lastRetrievedMinusTransactionDuration = Instant.now().minus(Duration.ofDays(365));
-            }
-            LOGGER.info("searching for tasks started after {}", lastRetrievedMinusTransactionDuration);
+                    List<CamundaTask> candidateTasks = connector.retrieveCamundaTasks(lastRetrievedMinusTransactionDuration);
+                    LOGGER.info("Candidate tasks retrieved from camunda: {}", LoggerUtils.listToString(candidateTasks));
 
-            List<CamundaTask> candidateTasks = connector.retrieveCamundaTasks(lastRetrievedMinusTransactionDuration);
-            LOGGER.info("Candidate tasks retrieved from camunda: {}", LoggerUtils.listToString(candidateTasks));
+                    List<CamundaTask> tasksToStart = findNewTasksInListOfCandidateTasks(connector.getCamundaSystemURL(), candidateTasks);
+                    if (LOGGER.isInfoEnabled()) {
+                        LOGGER.info("About to create taskana tasks for {} ", LoggerUtils.listToString(tasksToStart.stream().map(CamundaTask::getId)
+                            .collect(Collectors.toList())));
+                    }
 
-            List<CamundaTask> tasksToStart = findNewTasksInListOfCandidateTasks(connector.getCamundaSystemURL(), candidateTasks);
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("About to create taskana tasks for {} ", LoggerUtils.listToString(tasksToStart.stream().map(CamundaTask::getId)
-                                                                                .collect(Collectors.toList())));
+                    timestampMapper.rememberCamundaQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), connector.getCamundaSystemURL());
+
+                    for (CamundaTask camundaTask : tasksToStart) {
+                        camundaTask.setCamundaSystemURL(connector.getCamundaSystemURL());
+                        createTaskanaTask(camundaTask);
+                    }
+                } finally {
+                    returnConnection();
+                }
             }
-            for (CamundaTask camundaTask : tasksToStart) {
-                camundaTask.setCamundaSystemURL(connector.getCamundaSystemURL());
-                createTaskanaTask(camundaTask);
-            }
+        } finally {
+            isRunningCreateTaskanaTasksFromCamundaTasks = false;
         }
     }
 
@@ -182,7 +230,7 @@ public class Scheduler {
     }
 
     private void initDatabase() {
-        AdapterSchemaCreator schemaCreator = new AdapterSchemaCreator(clientCfg.dataSource(clientCfg.dataSourceProperties()), "TKA");
+        AdapterSchemaCreator schemaCreator = new AdapterSchemaCreator(clientCfg.dataSource(), schemaName);
         try {
             schemaCreator.run();
         } catch (SQLException e) {
