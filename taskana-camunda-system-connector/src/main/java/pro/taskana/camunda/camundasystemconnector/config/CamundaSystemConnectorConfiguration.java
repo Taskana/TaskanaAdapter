@@ -7,21 +7,34 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.web.client.RestTemplate;
 
+import pro.taskana.camunda.camundasystemconnector.api.impl.CamundaTaskCompleter;
 import pro.taskana.camunda.camundasystemconnector.api.impl.CamundaTaskRetriever;
+import pro.taskana.camunda.camundasystemconnector.api.impl.CamundaVariableRetriever;
 
 @Configuration
 @DependsOn(value= {"springContextProvider"})
 public class CamundaSystemConnectorConfiguration {
 
     @Bean
-    CamundaSystemUrls camundaSystemUrls(@Value("${taskana-camunda-camundasystemconnector.camundaSystemURLs}") final String strCamundaSystemurls) {
-        return new CamundaSystemUrls(strCamundaSystemurls);
+    CamundaSystemUrls camundaSystemUrls(@Value("${taskana-camunda-camundasystemconnector.camundaSystemURLs}") final String strUrls) {
+        return new CamundaSystemUrls(strUrls);
+    }
+    
+    @Bean
+    CamundaTaskRetriever camundaTaskRetriever() {
+        return new CamundaTaskRetriever();
     }
 
     @Bean
-    CamundaTaskRetriever camundaTaskRetriever(RestTemplateBuilder builder) {
-        return new CamundaTaskRetriever(builder);
+    CamundaTaskCompleter camundaTaskCompleter() {
+        return new CamundaTaskCompleter();
     }
+
+    @Bean
+    CamundaVariableRetriever camundaVariableRetriever() {
+        return new CamundaVariableRetriever();
+    }
+
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {

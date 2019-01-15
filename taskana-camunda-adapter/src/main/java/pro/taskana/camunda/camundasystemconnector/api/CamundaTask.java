@@ -1,7 +1,5 @@
 package pro.taskana.camunda.camundasystemconnector.api;
 
-import org.json.JSONObject;
-
 /**
  * POJO that represents a Camunda task.
  *
@@ -31,7 +29,8 @@ public class CamundaTask {
     private String formKey;
     private String tenantId;
     private String camundaSystemURL;
-    private JSONObject variables;
+    private String inputVariables;
+    private String outputVariables;
 
     public String getId() {
         return id;
@@ -209,24 +208,33 @@ public class CamundaTask {
         this.camundaSystemURL = camundaSystemName;
     }
 
-    public JSONObject getVariables() {
-        return variables;
+    public String getInputVariables() {
+        return inputVariables;
     }
 
-        public void setVariables(JSONObject variables) {
-        this.variables = variables;
+    public void setInputVariables(String inputVariables) {
+        this.inputVariables = inputVariables;
     }
 
-        @Override
-        public String toString() {
-            return "CamundaTask [id=" + id + ", name=" + name + ", assignee=" + assignee + ", created=" + created
-                + ", due=" + due + ", followUp=" + followUp + ", delegationState=" + delegationState + ", description="
-                + description + ", executionId=" + executionId + ", owner=" + owner + ", parentTaskId=" + parentTaskId
-                + ", priority=" + priority + ", processDefinitionId=" + processDefinitionId + ", processInstanceId="
-                + processInstanceId + ", taskDefinitionKey=" + taskDefinitionKey + ", caseExecutionId="
-                + caseExecutionId + ", caseInstanceId=" + caseInstanceId + ", caseDefinitionId=" + caseDefinitionId
-                + ", suspended=" + suspended + ", formKey=" + formKey + ", tenantId=" + tenantId + ", camundaSystemURL="
-                + camundaSystemURL + ", variables=" + variables + "]";
-        }
+    public String getOutputVariables() {
+        return outputVariables;
+    }
+
+    public void setOutputVariables(String outputVariables) {
+        this.outputVariables = outputVariables;
+    }
+
+    @Override
+    public String toString() {
+        return "CamundaTask [id=" + id + ", name=" + name + ", assignee=" + assignee + ", created=" + created + ", due="
+            + due + ", followUp=" + followUp + ", delegationState=" + delegationState + ", description=" + description
+            + ", executionId=" + executionId + ", owner=" + owner + ", parentTaskId=" + parentTaskId + ", priority="
+            + priority + ", processDefinitionId=" + processDefinitionId + ", processInstanceId=" + processInstanceId
+            + ", taskDefinitionKey=" + taskDefinitionKey + ", caseExecutionId=" + caseExecutionId + ", caseInstanceId="
+            + caseInstanceId + ", caseDefinitionId=" + caseDefinitionId + ", suspended=" + suspended + ", formKey="
+            + formKey + ", tenantId=" + tenantId + ", camundaSystemURL=" + camundaSystemURL + ", inputVariables="
+            + inputVariables + ", outputVariables=" + outputVariables + "]";
+    }
+
 
 }
