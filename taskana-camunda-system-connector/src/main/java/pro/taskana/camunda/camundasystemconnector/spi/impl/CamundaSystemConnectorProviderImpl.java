@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.DependsOn;
 
 import pro.taskana.camunda.camundasystemconnector.api.CamundaSystemConnector;
 import pro.taskana.camunda.camundasystemconnector.api.impl.CamundaSystemConnectorImpl;
@@ -29,7 +28,7 @@ public class CamundaSystemConnectorProviderImpl implements CamundaSystemConnecto
 
         List<CamundaSystemConnector> result = new ArrayList<>();
         for (String camundaSystemURL : camundaSystemURLs.getUrls()) {
-            result.add( new CamundaSystemConnectorImpl(camundaSystemURL));
+            result.add(new CamundaSystemConnectorImpl(camundaSystemURL));
         }
 
         return result;
