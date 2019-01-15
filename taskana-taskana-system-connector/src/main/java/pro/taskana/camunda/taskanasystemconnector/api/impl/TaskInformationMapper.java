@@ -20,6 +20,7 @@ import pro.taskana.ObjectReference;
 import pro.taskana.Task;
 import pro.taskana.TaskService;
 import pro.taskana.Workbasket;
+import pro.taskana.WorkbasketAccessItem;
 import pro.taskana.WorkbasketService;
 import pro.taskana.WorkbasketType;
 import pro.taskana.camunda.camundasystemconnector.api.CamundaTask;
@@ -55,13 +56,10 @@ public class TaskInformationMapper {
     private static final String DEFAULT_SYSTEM_INSTANCE = "DEFAULT_SYSTEM_INSTANCE";
     private static final String DEFAULT_TYPE = "DEFAULT_TYPE";
     private static final String DEFAULT_VALUE = "DEFAULT_VALUE";
-    private static final String CAMUNDA_TASK_ID = "camunda_task_id";
-    private static final String CAMUNDA_SYSTEM_URL = "camunda_system_url";
-       
-    
+
     public Task convertToTaskanaTask(CamundaTask camundaTask) 
         throws DomainNotFoundException, InvalidWorkbasketException, NotAuthorizedException,
-        WorkbasketAlreadyExistException, ClassificationAlreadyExistException, InvalidArgumentException {
+        WorkbasketAlreadyExistException, ClassificationAlreadyExistException, InvalidArgumentException, WorkbasketNotFoundException {
         
         
         Workbasket workbasket = findOrCreateWorkbasket(camundaTask.getAssignee());
@@ -70,8 +68,10 @@ public class TaskInformationMapper {
 
         TaskImpl taskanaTask = (TaskImpl) taskService.newTask(workbasket.getId());
         HashMap<String, String> callbackInfo = new HashMap<>();
-        callbackInfo.put(CAMUNDA_TASK_ID, camundaTask.getId());
-        callbackInfo.put(CAMUNDA_SYSTEM_URL, camundaTask.getCamundaSystemURL());
+        callbackInfo.put(TaskanaSystemConnectorImpl.CAMUNDA_TASK_ID, camundaTask.getId());
+        callbackInfo.put(TaskanaSystemConnectorImpl.CAMUNDA_SYSTEM_URL, camundaTask.getCamundaSystemURL());
+        callbackInfo.put(TaskanaSystemConnectorImpl.CAMUNDA_TASK_INPUT_VARIABLES, camundaTask.getInputVariables());
+        callbackInfo.put(TaskanaSystemConnectorImpl.CAMUNDA_TASK_OUTPUT_VARIABLES, camundaTask.getOutputVariables());
         taskanaTask.setCallbackInfo(callbackInfo);
         taskanaTask.setExternalId(camundaTask.getId());
 
@@ -109,13 +109,15 @@ public class TaskInformationMapper {
 
 	public CamundaTask convertToCamundaTask(Task taskanaTask) {
         CamundaTask camundaTask = new CamundaTask();
-        camundaTask.setCamundaSystemURL(taskanaTask.getCallbackInfo().get(CAMUNDA_SYSTEM_URL));
-        camundaTask.setId(taskanaTask.getCallbackInfo().get(CAMUNDA_TASK_ID));
+        camundaTask.setCamundaSystemURL(taskanaTask.getCallbackInfo().get(TaskanaSystemConnectorImpl.CAMUNDA_SYSTEM_URL));
+        camundaTask.setId(taskanaTask.getCallbackInfo().get(TaskanaSystemConnectorImpl.CAMUNDA_TASK_ID));
+        camundaTask.setInputVariables(taskanaTask.getCallbackInfo().get(TaskanaSystemConnectorImpl.CAMUNDA_TASK_INPUT_VARIABLES));
+        camundaTask.setOutputVariables(taskanaTask.getCallbackInfo().get(TaskanaSystemConnectorImpl.CAMUNDA_TASK_OUTPUT_VARIABLES));
         camundaTask.setName(taskanaTask.getName());
         camundaTask.setDescription(taskanaTask.getDescription());
         camundaTask.setAssignee(taskanaTask.getOwner());
         camundaTask.setProcessInstanceId(taskanaTask.getBusinessProcessId());
-        return null;
+        return camundaTask;
     }
 
     private Instant parseDate(String date) {
@@ -155,7 +157,7 @@ public class TaskInformationMapper {
     }
     
     private Workbasket findOrCreateWorkbasket(String key) throws DomainNotFoundException,
-    InvalidWorkbasketException, NotAuthorizedException, WorkbasketAlreadyExistException {
+    InvalidWorkbasketException, NotAuthorizedException, WorkbasketAlreadyExistException, WorkbasketNotFoundException, InvalidArgumentException {
     if (key == null) {
         key = DEFAULT_WORKBASKET;
     }
@@ -165,11 +167,25 @@ public class TaskInformationMapper {
     } catch (WorkbasketNotFoundException e) {
         wb = workbasketService.newWorkbasket(key, DEFAULT_DOMAIN);
         wb.setName(key);
+        wb.setOwner(key);
         wb.setType(WorkbasketType.PERSONAL);
         wb = workbasketService.createWorkbasket(wb);
+        createWorkbasketAccessList(wb);
     }
     return wb;
 }
+
+    private void createWorkbasketAccessList(Workbasket wb) throws WorkbasketNotFoundException, InvalidArgumentException, NotAuthorizedException {
+        WorkbasketAccessItem workbasketAccessItem = workbasketService.newWorkbasketAccessItem(wb.getId(), wb.getOwner());
+        workbasketAccessItem.setAccessName(wb.getOwner());
+        workbasketAccessItem.setPermAppend(true);
+        workbasketAccessItem.setPermTransfer(true);
+        workbasketAccessItem.setPermRead(true);
+        workbasketAccessItem.setPermOpen(true);
+        workbasketAccessItem.setPermDistribute(true);
+        workbasketService.createWorkbasketAccessItem(workbasketAccessItem);
+        
+    }
 
 
     

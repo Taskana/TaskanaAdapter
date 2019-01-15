@@ -25,11 +25,8 @@ public class CamundaTaskRetriever {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskRetriever.class);
 
+    @Autowired
     private RestTemplate restTemplate;
-
-    public CamundaTaskRetriever(RestTemplateBuilder builder) {
-        this.restTemplate = builder.build();
-    }
 
     public List<CamundaTask> retrieveCamundaTasks(String camundaSystemURL, Instant createdAfter) {
         LOGGER.debug("entry to retrieveCamundaTasks. CamundSystemURL = {}, createdAfter = {} ",camundaSystemURL, createdAfter );

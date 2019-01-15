@@ -19,13 +19,21 @@ public interface CamundaSystemConnector {
     List<CamundaTask> retrieveCamundaTasks(Instant createdAfter);
 
     /**
+     * Get the input variables of a camund task.
+     *
+     * @param taskId    the Id of the camunda task.
+     * @return the input variables of the camunda task.
+     */
+    String retrieveTaskVariables(String taskId);
+
+    /**
      * Instruct Camunda to complete a human task.
      *
-     * @param taskId  the Id of the task that is to be completed.
+     * @param task  the task to be completed.
      *
      * @return the response from camunda.
      */
-    CamundaResponse completeCamundaTask(String taskId);
+    CamundaResponse completeCamundaTask(CamundaTask task);
 
     /**
      * Get the URL of the camunda system this connector connects to.
@@ -33,4 +41,5 @@ public interface CamundaSystemConnector {
      * @return the URL of the connected camunda system.
      */
     String getCamundaSystemURL();
+
 }

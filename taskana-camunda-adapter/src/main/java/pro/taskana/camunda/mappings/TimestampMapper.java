@@ -69,9 +69,10 @@ public interface TimestampMapper {
     @Select("<script>SELECT MAX(COMPLETED) FROM TASKS_COMPLETED </script>")
     Instant getLatestCompletedTimestamp();
 
-    @Insert("INSERT INTO TASKS_COMPLETED (ID, COMPLETED) VALUES (#{id}, #{completed})")
-    void insertCompletedTimestamp(@Param("id") String id,
-        @Param("completed") Instant completed);
+    @Insert("INSERT INTO TASKS_COMPLETED (ID, COMPLETED, CAMUNDA_SYSTEM_URL) VALUES (#{id}, #{completed}, #{camundaSystemUrl})")
+    void registerTaskCompleted(@Param("id") String id,
+        @Param("completed") Instant completed,
+        @Param("camundaSystemUrl") String camundaSystemUrl);
 
     @Delete("<script>DELETE TASKS_COMPLETED</script>")
     void clearCompletedTable();
