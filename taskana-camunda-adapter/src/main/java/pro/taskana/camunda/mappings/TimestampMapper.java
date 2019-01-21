@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 /**
  * Mapper for the Timestamps of the last creation Taskana tasks or completion of Camunda tasks.
@@ -28,14 +29,14 @@ public interface TimestampMapper {
 
     @Select("<script>"
         + "SELECT MAX(CREATED) "
-        + "FROM TASKS_CREATED "
+        + "FROM TASKS "
         + "WHERE CAMUNDA_SYSTEM_URL = #{camundaSystemUrl}"
         + "</script>")
     Instant getLatestCreatedTaskCreationTimestamp(@Param("camundaSystemUrl") String camundaSystemUrl);
 
     @Select("<script>"
         + "SELECT ID "
-        + "FROM TASKS_CREATED "
+        + "FROM TASKS "
         + "WHERE (CAMUNDA_SYSTEM_URL = #{camundaSystemUrl} "
         + "AND  ID IN (<foreach item='item' collection='taskIdsIn' separator=',' >#{item}</foreach>))"
         + "</script>")
@@ -44,13 +45,14 @@ public interface TimestampMapper {
 
     @Select("<script>"
         + "SELECT ID "
-        + "FROM TASKS_COMPLETED "
-        + "WHERE ID IN (<foreach item='item' collection='taskIdsIn' separator=',' >#{item}</foreach>)"
+        + "FROM TASKS "
+        + "WHERE ID IN (<foreach item='item' collection='taskIdsIn' separator=',' >#{item}</foreach>) "
+        + "AND NOT (COMPLETED IS NULL) "
         + "</script>")
     @Results(value = {@Result(property = "taskId", column = "ID")})
     List<String> findAlreadyCompletedTaskIds(@Param("taskIdsIn") List<String> taskIdsIn);
 
-    @Insert("INSERT INTO TASKS_CREATED (ID, CREATED, CAMUNDA_SYSTEM_URL) VALUES (#{id}, #{created}, #{camundaSystemUrl})")
+    @Insert("INSERT INTO TASKS (ID, CREATED, CAMUNDA_SYSTEM_URL) VALUES (#{id}, #{created}, #{camundaSystemUrl})")
     void registerCreatedTask(@Param("id") String id,
         @Param("created") Instant created,
         @Param("camundaSystemUrl") String camundaSystemUrl);
@@ -60,21 +62,17 @@ public interface TimestampMapper {
         @Param("queryTimestamp") Instant queryTimestamp,
         @Param("camundaSystemUrl") String camundaSystemUrl);
 
-    @Delete("<script>"
-        + "DELETE FROM TASKS_CREATED "
-        + "WHERE CAMUNDA_SYSTEM_URL = #{camundaSystemUrl}"
-        + "</script>")
-    void removeLatestCreatedTimestamp(@Param("camundaSystemUrl") String camundaSystemUrl);
-
-    @Select("<script>SELECT MAX(COMPLETED) FROM TASKS_COMPLETED </script>")
+    @Select("<script>SELECT MAX(COMPLETED) FROM TASKS </script>")
     Instant getLatestCompletedTimestamp();
 
-    @Insert("INSERT INTO TASKS_COMPLETED (ID, COMPLETED, CAMUNDA_SYSTEM_URL) VALUES (#{id}, #{completed}, #{camundaSystemUrl})")
+    @Update("UPDATE TASKS SET COMPLETED = #{completed} where ID = #{id}")
     void registerTaskCompleted(@Param("id") String id,
-        @Param("completed") Instant completed,
-        @Param("camundaSystemUrl") String camundaSystemUrl);
+        @Param("completed") Instant completed);
 
-    @Delete("<script>DELETE TASKS_COMPLETED</script>")
-    void clearCompletedTable();
+    @Delete("DELETE FROM TASKS WHERE COMPLETED < ${completedBefore}")
+    void cleanupTasksCompletedBefore(@Param("completedBefore") Instant completedBefore);
+
+    @Delete("DELETE FROM LAST_QUERY_TIME where QUERY_TIMESTAMP < #{queriedBefore ")
+    void cleanupQueryTimestamps(@Param("queriedBefore") Instant queriedBefore);
 
 }
