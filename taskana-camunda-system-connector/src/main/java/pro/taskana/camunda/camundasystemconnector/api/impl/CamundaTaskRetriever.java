@@ -45,6 +45,9 @@ public class CamundaTaskRetriever {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
         CamundaTask[] tasks = restTemplate.postForEntity(requestUrl, entity, CamundaTask[].class).getBody();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("exit from retrieveCamundaTasks. Retrieved Tasks: {}",Arrays.toString(tasks) );
+        }
         return Arrays.asList(tasks);
     }    
 }

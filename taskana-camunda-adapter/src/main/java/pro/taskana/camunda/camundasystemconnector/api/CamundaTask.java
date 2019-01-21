@@ -236,5 +236,219 @@ public class CamundaTask {
             + inputVariables + ", outputVariables=" + outputVariables + "]";
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((assignee == null) ? 0 : assignee.hashCode());
+        result = prime * result + ((camundaSystemURL == null) ? 0 : camundaSystemURL.hashCode());
+        result = prime * result + ((caseDefinitionId == null) ? 0 : caseDefinitionId.hashCode());
+        result = prime * result + ((caseExecutionId == null) ? 0 : caseExecutionId.hashCode());
+        result = prime * result + ((caseInstanceId == null) ? 0 : caseInstanceId.hashCode());
+        result = prime * result + ((created == null) ? 0 : created.hashCode());
+        result = prime * result + ((delegationState == null) ? 0 : delegationState.hashCode());
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + ((due == null) ? 0 : due.hashCode());
+        result = prime * result + ((executionId == null) ? 0 : executionId.hashCode());
+        result = prime * result + ((followUp == null) ? 0 : followUp.hashCode());
+        result = prime * result + ((formKey == null) ? 0 : formKey.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((inputVariables == null) ? 0 : inputVariables.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((outputVariables == null) ? 0 : outputVariables.hashCode());
+        result = prime * result + ((owner == null) ? 0 : owner.hashCode());
+        result = prime * result + ((parentTaskId == null) ? 0 : parentTaskId.hashCode());
+        result = prime * result + ((priority == null) ? 0 : priority.hashCode());
+        result = prime * result + ((processDefinitionId == null) ? 0 : processDefinitionId.hashCode());
+        result = prime * result + ((processInstanceId == null) ? 0 : processInstanceId.hashCode());
+        result = prime * result + ((suspended == null) ? 0 : suspended.hashCode());
+        result = prime * result + ((taskDefinitionKey == null) ? 0 : taskDefinitionKey.hashCode());
+        result = prime * result + ((tenantId == null) ? 0 : tenantId.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        CamundaTask other = (CamundaTask) obj;
+        if (assignee == null) {
+            if (other.assignee != null) {
+                return false;
+            }
+        } else if (!assignee.equals(other.assignee)) {
+            return false;
+        }
+        if (camundaSystemURL == null) {
+            if (other.camundaSystemURL != null) {
+                return false;
+            }
+        } else if (!camundaSystemURL.equals(other.camundaSystemURL)) {
+            return false;
+        }
+        if (caseDefinitionId == null) {
+            if (other.caseDefinitionId != null) {
+                return false;
+            }
+        } else if (!caseDefinitionId.equals(other.caseDefinitionId)) {
+            return false;
+        }
+        if (caseExecutionId == null) {
+            if (other.caseExecutionId != null) {
+                return false;
+            }
+        } else if (!caseExecutionId.equals(other.caseExecutionId)) {
+            return false;
+        }
+        if (caseInstanceId == null) {
+            if (other.caseInstanceId != null) {
+                return false;
+            }
+        } else if (!caseInstanceId.equals(other.caseInstanceId)) {
+            return false;
+        }
+        if (created == null) {
+            if (other.created != null) {
+                return false;
+            }
+        } else if (!created.equals(other.created)) {
+            return false;
+        }
+        if (delegationState == null) {
+            if (other.delegationState != null) {
+                return false;
+            }
+        } else if (!delegationState.equals(other.delegationState)) {
+            return false;
+        }
+        if (description == null) {
+            if (other.description != null) {
+                return false;
+            }
+        } else if (!description.equals(other.description)) {
+            return false;
+        }
+        if (due == null) {
+            if (other.due != null) {
+                return false;
+            }
+        } else if (!due.equals(other.due)) {
+            return false;
+        }
+        if (executionId == null) {
+            if (other.executionId != null) {
+                return false;
+            }
+        } else if (!executionId.equals(other.executionId)) {
+            return false;
+        }
+        if (followUp == null) {
+            if (other.followUp != null) {
+                return false;
+            }
+        } else if (!followUp.equals(other.followUp)) {
+            return false;
+        }
+        if (formKey == null) {
+            if (other.formKey != null) {
+                return false;
+            }
+        } else if (!formKey.equals(other.formKey)) {
+            return false;
+        }
+        if (id == null) {
+            if (other.id != null) {
+                return false;
+            }
+        } else if (!id.equals(other.id)) {
+            return false;
+        }
+        if (inputVariables == null) {
+            if (other.inputVariables != null) {
+                return false;
+            }
+        } else if (!inputVariables.equals(other.inputVariables)) {
+            return false;
+        }
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        if (outputVariables == null) {
+            if (other.outputVariables != null) {
+                return false;
+            }
+        } else if (!outputVariables.equals(other.outputVariables)) {
+            return false;
+        }
+        if (owner == null) {
+            if (other.owner != null) {
+                return false;
+            }
+        } else if (!owner.equals(other.owner)) {
+            return false;
+        }
+        if (parentTaskId == null) {
+            if (other.parentTaskId != null) {
+                return false;
+            }
+        } else if (!parentTaskId.equals(other.parentTaskId)) {
+            return false;
+        }
+        if (priority == null) {
+            if (other.priority != null) {
+                return false;
+            }
+        } else if (!priority.equals(other.priority)) {
+            return false;
+        }
+        if (processDefinitionId == null) {
+            if (other.processDefinitionId != null) {
+                return false;
+            }
+        } else if (!processDefinitionId.equals(other.processDefinitionId)) {
+            return false;
+        }
+        if (processInstanceId == null) {
+            if (other.processInstanceId != null) {
+                return false;
+            }
+        } else if (!processInstanceId.equals(other.processInstanceId)) {
+            return false;
+        }
+        if (suspended == null) {
+            if (other.suspended != null) {
+                return false;
+            }
+        } else if (!suspended.equals(other.suspended)) {
+            return false;
+        }
+        if (taskDefinitionKey == null) {
+            if (other.taskDefinitionKey != null) {
+                return false;
+            }
+        } else if (!taskDefinitionKey.equals(other.taskDefinitionKey)) {
+            return false;
+        }
+        if (tenantId == null) {
+            if (other.tenantId != null) {
+                return false;
+            }
+        } else if (!tenantId.equals(other.tenantId)) {
+            return false;
+        }
+        return true;
+    }
+
 
 }
