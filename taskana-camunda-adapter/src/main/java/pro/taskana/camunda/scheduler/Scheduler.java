@@ -16,6 +16,7 @@ import org.apache.ibatis.session.SqlSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +49,12 @@ public class Scheduler {
     private static final int TOTAL_TRANSACTON_LIFE_TIME = 120;
     private boolean isRunningCreateTaskanaTasksFromCamundaTasks = false;
     private boolean isRunningCompleteCamundaTasks = false;
+    private boolean isRunningCleanupTaskanaCamundaAdapterTables = false;
+
+    @Value("@{taskanaCamundaAdapter.scheduler.task.age.for.cleanup.in.hours}")
+    private String strTaskAgeForCleanupInHours;
+
+    private final long maxTaskAgeBeforeCleanup;
 
     @Autowired
     private RestClientConfiguration clientCfg;
@@ -63,6 +70,13 @@ public class Scheduler {
 
     private Map<String, CamundaSystemConnector> camundaSystemConnectors;
     private List<TaskanaSystemConnector> taskanaSystemConnectors;
+
+    public Scheduler() {
+
+        maxTaskAgeBeforeCleanup = strTaskAgeForCleanupInHours != null
+                                    ? Long.getLong(strTaskAgeForCleanupInHours).longValue() : 5000;
+
+    }
 
     private void openConnection() {
         initSqlSession();
@@ -87,11 +101,31 @@ public class Scheduler {
         }
     }
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(cron = "${taskanaCamundaAdapter.scheduler.run.interval.for.cleanup.tasks.cron}")
+    public void cleanupTaskanaCamundaAdapterTables() {
+        LOGGER.info("----------cleanupTaskanaCamundaAdapterTables started----------------------------");
+        if (isRunningCleanupTaskanaCamundaAdapterTables) {
+            LOGGER.info("----------cleanupTaskanaCamundaAdapterTables stopped - another instance is already running ----------------------------");
+            return;
+        }
+        try {
+            isRunningCleanupTaskanaCamundaAdapterTables = true;
+            Instant completedBefore = Instant.now().minus(Duration.ofHours(maxTaskAgeBeforeCleanup));
+            timestampMapper.cleanupTasksCompletedBefore(completedBefore);
+            timestampMapper.cleanupQueryTimestamps(completedBefore);
+        } catch (Exception ex) {
+            LOGGER.error("Caught {} while cleaning up aged Taskana Camunda adapter tables", ex);
+        } finally {
+            isRunningCleanupTaskanaCamundaAdapterTables = false;
+        }
+    }
+
+
+    @Scheduled(fixedRateString = "${taskanaCamundaAdapter.scheduler.run.interval.for.start.taskana.tasks.in.milliseconds}")
     public void createTaskanaTasksFromCamundaTasks() {
-        LOGGER.error("----------createTaskanaTasksFromCamundaTasks started----------------------------");
+        LOGGER.info("----------createTaskanaTasksFromCamundaTasks started----------------------------");
         if (isRunningCreateTaskanaTasksFromCamundaTasks) {
-            LOGGER.error("----------createTaskanaTasksFromCamundaTasks stopped - another instance is already running ----------------------------");
+            LOGGER.info("----------createTaskanaTasksFromCamundaTasks stopped - another instance is already running ----------------------------");
             return;
         }
         try {
@@ -121,14 +155,20 @@ public class Scheduler {
                     timestampMapper.rememberCamundaQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), connector.getCamundaSystemURL());
 
                     for (CamundaTask camundaTask : tasksToStart) {
-                        camundaTask.setCamundaSystemURL(connector.getCamundaSystemURL());
-                        addVariablesToCamundaTask(camundaTask, connector);
-                        createTaskanaTask(camundaTask);
+                        try {
+                            camundaTask.setCamundaSystemURL(connector.getCamundaSystemURL());
+                            addVariablesToCamundaTask(camundaTask, connector);
+                            createTaskanaTask(camundaTask);
+                        } catch (Exception ex) {
+                            LOGGER.error("Caught {} when trying to create Taskana task for {}", ex, camundaTask);
+                        }
                     }
                 } finally {
                     returnConnection();
                 }
             }
+        } catch (Exception ex) {
+            LOGGER.error("Caught {} while trying to create Taskana tasks from Camunda tasks", ex);
         } finally {
             isRunningCreateTaskanaTasksFromCamundaTasks = false;
         }
@@ -141,7 +181,7 @@ public class Scheduler {
     }
 
     @Transactional
-    private void createTaskanaTask(CamundaTask camundaTask) {
+    public void createTaskanaTask(CamundaTask camundaTask) {
         Assert.assertion(taskanaSystemConnectors.size() == 1, "taskanaSystemConnectors.size() == 1");
         TaskanaSystemConnector connector = taskanaSystemConnectors.get(0);
         try {
@@ -171,11 +211,11 @@ public class Scheduler {
             .collect(Collectors.toList());
     }
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRateString = "${taskanaCamundaAdapter.scheduler.run.interval.for.complete.camunda.tasks.in.milliseconds}")
     public void completeCamundaTasks() {
-        LOGGER.error("----------completeCamundaTasks started----------------------------");
+        LOGGER.info("----------completeCamundaTasks started----------------------------");
         if (isRunningCompleteCamundaTasks) {
-            LOGGER.error("----------completeCamundaTasks stopped - another instance is already running ----------------------------");
+            LOGGER.info("----------completeCamundaTasks stopped - another instance is already running ----------------------------");
             return;
         }
         try {
@@ -204,16 +244,18 @@ public class Scheduler {
             } finally {
                 returnConnection();
             }
+        } catch (Exception ex) {
+            LOGGER.error("Caught {} while trying to complete Camunda tasks", ex);
         } finally {
             isRunningCompleteCamundaTasks = false;
         }
     }
 
     @Transactional
-    private void completeCamundaTask(CamundaTask camundaTask) {
+    public void completeCamundaTask(CamundaTask camundaTask) {
         CamundaSystemConnector connector = camundaSystemConnectors.get(camundaTask.getCamundaSystemURL());
         if (connector != null) {
-            timestampMapper.registerTaskCompleted(camundaTask.getId(), Instant.now(), camundaTask.getCamundaSystemURL());
+            timestampMapper.registerTaskCompleted(camundaTask.getId(), Instant.now());
             connector.completeCamundaTask(camundaTask);
         } else {
             throw new SystemException("couldnt find a connector for CamundaSystemUrl " + camundaTask.getCamundaSystemURL());
@@ -273,4 +315,5 @@ public class Scheduler {
             e.printStackTrace();
         }
     }
+
 }
