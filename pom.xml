@@ -2,7 +2,7 @@
                  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <modelVersion>4.0.0</modelVersion>
         <groupId>pro.taskana</groupId>
-        <artifactId>taskana-camunda-adapter-parent</artifactId>
+        <artifactId>taskana-adapter-parent</artifactId>
         <version>0.0.1</version>
         <packaging>pom</packaging>
 
@@ -13,9 +13,9 @@
         </properties>
 
         <modules>
-                <module>taskana-camunda-adapter</module>
-                <module>taskana-camunda-system-connector</module>
-                <module>taskana-taskana-system-connector</module>
-                <module>taskana-camunda-adapter-sample</module>
+                <module>taskana-adapter</module>
+                <module>taskana-adapter-camunda-system-connector</module>
+                <module>taskana-adapter-taskana-connector</module>
+                <module>taskana-adapter-sample</module>
         </modules>
 </project>
