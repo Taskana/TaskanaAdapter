@@ -12,6 +12,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import pro.taskana.adapter.scheduler.AgentType;
+
 /**
  * Mapper for the Timestamps of the last creation of Taskana tasks or completion of general tasks.
  *
@@ -23,9 +25,9 @@ public interface TimestampMapper {
     @Select("<script>"
         + "SELECT MAX(QUERY_TIMESTAMP) "
         + "FROM LAST_QUERY_TIME "
-        + "WHERE SYSTEM_URL = #{systemUrl}"
+        + "WHERE SYSTEM_URL = #{systemUrl} AND AGENT_TYPE = #{agentType} "
         + "</script>")
-    Instant getLatestQueryTimestamp(@Param("systemUrl") String systemUrl);
+    Instant getLatestQueryTimestamp(@Param("systemUrl") String systemUrl, @Param("agentType") AgentType agentType);
 
     @Select("<script>"
         + "SELECT MAX(CREATED) "
@@ -33,6 +35,13 @@ public interface TimestampMapper {
         + "WHERE SYSTEM_URL = #{systemUrl}"
         + "</script>")
     Instant getLatestCreatedTaskCreationTimestamp(@Param("systemUrl") String systemUrl);
+
+    @Select("<script>"
+        + "SELECT MIN(CREATED) "
+        + "FROM TASKS "
+        + "WHERE SYSTEM_URL = #{systemUrl}"
+        + "</script>")
+    Instant getFirstCreatedTaskCreationTimestamp(@Param("systemUrl") String systemUrl);
 
     @Select("<script>"
         + "SELECT ID "
@@ -57,10 +66,12 @@ public interface TimestampMapper {
         @Param("created") Instant created,
         @Param("systemUrl") String systemUrl);
 
-    @Insert("INSERT INTO LAST_QUERY_TIME (ID, QUERY_TIMESTAMP, SYSTEM_URL) VALUES (#{id}, #{queryTimestamp}, #{systemUrl})")
-    void rememberSystemQueryTime(@Param("id") String id,
+    @Insert("INSERT INTO LAST_QUERY_TIME (ID, QUERY_TIMESTAMP, SYSTEM_URL, AGENT_TYPE) "
+        + "VALUES (#{id}, #{queryTimestamp}, #{systemUrl}, #{agentType})")
+    void rememberLastQueryTime(@Param("id") String id,
         @Param("queryTimestamp") Instant queryTimestamp,
-        @Param("systemUrl") String systemUrl);
+        @Param("systemUrl") String systemUrl,
+        @Param("agentType") AgentType agentType);
 
     @Select("<script>SELECT MAX(COMPLETED) FROM TASKS </script>")
     Instant getLatestCompletedTimestamp();
@@ -74,5 +85,14 @@ public interface TimestampMapper {
 
     @Delete(value = "DELETE FROM LAST_QUERY_TIME where QUERY_TIMESTAMP < #{queriedBefore}")
     void cleanupQueryTimestamps(@Param("queriedBefore") Instant queriedBefore);
+
+    @Select("<script>"
+        + "SELECT ID "
+        + "FROM TASKS "
+        + "WHERE ID IN (<foreach item='item' collection='taskIdsIn' separator=',' >#{item}</foreach>) "
+        + "AND (COMPLETED IS NULL) "
+        + "</script>")
+    @Results(value = {@Result(property = "taskId", column = "ID")})
+    List<String> findActiveTasks(@Param("systemUrl") String systemUrl, @Param("taskIdsIn") List<String> taskIdsIn);
 
 }

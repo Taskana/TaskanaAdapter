@@ -19,6 +19,15 @@ public interface SystemConnector {
     List<GeneralTask> retrieveGeneralTasks(Instant createdAfter);
 
     /**
+     * Retrieve General tasks that were finished after a specified instant.
+     *
+     * @param finishedAfter  the instant after which the tasks finished.
+     *
+     * @return a list of general tasks that were finished after the finishedAfter instant.
+     */
+    List<GeneralTask> retrieveFinishedTasks(Instant finishedAfter);
+
+    /**
      * Get the variables of a general task.
      *
      * @param taskId    the Id of the general task.
