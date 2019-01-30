@@ -50,7 +50,7 @@ public class RetrieveCamundaTaskAccTest {
     }
     
     @Test
-    public void testGetCamundaTasks() throws ParseException {
+    public void testGetActiveCamundaTasks() throws ParseException {
         
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         Date date = formatter.parse("2019-01-14T15:22:30.811+0100");
@@ -100,7 +100,67 @@ public class RetrieveCamundaTaskAccTest {
         .andExpect(content().string( expectedBody))
         .andRespond(withSuccess(expectedReplyBody, MediaType.APPLICATION_JSON));
 
-        List<GeneralTask> actualResult = taskRetriever.retrieveCamundaTasks(camundaSystemUrl, createdAfter);
+        List<GeneralTask> actualResult = taskRetriever.retrieveActiveCamundaTasks(camundaSystemUrl, createdAfter);
+        
+        assertNotNull(actualResult);
+        assertEquals(expectedTask, actualResult.get(0));
+    }
+    
+    //@Test
+    public void testGetFinishedCamundaTasks() throws ParseException {
+        
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        Date date = formatter.parse("2019-01-14T15:22:30.811+0100");
+        Instant createdAfter = date.toInstant();
+        
+        String expectedBody = "{\"finished\" : \"true\", \"createdAfter\": \"" + formatter.format(date) + "\"}";
+
+        GeneralTask expectedTask = new GeneralTask();
+        expectedTask.setId("801aca2e-1b25-11e9-b283-94819a5b525c");
+        expectedTask.setName("modify Request");
+        expectedTask.setCreated(formatter.format(date));
+        expectedTask.setPriority("50");
+        expectedTask.setSuspended("false");
+        
+//        GeneralTask[] expectedResultBody = new GeneralTask[] {expectedTask};
+//        ResponseEntity<GeneralTask[]> expectedResult = new ResponseEntity<GeneralTask[]>(expectedResultBody, HttpStatus.OK);
+        
+        String expectedReplyBody = "[{" +
+            "        \"id\": \"0146d379-fc67-11e8-84f7-94819a5b525c\",\r\n" + 
+            "        \"processDefinitionKey\": \"loan_approval\",\r\n" + 
+            "        \"processDefinitionId\": \"loan_approval:2:6c515a29-fc64-11e8-91c8-94819a5b525c\",\r\n" + 
+            "        \"processInstanceId\": \"0146ac63-fc67-11e8-84f7-94819a5b525c\",\r\n" + 
+            "        \"executionId\": \"0146ac63-fc67-11e8-84f7-94819a5b525c\",\r\n" + 
+            "        \"caseDefinitionKey\": null,\r\n" + 
+            "        \"caseDefinitionId\": null,\r\n" + 
+            "        \"caseInstanceId\": null,\r\n" + 
+            "        \"caseExecutionId\": null,\r\n" + 
+            "        \"activityInstanceId\": \"Task_1er4qhz:0146d378-fc67-11e8-84f7-94819a5b525c\",\r\n" + 
+            "        \"name\": null,\r\n" + 
+            "        \"description\": null,\r\n" + 
+            "        \"deleteReason\": \"completed\",\r\n" + 
+            "        \"owner\": null,\r\n" + 
+            "        \"assignee\": \"peter\",\r\n" + 
+            "        \"startTime\": \"2018-12-10T11:33:16.806+0100\",\r\n" + 
+            "        \"endTime\": \"2019-01-15T15:22:53.440+0100\",\r\n" + 
+            "        \"duration\": 3124176634,\r\n" + 
+            "        \"taskDefinitionKey\": \"Task_1er4qhz\",\r\n" + 
+            "        \"priority\": 50,\r\n" + 
+            "        \"due\": null,\r\n" + 
+            "        \"parentTaskId\": null,\r\n" + 
+            "        \"followUp\": null,\r\n" + 
+            "        \"tenantId\": null\r\n" + 
+            " }]";
+        
+        
+        String camundaSystemUrl = "http://localhost:8080/engine-rest";
+        mockServer.expect(requestTo(camundaSystemUrl + "history/task/" ))
+        .andExpect(method(HttpMethod.POST)) 
+        .andExpect(content().contentType( org.springframework.http.MediaType.APPLICATION_JSON))                
+        .andExpect(content().string( expectedBody))
+        .andRespond(withSuccess(expectedReplyBody, MediaType.APPLICATION_JSON));
+
+        List<GeneralTask> actualResult = taskRetriever.retrieveActiveCamundaTasks(camundaSystemUrl, createdAfter);
         
         assertNotNull(actualResult);
         assertEquals(expectedTask, actualResult.get(0));

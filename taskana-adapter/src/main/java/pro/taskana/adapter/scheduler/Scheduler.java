@@ -1,6 +1,8 @@
 package pro.taskana.adapter.scheduler;
 
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -50,6 +52,9 @@ public class Scheduler {
     private boolean isRunningCreateTaskanaTasksFromGeneralTasks = false;
     private boolean isRunningCompleteGeneralTasks = false;
     private boolean isRunningCleanupTaskanaAdapterTables = false;
+    private boolean isRunningRetrieveFinishedGeneralTasksAndTerminateCorrespondingTaskanaTasks = false;
+    private boolean isInitializing = true;
+    private boolean isFirstAttemptToProcessFinishedTasks = true;
 
     @Value("@{taskanaAdapter.scheduler.task.age.for.cleanup.in.hours}")
     private String strTaskAgeForCleanupInHours;
@@ -74,7 +79,7 @@ public class Scheduler {
     public Scheduler() {
 
         maxTaskAgeBeforeCleanup = strTaskAgeForCleanupInHours != null
-                                    ? Long.getLong(strTaskAgeForCleanupInHours).longValue() : 5000;
+            ? Long.getLong(strTaskAgeForCleanupInHours).longValue() : 5000;
 
     }
 
@@ -90,14 +95,14 @@ public class Scheduler {
     }
 
     private void initSqlSession() {
-       if (!this.sqlSessionManager.isManagedSessionStarted()) {
+        if (!this.sqlSessionManager.isManagedSessionStarted()) {
             this.sqlSessionManager.startManagedSession();
         }
     }
 
     private void returnConnection() {
         if (this.sqlSessionManager.isManagedSessionStarted()) {
-                this.sqlSessionManager.close();
+            this.sqlSessionManager.close();
         }
     }
 
@@ -123,10 +128,10 @@ public class Scheduler {
 
 
     @Scheduled(fixedRateString = "${taskanaAdapter.scheduler.run.interval.for.start.taskana.tasks.in.milliseconds}")
-    public void createTaskanaTasksFromGeneralTasks() {
-        LOGGER.info("----------createTaskanaTasksFromGeneralTasks started----------------------------");
+    public void retrieveGeneralTasksAndCreateCorrespondingTaskanaTasks() {
+        LOGGER.info("----------retrieveGeneralTasksAndCreateCorrespondingTaskanaTasks started----------------------------");
         if (isRunningCreateTaskanaTasksFromGeneralTasks) {
-            LOGGER.info("----------createTaskanaTasksFromGeneralTasks stopped - another instance is already running ----------------------------");
+            LOGGER.info("----------retrieveGeneralTasksAndCreateCorrespondingTaskanaTasks stopped - another instance is already running ----------------------------");
             return;
         }
         try {
@@ -134,15 +139,17 @@ public class Scheduler {
             for (SystemConnector systemConnector : (systemConnectors.values())) {
                 openConnection();
                 try {
-                    Instant lastRetrieved = timestampMapper.getLatestQueryTimestamp(systemConnector.getSystemURL());
+                    Instant lastRetrieved = timestampMapper.getLatestQueryTimestamp(systemConnector.getSystemURL(), AgentType.START_TASKANA_TASKS);
                     LOGGER.info("lastRetrieved is {}", lastRetrieved);
                     Instant lastRetrievedMinusTransactionDuration;
                     if (lastRetrieved != null) {
                         lastRetrievedMinusTransactionDuration = lastRetrieved.minus(Duration.ofSeconds(TOTAL_TRANSACTON_LIFE_TIME));
+                        isInitializing = false;
                     } else {
                         lastRetrievedMinusTransactionDuration = Instant.MIN;
                     }
                     LOGGER.info("searching for tasks started after {}", lastRetrievedMinusTransactionDuration);
+                    timestampMapper.rememberLastQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), systemConnector.getSystemURL(), AgentType.START_TASKANA_TASKS);
 
                     List<GeneralTask> candidateTasks = systemConnector.retrieveGeneralTasks(lastRetrievedMinusTransactionDuration);
                     if (LOGGER.isInfoEnabled()) {
@@ -154,10 +161,8 @@ public class Scheduler {
                             .collect(Collectors.toList())));
                     }
 
-                    timestampMapper.rememberSystemQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), systemConnector.getSystemURL());
-
                     for (GeneralTask generalTask : tasksToStart) {
-                            createTaskanaTask(generalTask, systemConnector);
+                        createTaskanaTask(generalTask, systemConnector);
                     }
                 } finally {
                     returnConnection();
@@ -168,7 +173,76 @@ public class Scheduler {
         } finally {
             isRunningCreateTaskanaTasksFromGeneralTasks = false;
             LOGGER.info("----------createTaskanaTasksFromGeneralTasks finished----------------------------");
-       }
+        }
+    }
+
+    @Scheduled(fixedRateString = "${taskanaAdapter.scheduler.run.interval.for.check.cancelled.general.tasks.in.milliseconds}")
+    public void retrieveFinishedGeneralTasksAndTerminateCorrespondingTaskanaTasks() {
+        LOGGER.info("----------retrieveFinishedGeneralTasksAndTerminateCorrespondingTaskanaTasks started----------------------------");
+        if (isInitializing) {
+            LOGGER.info("----------retrieveFinishedGeneralTasksAndTerminateCorrespondingTaskanaTasks stopped - the adapter is still not initialized  ----------------------------");
+            return;
+        }
+        if (isRunningRetrieveFinishedGeneralTasksAndTerminateCorrespondingTaskanaTasks) {
+            LOGGER.info("----------retrieveFinishedGeneralTasksAndTerminateCorrespondingTaskanaTasks stopped - another instance is already running ----------------------------");
+            return;
+        }
+
+        try {
+
+            isRunningRetrieveFinishedGeneralTasksAndTerminateCorrespondingTaskanaTasks = true;
+            for (SystemConnector systemConnector : (systemConnectors.values())) {
+                openConnection();
+
+                try {
+                    Instant lowerThreshold;
+                    if (isFirstAttemptToProcessFinishedTasks) {
+                        lowerThreshold = timestampMapper.getFirstCreatedTaskCreationTimestamp(systemConnector.getSystemURL())
+                            .minus(Duration.ofSeconds(TOTAL_TRANSACTON_LIFE_TIME));
+                        isFirstAttemptToProcessFinishedTasks = false;
+                    } else {
+                        Instant lastQuerytime = timestampMapper.getLatestQueryTimestamp(systemConnector.getSystemURL(), AgentType.HANDLE_FINISHED_GENERAL_TASKS);
+                        LOGGER.debug("lastQueryTime is {}", lastQuerytime);
+                        Assert.assertion(lastQuerytime != null, "lastQueryTime != null");
+                        lowerThreshold = lastQuerytime.minus(Duration.ofSeconds(TOTAL_TRANSACTON_LIFE_TIME));
+                        isInitializing = false;
+                    }
+
+                    timestampMapper.rememberLastQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), systemConnector.getSystemURL(), AgentType.HANDLE_FINISHED_GENERAL_TASKS);
+                    List<GeneralTask> tasksFinishedBySystem = systemConnector.retrieveFinishedTasks(lowerThreshold);
+                    List<GeneralTask> taskanaTasksToTerminate = determineTaskanaTasksToTerminate(tasksFinishedBySystem, systemConnector.getSystemURL());
+                    for (GeneralTask generalTask : taskanaTasksToTerminate) {
+                        terminateTaskanaTask(generalTask);
+                    }
+
+                } finally {
+                    returnConnection();
+                }
+            }
+        } finally {
+            isRunningRetrieveFinishedGeneralTasksAndTerminateCorrespondingTaskanaTasks = false;
+            LOGGER.info("----------retrieveFinishedGeneralTasksAndTerminateCorrespondingTaskanaTasks finished processing ----------------------------");
+        }
+    }
+
+    private void terminateTaskanaTask(GeneralTask generalTask) {
+        Assert.assertion(taskanaConnectors.size() == 1, "taskanaConnectors.size() == 1");
+        TaskanaConnector connector = taskanaConnectors.get(0);
+        try {
+           // connector.
+            timestampMapper.registerTaskCompleted(generalTask.getId(), Instant.now());
+        } catch (Exception ex) {
+
+        }
+
+    }
+
+    private List<GeneralTask> determineTaskanaTasksToTerminate(List<GeneralTask> tasksFinishedBySystem,
+        String systemURL) {
+        List<String> candidateTaskIds = tasksFinishedBySystem.stream().map(GeneralTask::getId).collect(Collectors.toList());
+        List<String> actualTaskIds = timestampMapper.findActiveTasks(systemURL, candidateTaskIds);
+        List<GeneralTask> result = tasksFinishedBySystem.stream().filter(t -> actualTaskIds.contains(t.getId())).collect(Collectors.toList());
+        return result;
     }
 
     private void addVariablesToGeneralTask(GeneralTask generalTask, SystemConnector connector) {
@@ -185,7 +259,17 @@ public class Scheduler {
             addVariablesToGeneralTask(generalTask, systemConnector);
             Task taskanaTask = connector.convertToTaskanaTask(generalTask);
             connector.createTaskanaTask(taskanaTask);
-            timestampMapper.registerCreatedTask(generalTask.getId(), Instant.now(), generalTask.getSystemURL());
+
+            Instant created;
+            try {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                created = formatter.parse(generalTask.getCreated()).toInstant();
+            } catch (ParseException excpt) {
+                LOGGER.error("Caught {} when trying to parse created timestamp {} ", excpt, generalTask.getCreated());
+                created = Instant.now();
+            }
+
+            timestampMapper.registerCreatedTask(generalTask.getId(), created, generalTask.getSystemURL());
         } catch (TaskCreationFailedException | TaskConversionFailedException e) {
             LOGGER.error("Caught {} when creating a task in taskana for general task {}", e, generalTask);
         }
@@ -252,13 +336,13 @@ public class Scheduler {
     @Transactional
     public void completeGeneralTask(GeneralTask generalTask) {
         try {
-        SystemConnector connector = systemConnectors.get(generalTask.getSystemURL());
-        if (connector != null) {
-            timestampMapper.registerTaskCompleted(generalTask.getId(), Instant.now());
-            connector.completeGeneralTask(generalTask);
-        } else {
-            throw new SystemException("couldnt find a connector for systemUrl " + generalTask.getSystemURL());
-        }
+            SystemConnector connector = systemConnectors.get(generalTask.getSystemURL());
+            if (connector != null) {
+                timestampMapper.registerTaskCompleted(generalTask.getId(), Instant.now());
+                connector.completeGeneralTask(generalTask);
+            } else {
+                throw new SystemException("couldnt find a connector for systemUrl " + generalTask.getSystemURL());
+            }
         } catch (Exception ex) {
             LOGGER.error("Caught {} when attempting to complete general task {}", ex, generalTask);
         }
