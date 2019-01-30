@@ -23,6 +23,7 @@ import pro.taskana.adapter.systemconnector.api.GeneralTask;
 public class CamundaSystemConnectorImpl implements SystemConnector {
     
     static final String URL_GET_CAMUNDA_TASKS = "/task/";
+    static final String URL_GET_CAMUNDA_HISTORIC_TASKS = "/history/task/";
     static final String URL_GET_CAMUNDA_VARIABLES = "/form-variables/";
     static final String BODY_SET_CAMUNDA_VARIABLES = "{\"variables\":";
     static final String COMPLETE_TASK = "/complete/";
@@ -45,7 +46,7 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
     
     @Override
     public List<GeneralTask> retrieveGeneralTasks(Instant createdAfter) {
-        return taskRetriever.retrieveCamundaTasks(camundaSystemURL, createdAfter);
+        return taskRetriever.retrieveActiveCamundaTasks(camundaSystemURL, createdAfter);
     }
 
     @Override
@@ -62,6 +63,11 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
     public String retrieveTaskVariables(String taskId) {
         String variables = variableRetriever.retrieveTaskVariables(taskId, camundaSystemURL);
         return variables;
+    }
+
+    @Override
+    public List<GeneralTask> retrieveFinishedTasks(Instant finishedAfter) {
+        return taskRetriever.retrieveFinishedCamundaTasks(camundaSystemURL, finishedAfter);
     }
 
 
