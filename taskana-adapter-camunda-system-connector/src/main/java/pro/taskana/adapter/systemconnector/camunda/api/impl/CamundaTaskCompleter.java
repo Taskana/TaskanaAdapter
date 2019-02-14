@@ -29,7 +29,7 @@ public class CamundaTaskCompleter {
         } else {
             requestBody = CamundaSystemConnectorImpl.BODY_SET_CAMUNDA_VARIABLES + camundaTask.getVariables() + "}";
         }
-        LOGGER.info("completing camunda task {}  with request body {}",camundaTask.getId(), requestBody);
+        LOGGER.debug("completing camunda task {}  with request body {}",camundaTask.getId(), requestBody);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -37,8 +37,11 @@ public class CamundaTaskCompleter {
 
         try {
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, entity, String.class);
+            LOGGER.debug("completed camunda task {}. Status code = {}",camundaTask.getId(), responseEntity.getStatusCode());
+           
             return new SystemResponse(responseEntity.getStatusCode(), null);
         } catch(HttpStatusCodeException e) {
+            LOGGER.info("tried to complete camunda task {} and caught Status code {}",camundaTask.getId(), e.getStatusCode());
             throw new SystemException("caught HttpStatusCodeException " + e.getStatusCode() + " on the attempt to complete Camunda Task " + camundaTask.getId(), e.getMostSpecificCause() );
         } 
         

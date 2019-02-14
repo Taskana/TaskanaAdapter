@@ -28,7 +28,7 @@ public class CamundaTaskRetriever {
     @Autowired
     private RestTemplate restTemplate;
 
-    public List<GeneralTask> retrieveActiveCamundaTasks(String camundaSystemURL, Instant createdAfter) {
+    public List<GeneralTask> retrieveCamundaTasksStartedAfter(String camundaSystemURL, Instant createdAfter) {
         LOGGER.debug("entry to retrieveActiveCamundaTasks. CamundSystemURL = {}, createdAfter = {} ",camundaSystemURL, createdAfter );
         String requestUrl = camundaSystemURL + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS ;
         String requestBody;
@@ -44,6 +44,7 @@ public class CamundaTaskRetriever {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        LOGGER.debug("retrieveActiveCamundaTasks posts {}, body = {}", requestUrl, requestBody );
         GeneralTask[] tasks = restTemplate.postForEntity(requestUrl, entity, GeneralTask[].class).getBody();
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("exit from retrieveActiveCamundaTasks. Retrieved Tasks: {}",Arrays.toString(tasks) );
@@ -67,9 +68,12 @@ public class CamundaTaskRetriever {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
+        LOGGER.debug("retrieveFinishedCamundaTasks postw {}, body = {}", requestUrl, requestBody );
+
         GeneralTask[] tasks = restTemplate.postForEntity(requestUrl, entity, GeneralTask[].class).getBody();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("exit from retrieveCamundaTasks. Retrieved Tasks: {}",Arrays.toString(tasks) );
+            LOGGER.debug("exit from retrieveFinishedCamundaTasks. Retrieved Tasks: {}",Arrays.toString(tasks) );
         }
         return Arrays.asList(tasks);
     }

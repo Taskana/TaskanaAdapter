@@ -16,8 +16,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.PropertySource;
 
-import pro.taskana.adapter.mappings.TimestampMapper;
+import pro.taskana.adapter.mappings.AdapterMapper;
 import pro.taskana.exceptions.SystemException;
 import pro.taskana.exceptions.UnsupportedDatabaseException;
 import pro.taskana.impl.TaskanaEngineImpl;
@@ -26,6 +27,7 @@ import pro.taskana.impl.TaskanaEngineImpl;
  * Configures the REST client.
  */
 @Configuration
+@PropertySource("application.properties")
 public class RestClientConfiguration {
 
     private DataSource dataSource;
@@ -62,8 +64,8 @@ public class RestClientConfiguration {
     }
 
     @Bean
-    TimestampMapper timestampMapper() {
-        return getOrCreateSqlSessionManager().getMapper(TimestampMapper.class);
+    AdapterMapper timestampMapper() {
+        return getOrCreateSqlSessionManager().getMapper(AdapterMapper.class);
     }
 
     @Bean
@@ -103,7 +105,7 @@ public class RestClientConfiguration {
                     e.getCause());
             }
 
-            configuration.addMapper(TimestampMapper.class);
+            configuration.addMapper(AdapterMapper.class);
             SqlSessionFactory localSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
             sqlSessionManager = SqlSessionManager.newInstance(localSessionFactory);
         }

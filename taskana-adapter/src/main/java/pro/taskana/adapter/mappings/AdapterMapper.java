@@ -20,11 +20,11 @@ import pro.taskana.adapter.scheduler.AgentType;
  * @author kkl
  */
 @Mapper
-public interface TimestampMapper {
+public interface AdapterMapper {
 
     @Select("<script>"
         + "SELECT MAX(QUERY_TIMESTAMP) "
-        + "FROM LAST_QUERY_TIME "
+        + "FROM QUERY_HISTORY "
         + "WHERE SYSTEM_URL = #{systemUrl} AND AGENT_TYPE = #{agentType} "
         + "</script>")
     Instant getLatestQueryTimestamp(@Param("systemUrl") String systemUrl, @Param("agentType") AgentType agentType);
@@ -34,14 +34,14 @@ public interface TimestampMapper {
         + "FROM TASKS "
         + "WHERE SYSTEM_URL = #{systemUrl}"
         + "</script>")
-    Instant getLatestCreatedTaskCreationTimestamp(@Param("systemUrl") String systemUrl);
+    Instant getYoungestTaskCreationTimestamp(@Param("systemUrl") String systemUrl);
 
     @Select("<script>"
         + "SELECT MIN(CREATED) "
         + "FROM TASKS "
         + "WHERE SYSTEM_URL = #{systemUrl}"
         + "</script>")
-    Instant getFirstCreatedTaskCreationTimestamp(@Param("systemUrl") String systemUrl);
+    Instant getOldestTaskCreationTimestamp(@Param("systemUrl") String systemUrl);
 
     @Select("<script>"
         + "SELECT ID "
@@ -66,7 +66,7 @@ public interface TimestampMapper {
         @Param("created") Instant created,
         @Param("systemUrl") String systemUrl);
 
-    @Insert("INSERT INTO LAST_QUERY_TIME (ID, QUERY_TIMESTAMP, SYSTEM_URL, AGENT_TYPE) "
+    @Insert("INSERT INTO QUERY_HISTORY (ID, QUERY_TIMESTAMP, SYSTEM_URL, AGENT_TYPE) "
         + "VALUES (#{id}, #{queryTimestamp}, #{systemUrl}, #{agentType})")
     void rememberLastQueryTime(@Param("id") String id,
         @Param("queryTimestamp") Instant queryTimestamp,
@@ -83,8 +83,8 @@ public interface TimestampMapper {
     @Delete(value = "DELETE FROM TASKS WHERE COMPLETED < #{completedBefore}")
     void cleanupTasksCompletedBefore(@Param("completedBefore") Instant completedBefore);
 
-    @Delete(value = "DELETE FROM LAST_QUERY_TIME where QUERY_TIMESTAMP < #{queriedBefore}")
-    void cleanupQueryTimestamps(@Param("queriedBefore") Instant queriedBefore);
+    @Delete(value = "DELETE FROM QUERY_HISTORY where QUERY_TIMESTAMP < #{queriedBefore}")
+    void cleanupQueryHistoryEntries(@Param("queriedBefore") Instant queriedBefore);
 
     @Select("<script>"
         + "SELECT ID "
