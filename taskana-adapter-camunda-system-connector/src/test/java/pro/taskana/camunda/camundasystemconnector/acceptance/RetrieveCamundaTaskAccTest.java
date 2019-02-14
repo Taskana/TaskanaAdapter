@@ -64,6 +64,7 @@ public class RetrieveCamundaTaskAccTest {
         expectedTask.setCreated(formatter.format(date));
         expectedTask.setPriority("50");
         expectedTask.setSuspended("false");
+        expectedTask.setTaskDefinitionKey("Task_0yogl0i");
         
 //        GeneralTask[] expectedResultBody = new GeneralTask[] {expectedTask};
 //        ResponseEntity<GeneralTask[]> expectedResult = new ResponseEntity<GeneralTask[]>(expectedResultBody, HttpStatus.OK);
@@ -100,7 +101,7 @@ public class RetrieveCamundaTaskAccTest {
         .andExpect(content().string( expectedBody))
         .andRespond(withSuccess(expectedReplyBody, MediaType.APPLICATION_JSON));
 
-        List<GeneralTask> actualResult = taskRetriever.retrieveActiveCamundaTasks(camundaSystemUrl, createdAfter);
+        List<GeneralTask> actualResult = taskRetriever.retrieveCamundaTasksStartedAfter(camundaSystemUrl, createdAfter);
         
         assertNotNull(actualResult);
         assertEquals(expectedTask, actualResult.get(0));
@@ -160,7 +161,7 @@ public class RetrieveCamundaTaskAccTest {
         .andExpect(content().string( expectedBody))
         .andRespond(withSuccess(expectedReplyBody, MediaType.APPLICATION_JSON));
 
-        List<GeneralTask> actualResult = taskRetriever.retrieveActiveCamundaTasks(camundaSystemUrl, createdAfter);
+        List<GeneralTask> actualResult = taskRetriever.retrieveCamundaTasksStartedAfter(camundaSystemUrl, createdAfter);
         
         assertNotNull(actualResult);
         assertEquals(expectedTask, actualResult.get(0));

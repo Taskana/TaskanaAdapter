@@ -2,6 +2,7 @@ package pro.taskana.adapter.taskanaconnector.api.impl;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import pro.taskana.TaskSummary;
 import pro.taskana.TimeInterval;
 import pro.taskana.adapter.exceptions.TaskConversionFailedException;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
+import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
 import pro.taskana.adapter.scheduler.Scheduler;
 import pro.taskana.adapter.systemconnector.api.GeneralTask;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
@@ -24,17 +26,20 @@ import pro.taskana.exceptions.ClassificationAlreadyExistException;
 import pro.taskana.exceptions.ClassificationNotFoundException;
 import pro.taskana.exceptions.DomainNotFoundException;
 import pro.taskana.exceptions.InvalidArgumentException;
+import pro.taskana.exceptions.InvalidOwnerException;
+import pro.taskana.exceptions.InvalidStateException;
 import pro.taskana.exceptions.InvalidWorkbasketException;
 import pro.taskana.exceptions.NotAuthorizedException;
 import pro.taskana.exceptions.TaskAlreadyExistException;
 import pro.taskana.exceptions.TaskNotFoundException;
 import pro.taskana.exceptions.WorkbasketAlreadyExistException;
 import pro.taskana.exceptions.WorkbasketNotFoundException;
+import pro.taskana.impl.util.LoggerUtils;
 
 @Component
 public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(Scheduler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaSystemConnectorImpl.class);
     static String  GENERAL_TASK_ID = "general_task_id";
     static String  GENERAL_TASK_VARIABLES = "general_task_variables";
 
@@ -55,6 +60,12 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
                                            .stateIn(TaskState.COMPLETED)
                                            .completedWithin(completedIn)
                                            .list();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("in the time interval {} the following taskana tasks were completed {}",
+                           completedIn, LoggerUtils.listToString(completedTasks) );
+        }
+
+        
         List<GeneralTask> result = new ArrayList<>();
         for (TaskSummary taskSummary : completedTasks) {
             try {
@@ -95,6 +106,22 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     @Override
     public GeneralTask convertToGeneralTask(Task task) {
         return taskInformationMapper.convertToGeneralTask(task);
+    }
+
+    @Override
+    public void terminateTaskanaTask(GeneralTask generalTask) throws TaskTerminationFailedException {
+        String taskId = null;
+        try {
+            TaskSummary taskSummary = taskService.createTaskQuery()
+                .externalIdIn(generalTask.getId())
+                .single();
+            if (taskSummary != null) {
+                taskId = taskSummary.getTaskId();
+                taskService.forceCompleteTask(taskId);
+            }
+        } catch (TaskNotFoundException | InvalidOwnerException | InvalidStateException | NotAuthorizedException ex) {
+            throw new TaskTerminationFailedException("Task termination failed for task " + taskId, ex);
+        }
     }
 
 }

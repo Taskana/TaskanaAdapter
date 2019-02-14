@@ -6,6 +6,7 @@ import java.util.List;
 import pro.taskana.Task;
 import pro.taskana.adapter.exceptions.TaskConversionFailedException;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
+import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
 import pro.taskana.adapter.systemconnector.api.GeneralTask;
 
 /**
@@ -41,5 +42,12 @@ public interface TaskanaConnector {
      * @return      the general task for which the taskana task was executed.
      */
     GeneralTask convertToGeneralTask(Task task);
+
+    /**
+     * terminate taskana task that runs on behalf of an external task.
+     * @param generalTask                   The external task on behalf of which the taskana task is running.
+     * @throws TaskTerminationFailedExceptioin if the attempt to terminate a taskana task failed.
+     */
+  void terminateTaskanaTask(GeneralTask generalTask) throws TaskTerminationFailedException;
 
 }
