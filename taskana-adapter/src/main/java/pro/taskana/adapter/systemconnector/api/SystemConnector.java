@@ -16,7 +16,7 @@ public interface SystemConnector {
      *
      * @return a list of general tasks that were created after the createdAfter instant.
      */
-    List<GeneralTask> retrieveGeneralTasks(Instant createdAfter);
+    List<GeneralTask> retrieveGeneralTasksStartedAfter(Instant createdAfter);
 
     /**
      * Retrieve General tasks that were finished after a specified instant.
@@ -28,12 +28,12 @@ public interface SystemConnector {
     List<GeneralTask> retrieveFinishedTasks(Instant finishedAfter);
 
     /**
-     * Get the variables of a general task.
+     * Get the variables of the process the general task belongs to.
      *
      * @param taskId    the Id of the general task.
-     * @return the variables of the general task.
+     * @return the variables of the general task's process.
      */
-    String retrieveTaskVariables(String taskId);
+    String retrieveVariables(String taskId);
 
     /**
      * Instruct the external system to complete a human task.

@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,28 +58,35 @@ public class TaskInformationMapper {
     private static final String DEFAULT_TYPE = "DEFAULT_TYPE";
     private static final String DEFAULT_VALUE = "DEFAULT_VALUE";
 
-    public Task convertToTaskanaTask(GeneralTask camundaTask) 
+    public Task convertToTaskanaTask(GeneralTask generalTask) 
         throws DomainNotFoundException, InvalidWorkbasketException, NotAuthorizedException,
         WorkbasketAlreadyExistException, ClassificationAlreadyExistException, InvalidArgumentException, WorkbasketNotFoundException {
         
         
-        Workbasket workbasket = findOrCreateWorkbasket(camundaTask.getAssignee());
+        Workbasket workbasket = findOrCreateWorkbasket(generalTask.getAssignee());
         Classification classification = findOrCreateClassification();
         ObjectReference objectReference = createObjectReference();
 
         TaskImpl taskanaTask = (TaskImpl) taskService.newTask(workbasket.getId());
-        HashMap<String, String> callbackInfo = new HashMap<>();
-        callbackInfo.put(TaskanaSystemConnectorImpl.GENERAL_TASK_ID, camundaTask.getId());
-        callbackInfo.put(TaskanaSystemConnectorImpl.SYSTEM_URL, camundaTask.getSystemURL());
-        callbackInfo.put(TaskanaSystemConnectorImpl.GENERAL_TASK_VARIABLES, camundaTask.getVariables());
+        Map<String, String> callbackInfo = new HashMap<>();
+        callbackInfo.put(TaskanaSystemConnectorImpl.GENERAL_TASK_ID, generalTask.getId());
+        callbackInfo.put(TaskanaSystemConnectorImpl.SYSTEM_URL, generalTask.getSystemURL());
         taskanaTask.setCallbackInfo(callbackInfo);
-        taskanaTask.setExternalId(camundaTask.getId());
-
-        taskanaTask.setName(camundaTask.getName());
-        taskanaTask.setDescription(camundaTask.getDescription());
-        setTimestampsInTaskanaTask(taskanaTask, camundaTask);
+        taskanaTask.setExternalId(generalTask.getId()); 
         
-        taskanaTask.setOwner(camundaTask.getAssignee());
+        Map<String,String> customAttributes = new HashMap<>();
+        customAttributes.put(TaskanaSystemConnectorImpl.GENERAL_TASK_VARIABLES, generalTask.getVariables());
+        taskanaTask.setCustomAttributes(customAttributes);
+        
+        if (generalTask.getName() != null && ! generalTask.getName().isEmpty()) {
+            taskanaTask.setName(generalTask.getName());
+        } else {
+            taskanaTask.setName(generalTask.getTaskDefinitionKey());
+        }
+        taskanaTask.setDescription(generalTask.getDescription());
+        setTimestampsInTaskanaTask(taskanaTask, generalTask);
+        
+        taskanaTask.setOwner(generalTask.getAssignee());
         taskanaTask.setClassificationKey(classification.getKey());
         taskanaTask.setPrimaryObjRef(objectReference);
 
@@ -106,15 +114,22 @@ public class TaskInformationMapper {
 	}
 
 	public GeneralTask convertToGeneralTask(Task taskanaTask) {
-        GeneralTask generalTask = new GeneralTask();
-        generalTask.setSystemURL(taskanaTask.getCallbackInfo().get(TaskanaSystemConnectorImpl.SYSTEM_URL));
-        generalTask.setId(taskanaTask.getCallbackInfo().get(TaskanaSystemConnectorImpl.GENERAL_TASK_ID));
-        generalTask.setVariables(taskanaTask.getCallbackInfo().get(TaskanaSystemConnectorImpl.GENERAL_TASK_VARIABLES));
-        generalTask.setName(taskanaTask.getName());
-        generalTask.setDescription(taskanaTask.getDescription());
-        generalTask.setAssignee(taskanaTask.getOwner());
-        return generalTask;
-    }
+	    GeneralTask generalTask = new GeneralTask();
+	    Map<String,String> callbackInfo = taskanaTask.getCallbackInfo();
+	    if (callbackInfo != null) {
+	        generalTask.setSystemURL(callbackInfo.get(TaskanaSystemConnectorImpl.SYSTEM_URL));
+	        generalTask.setId(callbackInfo.get(TaskanaSystemConnectorImpl.GENERAL_TASK_ID));
+	    }
+
+	    Map<String,String> customAttributes  = taskanaTask.getCustomAttributes();
+	    if (customAttributes != null) {
+	        generalTask.setVariables(customAttributes.get(TaskanaSystemConnectorImpl.GENERAL_TASK_VARIABLES));
+	    }
+	    generalTask.setName(taskanaTask.getName());
+	    generalTask.setDescription(taskanaTask.getDescription());
+	    generalTask.setAssignee(taskanaTask.getOwner());
+	    return generalTask;
+	}
 
     private Instant parseDate(String date) {
     	if (date == null || date.isEmpty()) {

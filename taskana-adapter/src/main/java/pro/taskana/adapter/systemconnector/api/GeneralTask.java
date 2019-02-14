@@ -17,6 +17,7 @@ public class GeneralTask {
     private String priority;
     private String suspended;
     private String systemURL;
+    private String taskDefinitionKey;
     private String variables;
 
     public String getId() {
@@ -99,6 +100,14 @@ public class GeneralTask {
         this.systemURL = systemURL;
     }
 
+    public String getTaskDefinitionKey() {
+        return taskDefinitionKey;
+    }
+
+    public void setTaskDefinitionKey(String taskDefinitionKey) {
+        this.taskDefinitionKey = taskDefinitionKey;
+    }
+
     public String getVariables() {
         return variables;
     }
@@ -111,7 +120,8 @@ public class GeneralTask {
     public String toString() {
         return "GeneralTask [id=" + id + ", name=" + name + ", assignee=" + assignee + ", created=" + created + ", due="
             + due + ", description=" + description + ", owner=" + owner + ", priority=" + priority + ", suspended="
-            + suspended + ", systemURL=" + systemURL + ", variables=" + variables + "]";
+            + suspended + ", systemURL=" + systemURL + ",taskDefinitionKey=" + taskDefinitionKey
+            + ", variables=" + variables + "]";
     }
 
     @Override
@@ -128,6 +138,7 @@ public class GeneralTask {
         result = prime * result + ((priority == null) ? 0 : priority.hashCode());
         result = prime * result + ((suspended == null) ? 0 : suspended.hashCode());
         result = prime * result + ((systemURL == null) ? 0 : systemURL.hashCode());
+        result = prime * result + ((taskDefinitionKey == null) ? 0 : taskDefinitionKey.hashCode());
         result = prime * result + ((variables == null) ? 0 : variables.hashCode());
         return result;
     }
@@ -212,6 +223,13 @@ public class GeneralTask {
                 return false;
             }
         } else if (!systemURL.equals(other.systemURL)) {
+            return false;
+        }
+        if (taskDefinitionKey == null) {
+            if (other.taskDefinitionKey != null) {
+                return false;
+            }
+        } else if (!taskDefinitionKey.equals(other.taskDefinitionKey)) {
             return false;
         }
         if (variables == null) {

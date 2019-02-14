@@ -15,7 +15,7 @@ public class CamundaVariableRetriever {
     @Autowired
     private RestTemplate restTemplate;
 
-    public String retrieveTaskVariables(String taskId, String camundaSystemURL) {
+    public String retrieveVariables(String taskId, String camundaSystemURL) {
         LOGGER.debug("entry to retrieveTaskVariables.  taskId = {}, CamundSystemURL = {} ",taskId, camundaSystemURL );
         String requestUrl = camundaSystemURL + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS 
                             + taskId + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_VARIABLES;
