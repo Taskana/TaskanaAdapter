@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import pro.taskana.adapter.scheduler.Scheduler;
-import pro.taskana.adapter.systemconnector.api.GeneralTask;
+import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 
 @Component
 public class CamundaTaskRetriever {
@@ -28,7 +28,7 @@ public class CamundaTaskRetriever {
     @Autowired
     private RestTemplate restTemplate;
 
-    public List<GeneralTask> retrieveCamundaTasksStartedAfter(String camundaSystemURL, Instant createdAfter) {
+    public List<ReferencedTask> retrieveCamundaTasksStartedAfter(String camundaSystemURL, Instant createdAfter) {
         LOGGER.debug("entry to retrieveActiveCamundaTasks. CamundSystemURL = {}, createdAfter = {} ",camundaSystemURL, createdAfter );
         String requestUrl = camundaSystemURL + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS ;
         String requestBody;
@@ -45,14 +45,14 @@ public class CamundaTaskRetriever {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
         LOGGER.debug("retrieveActiveCamundaTasks posts {}, body = {}", requestUrl, requestBody );
-        GeneralTask[] tasks = restTemplate.postForEntity(requestUrl, entity, GeneralTask[].class).getBody();
+        ReferencedTask[] tasks = restTemplate.postForEntity(requestUrl, entity, ReferencedTask[].class).getBody();
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("exit from retrieveActiveCamundaTasks. Retrieved Tasks: {}",Arrays.toString(tasks) );
         }
         return Arrays.asList(tasks);
     }
     
-    public List<GeneralTask> retrieveFinishedCamundaTasks(String camundaSystemURL, Instant finishedAfter) {
+    public List<ReferencedTask> retrieveFinishedCamundaTasks(String camundaSystemURL, Instant finishedAfter) {
         LOGGER.debug("entry to retrieveFinishedCamundaTasks. CamundSystemURL = {}, finishedAfter = {} ",camundaSystemURL, finishedAfter );
         String requestUrl = camundaSystemURL + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_HISTORIC_TASKS ;
         String requestBody;
@@ -71,7 +71,7 @@ public class CamundaTaskRetriever {
 
         LOGGER.debug("retrieveFinishedCamundaTasks postw {}, body = {}", requestUrl, requestBody );
 
-        GeneralTask[] tasks = restTemplate.postForEntity(requestUrl, entity, GeneralTask[].class).getBody();
+        ReferencedTask[] tasks = restTemplate.postForEntity(requestUrl, entity, ReferencedTask[].class).getBody();
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("exit from retrieveFinishedCamundaTasks. Retrieved Tasks: {}",Arrays.toString(tasks) );
         }

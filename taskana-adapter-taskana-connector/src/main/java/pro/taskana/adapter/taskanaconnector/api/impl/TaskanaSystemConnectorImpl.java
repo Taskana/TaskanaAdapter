@@ -20,7 +20,7 @@ import pro.taskana.adapter.exceptions.TaskConversionFailedException;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
 import pro.taskana.adapter.scheduler.Scheduler;
-import pro.taskana.adapter.systemconnector.api.GeneralTask;
+import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.exceptions.ClassificationAlreadyExistException;
 import pro.taskana.exceptions.ClassificationNotFoundException;
@@ -52,7 +52,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     private TaskInformationMapper taskInformationMapper;
 
     @Override
-    public List<GeneralTask> retrieveCompletedTaskanaTasks(Instant completedAfter) {
+    public List<ReferencedTask> retrieveCompletedTaskanaTasks(Instant completedAfter) {
         Instant now = Instant.now();
         TimeInterval completedIn = new TimeInterval(completedAfter, now);
 
@@ -66,14 +66,14 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
         }
 
         
-        List<GeneralTask> result = new ArrayList<>();
+        List<ReferencedTask> result = new ArrayList<>();
         for (TaskSummary taskSummary : completedTasks) {
             try {
                 Task taskanaTask = taskService.getTask(taskSummary.getTaskId());
                 Map<String,String> callbackInfo = taskanaTask.getCallbackInfo();
                 if ( callbackInfo != null && callbackInfo.get(GENERAL_TASK_ID) != null 
                                           && callbackInfo.get(SYSTEM_URL) != null) {
-                    result.add(taskInformationMapper.convertToGeneralTask(taskanaTask));
+                    result.add(taskInformationMapper.convertToReferencedTask(taskanaTask));
                 }
             } catch (TaskNotFoundException | NotAuthorizedException e) {
                 LOGGER.error("Caught {} when trying to retrieve completed taskana tasks." , e);
@@ -94,7 +94,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     }
 
     @Override
-    public Task convertToTaskanaTask(GeneralTask camundaTask) throws TaskConversionFailedException {
+    public Task convertToTaskanaTask(ReferencedTask camundaTask) throws TaskConversionFailedException {
         try {
             return taskInformationMapper.convertToTaskanaTask(camundaTask);
         } catch (DomainNotFoundException | InvalidWorkbasketException | NotAuthorizedException | WorkbasketNotFoundException
@@ -104,16 +104,16 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     }
 
     @Override
-    public GeneralTask convertToGeneralTask(Task task) {
-        return taskInformationMapper.convertToGeneralTask(task);
+    public ReferencedTask convertToReferencedTask(Task task) {
+        return taskInformationMapper.convertToReferencedTask(task);
     }
 
     @Override
-    public void terminateTaskanaTask(GeneralTask generalTask) throws TaskTerminationFailedException {
+    public void terminateTaskanaTask(ReferencedTask referencedTask) throws TaskTerminationFailedException {
         String taskId = null;
         try {
             TaskSummary taskSummary = taskService.createTaskQuery()
-                .externalIdIn(generalTask.getId())
+                .externalIdIn(referencedTask.getId())
                 .single();
             if (taskSummary != null) {
                 taskId = taskSummary.getTaskId();

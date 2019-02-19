@@ -1,11 +1,11 @@
 package pro.taskana.adapter.systemconnector.api;
 
 /**
- * POJO that represents a general task.
+ * POJO that represents a task in the external system.
  *
  * @author kkl
  */
-public class GeneralTask {
+public class ReferencedTask {
 
     private String id;
     private String name;
@@ -118,7 +118,7 @@ public class GeneralTask {
 
     @Override
     public String toString() {
-        return "GeneralTask [id=" + id + ", name=" + name + ", assignee=" + assignee + ", created=" + created + ", due="
+        return "ReferencedTask [id=" + id + ", name=" + name + ", assignee=" + assignee + ", created=" + created + ", due="
             + due + ", description=" + description + ", owner=" + owner + ", priority=" + priority + ", suspended="
             + suspended + ", systemURL=" + systemURL + ",taskDefinitionKey=" + taskDefinitionKey
             + ", variables=" + variables + "]";
@@ -154,7 +154,7 @@ public class GeneralTask {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        GeneralTask other = (GeneralTask) obj;
+        ReferencedTask other = (ReferencedTask) obj;
         if (assignee == null) {
             if (other.assignee != null) {
                 return false;

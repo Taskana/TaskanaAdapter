@@ -10,13 +10,13 @@ import java.util.List;
  */
 public interface SystemConnector {
     /**
-     * Retrieve General tasks that were started after a specified instant.
+     * Retrieve referenced tasks that were started after a specified instant.
      *
      * @param createdAfter  the instant after which the tasks were created.
      *
      * @return a list of general tasks that were created after the createdAfter instant.
      */
-    List<GeneralTask> retrieveGeneralTasksStartedAfter(Instant createdAfter);
+    List<ReferencedTask> retrieveReferencedTasksStartedAfter(Instant createdAfter);
 
     /**
      * Retrieve General tasks that were finished after a specified instant.
@@ -25,7 +25,7 @@ public interface SystemConnector {
      *
      * @return a list of general tasks that were finished after the finishedAfter instant.
      */
-    List<GeneralTask> retrieveFinishedTasks(Instant finishedAfter);
+    List<ReferencedTask> retrieveFinishedTasks(Instant finishedAfter);
 
     /**
      * Get the variables of the process the general task belongs to.
@@ -42,7 +42,7 @@ public interface SystemConnector {
      *
      * @return the response from the external system.
      */
-    SystemResponse completeGeneralTask(GeneralTask task);
+    SystemResponse completeReferencedTask(ReferencedTask task);
 
     /**
      * Get the URL of the external system this connector connects to.
