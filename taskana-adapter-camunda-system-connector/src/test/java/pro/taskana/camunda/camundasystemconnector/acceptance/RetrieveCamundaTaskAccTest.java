@@ -26,7 +26,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
-import pro.taskana.adapter.systemconnector.api.GeneralTask;
+import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaSystemConnectorImpl;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskRetriever;
 import pro.taskana.camunda.camundasystemconnector.configuration.CamundaConnectorTestConfiguration;
@@ -58,7 +58,7 @@ public class RetrieveCamundaTaskAccTest {
         
         String expectedBody = "{\"createdAfter\": \"" + formatter.format(date) + "\"}";
 
-        GeneralTask expectedTask = new GeneralTask();
+        ReferencedTask expectedTask = new ReferencedTask();
         expectedTask.setId("801aca2e-1b25-11e9-b283-94819a5b525c");
         expectedTask.setName("modify Request");
         expectedTask.setCreated(formatter.format(date));
@@ -66,8 +66,8 @@ public class RetrieveCamundaTaskAccTest {
         expectedTask.setSuspended("false");
         expectedTask.setTaskDefinitionKey("Task_0yogl0i");
         
-//        GeneralTask[] expectedResultBody = new GeneralTask[] {expectedTask};
-//        ResponseEntity<GeneralTask[]> expectedResult = new ResponseEntity<GeneralTask[]>(expectedResultBody, HttpStatus.OK);
+//        ReferencedTask[] expectedResultBody = new ReferencedTask[] {expectedTask};
+//        ResponseEntity<ReferencedTask[]> expectedResult = new ResponseEntity<ReferencedTask[]>(expectedResultBody, HttpStatus.OK);
         
         String expectedReplyBody = "[{" +
             "        \"id\": \"801aca2e-1b25-11e9-b283-94819a5b525c\",\r\n" + 
@@ -101,7 +101,7 @@ public class RetrieveCamundaTaskAccTest {
         .andExpect(content().string( expectedBody))
         .andRespond(withSuccess(expectedReplyBody, MediaType.APPLICATION_JSON));
 
-        List<GeneralTask> actualResult = taskRetriever.retrieveCamundaTasksStartedAfter(camundaSystemUrl, createdAfter);
+        List<ReferencedTask> actualResult = taskRetriever.retrieveCamundaTasksStartedAfter(camundaSystemUrl, createdAfter);
         
         assertNotNull(actualResult);
         assertEquals(expectedTask, actualResult.get(0));
@@ -116,15 +116,15 @@ public class RetrieveCamundaTaskAccTest {
         
         String expectedBody = "{\"finished\" : \"true\", \"createdAfter\": \"" + formatter.format(date) + "\"}";
 
-        GeneralTask expectedTask = new GeneralTask();
+        ReferencedTask expectedTask = new ReferencedTask();
         expectedTask.setId("801aca2e-1b25-11e9-b283-94819a5b525c");
         expectedTask.setName("modify Request");
         expectedTask.setCreated(formatter.format(date));
         expectedTask.setPriority("50");
         expectedTask.setSuspended("false");
         
-//        GeneralTask[] expectedResultBody = new GeneralTask[] {expectedTask};
-//        ResponseEntity<GeneralTask[]> expectedResult = new ResponseEntity<GeneralTask[]>(expectedResultBody, HttpStatus.OK);
+//        ReferencedTask[] expectedResultBody = new ReferencedTask[] {expectedTask};
+//        ResponseEntity<ReferencedTask[]> expectedResult = new ResponseEntity<ReferencedTask[]>(expectedResultBody, HttpStatus.OK);
         
         String expectedReplyBody = "[{" +
             "        \"id\": \"0146d379-fc67-11e8-84f7-94819a5b525c\",\r\n" + 
@@ -161,7 +161,7 @@ public class RetrieveCamundaTaskAccTest {
         .andExpect(content().string( expectedBody))
         .andRespond(withSuccess(expectedReplyBody, MediaType.APPLICATION_JSON));
 
-        List<GeneralTask> actualResult = taskRetriever.retrieveCamundaTasksStartedAfter(camundaSystemUrl, createdAfter);
+        List<ReferencedTask> actualResult = taskRetriever.retrieveCamundaTasksStartedAfter(camundaSystemUrl, createdAfter);
         
         assertNotNull(actualResult);
         assertEquals(expectedTask, actualResult.get(0));
