@@ -7,7 +7,7 @@ import pro.taskana.Task;
 import pro.taskana.adapter.exceptions.TaskConversionFailedException;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
-import pro.taskana.adapter.systemconnector.api.GeneralTask;
+import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 
 /**
  * The interface that must be implemented by a SystemConnector to a taskana system.
@@ -20,7 +20,7 @@ public interface TaskanaConnector {
      * @param completedAfter  The instant after which the tasks have been completed.
      * @return
      */
-    List<GeneralTask> retrieveCompletedTaskanaTasks(Instant completedAfter);
+    List<ReferencedTask> retrieveCompletedTaskanaTasks(Instant completedAfter);
 
     /**
      * create a task in taskana on behalf of an external task.
@@ -31,23 +31,23 @@ public interface TaskanaConnector {
 
     /**
      * Convert a general task to a Taskana task.
-     * @param generalTask   the general task that is to be converted.
-     * @return              the taskana task that will be created started on behalf of the general task.
+     * @param referencedTask   the general task that is to be converted.
+     * @return                 the taskana task that will be created started on behalf of the general task.
      */
-    Task convertToTaskanaTask(GeneralTask generalTask) throws TaskConversionFailedException;
+    Task convertToTaskanaTask(ReferencedTask referencedTask) throws TaskConversionFailedException;
 
     /**
-     * Convert a taskana task into a general task.
+     * Convert a taskana task into a referenced task.
      * @param task  the taskana task that was executed on behalf of a general task.
-     * @return      the general task for which the taskana task was executed.
+     * @return      the referenced task for which the taskana task was executed.
      */
-    GeneralTask convertToGeneralTask(Task task);
+    ReferencedTask convertToReferencedTask(Task task);
 
     /**
      * terminate taskana task that runs on behalf of an external task.
-     * @param generalTask                   The external task on behalf of which the taskana task is running.
+     * @param referencedTask                   The external task on behalf of which the taskana task is running.
      * @throws TaskTerminationFailedExceptioin if the attempt to terminate a taskana task failed.
      */
-  void terminateTaskanaTask(GeneralTask generalTask) throws TaskTerminationFailedException;
+  void terminateTaskanaTask(ReferencedTask referencedTask) throws TaskTerminationFailedException;
 
 }

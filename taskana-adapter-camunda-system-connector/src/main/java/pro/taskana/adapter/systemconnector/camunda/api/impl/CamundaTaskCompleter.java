@@ -10,8 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemResponse;
-import pro.taskana.adapter.systemconnector.api.GeneralTask;
 import pro.taskana.exceptions.SystemException;
 
 public class CamundaTaskCompleter {
@@ -21,7 +21,7 @@ public class CamundaTaskCompleter {
     @Autowired
     private RestTemplate restTemplate;
     
-    public SystemResponse completeCamundaTask(String camundaHost, GeneralTask camundaTask) {
+    public SystemResponse completeCamundaTask(String camundaHost, ReferencedTask camundaTask) {
         String url = camundaHost + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS + camundaTask.getId() + CamundaSystemConnectorImpl.COMPLETE_TASK;
         String requestBody;
         if (camundaTask.getVariables() == null) {

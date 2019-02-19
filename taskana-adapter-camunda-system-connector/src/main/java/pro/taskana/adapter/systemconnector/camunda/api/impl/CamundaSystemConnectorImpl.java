@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import pro.taskana.adapter.configuration.SpringContextProvider;
 import pro.taskana.adapter.systemconnector.api.SystemResponse;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
-import pro.taskana.adapter.systemconnector.api.GeneralTask;
+import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 
 /**
  * Sample Implementation of SystemConnector.
@@ -45,12 +45,12 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
     }
     
     @Override
-    public List<GeneralTask> retrieveGeneralTasksStartedAfter(Instant createdAfter) {
+    public List<ReferencedTask> retrieveReferencedTasksStartedAfter(Instant createdAfter) {
         return taskRetriever.retrieveCamundaTasksStartedAfter(camundaSystemURL, createdAfter);
     }
 
     @Override
-    public SystemResponse completeGeneralTask(GeneralTask camundaTask) {
+    public SystemResponse completeReferencedTask(ReferencedTask camundaTask) {
         return taskCompleter.completeCamundaTask(camundaSystemURL, camundaTask);
     }
 
@@ -66,7 +66,7 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
     }
 
     @Override
-    public List<GeneralTask> retrieveFinishedTasks(Instant finishedAfter) {
+    public List<ReferencedTask> retrieveFinishedTasks(Instant finishedAfter) {
         return taskRetriever.retrieveFinishedCamundaTasks(camundaSystemURL, finishedAfter);
     }
 
