@@ -64,7 +64,7 @@ public class RestClientConfiguration {
     }
 
     @Bean
-    AdapterMapper timestampMapper() {
+    AdapterMapper adapterMapper() {
         return getOrCreateSqlSessionManager().getMapper(AdapterMapper.class);
     }
 

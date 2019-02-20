@@ -45,7 +45,7 @@ public class TaskanaSystemConnectorConfiguration {
     private String categoryNames;
 
 
-    @Value("${generateSampleData:true}")
+    @Value("${taskana.generateSampleData:true}")
     public boolean generateSampleData;
 
 
@@ -87,15 +87,7 @@ public class TaskanaSystemConnectorConfiguration {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     public SpringTaskanaEngineConfiguration taskanaEngineConfiguration(DataSource dataSource) throws SQLException {
-//        ,
-//        @Value("${taskana.domains}") final String domainNames,
-//        @Value("${taskana.classification.types}") final String classificationTypeNames,
-//        @Value("${taskana.classification.categories}") final String categoryNames) throws SQLException {
-//        List<String> domains = initDomains(domainNames);
-//        List<String> classificationTypes = initClassificationTypes(classificationTypeNames);
         SpringTaskanaEngineConfiguration configuration = new SpringTaskanaEngineConfiguration(dataSource, true, false, "TASKANA");
-//        configuration.setDomains(domains);
-//        configuration.setClassificationTypes(classificationTypes);
         return configuration;
     }
 
