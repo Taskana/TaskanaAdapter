@@ -42,9 +42,9 @@ public class ReferencedTaskCompleter {
         this.scheduler = scheduler;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTask() {
         LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
-        scheduler.openConnection();
         try {
             List<TaskanaConnector> taskanaConnectors = scheduler.getTaskanaConnectors();
             Assert.assertion(taskanaConnectors.size() == 1, "taskanaConnectors.size() == 1");
@@ -57,7 +57,6 @@ public class ReferencedTaskCompleter {
             }
         } finally {
             LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
-            scheduler.returnConnection();
         }
     }
 

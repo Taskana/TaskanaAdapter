@@ -1,5 +1,6 @@
 package pro.taskana.adapter.scheduler;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
@@ -18,9 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import pro.taskana.adapter.configuration.AdapterConfiguration;
 import pro.taskana.adapter.configuration.AdapterSchemaCreator;
-import pro.taskana.adapter.configuration.RestClientConfiguration;
 import pro.taskana.adapter.impl.ReferencedTaskCompleter;
 import pro.taskana.adapter.impl.TaskanaTaskStarter;
 import pro.taskana.adapter.impl.TaskanaTaskTerminator;
@@ -30,6 +32,7 @@ import pro.taskana.adapter.systemconnector.spi.SystemConnectorProvider;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.adapter.taskanaconnector.spi.TaskanaConnectorProvider;
 import pro.taskana.exceptions.SystemException;
+import pro.taskana.impl.TaskanaEngineImpl;
 
 /**
  * Scheduler for receiving general tasks, completing Taskana tasks and cleaning adapter tables.
@@ -53,7 +56,7 @@ public class Scheduler {
     private long maxTaskAgeBeforeCleanup;
 
     @Autowired
-    private RestClientConfiguration clientCfg;
+    private AdapterConfiguration clientCfg;
 
     @Autowired
     private AdapterMapper adapterMapper;
@@ -81,7 +84,8 @@ public class Scheduler {
     public void openConnection() {
         initSqlSession();
         try {
-            this.sqlSessionManager.getConnection().setSchema(schemaName);
+            Connection connection = this.sqlSessionManager.getConnection();
+            TaskanaEngineImpl.setSchemaToConnection(connection, schemaName);
         } catch (SQLException e) {
             throw new SystemException(
                 "Method openConnection() could not open a connection to the database. No schema has been created.",
@@ -109,6 +113,7 @@ public class Scheduler {
         return taskanaConnectors;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Scheduled(cron = "${taskanaAdapter.scheduler.run.interval.for.cleanup.tasks.cron}")
     public void cleanupTaskanaAdapterTables() {
         LOGGER.info("----------cleanupTaskanaAdapterTables started----------------------------");
@@ -116,6 +121,7 @@ public class Scheduler {
             LOGGER.info("----------cleanupTaskanaAdapterTables stopped - another instance is already running ----------------------------");
             return;
         }
+        openConnection();
         try {
             isRunningCleanupTaskanaAdapterTables = true;
             Instant completedBefore = Instant.now().minus(Duration.ofHours(maxTaskAgeBeforeCleanup));
@@ -126,6 +132,7 @@ public class Scheduler {
         } finally {
             isRunningCleanupTaskanaAdapterTables = false;
             LOGGER.info("----------cleanupTaskanaAdapterTables finished----------------------------");
+            returnConnection();
         }
     }
 
@@ -137,6 +144,7 @@ public class Scheduler {
             LOGGER.info("----------retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks stopped - another instance is already running ----------------------------");
             return;
         }
+        openConnection();
         try {
             isRunningCreateTaskanaTasksFromReferencedTasks = true;
             taskanaTaskStarter.retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks();
@@ -146,8 +154,10 @@ public class Scheduler {
             isInitializing = false;
             isRunningCreateTaskanaTasksFromReferencedTasks = false;
             LOGGER.info("----------createTaskanaTasksFromReferencedTasks finished----------------------------");
+            returnConnection();
         }
     }
+
 
     @Scheduled(fixedRateString = "${taskanaAdapter.scheduler.run.interval.for.check.cancelled.general.tasks.in.milliseconds}")
     public void retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks() {
@@ -161,6 +171,7 @@ public class Scheduler {
             return;
         }
 
+        openConnection();
         try {
             isRunningRetrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks = true;
             for (SystemConnector systemConnector : (systemConnectors.values())) {
@@ -169,6 +180,7 @@ public class Scheduler {
         } finally {
             isRunningRetrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks = false;
             LOGGER.info("----------retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks finished processing ----------------------------");
+            returnConnection();
         }
     }
 
@@ -179,6 +191,7 @@ public class Scheduler {
             LOGGER.info("----------completeReferencedTasks stopped - another instance is already running ----------------------------");
             return;
         }
+        openConnection();
         try {
             isRunningCompleteReferencedTasks = true;
             referencedTaskCompleter.retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTask();
@@ -186,6 +199,7 @@ public class Scheduler {
             LOGGER.error("Caught {} while trying to complete general tasks", ex);
         } finally {
             isRunningCompleteReferencedTasks = false;
+            returnConnection();
         }
     }
 
@@ -198,9 +212,6 @@ public class Scheduler {
 
 
     private void initJobHandlers() {
-//        taskanaTaskStarter = SpringContextProvider.getBean(TaskanaTaskStarter.class);
-//        referencedTaskCompleter = SpringContextProvider.getBean(ReferencedTaskCompleter.class);
-//        taskanaTaskTerminator = SpringContextProvider.getBean(TaskanaTaskTerminator.class);
         taskanaTaskStarter.setScheduler(this);
         referencedTaskCompleter.setScheduler(this);
         taskanaTaskTerminator.setScheduler(this);

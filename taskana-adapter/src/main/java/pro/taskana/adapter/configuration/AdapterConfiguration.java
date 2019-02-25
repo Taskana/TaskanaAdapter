@@ -18,7 +18,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 
+import pro.taskana.adapter.impl.ReferencedTaskCompleter;
+import pro.taskana.adapter.impl.TaskanaTaskStarter;
+import pro.taskana.adapter.impl.TaskanaTaskTerminator;
 import pro.taskana.adapter.mappings.AdapterMapper;
+import pro.taskana.adapter.scheduler.Scheduler;
 import pro.taskana.exceptions.SystemException;
 import pro.taskana.exceptions.UnsupportedDatabaseException;
 import pro.taskana.impl.TaskanaEngineImpl;
@@ -28,7 +32,7 @@ import pro.taskana.impl.TaskanaEngineImpl;
  */
 @Configuration
 @PropertySource("application.properties")
-public class RestClientConfiguration {
+public class AdapterConfiguration {
 
     private DataSource dataSource;
     private SqlSessionManager sqlSessionManager;
@@ -46,11 +50,27 @@ public class RestClientConfiguration {
     @ConfigurationProperties(prefix = "datasource")
     public DataSourceProperties dataSourceProperties() {
         return  new DataSourceProperties();
-//        DataSourceProperties props = new DataSourceProperties();
-//        props.setUrl("jdbc:h2:mem:taskana;IGNORECASE=TRUE;LOCK_MODE=0;INIT=CREATE SCHEMA IF NOT EXISTS TASKANA");
-//        return props;
     }
 
+    @Bean
+    public Scheduler scheduler() {
+        return new Scheduler();
+    }
+    
+    @Bean
+    public ReferencedTaskCompleter referencedTaskCompleter(){
+        return new ReferencedTaskCompleter();
+    }
+    
+    @Bean
+    public TaskanaTaskStarter taskanaTaskStarter() {
+        return new TaskanaTaskStarter();
+    }
+    
+    @Bean TaskanaTaskTerminator taskanaTaskTerminator() {
+        return new TaskanaTaskTerminator();
+    }
+    
     @Bean
     public DataSource dataSource() {
         return getOrCreateDataSource();
