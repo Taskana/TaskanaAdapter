@@ -11,7 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import pro.taskana.adapter.configuration.RestClientConfiguration;
+import pro.taskana.adapter.configuration.AdapterConfiguration;
 
 /**
  * Application that provides an adapter between taskana and one or more external systems.
@@ -23,7 +23,7 @@ import pro.taskana.adapter.configuration.RestClientConfiguration;
 @EnableAutoConfiguration
 @EnableScheduling
 @ComponentScan(basePackages = "pro.taskana.adapter")
-@Import({RestClientConfiguration.class})
+@Import({AdapterConfiguration.class})
 
 public class TaskanaAdapterApplication {
 

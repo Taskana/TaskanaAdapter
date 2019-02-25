@@ -51,10 +51,10 @@ public class TaskanaTaskStarter {
         this.scheduler = scheduler;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks() {
         LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
         for (SystemConnector systemConnector : (scheduler.getSystemConnectors().values())) {
-            scheduler.openConnection();
             try {
                 Instant lastRetrievedMinusTransactionDuration = determineStartInstant(systemConnector);
                 adapterMapper.rememberLastQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), systemConnector.getSystemURL(), AgentType.START_TASKANA_TASKS);
@@ -74,7 +74,6 @@ public class TaskanaTaskStarter {
                 }
             } finally {
                 LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
-                scheduler.returnConnection();
             }
         }
     }

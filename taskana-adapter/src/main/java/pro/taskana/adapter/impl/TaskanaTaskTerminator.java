@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import pro.taskana.adapter.mappings.AdapterMapper;
 import pro.taskana.adapter.scheduler.AgentType;
@@ -44,10 +45,9 @@ public class TaskanaTaskTerminator {
         this.scheduler = scheduler;
     }
 
-
+    @Transactional(rollbackFor = Exception.class)
     public void retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks(SystemConnector systemConnector) {
         LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
-        scheduler.openConnection();
 
         try {
             Instant lowerThreshold;
@@ -76,7 +76,6 @@ public class TaskanaTaskTerminator {
 
         } finally {
             LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
-            scheduler.returnConnection();
         }
     }
 

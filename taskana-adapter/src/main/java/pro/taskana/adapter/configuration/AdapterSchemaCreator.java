@@ -1,21 +1,23 @@
 package pro.taskana.adapter.configuration;
 
     import java.io.BufferedReader;
-    import java.io.IOException;
-    import java.io.InputStreamReader;
-    import java.io.PrintWriter;
-    import java.io.StringReader;
-    import java.io.StringWriter;
-    import java.sql.Connection;
-    import java.sql.SQLException;
-    import java.util.Map;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Map;
 
-    import javax.sql.DataSource;
+import javax.sql.DataSource;
 
-    import org.apache.ibatis.jdbc.ScriptRunner;
-    import org.apache.ibatis.jdbc.SqlRunner;
-    import org.slf4j.Logger;
-    import org.slf4j.LoggerFactory;
+import org.apache.ibatis.jdbc.ScriptRunner;
+import org.apache.ibatis.jdbc.SqlRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import pro.taskana.impl.TaskanaEngineImpl;
 
     /**
      * This class create the schema for the taskana adapter.
@@ -63,14 +65,15 @@ package pro.taskana.adapter.configuration;
             Connection connection = dataSource.getConnection();
             ScriptRunner runner = new ScriptRunner(connection);
             LOGGER.debug(connection.getMetaData().toString());
+            String databaseProductName = connection.getMetaData().getDatabaseProductName();
             runner.setStopOnError(true);
             runner.setLogWriter(logWriter);
             runner.setErrorLogWriter(errorLogWriter);
             try {
-                if (!isSchemaPreexisting(runner, connection.getMetaData().getDatabaseProductName())) {
+                if (!isSchemaPreexisting(runner, databaseProductName)) {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass()
-                        .getResourceAsStream(selectDbScriptFileName(connection.getMetaData().getDatabaseProductName()))));
-                    runner.runScript(getSqlSchemaNameParsed(reader));
+                        .getResourceAsStream(selectDbScriptFileName(databaseProductName))));
+                    runner.runScript(getSqlSchemaNameParsed(reader, databaseProductName));
                 }
             } finally {
                 runner.closeConnection();
@@ -85,7 +88,7 @@ package pro.taskana.adapter.configuration;
             try {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass()
                     .getResourceAsStream(selectDbSchemaDetectionScript(productName))));
-                runner.runScript(getSqlSchemaNameParsed(reader));
+                runner.runScript(getSqlSchemaNameParsed(reader,productName));
             } catch (Exception e) {
                 LOGGER.debug("Schema does not exist.");
                 return false;
@@ -98,12 +101,13 @@ package pro.taskana.adapter.configuration;
             SqlRunner runner = null;
             try {
                 Connection connection = dataSource.getConnection();
-                connection.setSchema(this.schemaName);
+                TaskanaEngineImpl.setSchemaToConnection(connection, this.schemaName);
+
                 runner = new SqlRunner(connection);
                 LOGGER.debug(connection.getMetaData().toString());
 
-                String query = "select VERSION from TASKANA_SCHEMA_VERSION where "
-                    + "VERSION = (select max(VERSION) from TASKANA_SCHEMA_VERSION) "
+                String query = "select VERSION from TCA_SCHEMA_VERSION where "
+                    + "VERSION = (select max(VERSION) from TCA_SCHEMA_VERSION) "
                     + "AND VERSION = ?";
 
                 Map<String, Object> queryResult = runner.selectOne(query, expectedVersion);
@@ -137,20 +141,20 @@ package pro.taskana.adapter.configuration;
             this.dataSource = dataSource;
         }
 
-        private StringReader getSqlSchemaNameParsed(BufferedReader reader) {
-
+        private StringReader getSqlSchemaNameParsed(BufferedReader reader, String dbProductName) {
+            boolean isPostGres = TaskanaEngineImpl.isPostgreSQL(dbProductName);
             StringBuffer content = new StringBuffer();
+            String effectiveSchemaName = isPostGres ? schemaName.toLowerCase() : schemaName.toUpperCase();
             try {
                 String line = "";
                 while (line != null) {
                     line = reader.readLine();
                     if (line != null) {
-                        content.append(line.replaceAll("%schemaName%", schemaName) + System.lineSeparator());
+                        content.append(line.replaceAll("%schemaName%", effectiveSchemaName) + System.lineSeparator());
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
-                LOGGER.error("SchemaName sql parsing failed for schemaName {}", schemaName);
+                LOGGER.error("SchemaName sql parsing failed for schemaName {}. Caught {}", effectiveSchemaName, e);
             }
             return new StringReader(content.toString());
         }
