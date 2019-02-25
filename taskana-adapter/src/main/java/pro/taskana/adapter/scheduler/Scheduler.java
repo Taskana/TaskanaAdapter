@@ -49,14 +49,14 @@ public class Scheduler {
     private static boolean isRunningRetrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks = false;
     private static boolean isInitializing = true;
 
-    @Value("${taskanaAdapter.total.transaction.lifetime.in.seconds:120}")
+    @Value("${taskana.adapter.total.transaction.lifetime.in.seconds:120}")
     private int maximumTotalTransactionLifetime;
 
-    @Value("${taskanaAdapter.scheduler.task.age.for.cleanup.in.hours:600}")
+    @Value("${taskana.adapter.scheduler.task.age.for.cleanup.in.hours:600}")
     private long maxTaskAgeBeforeCleanup;
 
     @Autowired
-    private AdapterConfiguration clientCfg;
+    private AdapterConfiguration adapterConfiguration;
 
     @Autowired
     private AdapterMapper adapterMapper;
@@ -114,7 +114,7 @@ public class Scheduler {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    @Scheduled(cron = "${taskanaAdapter.scheduler.run.interval.for.cleanup.tasks.cron}")
+    @Scheduled(cron = "${taskana.adapter.scheduler.run.interval.for.cleanup.tasks.cron}")
     public void cleanupTaskanaAdapterTables() {
         LOGGER.info("----------cleanupTaskanaAdapterTables started----------------------------");
         if (isRunningCleanupTaskanaAdapterTables) {
@@ -137,7 +137,7 @@ public class Scheduler {
     }
 
 
-    @Scheduled(fixedRateString = "${taskanaAdapter.scheduler.run.interval.for.start.taskana.tasks.in.milliseconds}")
+    @Scheduled(fixedRateString = "${taskana.adapter.scheduler.run.interval.for.start.taskana.tasks.in.milliseconds}")
     public void retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks() {
         LOGGER.info("----------retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks started----------------------------");
         if (isRunningCreateTaskanaTasksFromReferencedTasks) {
@@ -159,7 +159,7 @@ public class Scheduler {
     }
 
 
-    @Scheduled(fixedRateString = "${taskanaAdapter.scheduler.run.interval.for.check.cancelled.general.tasks.in.milliseconds}")
+    @Scheduled(fixedRateString = "${taskana.adapter.scheduler.run.interval.for.check.cancelled.general.tasks.in.milliseconds}")
     public void retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks() {
         LOGGER.info("----------retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks started----------------------------");
         if (isInitializing) {
@@ -184,7 +184,7 @@ public class Scheduler {
         }
     }
 
-    @Scheduled(fixedRateString = "${taskanaAdapter.scheduler.run.interval.for.complete.general.tasks.in.milliseconds}")
+    @Scheduled(fixedRateString = "${taskana.adapter.scheduler.run.interval.for.complete.general.tasks.in.milliseconds}")
     public void retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTasks() {
         LOGGER.info("----------completeReferencedTasks started----------------------------");
         if (isRunningCompleteReferencedTasks) {
@@ -243,7 +243,7 @@ public class Scheduler {
     }
 
     private void initDatabase() {
-        AdapterSchemaCreator schemaCreator = new AdapterSchemaCreator(clientCfg.dataSource(), schemaName);
+        AdapterSchemaCreator schemaCreator = new AdapterSchemaCreator(adapterConfiguration.dataSource(), schemaName);
         try {
             schemaCreator.run();
         } catch (SQLException ex) {

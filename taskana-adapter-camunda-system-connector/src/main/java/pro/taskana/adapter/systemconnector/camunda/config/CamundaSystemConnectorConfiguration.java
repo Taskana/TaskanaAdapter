@@ -16,10 +16,10 @@ import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaVariableRetri
 public class CamundaSystemConnectorConfiguration {
 
     @Bean
-    CamundaSystemUrls camundaSystemUrls(@Value("${taskana-camunda-camundasystemconnector.camundaSystemURLs}") final String strUrls) {
+    CamundaSystemUrls camundaSystemUrls(@Value("${taskana-system-connector-camundaSystemURLs}") final String strUrls) {
         return new CamundaSystemUrls(strUrls);
     }
-    
+
     @Bean
     CamundaTaskRetriever camundaTaskRetriever() {
         return new CamundaTaskRetriever();

@@ -37,7 +37,7 @@ public class AdapterConfiguration {
     private DataSource dataSource;
     private SqlSessionManager sqlSessionManager;
 
-    @Value("${taskanaAdapter.schemaName}")
+    @Value("${taskana.adapter.schemaName}")
     private String schemaName;
 
     @Bean
@@ -47,7 +47,7 @@ public class AdapterConfiguration {
 
     @Bean
     @Primary
-    @ConfigurationProperties(prefix = "datasource")
+    @ConfigurationProperties(prefix = "taskana.adapter.datasource")
     public DataSourceProperties dataSourceProperties() {
         return  new DataSourceProperties();
     }
