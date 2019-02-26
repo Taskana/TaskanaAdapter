@@ -69,13 +69,13 @@ public class TaskInformationMapper {
 
         TaskImpl taskanaTask = (TaskImpl) taskService.newTask(workbasket.getId());
         Map<String, String> callbackInfo = new HashMap<>();
-        callbackInfo.put(TaskanaSystemConnectorImpl.GENERAL_TASK_ID, referencedTask.getId());
+        callbackInfo.put(TaskanaSystemConnectorImpl.REFERENCED_TASK_ID, referencedTask.getId());
         callbackInfo.put(TaskanaSystemConnectorImpl.SYSTEM_URL, referencedTask.getSystemURL());
         taskanaTask.setCallbackInfo(callbackInfo);
         taskanaTask.setExternalId(referencedTask.getId()); 
         
         Map<String,String> customAttributes = new HashMap<>();
-        customAttributes.put(TaskanaSystemConnectorImpl.GENERAL_TASK_VARIABLES, referencedTask.getVariables());
+        customAttributes.put(TaskanaSystemConnectorImpl.REFERENCED_TASK_VARIABLES, referencedTask.getVariables());
         taskanaTask.setCustomAttributes(customAttributes);
         
         if (referencedTask.getName() != null && ! referencedTask.getName().isEmpty()) {
@@ -118,12 +118,12 @@ public class TaskInformationMapper {
 	    Map<String,String> callbackInfo = taskanaTask.getCallbackInfo();
 	    if (callbackInfo != null) {
 	        referencedTask.setSystemURL(callbackInfo.get(TaskanaSystemConnectorImpl.SYSTEM_URL));
-	        referencedTask.setId(callbackInfo.get(TaskanaSystemConnectorImpl.GENERAL_TASK_ID));
+	        referencedTask.setId(callbackInfo.get(TaskanaSystemConnectorImpl.REFERENCED_TASK_ID));
 	    }
 
 	    Map<String,String> customAttributes  = taskanaTask.getCustomAttributes();
 	    if (customAttributes != null) {
-	        referencedTask.setVariables(customAttributes.get(TaskanaSystemConnectorImpl.GENERAL_TASK_VARIABLES));
+	        referencedTask.setVariables(customAttributes.get(TaskanaSystemConnectorImpl.REFERENCED_TASK_VARIABLES));
 	    }
 	    referencedTask.setName(taskanaTask.getName());
 	    referencedTask.setDescription(taskanaTask.getDescription());
