@@ -13,12 +13,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import pro.taskana.adapter.mappings.AdapterMapper;
+import pro.taskana.adapter.scheduler.AgentType;
 import pro.taskana.adapter.scheduler.Scheduler;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.adapter.util.Assert;
 import pro.taskana.exceptions.SystemException;
+import pro.taskana.impl.util.IdGenerator;
 
 /**
  * Completes ReferencedTasks in the external system after completion of corresponding taskana tasks.
@@ -55,7 +57,8 @@ public class ReferencedTaskCompleter {
             for (ReferencedTask referencedTask : tasksToBeCompletedInExternalSystem) {
                 completeReferencedTask(referencedTask);
             }
-        } finally {
+            adapterMapper.rememberLastQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), "NONE", AgentType.HANDLE_FINISHED_TASKANA_TASKS);
+  } finally {
             LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
         }
     }
@@ -99,7 +102,7 @@ public class ReferencedTaskCompleter {
                 throw new SystemException("couldnt find a connector for systemUrl " + referencedTask.getSystemURL());
             }
         } catch (Exception ex) {
-            LOGGER.error("Caught {} when attempting to complete general task {}", ex, referencedTask);
+            LOGGER.error("Caught {} when attempting to complete referenced task {}", ex, referencedTask);
         }
         LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
     }

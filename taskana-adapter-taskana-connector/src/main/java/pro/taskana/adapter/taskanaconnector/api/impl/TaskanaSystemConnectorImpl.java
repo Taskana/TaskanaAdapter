@@ -40,8 +40,8 @@ import pro.taskana.impl.util.LoggerUtils;
 public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaSystemConnectorImpl.class);
-    static String  GENERAL_TASK_ID = "general_task_id";
-    static String  GENERAL_TASK_VARIABLES = "general_task_variables";
+    static String  REFERENCED_TASK_ID = "referenced_task_id";
+    static String  REFERENCED_TASK_VARIABLES = "referenced_task_variables";
 
     static String  SYSTEM_URL = "system_url";
 
@@ -71,7 +71,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
             try {
                 Task taskanaTask = taskService.getTask(taskSummary.getTaskId());
                 Map<String,String> callbackInfo = taskanaTask.getCallbackInfo();
-                if ( callbackInfo != null && callbackInfo.get(GENERAL_TASK_ID) != null 
+                if ( callbackInfo != null && callbackInfo.get(REFERENCED_TASK_ID) != null 
                                           && callbackInfo.get(SYSTEM_URL) != null) {
                     result.add(taskInformationMapper.convertToReferencedTask(taskanaTask));
                 }

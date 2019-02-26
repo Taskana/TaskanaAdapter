@@ -14,24 +14,24 @@ public interface SystemConnector {
      *
      * @param createdAfter  the instant after which the tasks were created.
      *
-     * @return a list of general tasks that were created after the createdAfter instant.
+     * @return a list of referenced tasks that were created after the createdAfter instant.
      */
     List<ReferencedTask> retrieveReferencedTasksStartedAfter(Instant createdAfter);
 
     /**
-     * Retrieve General tasks that were finished after a specified instant.
+     * Retrieve referenced tasks that were finished after a specified instant.
      *
      * @param finishedAfter  the instant after which the tasks finished.
      *
-     * @return a list of general tasks that were finished after the finishedAfter instant.
+     * @return a list of referenced tasks that were finished after the finishedAfter instant.
      */
     List<ReferencedTask> retrieveFinishedTasks(Instant finishedAfter);
 
     /**
-     * Get the variables of the process the general task belongs to.
+     * Get the variables of the process the referenced task belongs to.
      *
-     * @param taskId    the Id of the general task.
-     * @return the variables of the general task's process.
+     * @param taskId    the Id of the referenced task.
+     * @return the variables of the referenced task's process.
      */
     String retrieveVariables(String taskId);
 
