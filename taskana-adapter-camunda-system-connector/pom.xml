@@ -51,31 +51,29 @@
                   <groupId>org.springframework.boot</groupId>
                   <artifactId>spring-boot-starter-test</artifactId>
                   <scope>test</scope>
+                  <exclusions>
+                      <exclusion>
+                          <groupId>com.vaadin.external.google</groupId>
+                          <artifactId>android-json</artifactId>
+                      </exclusion>
+                  </exclusions>
               </dependency>
 
         </dependencies>
 
-        <!--
         <build>
                 <plugins>
                         <plugin>
                                 <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-compiler-plugin</artifactId>
-                                <version>3.5.1</version>
+                                <artifactId>maven-failsafe-plugin</artifactId>
                                 <configuration>
-                                        <showWarnings>true</showWarnings>
-                                        <debug>true</debug>
-                                        <compilerArgs>
-                                                <arg>-Xlint:all</arg>
-                                        </compilerArgs>
+                                        <classpathDependencyExcludes>
+                                                <classpathDependencyExcludes>com.googlecode.json-simple:json-simple</classpathDependencyExcludes>
+                                                <classpathDependencyExcludes>com.vaadin.external.google:android-json</classpathDependencyExcludes>
+                                        </classpathDependencyExcludes>
                                 </configuration>
-                        </plugin>
-                        <plugin>
-                                <groupId>org.springframework.boot</groupId>
-                                <artifactId>spring-boot-maven-plugin</artifactId>
                         </plugin>
                 </plugins>
         </build>
-        -->
 
 </project>

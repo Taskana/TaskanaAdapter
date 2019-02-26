@@ -9,8 +9,12 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,16 +22,13 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
-import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaSystemConnectorImpl;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskRetriever;
 import pro.taskana.camunda.camundasystemconnector.configuration.CamundaConnectorTestConfiguration;
 
@@ -52,16 +53,26 @@ public class RetrieveCamundaTaskAccTest {
     @Test
     public void testGetActiveCamundaTasks() throws ParseException {
         
+        String timeStamp = "2019-01-14T15:22:30.811+0000";
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+                                        .withLocale(Locale.ROOT)
+                                        .withZone(ZoneId.of("UTC"));
+
+        Instant createdAfter = Instant.from(dateTimeFormatter.parse("2019-01-14T15:22:29.811+0000"));
+        
+        
+        Date date = java.sql.Timestamp.valueOf(createdAfter.atZone(ZoneId.systemDefault()).toLocalDateTime());
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        Date date = formatter.parse("2019-01-14T15:22:30.811+0100");
-        Instant createdAfter = date.toInstant();
         
         String expectedBody = "{\"createdAfter\": \"" + formatter.format(date) + "\"}";
+        
+        
 
         ReferencedTask expectedTask = new ReferencedTask();
         expectedTask.setId("801aca2e-1b25-11e9-b283-94819a5b525c");
         expectedTask.setName("modify Request");
-        expectedTask.setCreated(formatter.format(date));
+        expectedTask.setCreated(timeStamp);
         expectedTask.setPriority("50");
         expectedTask.setSuspended("false");
         expectedTask.setTaskDefinitionKey("Task_0yogl0i");
@@ -73,7 +84,7 @@ public class RetrieveCamundaTaskAccTest {
             "        \"id\": \"801aca2e-1b25-11e9-b283-94819a5b525c\",\r\n" + 
             "        \"name\": \"modify Request\",\r\n" + 
             "        \"assignee\": null,\r\n" + 
-            "        \"created\": \"2019-01-14T15:22:30.811+0100\",\r\n" + 
+            "        \"created\": \"2019-01-14T15:22:30.811+0000\",\r\n" + 
             "        \"due\": null,\r\n" + 
             "        \"followUp\": null,\r\n" + 
             "        \"delegationState\": null,\r\n" + 
