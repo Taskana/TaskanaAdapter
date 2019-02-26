@@ -30,15 +30,15 @@ public interface TaskanaConnector {
     void createTaskanaTask(Task taskanaTask) throws TaskCreationFailedException;
 
     /**
-     * Convert a general task to a Taskana task.
-     * @param referencedTask   the general task that is to be converted.
-     * @return                 the taskana task that will be created started on behalf of the general task.
+     * Convert a referenced task to a Taskana task.
+     * @param referencedTask   the referenced task that is to be converted.
+     * @return                 the taskana task that will be created started on behalf of the referenced task.
      */
     Task convertToTaskanaTask(ReferencedTask referencedTask) throws TaskConversionFailedException;
 
     /**
      * Convert a taskana task into a referenced task.
-     * @param task  the taskana task that was executed on behalf of a general task.
+     * @param task  the taskana task that was executed on behalf of a referenced task.
      * @return      the referenced task for which the taskana task was executed.
      */
     ReferencedTask convertToReferencedTask(Task task);

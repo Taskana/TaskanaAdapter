@@ -61,19 +61,19 @@ public class TaskanaTaskTerminator {
                     return;
                 }
             } else {
-                Instant lastQuerytime = adapterMapper.getLatestQueryTimestamp(systemConnector.getSystemURL(), AgentType.HANDLE_FINISHED_GENERAL_TASKS);
+                Instant lastQuerytime = adapterMapper.getLatestQueryTimestamp(systemConnector.getSystemURL(), AgentType.HANDLE_FINISHED_REFERENCED_TASKS);
                 LOGGER.debug("lastQueryTime is {}", lastQuerytime);
                 Assert.assertion(lastQuerytime != null, "lastQueryTime != null");
                 lowerThreshold = lastQuerytime.minus(Duration.ofSeconds(maximumTotalTransactionLifetime));
             }
 
-            adapterMapper.rememberLastQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), systemConnector.getSystemURL(), AgentType.HANDLE_FINISHED_GENERAL_TASKS);
             List<ReferencedTask> tasksFinishedBySystem = systemConnector.retrieveFinishedTasks(lowerThreshold);
             List<ReferencedTask> taskanaTasksToTerminate = determineTaskanaTasksToTerminate(tasksFinishedBySystem, systemConnector.getSystemURL());
             for (ReferencedTask referencedTask : taskanaTasksToTerminate) {
                 terminateTaskanaTask(referencedTask);
             }
 
+            adapterMapper.rememberLastQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), systemConnector.getSystemURL(), AgentType.HANDLE_FINISHED_REFERENCED_TASKS);
         } finally {
             LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
         }

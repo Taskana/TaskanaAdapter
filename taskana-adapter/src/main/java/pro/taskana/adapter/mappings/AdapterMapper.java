@@ -15,7 +15,7 @@ import org.apache.ibatis.annotations.Update;
 import pro.taskana.adapter.scheduler.AgentType;
 
 /**
- * Mapper for the Timestamps of the last creation of Taskana tasks or completion of general tasks.
+ * Mapper for the Timestamps of the last creation of Taskana tasks or completion of referenced tasks.
  *
  * @author kkl
  */

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionManager;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ import pro.taskana.exceptions.SystemException;
 import pro.taskana.impl.TaskanaEngineImpl;
 
 /**
- * Scheduler for receiving general tasks, completing Taskana tasks and cleaning adapter tables.
+ * Scheduler for receiving referenced tasks, completing Taskana tasks and cleaning adapter tables.
  *
  * @author bbr
  */
@@ -85,7 +86,7 @@ public class Scheduler {
         initSqlSession();
         try {
             Connection connection = this.sqlSessionManager.getConnection();
-            TaskanaEngineImpl.setSchemaToConnection(connection, schemaName);
+            connection.setSchema(schemaName);
         } catch (SQLException e) {
             throw new SystemException(
                 "Method openConnection() could not open a connection to the database. No schema has been created.",
@@ -149,7 +150,7 @@ public class Scheduler {
             isRunningCreateTaskanaTasksFromReferencedTasks = true;
             taskanaTaskStarter.retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks();
         } catch (Exception ex) {
-            LOGGER.error("Caught {} while trying to create Taskana tasks from general tasks", ex);
+            LOGGER.error("Caught {} while trying to create Taskana tasks from referenced tasks", ex);
         } finally {
             isInitializing = false;
             isRunningCreateTaskanaTasksFromReferencedTasks = false;
@@ -159,7 +160,7 @@ public class Scheduler {
     }
 
 
-    @Scheduled(fixedRateString = "${taskana.adapter.scheduler.run.interval.for.check.cancelled.general.tasks.in.milliseconds}")
+    @Scheduled(fixedRateString = "${taskana.adapter.scheduler.run.interval.for.check.cancelled.referenced.tasks.in.milliseconds}")
     public void retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks() {
         LOGGER.info("----------retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks started----------------------------");
         if (isInitializing) {
@@ -184,7 +185,7 @@ public class Scheduler {
         }
     }
 
-    @Scheduled(fixedRateString = "${taskana.adapter.scheduler.run.interval.for.complete.general.tasks.in.milliseconds}")
+    @Scheduled(fixedRateString = "${taskana.adapter.scheduler.run.interval.for.complete.referenced.tasks.in.milliseconds}")
     public void retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTasks() {
         LOGGER.info("----------completeReferencedTasks started----------------------------");
         if (isRunningCompleteReferencedTasks) {
@@ -196,7 +197,7 @@ public class Scheduler {
             isRunningCompleteReferencedTasks = true;
             referencedTaskCompleter.retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTask();
         } catch (Exception ex) {
-            LOGGER.error("Caught {} while trying to complete general tasks", ex);
+            LOGGER.error("Caught {} while trying to complete referenced tasks", ex);
         } finally {
             isRunningCompleteReferencedTasks = false;
             returnConnection();
@@ -243,8 +244,16 @@ public class Scheduler {
     }
 
     private void initDatabase() {
-        AdapterSchemaCreator schemaCreator = new AdapterSchemaCreator(adapterConfiguration.dataSource(), schemaName);
         try {
+            DataSource dataSource = adapterConfiguration.dataSource();
+            Connection connection = dataSource.getConnection();
+            String databaseProductName = connection.getMetaData().getDatabaseProductName();
+            if (TaskanaEngineImpl.isPostgreSQL(databaseProductName)) {
+                this.schemaName = this.schemaName.toLowerCase();
+            } else {
+                this.schemaName = this.schemaName.toUpperCase();
+            }
+            AdapterSchemaCreator schemaCreator = new AdapterSchemaCreator(adapterConfiguration.dataSource(), schemaName);
             schemaCreator.run();
         } catch (SQLException ex) {
             LOGGER.error("Caught {} when attempting to initialize the database", ex);

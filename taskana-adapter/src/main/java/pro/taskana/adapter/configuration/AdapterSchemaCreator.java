@@ -101,7 +101,7 @@ import pro.taskana.impl.TaskanaEngineImpl;
             SqlRunner runner = null;
             try {
                 Connection connection = dataSource.getConnection();
-                TaskanaEngineImpl.setSchemaToConnection(connection, this.schemaName);
+                connection.setSchema(this.schemaName);
 
                 runner = new SqlRunner(connection);
                 LOGGER.debug(connection.getMetaData().toString());

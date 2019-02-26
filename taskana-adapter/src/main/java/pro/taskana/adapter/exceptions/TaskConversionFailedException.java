@@ -3,7 +3,7 @@ package pro.taskana.adapter.exceptions;
 import pro.taskana.exceptions.TaskanaException;
 
 /**
- * This exception is thrown when an attempt to convert a general task into a taskana task fails.
+ * This exception is thrown when an attempt to convert a referenced task to a taskana task fails.
  * @author bbr
  *
  */

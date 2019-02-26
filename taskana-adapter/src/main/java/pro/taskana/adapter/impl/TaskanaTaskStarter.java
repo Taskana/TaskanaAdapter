@@ -57,7 +57,6 @@ public class TaskanaTaskStarter {
         for (SystemConnector systemConnector : (scheduler.getSystemConnectors().values())) {
             try {
                 Instant lastRetrievedMinusTransactionDuration = determineStartInstant(systemConnector);
-                adapterMapper.rememberLastQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), systemConnector.getSystemURL(), AgentType.START_TASKANA_TASKS);
 
                 List<ReferencedTask> candidateTasks = systemConnector.retrieveReferencedTasksStartedAfter(lastRetrievedMinusTransactionDuration);
                 if (LOGGER.isInfoEnabled()) {
@@ -72,6 +71,7 @@ public class TaskanaTaskStarter {
                 for (ReferencedTask referencedTask : tasksToStart) {
                     createTaskanaTask(referencedTask, scheduler.getTaskanaConnectors(), systemConnector);
                 }
+                adapterMapper.rememberLastQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), systemConnector.getSystemURL(), AgentType.START_TASKANA_TASKS);
             } finally {
                 LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
             }
@@ -137,7 +137,7 @@ public class TaskanaTaskStarter {
 
             adapterMapper.registerCreatedTask(referencedTask.getId(), created, referencedTask.getSystemURL());
         } catch (TaskCreationFailedException | TaskConversionFailedException e) {
-            LOGGER.error("Caught {} when creating a task in taskana for general task {}", e, referencedTask);
+            LOGGER.error("Caught {} when creating a task in taskana for referenced task {}", e, referencedTask);
         }
         LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
     }
