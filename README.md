@@ -1,7 +1,7 @@
 # TaskanaAdapter
 Adapter to sync tasks between TASKANA and an external workflow system, e.g. Camunda BPM
 ## Components
-The Taskana Adapter plus sample connectors consists of the following components
+The Taskana Adapter repository consists of the taskana adapter plus sample connectors to camunda and taskana.
 
     +------------------------------------------+--------------------------------------------------------------+
     | Component                                | Description                                                  |
@@ -12,9 +12,10 @@ The Taskana Adapter plus sample connectors consists of the following components
     |                                          | These connectors are plugged in at runtime via SPI mechanisms|
     +------------------------------------------+--------------------------------------------------------------+
     | taskana-adapter-sample                   | contains Application main class and properties               |
+    |                                          | for taskana-adapter                                          |
     +------------------------------------------+--------------------------------------------------------------+
     | taskana-adapter-camunda-system-connector | Sample implementation of SystemConnector SPI.                |
-    |                                          | Connects to 1..n camunda systems via REST                    |
+    |                                          | Connects to a camunda systems via camunda's REST API         |
     +------------------------------------------+--------------------------------------------------------------+
     | taskana-adapter-taskana-connector        | Sample implementation of TaskanaConnector SPI. Connects      |
     |                                          | to one taskana system via taskana's java api which           |
@@ -22,8 +23,8 @@ The Taskana Adapter plus sample connectors consists of the following components
     +------------------------------------------+--------------------------------------------------------------+
 
 ## The Adapter defines two SPIs
-- **SystemConnector SPI** that connects the adapter to an external system like e.g. camunda.
-- **TaskanaConnector SPI** that connects the adapter to taskana.
+- **SystemConnector SPI**  connects the adapter to an external system like e.g. camunda.
+- **TaskanaConnector SPI** connects the adapter to taskana.
 
 Both SPI implementations are loaded by the adapter at initialization time via the Java SPI mechanism.  They provide plug points where custom code can be plugged in.\
 Please note, that the term ‘referenced task’ is used in this document to refer to tasks in the external system that is accessed via the SystemConnector
@@ -52,25 +53,23 @@ The adapter performs periodically the following tasks
 
 ## Notes
 
-1.   Duplicate tasks <br/>
-Method retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks periodically queries the external system, to retrieve tasks that were created in a specific interval. \
-To determine this interval, transactional behavior must be taken into account. Due to transactions, a task that was created at an instant x may become visible only when \
-the transaction is committed. In the extreme case this is the maximum transaction lifetime. As a consequence, the specified interval is not between the last query time and now, \
-but between (the last query time – maximum transaction lifetime) and now.\
-Using default values to illustrate: Queries are performed every 10 seconds. The default maximum transaction lifetime is 120 seconds. This is, the adapter has to retrieve all tasks\
-that were created in the last 130 seconds.<br/>
-In the result, the query returns many tasks that have already been processed by the adapter. To cope with this problem, the adapter uses the TASKS table of its database to keep track
-of the tasks that are already handled. Tasks that are not found in this table are added to the table and a corresponding taskana task is started. Tasks that are found in the table are
-ignored, they are duplicates.
-
-2.      Variables<br/>
-When a referenced task is newly started, the variables of its surrounding process are retrieved.
-These variables are stored in the custom attributes of the taskana task in a HashMap with key **referenced_task_variables** and as value a String that contains the Json representation\
-of the variables.
-
-3.      Workbaskets<br/>
-Task mapping has been kept to a minimum. If the adapter creates a taskana task, it puts it into the workbasket of the referenced task’s assignee. If this workbasket doesn't exist,\
-it is created (together with some workbasket_access_items). If the task has no assignee, it is put into a default workbasket with name DEFAULT_WORKBASKET.
+1.  Duplicate tasks \
+    Method retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks periodically queries the external system, to retrieve tasks that were created in a specific interval. \
+    To determine this interval, transactional behavior must be taken into account. Due to transactions, a task that was created at a specific instant may become visible only when 
+    the transaction is committed.\
+    In the extreme case this is the maximum transaction lifetime. As a consequence, the specified interval is not between the last query time and now, 
+    but between (the last query time – maximum transaction lifetime) and now.\
+    Using default values to illustrate: Queries are performed every 10 seconds. The default maximum transaction lifetime is 120 seconds. This is, the adapter has to retrieve all tasks
+    that were created in the last 130 seconds. \
+    In the result, the query returns many tasks that have already been processed by the adapter. To cope with this problem, the adapter uses the TASKS table of its database to keep track
+    of the tasks that are already handled.\ 
+    Tasks that are not found in this table are added to the table and a corresponding taskana task is started. Tasks that are found in the table are
+    ignored, they are duplicates.
+2.  Variables \
+    When the adapter finds a referenced task for which a taskana task must be started, it retrieves the variables of the referenced task's process.
+    These variables are stored in the **custom attributes** of the corresponding taskana task in a HashMap with key **referenced_task_variables** and value of type String that contains the Json representation of the variables.
+3.  Workbaskets \
+    Task / workbasket mapping has been kept to a minimum. If the adapter creates a taskana task, it puts it into the workbasket of the referenced task’s assignee. If this workbasket doesn't exist, it is created (together with some workbasket_access_items). If the task has no assignee, it is put into a default workbasket with name DEFAULT_WORKBASKET.
 
 ## Properties
 *       Adapter properties
