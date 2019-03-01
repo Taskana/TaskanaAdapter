@@ -5,7 +5,7 @@
 
         <groupId>pro.taskana</groupId>
         <artifactId>taskana-adapter</artifactId>
-        <version>0.0.1</version>
+        <version>0.0.1-SNAPSHOT</version>
         <packaging>jar</packaging>
 
         <name>taskana-adapter</name>

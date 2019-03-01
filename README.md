@@ -55,14 +55,14 @@ The adapter performs periodically the following tasks
 
 1.  Duplicate tasks \
     Method retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks periodically queries the external system, to retrieve tasks that were created in a specific interval. \
-    To determine this interval, transactional behavior must be taken into account. Due to transactions, a task that was created at a specific instant may become visible only when 
+    To determine this interval, transactional behavior must be taken into account. Due to transactions, a task that was created at a specific instant may become visible only when
     the transaction is committed.\
-    In the extreme case this is the maximum transaction lifetime. As a consequence, the specified interval is not between the last query time and now, 
+    In the extreme case this is the maximum transaction lifetime. As a consequence, the specified interval is not between the last query time and now,
     but between (the last query time – maximum transaction lifetime) and now.\
     Using default values to illustrate: Queries are performed every 10 seconds. The default maximum transaction lifetime is 120 seconds. This is, the adapter has to retrieve all tasks
     that were created in the last 130 seconds. \
     In the result, the query returns many tasks that have already been processed by the adapter. To cope with this problem, the adapter uses the TASKS table of its database to keep track
-    of the tasks that are already handled.\ 
+    of the tasks that are already handled.\
     Tasks that are not found in this table are added to the table and a corresponding taskana task is started. Tasks that are found in the table are
     ignored, they are duplicates.
 2.  Variables \
@@ -77,6 +77,8 @@ The adapter performs periodically the following tasks
         * taskana.adapter.datasource.driverClassName                    - fully qualified name of driver class
         * taskana.adapter.datasource.username                           - user name to connect to adapter's db
         * taskana.adapter.datasource.password                           - password to connect to adapter's db
+        * taskana.adapter.datasource.jndi-name                          - the jndi name of the configured adapter datasource for the wildfly sample
+
         * taskana.adapter.schemaName                                    - schema name for adapters tables
 
         * taskana.adapter.total.transaction.lifetime.in.seconds         - total transaction lifetime in seconds. Default: 120
@@ -93,11 +95,9 @@ The adapter performs periodically the following tasks
         * taskana-system-connector-camundaSystemURLs - Rest endpoint of camunda. e.g. http://localhost:8080/engine-rest
 
 *        Taskana-connector properties
-        * taskana.domains                          - valid taskana domains
-        * taskana.classification.types             - valid classification types
-        * taskana.classification.categories        - valid classification categories
         * taskana.datasource.url                   - jdbc url of taskana's database
         * taskana.datasource.driverClassName       - fully qualified name of driver class
         * taskana.datasource.username              - user name to connect to taskana db
         * taskana.datasource.password              - password to connect to taskana db
+        * taskana.datasource.jndi-name             - the jndi name of the configured taskana datasource for the wildfly sample
         * taskana.schemaName=TASKANA               - schema name of taskana's tables
