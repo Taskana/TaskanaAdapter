@@ -44,7 +44,7 @@
               <dependency>
                    <groupId>pro.taskana</groupId>
                    <artifactId>taskana-adapter</artifactId>
-                   <version>0.0.1</version>
+                   <version>${project.version}</version>
               </dependency>
 
              <dependency>

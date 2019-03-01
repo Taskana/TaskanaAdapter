@@ -30,11 +30,11 @@
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-web</artifactId>
                 </dependency>
-				<dependency>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-configuration-processor</artifactId>
-					<optional>true</optional>
-				</dependency>
+                <dependency>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-configuration-processor</artifactId>
+                        <optional>true</optional>
+                </dependency>
 
                 <dependency>
                         <groupId>org.springframework.boot</groupId>
@@ -45,17 +45,17 @@
                 <dependency>
                         <groupId>pro.taskana</groupId>
                         <artifactId>taskana-adapter</artifactId>
-                        <version>0.0.1</version>
+                        <version>${project.version}</version>
                 </dependency>
                 <dependency>
                         <groupId>pro.taskana</groupId>
                         <artifactId>taskana-adapter-camunda-system-connector</artifactId>
-                        <version>0.0.1</version>
+                        <version>${project.version}</version>
                 </dependency>
                 <dependency>
                         <groupId>pro.taskana</groupId>
                         <artifactId>taskana-adapter-taskana-connector</artifactId>
-                        <version>0.0.1</version>
+                        <version>${project.version}</version>
                 </dependency>
 
                 <dependency>
