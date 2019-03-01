@@ -2,7 +2,6 @@ package pro.taskana.adapter.taskanaconnector.api.impl;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +18,6 @@ import pro.taskana.TimeInterval;
 import pro.taskana.adapter.exceptions.TaskConversionFailedException;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
-import pro.taskana.adapter.scheduler.Scheduler;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.exceptions.ClassificationAlreadyExistException;

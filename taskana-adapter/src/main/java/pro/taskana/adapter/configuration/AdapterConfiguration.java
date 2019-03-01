@@ -3,6 +3,9 @@ package pro.taskana.adapter.configuration;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.mapping.Environment;
@@ -10,86 +13,83 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.session.SqlSessionManager;
 import org.mybatis.spring.transaction.SpringManagedTransactionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Scope;
 
 import pro.taskana.adapter.impl.ReferencedTaskCompleter;
 import pro.taskana.adapter.impl.TaskanaTaskStarter;
 import pro.taskana.adapter.impl.TaskanaTaskTerminator;
+import pro.taskana.adapter.manager.Manager;
 import pro.taskana.adapter.mappings.AdapterMapper;
-import pro.taskana.adapter.scheduler.Scheduler;
 import pro.taskana.exceptions.SystemException;
 import pro.taskana.exceptions.UnsupportedDatabaseException;
 import pro.taskana.impl.TaskanaEngineImpl;
 
 /**
- * Configures the REST client.
+ * Configures the adapter .
  */
 @Configuration
-@PropertySource("application.properties")
 public class AdapterConfiguration {
 
-    private DataSource dataSource;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdapterConfiguration.class);
+
+    @Value("${taskana.adapter.datasource.jndi-name:no-jndi-configured}")
+    private String jndiName;
+
+    @Bean(name = "adapterDataSource")
+    @ConfigurationProperties(prefix = "taskana.adapter.datasource")
+    public DataSource adapterDataSource() throws NamingException {
+        if ("no-jndi-configured".equals(jndiName)) {
+            return  DataSourceBuilder.create().build();
+        } else {
+            Context ctx = new InitialContext();
+            return (DataSource) ctx.lookup(jndiName);
+        }
+    }
+
     private SqlSessionManager sqlSessionManager;
 
-    @Value("${taskana.adapter.schemaName}")
-    private String schemaName;
-
     @Bean
-    public String schemaName() {
-        return schemaName;
+    @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public Manager manager() {
+        return new Manager();
     }
 
     @Bean
-    @Primary
-    @ConfigurationProperties(prefix = "taskana.adapter.datasource")
-    public DataSourceProperties dataSourceProperties() {
-        return  new DataSourceProperties();
-    }
-
-    @Bean
-    public Scheduler scheduler() {
-        return new Scheduler();
-    }
-    
-    @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     public ReferencedTaskCompleter referencedTaskCompleter(){
         return new ReferencedTaskCompleter();
     }
-    
+
     @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     public TaskanaTaskStarter taskanaTaskStarter() {
         return new TaskanaTaskStarter();
     }
-    
-    @Bean TaskanaTaskTerminator taskanaTaskTerminator() {
+
+    @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
+    TaskanaTaskTerminator taskanaTaskTerminator() {
         return new TaskanaTaskTerminator();
     }
-    
-    @Bean
-    public DataSource dataSource() {
-        return getOrCreateDataSource();
-    }
-
-    private DataSource getOrCreateDataSource() {
-        if (dataSource == null) {
-            dataSource = dataSourceProperties().initializeDataSourceBuilder().build();
-        }
-        return dataSource;
-    }
 
     @Bean
-    AdapterMapper adapterMapper() {
+    @DependsOn(value= {"adapterDataSource"})
+    AdapterMapper adapterMapper() throws NamingException {
         return getOrCreateSqlSessionManager().getMapper(AdapterMapper.class);
     }
 
     @Bean
-    public SqlSessionManager sqlSessionManager() {
+    @DependsOn(value= {"adapterDataSource"})
+    public SqlSessionManager sqlSessionManager() throws NamingException {
         return getOrCreateSqlSessionManager();
     }
     /**
@@ -97,19 +97,22 @@ public class AdapterConfiguration {
      * attribute.
      *
      * @return a {@link SqlSessionFactory}
+     * @throws NamingException
      */
-    protected SqlSessionManager getOrCreateSqlSessionManager() {
+    protected SqlSessionManager getOrCreateSqlSessionManager() throws NamingException {
         if (sqlSessionManager == null) {
-            dataSource = getOrCreateDataSource();
+            DataSource adapterDataSource = adapterDataSource();
             Environment environment = new Environment("taskanaAdapterEnvironment",  new SpringManagedTransactionFactory(),
-                dataSource);
+                adapterDataSource);
             org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration(environment);
 
             // set databaseId
             String databaseProductName;
-            try (Connection con = dataSource.getConnection()) {
+            try (Connection con = adapterDataSource.getConnection()) {
                 databaseProductName = con.getMetaData().getDatabaseProductName();
+                LOGGER.info("using database product {} ", databaseProductName );
                 if (TaskanaEngineImpl.isDb2(databaseProductName)) {
+
                     configuration.setDatabaseId("db2");
                 } else if (TaskanaEngineImpl.isH2(databaseProductName)) {
                     configuration.setDatabaseId("h2");
@@ -131,4 +134,5 @@ public class AdapterConfiguration {
         }
         return sqlSessionManager;
     }
+
 }

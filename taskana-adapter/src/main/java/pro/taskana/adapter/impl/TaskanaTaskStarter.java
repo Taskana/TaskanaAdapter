@@ -18,9 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import pro.taskana.Task;
 import pro.taskana.adapter.exceptions.TaskConversionFailedException;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
+import pro.taskana.adapter.manager.AgentType;
+import pro.taskana.adapter.manager.Manager;
 import pro.taskana.adapter.mappings.AdapterMapper;
-import pro.taskana.adapter.scheduler.AgentType;
-import pro.taskana.adapter.scheduler.Scheduler;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
@@ -38,7 +38,7 @@ public class TaskanaTaskStarter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskStarter.class);
 
-    private Scheduler scheduler;
+    private Manager manager;
 
     @Value("${taskanaAdapter.total.transaction.lifetime.in.seconds:120}")
     private int maximumTotalTransactionLifetime;
@@ -47,14 +47,14 @@ public class TaskanaTaskStarter {
     @Autowired
     private AdapterMapper adapterMapper;
 
-    public void setScheduler(Scheduler scheduler) {
-        this.scheduler = scheduler;
+    public void setManager(Manager manager) {
+        this.manager = manager;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks() {
         LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
-        for (SystemConnector systemConnector : (scheduler.getSystemConnectors().values())) {
+        for (SystemConnector systemConnector : (manager.getSystemConnectors().values())) {
             try {
                 Instant lastRetrievedMinusTransactionDuration = determineStartInstant(systemConnector);
 
@@ -69,7 +69,7 @@ public class TaskanaTaskStarter {
                 }
 
                 for (ReferencedTask referencedTask : tasksToStart) {
-                    createTaskanaTask(referencedTask, scheduler.getTaskanaConnectors(), systemConnector);
+                    createTaskanaTask(referencedTask, manager.getTaskanaConnectors(), systemConnector);
                 }
                 adapterMapper.rememberLastQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), systemConnector.getSystemURL(), AgentType.START_TASKANA_TASKS);
             } finally {

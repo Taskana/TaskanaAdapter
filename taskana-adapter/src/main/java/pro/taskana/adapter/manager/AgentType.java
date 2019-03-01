@@ -1,4 +1,4 @@
-package pro.taskana.adapter.scheduler;
+package pro.taskana.adapter.manager;
 
 /**
  * Distinguish the various agents running in scheduler.

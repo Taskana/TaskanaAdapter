@@ -12,7 +12,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import pro.taskana.adapter.scheduler.AgentType;
+import pro.taskana.adapter.manager.AgentType;
 
 /**
  * Mapper for the Timestamps of the last creation of Taskana tasks or completion of referenced tasks.

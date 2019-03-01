@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import pro.taskana.adapter.manager.AgentType;
+import pro.taskana.adapter.manager.Manager;
 import pro.taskana.adapter.mappings.AdapterMapper;
-import pro.taskana.adapter.scheduler.AgentType;
-import pro.taskana.adapter.scheduler.Scheduler;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
@@ -38,17 +38,17 @@ public class ReferencedTaskCompleter {
     @Value("${taskanaAdapter.total.transaction.lifetime.in.seconds:120}")
     private int maximumTotalTransactionLifetime;
 
-    private Scheduler scheduler;
+    private Manager manager;
 
-    public void setScheduler(Scheduler scheduler) {
-        this.scheduler = scheduler;
+    public void setManager(Manager manager) {
+        this.manager = manager;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTask() {
         LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
         try {
-            List<TaskanaConnector> taskanaConnectors = scheduler.getTaskanaConnectors();
+            List<TaskanaConnector> taskanaConnectors = manager.getTaskanaConnectors();
             Assert.assertion(taskanaConnectors.size() == 1, "taskanaConnectors.size() == 1");
             Instant lastRetrievedMinusTransactionDuration = determineStartInstant();
             TaskanaConnector taskanaSystemConnector = taskanaConnectors.get(0);
@@ -94,7 +94,7 @@ public class ReferencedTaskCompleter {
     public void completeReferencedTask(ReferencedTask referencedTask) {
         LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
         try {
-            SystemConnector connector = scheduler.getSystemConnectors().get(referencedTask.getSystemURL());
+            SystemConnector connector = manager.getSystemConnectors().get(referencedTask.getSystemURL());
             if (connector != null) {
                 adapterMapper.registerTaskCompleted(referencedTask.getId(), Instant.now());
                 connector.completeReferencedTask(referencedTask);
