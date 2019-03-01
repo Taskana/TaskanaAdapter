@@ -3,17 +3,10 @@ package pro.taskana.adapter.systemconnector.camunda.api.impl;
 import java.time.Instant;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-
-import pro.taskana.adapter.configuration.SpringContextProvider;
-import pro.taskana.adapter.systemconnector.api.SystemResponse;
-import pro.taskana.adapter.systemconnector.api.SystemConnector;
+import pro.taskana.adapter.configuration.AdapterSpringContextProvider;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
+import pro.taskana.adapter.systemconnector.api.SystemConnector;
+import pro.taskana.adapter.systemconnector.api.SystemResponse;
 
 /**
  * Sample Implementation of SystemConnector.
@@ -39,9 +32,9 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
        
     public CamundaSystemConnectorImpl(String camundaSystemURL) {
         this.camundaSystemURL = camundaSystemURL;
-        taskRetriever = SpringContextProvider.getBean(CamundaTaskRetriever.class);
-        variableRetriever = SpringContextProvider.getBean(CamundaVariableRetriever.class);
-        taskCompleter = SpringContextProvider.getBean(CamundaTaskCompleter.class);
+        taskRetriever = AdapterSpringContextProvider.getBean(CamundaTaskRetriever.class);
+        variableRetriever = AdapterSpringContextProvider.getBean(CamundaVariableRetriever.class);
+        taskCompleter = AdapterSpringContextProvider.getBean(CamundaTaskCompleter.class);
     }
     
     @Override
