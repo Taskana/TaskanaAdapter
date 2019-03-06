@@ -17,5 +17,6 @@
                 <module>taskana-adapter-camunda-system-connector</module>
                 <module>taskana-adapter-taskana-connector</module>
                 <module>taskana-adapter-sample</module>
+                <module>taskana-adapter-wildfly-example</module>
         </modules>
 </project>

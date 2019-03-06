@@ -44,6 +44,7 @@ import pro.taskana.impl.util.LoggerUtils;
 public class Manager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Manager.class);
+    private static final String ADAPTER_SCHEMA_VERSION = "0.0.1";
     private static boolean isRunningCreateTaskanaTasksFromReferencedTasks = false;
     private static boolean isRunningCompleteReferencedTasks = false;
     private static boolean isRunningCleanupTaskanaAdapterTables = false;
@@ -291,8 +292,14 @@ public class Manager {
             } else {
                 this.adapterSchemaName = this.adapterSchemaName.toUpperCase();
             }
-            AdapterSchemaCreator schemaCreator = new AdapterSchemaCreator(adapterDataSource, adapterSchemaName);
+            AdapterSchemaCreator schemaCreator = new AdapterSchemaCreator(adapterDataSource, adapterSchemaName, ADAPTER_SCHEMA_VERSION);
             schemaCreator.run();
+            if (!schemaCreator.isValidSchemaVersion(ADAPTER_SCHEMA_VERSION)) {
+                throw new SystemException(
+                    "The Database Schema Version doesn't match the expected version " + ADAPTER_SCHEMA_VERSION);
+            }
+            
+            
         } catch (SQLException ex) {
             LOGGER.error("Caught {} when attempting to initialize the database", ex);
         }
