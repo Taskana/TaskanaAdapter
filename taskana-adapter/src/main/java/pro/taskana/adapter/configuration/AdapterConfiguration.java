@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Scope;
 import pro.taskana.adapter.impl.ReferencedTaskCompleter;
 import pro.taskana.adapter.impl.TaskanaTaskStarter;
 import pro.taskana.adapter.impl.TaskanaTaskTerminator;
-import pro.taskana.adapter.manager.Manager;
+import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.mappings.AdapterMapper;
 import pro.taskana.exceptions.SystemException;
 import pro.taskana.exceptions.UnsupportedDatabaseException;
@@ -55,12 +55,10 @@ public class AdapterConfiguration {
         }
     }
 
-    private SqlSessionManager sqlSessionManager;
-
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public Manager manager() {
-        return new Manager();
+    public AdapterManager manager() {
+        return new AdapterManager();
     }
 
     @Bean
@@ -83,24 +81,8 @@ public class AdapterConfiguration {
 
     @Bean
     @DependsOn(value= {"adapterDataSource"})
-    AdapterMapper adapterMapper() throws NamingException {
-        return getOrCreateSqlSessionManager().getMapper(AdapterMapper.class);
-    }
-
-    @Bean
-    @DependsOn(value= {"adapterDataSource"})
-    public SqlSessionManager sqlSessionManager() throws NamingException {
-        return getOrCreateSqlSessionManager();
-    }
-    /**
-     * This method creates the sqlSessionManager of myBatis. It integrates all the SQL mappers and sets the databaseId
-     * attribute.
-     *
-     * @return a {@link SqlSessionFactory}
-     * @throws NamingException
-     */
-    protected SqlSessionManager getOrCreateSqlSessionManager() throws NamingException {
-        if (sqlSessionManager == null) {
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public SqlSessionManager sqlSessionManager() throws NamingException {        
             DataSource adapterDataSource = adapterDataSource();
             Environment environment = new Environment("taskanaAdapterEnvironment",  new SpringManagedTransactionFactory(),
                 adapterDataSource);
@@ -130,9 +112,7 @@ public class AdapterConfiguration {
 
             configuration.addMapper(AdapterMapper.class);
             SqlSessionFactory localSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
-            sqlSessionManager = SqlSessionManager.newInstance(localSessionFactory);
-        }
-        return sqlSessionManager;
+            return SqlSessionManager.newInstance(localSessionFactory);        
     }
 
 }

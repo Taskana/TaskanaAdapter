@@ -34,17 +34,15 @@ import pro.taskana.impl.TaskanaEngineImpl;
 
         private DataSource dataSource;
         private String schemaName;
-        private String schemaVersion;
         private StringWriter outWriter = new StringWriter();
         private PrintWriter logWriter = new PrintWriter(outWriter);
         private StringWriter errorWriter = new StringWriter();
         private PrintWriter errorLogWriter = new PrintWriter(errorWriter);
 
-        public AdapterSchemaCreator(DataSource dataSource, String schemaName, String schemaVersion) {
+        public AdapterSchemaCreator(DataSource dataSource, String schemaName) {
             super();
             this.dataSource = dataSource;
             this.schemaName = schemaName;
-            this.schemaVersion = schemaVersion;
         }
 
         private static String selectDbScriptFileName(String dbProductName) {
