@@ -152,7 +152,6 @@ import pro.taskana.impl.TaskanaEngineImpl;
                 while (line != null) {
                     line = reader.readLine();
                     if (line != null) {
-                        line = line.replaceAll("%schemaVersion%", schemaVersion);
                         content.append(line.replaceAll("%schemaName%", effectiveSchemaName) + System.lineSeparator());
                     }
                 }
