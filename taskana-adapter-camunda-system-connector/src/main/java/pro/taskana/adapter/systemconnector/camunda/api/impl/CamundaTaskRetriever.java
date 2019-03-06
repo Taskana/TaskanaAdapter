@@ -37,7 +37,7 @@ public class CamundaTaskRetriever {
             Date date = java.sql.Timestamp.valueOf(createdAfter.atZone(ZoneId.systemDefault()).toLocalDateTime());
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
             requestBody = "{\"createdAfter\": \"" + formatter.format(date) + "\"}";
-            LOGGER.info("retrieving active camunda tasks with request body {}", requestBody);
+            LOGGER.debug("retrieving active camunda tasks with request body {}", requestBody);
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -61,7 +61,7 @@ public class CamundaTaskRetriever {
             Date date = java.sql.Timestamp.valueOf(finishedAfter.atZone(ZoneId.systemDefault()).toLocalDateTime());
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
             requestBody = "{ \"finished\" : \"true\", \"finishedAfter\": \"" + formatter.format(date) + "\"}";
-            LOGGER.info("retrieving finished camunda tasks with request body {}", requestBody);
+            LOGGER.debug("retrieving finished camunda tasks with request body {}", requestBody);
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
