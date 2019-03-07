@@ -3,7 +3,9 @@ package pro.taskana.adapter.impl;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -35,7 +37,8 @@ import pro.taskana.impl.util.IdGenerator;
 public class TaskanaTaskTerminator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskTerminator.class);
-    private boolean isFirstAttemptToProcessFinishedReferencedTasks = true;
+
+    private Map<String,Boolean> referencedTasksHaveAlreadyBeenProcessed = new HashMap<>();
 
     @Value("${taskanaAdapter.total.transaction.lifetime.in.seconds:120}")
     private int maximumTotalTransactionLifetime;
@@ -86,11 +89,11 @@ public class TaskanaTaskTerminator {
 
         try {
             Instant lowerThreshold;
-            if (isFirstAttemptToProcessFinishedReferencedTasks) {
+            if (! referencedTasksHaveAlreadyBeenProcessed.containsKey(systemConnector.getSystemURL())) {
                 Instant firstCreatedTask = adapterMapper.getOldestTaskCreationTimestamp(systemConnector.getSystemURL());
                 if (firstCreatedTask != null) {
                     lowerThreshold = firstCreatedTask.minus(Duration.ofSeconds(maximumTotalTransactionLifetime));
-                    isFirstAttemptToProcessFinishedReferencedTasks = false;
+                    referencedTasksHaveAlreadyBeenProcessed.put(systemConnector.getSystemURL(), true);
                 } else {
                     LOGGER.debug("retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks didn't find running tasks -> returning");
                     return;
