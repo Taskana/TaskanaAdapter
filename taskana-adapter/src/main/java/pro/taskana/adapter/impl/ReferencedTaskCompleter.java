@@ -5,15 +5,19 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+
+import org.apache.ibatis.session.SqlSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import pro.taskana.adapter.manager.AgentType;
-import pro.taskana.adapter.manager.Manager;
+import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.mappings.AdapterMapper;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
@@ -32,23 +36,48 @@ public class ReferencedTaskCompleter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferencedTaskCompleter.class);
 
-    @Autowired
-    private AdapterMapper adapterMapper;
-
     @Value("${taskanaAdapter.total.transaction.lifetime.in.seconds:120}")
     private int maximumTotalTransactionLifetime;
 
-    private Manager manager;
+    @Autowired
+    private  SqlSessionManager sqlSessionManager;
 
-    public void setManager(Manager manager) {
-        this.manager = manager;
+    @Autowired
+    AdapterManager adapterManager;
+
+    private AdapterMapper adapterMapper;
+    
+    @PostConstruct
+    public void init() {
+        adapterMapper = sqlSessionManager.getMapper(AdapterMapper.class);         
+    }
+
+    @Scheduled(fixedRateString = "${taskana.adapter.scheduler.run.interval.for.complete.referenced.tasks.in.milliseconds}")
+    public void retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTasks() {
+
+        synchronized (this.getClass()) {
+            if (!adapterManager.isInitialized()) {
+                return;
+            }
+
+            LOGGER.debug("----------retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTasks started----------------------------");
+            adapterManager.openConnection(sqlSessionManager);
+            try {
+                retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTask();
+            } catch (Exception ex) {
+                LOGGER.debug("Caught {} while trying to complete referenced tasks", ex);
+            } finally {
+                LOGGER.debug("----------retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTasks finished----------------------------");
+                adapterManager.returnConnection(sqlSessionManager);
+            }
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTask() {
         LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
         try {
-            List<TaskanaConnector> taskanaConnectors = manager.getTaskanaConnectors();
+            List<TaskanaConnector> taskanaConnectors = adapterManager.getTaskanaConnectors();
             Assert.assertion(taskanaConnectors.size() == 1, "taskanaConnectors.size() == 1");
             Instant lastRetrievedMinusTransactionDuration = determineStartInstant();
             TaskanaConnector taskanaSystemConnector = taskanaConnectors.get(0);
@@ -58,7 +87,7 @@ public class ReferencedTaskCompleter {
                 completeReferencedTask(referencedTask);
             }
             adapterMapper.rememberLastQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), "NONE", AgentType.HANDLE_FINISHED_TASKANA_TASKS);
-  } finally {
+        } finally {
             LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
         }
     }
@@ -94,7 +123,7 @@ public class ReferencedTaskCompleter {
     public void completeReferencedTask(ReferencedTask referencedTask) {
         LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
         try {
-            SystemConnector connector = manager.getSystemConnectors().get(referencedTask.getSystemURL());
+            SystemConnector connector = adapterManager.getSystemConnectors().get(referencedTask.getSystemURL());
             if (connector != null) {
                 adapterMapper.registerTaskCompleted(referencedTask.getId(), Instant.now());
                 connector.completeReferencedTask(referencedTask);

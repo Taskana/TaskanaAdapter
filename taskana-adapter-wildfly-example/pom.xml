@@ -17,11 +17,6 @@
         <properties>
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
                 <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-                <connection-url>jdbc:h2:mem:taskana;IGNORECASE=TRUE;LOCK_MODE=0</connection-url>
-                <driver-class>org.h2.Driver</driver-class>
-                <driver-name>h2</driver-name>
-                <user-name>sa</user-name>
-                <password>sa</password>
                 <java.version>1.8</java.version>
                 <taskana.version>1.0.8-SNAPSHOT</taskana.version>
                 <maven.compiler.source>1.8</maven.compiler.source>
@@ -76,6 +71,11 @@
                         <artifactId>postgresql</artifactId>
                         <version>42.2.5</version>
                 </dependency>
+                <dependency>
+                        <groupId>com.h2database</groupId>
+                        <artifactId>h2</artifactId>
+                        <version>1.4.196</version>
+                </dependency>
 
                 <dependency>
                         <groupId>org.springframework.plugin</groupId>
@@ -107,36 +107,37 @@
                         <activation>
                                 <activeByDefault>false</activeByDefault>
                         </activation>
+                        <!-- Reading properties from file and use then as data source properties
+                                 is a pending improvement of Jboss development team check out -> https://issues.jboss.org/browse/WFMP-70
+                                 That's why we are including postgres connection properties directly in this pom file.
+                        -->
                         <properties>
-                                <driver-class>${jdbcDriver}</driver-class>
-                                <connection-url>${jdbcUrl}</connection-url>
+                                <driver-class>org.postgresql.Driver</driver-class>
+                                <connection-url>jdbc:postgresql://localhost:50102/postgres</connection-url>
                                 <driver-name>postgresqldriver</driver-name>
-                                <user-name>${dbUserName}</user-name>
-                                <password>${dbPassword}</password>
+                                <user-name>postgres</user-name>
+                                <password>postgres</password>
                                 <activatedProperties>postgres</activatedProperties>
                         </properties>
-                        <build>
-                                <plugins>
-                                        <plugin>
-                                                <groupId>org.codehaus.mojo</groupId>
-                                                <artifactId>properties-maven-plugin</artifactId>
-                                                <version>1.0.0</version>
-                                                <executions>
-                                                        <execution>
-                                                                <phase>initialize</phase>
-                                                                <goals>
-                                                                        <goal>read-project-properties</goal>
-                                                                </goals>
-                                                                <configuration>
-                                                                        <files>
-                                                                                <file>${user.home}/taskanaUnitTest.properties</file>
-                                                                        </files>
-                                                                </configuration>
-                                                        </execution>
-                                                </executions>
-                                        </plugin>
-                                </plugins>
-                        </build>
+                </profile>
+
+                <profile>
+                        <id>h2</id>
+                        <activation>
+                                <activeByDefault>true</activeByDefault>
+                        </activation>
+                        <!-- Reading properties from file and use then as data source properties
+                                 is a pending improvement of Jboss development team check out -> https://issues.jboss.org/browse/WFMP-70
+                                 That's why we are including postgres connection properties directly in this pom file.
+                        -->
+                        <properties>
+                                <driver-class>org.h2.Driver</driver-class>
+                                <connection-url>datasource.url=jdbc:h2:mem:tca;IGNORECASE=TRUE;LOCK_MODE=0;INIT=CREATE SCHEMA IF NOT EXISTS TCA</connection-url>
+                                <driver-name>h2driver</driver-name>
+                                <user-name>sa</user-name>
+                                <password>sa</password>
+                                <!-- activatedProperties>h2</activatedProperties-->
+                        </properties>
                 </profile>
         </profiles>
 
@@ -158,18 +159,22 @@
                                 <version>2.0.0.Final</version>
                                 <configuration>
                                         <version>11.0.0.Final</version>
+                                        <javaOpts>-Djboss.http.port=8089</javaOpts>
                                 </configuration>
                                 <executions>
-                                        <!-- execution>
+                                    <!--
+                                        <execution>
                                                 <id>run-wildfly</id>
                                                 <phase>install</phase>
                                                 <goals>
                                                         <goal>start</goal>
                                                 </goals>
-                                        </execution -->
+                                        </execution>
+                                    -->
                                         <!-- Deploy the JDBC library in JBoss -->
-                                        <!--execution>
-                                                <id>deploy-driver</id>
+                                    <!--
+                                        <execution>
+                                                <id>deploy-driver-postgres</id>
                                                 <phase>install</phase>
                                                 <configuration>
                                                         <groupId>org.postgresql</groupId>
@@ -179,10 +184,24 @@
                                                 <goals>
                                                         <goal>deploy-artifact</goal>
                                                 </goals>
-                                        </execution-->
+                                        </execution>
+                                        <execution>
+                                                <id>deploy-driver-h2</id>
+                                                <phase>install</phase>
+                                                <configuration>
+                                                        <groupId>com.h2database</groupId>
+                                                        <artifactId>h2</artifactId>
+                                                        <name>h2driver</name>
+                                                </configuration>
+                                                <goals>
+                                                        <goal>deploy-artifact</goal>
+                                                </goals>
+                                        </execution>
+                                    -->
                                         <!-- Add a data source -->
-                                        <!--execution>
-                                                <id>add-datasource</id>
+                                    <!--
+                                        <execution>
+                                                <id>add-datasource-taskanads</id>
                                                 <phase>install</phase>
                                                 <configuration>
                                                         <address>subsystem=datasources,data-source=java:/TaskanaDS</address>
@@ -203,8 +222,34 @@
                                                 <goals>
                                                         <goal>add-resource</goal>
                                                 </goals>
-                                        </execution-->
+                                        </execution>
+                                        <execution>
+                                                <id>add-datasource=adapterDS</id>
+                                                <phase>install</phase>
+                                                <configuration>
+                                                        <address>subsystem=datasources,data-source=java:/TaskanaAdapterDS</address>
+                                                        <resources>
+                                                                <resource>
+                                                                        <properties>
+                                                                                <jndi-name>java:/TaskanaAdapterDS</jndi-name>
+                                                                                <enabled>true</enabled>
+                                                                                <connection-url>${connection-url}</connection-url>
+                                                                                <driver-class>${driver-class}</driver-class>
+                                                                                <driver-name>${driver-name}</driver-name>
+                                                                                <user-name>${user-name}</user-name>
+                                                                                <password>${password}</password>
+                                                                        </properties>
+                                                                </resource>
+                                                        </resources>
+                                                </configuration>
+                                                <goals>
+                                                        <goal>add-resource</goal>
+                                                </goals>
+                                        </execution>
+                                    -->
                                         <!-- Deploy the application on install -->
+
+                                    <!--
                                         <execution>
                                                 <id>wildfly-deploy</id>
                                                 <phase>install</phase>
@@ -212,7 +257,9 @@
                                                         <goal>deploy</goal>
                                                 </goals>
                                         </execution>
+                                    -->
                                         <!-- undeploy the application on install -->
+                                    <!--
                                         <execution>
                                                 <id>wildfly-undeploy</id>
                                                 <phase>install</phase>
@@ -220,14 +267,17 @@
                                                         <goal>undeploy</goal>
                                                 </goals>
                                         </execution>
+                                    -->
                                         <!-- shutdown the application on install -->
-                                        <!--execution>
+                                    <!--
+                                        <execution>
                                                 <id>wildfly-shutdown</id>
                                                 <phase>install</phase>
                                                 <goals>
                                                         <goal>shutdown</goal>
                                                 </goals>
-                                        </execution -->
+                                        </execution>
+                                    -->
                                 </executions>
                         </plugin>
                 </plugins>
