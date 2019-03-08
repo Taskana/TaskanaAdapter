@@ -18,5 +18,6 @@
                 <module>taskana-adapter-taskana-connector</module>
                 <module>taskana-adapter-sample</module>
                 <module>taskana-adapter-wildfly-example</module>
+                <module>taskana-adapter-test</module>
         </modules>
 </project>
