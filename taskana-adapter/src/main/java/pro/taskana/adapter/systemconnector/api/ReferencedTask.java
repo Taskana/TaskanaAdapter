@@ -1,10 +1,13 @@
 package pro.taskana.adapter.systemconnector.api;
 
+import jdk.nashorn.internal.objects.annotations.Getter;
+
 /**
  * POJO that represents a task in the external system.
  *
  * @author kkl
  */
+
 public class ReferencedTask {
 
     private String id;

@@ -63,7 +63,7 @@
              <dependency>
                    <groupId>pro.taskana</groupId>
                    <artifactId>taskana-spring</artifactId>
-                   <version>${taskana.version}</version>
+                   <version>1.1.0</version>
               </dependency>
 
                 <dependency>
