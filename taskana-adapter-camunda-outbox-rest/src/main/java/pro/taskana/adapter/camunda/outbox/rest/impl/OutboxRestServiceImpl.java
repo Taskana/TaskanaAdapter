@@ -1,6 +1,5 @@
 package pro.taskana.adapter.camunda.outbox.rest.impl;
 
-import com.google.gson.Gson;
 import pro.taskana.adapter.camunda.outbox.rest.OutboxRestService;
 import pro.taskana.adapter.camunda.outbox.rest.dto.ReferencedTaskDTO;
 
@@ -13,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import static org.camunda.spin.Spin.*;
 
 public class OutboxRestServiceImpl implements OutboxRestService {
 
@@ -36,8 +36,7 @@ public class OutboxRestServiceImpl implements OutboxRestService {
                 String creationEventId = Integer.toString(resultSet.getInt(1));
                 String referencedTaskJson = resultSet.getString(2);
 
-                Gson gson = new Gson();
-                ReferencedTaskDTO referencedTaskDTO = gson.fromJson(referencedTaskJson, ReferencedTaskDTO.class);
+                ReferencedTaskDTO referencedTaskDTO = JSON(referencedTaskJson).mapTo(ReferencedTaskDTO.class);
                 referencedTaskDTO.setCreationEventId(creationEventId);
                 referencedTaskDTOS.add(referencedTaskDTO);
             }
