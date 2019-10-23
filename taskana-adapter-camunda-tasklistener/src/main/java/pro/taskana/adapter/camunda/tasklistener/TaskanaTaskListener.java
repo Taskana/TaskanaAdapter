@@ -73,15 +73,15 @@ public class TaskanaTaskListener implements TaskListener {
              */
 
             String referencedTaskJson = "{" +
-                    "id:" + "\""+ delegateTask.getId()+ "\"" + "," +
-                    "name:" + "\"" + delegateTask.getName() + "\"" + "," +
-                    "assignee:" + "\""+delegateTask.getAssignee()+"\"" + "," +
-                    "created:" + "\""+ delegateTask.getCreateTime()+ "\"" + "," +
-                    "due:" + "\"" + delegateTask.getDueDate() + "\"" + "," +
-                    "description:" + "\"" + delegateTask.getDescription() + "\"" + "," +
-                    "owner:" + "\"" + delegateTask.getOwner() + "\"" + "," +
-                    "priority:"+ "\"" + delegateTask.getPriority()+ "\"" + "," +
-                    "taskDefinitionKey:" + "\"" + delegateTask.getTaskDefinitionKey()+ "\""
+                    "\"id\":" + "\""+ delegateTask.getId()+ "\"" + "," +
+                    "\"name\":" + "\"" + delegateTask.getName() + "\"" + "," +
+                    "\"assignee\":" + "\""+delegateTask.getAssignee()+"\"" + "," +
+                    "\"created\":" + "\""+ delegateTask.getCreateTime()+ "\"" + "," +
+                    "\"due\":" + "\"" + delegateTask.getDueDate() + "\"" + "," +
+                    "\"description\":" + "\"" + delegateTask.getDescription() + "\"" + "," +
+                    "\"owner\":" + "\"" + delegateTask.getOwner() + "\"" + "," +
+                    "\"priority\":"+ "\"" + delegateTask.getPriority()+ "\"" + "," +
+                    "\"taskDefinitionKey\":" + "\"" + delegateTask.getTaskDefinitionKey()+ "\""
                     + "}";
 
             PreparedStatement preparedStatement = connection.prepareStatement(insertCreateEventSql, Statement.RETURN_GENERATED_KEYS);
