@@ -88,7 +88,7 @@
                 <dependency>
                         <groupId>pro.taskana</groupId>
                         <artifactId>taskana-spring</artifactId>
-                        <version>1.0.8-SNAPSHOT</version>
+                        <version>1.1.0</version>
                 </dependency>
 
                 <dependency>

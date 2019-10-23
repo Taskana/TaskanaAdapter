@@ -43,8 +43,8 @@ public class CamundaTaskCompleter {
         } catch(HttpStatusCodeException e) {
             LOGGER.info("tried to complete camunda task {} and caught Status code {}",camundaTask.getId(), e.getStatusCode());
             throw new SystemException("caught HttpStatusCodeException " + e.getStatusCode() + " on the attempt to complete Camunda Task " + camundaTask.getId(), e.getMostSpecificCause() );
-        } 
-        
+        }
+
     }          
 
 }

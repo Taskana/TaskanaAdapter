@@ -65,6 +65,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
 
         
         List<ReferencedTask> result = new ArrayList<>();
+
         for (TaskSummary taskSummary : completedTasks) {
             try {
                 Task taskanaTask = taskService.getTask(taskSummary.getTaskId());
