@@ -50,24 +50,9 @@
         </dependency>
         <!-- Jersey 2.19 -->
         <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet</artifactId>
-            <version>2.28</version>
-        </dependency>
-        <dependency>
             <groupId>pro.taskana</groupId>
             <artifactId>taskana-adapter-camunda-tasklistener</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>2.28</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>2.28</version>
         </dependency>
         <dependency>
             <!-- process engine, needs to be 'provided' because it's already a shared library in the container -->
