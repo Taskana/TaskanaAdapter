@@ -91,35 +91,48 @@ public class TaskanaTaskListener implements TaskListener {
 
     private String getDomain(DelegateTask delegateTask) throws Exception {
 
+            String domain = null;
+
             BpmnModelInstance model = delegateTask.getExecution().getBpmnModelInstance();
 
-            String domain = model.getModelElementsByType(CamundaProperty.class).stream().filter(camundaProperty ->
-            camundaProperty.getCamundaName()
-                           .equals("domain"))
-                           .collect(Collectors.toList())
-                           .get(0)
-                           .getCamundaValue();
+            try {
+                domain = model.getModelElementsByType(CamundaProperty.class).stream().filter(camundaProperty ->
+                        camundaProperty.getCamundaName()
+                                .equals("domain"))
+                        .collect(Collectors.toList())
+                        .get(0)
+                        .getCamundaValue();
+            }catch (Exception e){
 
+            }
+            
             return domain;
 
     }
 
-    private String getClassification(DelegateTask delegateTask) throws Exception {
+    private String getClassification(DelegateTask delegateTask) {
 
-        CamundaProperties camundaProperties = delegateTask.getExecution()
-                                              .getBpmnModelElementInstance()
-                                              .getExtensionElements()
-                                              .getElementsQuery()
-                                              .filterByType(CamundaProperties.class)
-                                              .singleResult();
+        String classification = null;
 
-        String classification = camundaProperties.getCamundaProperties()
-                                                 .stream()
-                                                 .filter(camundaProperty -> camundaProperty.getCamundaName()
-                                                         .equals("classification"))
-                                                         .collect(Collectors.toList())
-                                                         .get(0)
-                                                         .getCamundaValue();
+        try {
+            CamundaProperties camundaProperties = delegateTask.getExecution()
+                    .getBpmnModelElementInstance()
+                    .getExtensionElements()
+                    .getElementsQuery()
+                    .filterByType(CamundaProperties.class)
+                    .singleResult();
+
+            classification = camundaProperties.getCamundaProperties()
+                    .stream()
+                    .filter(camundaProperty -> camundaProperty.getCamundaName()
+                            .equals("classification"))
+                    .collect(Collectors.toList())
+                    .get(0)
+                    .getCamundaValue();
+
+        }catch (Exception e){
+
+        }
 
         return classification;
     }
