@@ -1,5 +1,7 @@
 package pro.taskana.adapter.camunda.outbox.rest.jboss.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.taskana.adapter.camunda.outbox.rest.core.OutboxRestServiceCoreImpl;
 import pro.taskana.adapter.camunda.outbox.rest.core.dto.ReferencedTaskDTO;
 import pro.taskana.adapter.camunda.outbox.rest.jboss.OutboxRestServiceJboss;
@@ -15,6 +17,8 @@ import java.util.Properties;
 
 public class OutboxRestServiceJbossImpl implements OutboxRestServiceJboss {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OutboxRestServiceCoreImpl.class);
+
     @Override
     public List<ReferencedTaskDTO> getCreateEvents() {
 
@@ -28,7 +32,7 @@ public class OutboxRestServiceJbossImpl implements OutboxRestServiceJboss {
             referencedTaskDTOS = outboxRestService.getCreateEvents(connection);
 
         } catch (Exception e) {
-
+            LOGGER.warn("Caught {} while trying to retrieve createEvents",e);
         }
         return referencedTaskDTOS;
     }
@@ -44,7 +48,7 @@ public class OutboxRestServiceJbossImpl implements OutboxRestServiceJboss {
             outboxRestService.deleteEvents(connection, ids);
 
         }catch (Exception e){
-
+            LOGGER.warn("Caught {} while trying to delete Events from the outbox table",e);
         }
     }
 
@@ -59,7 +63,8 @@ public class OutboxRestServiceJbossImpl implements OutboxRestServiceJboss {
             DataSource ds = (DataSource) new InitialContext().lookup(properties.getProperty("datasource"));
             connection = ds.getConnection();
 
-        } catch (Exception ex) {
+        } catch (Exception e) {
+            LOGGER.warn("Caught {} while trying to establish a connection from the provided datasource",e);
         }
 
         return connection;

@@ -1,6 +1,8 @@
 package pro.taskana.adapter.camunda.outbox.rest.core;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.taskana.adapter.camunda.outbox.rest.core.dto.ReferencedTaskDTO;
 
 import java.sql.Connection;
@@ -10,14 +12,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.camunda.spin.Spin.JSON;
 
 public class OutboxRestServiceCoreImpl {
 
-    private final Logger LOGGER = Logger.getLogger(this.getClass().getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(OutboxRestServiceCoreImpl.class);
 
     public List<ReferencedTaskDTO> getCreateEvents(Connection connection) {
 
@@ -29,7 +29,7 @@ public class OutboxRestServiceCoreImpl {
 
         } catch (Exception e) {
 
-            LOGGER.log(Level.WARNING, e.getMessage(), e);
+            LOGGER.error("Caught {} while trying to retrieve create Events from the outbox table",e);
         }
 
         return referencedTaskDTOS;
@@ -50,6 +50,7 @@ public class OutboxRestServiceCoreImpl {
 
         } catch (Exception e) {
 
+            LOGGER.warn("Caught {} while trying to delete events from the outbox table",e);
         }
     }
 
@@ -65,6 +66,8 @@ public class OutboxRestServiceCoreImpl {
                 idsAsIntegers.add(Integer.parseInt(id));
 
             } catch (NumberFormatException e) {
+
+                LOGGER.warn("Caught {} while trying to parse an integer from the given string",e);
 
             }
         }
@@ -96,13 +99,14 @@ public class OutboxRestServiceCoreImpl {
             resultSet = preparedStatement.executeQuery();
 
         } catch (Exception e) {
+            LOGGER.warn("Caught {} while trying to retrieve the ResultSet for the requested createEvents",e);
 
         }
 
         return resultSet;
     }
 
-    private List<ReferencedTaskDTO> getReferencedTaskDtos(ResultSet rs, List<ReferencedTaskDTO> referencedTaskDTOS) throws SQLException {
+    private List<ReferencedTaskDTO> getReferencedTaskDtos(ResultSet rs, List<ReferencedTaskDTO> referencedTaskDTOS) {
 
         try (ResultSet resultSet = rs) {
 
@@ -119,6 +123,7 @@ public class OutboxRestServiceCoreImpl {
             }
 
         } catch (Exception e) {
+            LOGGER.warn("Caught {} while trying to retrieve the referencedTaskDTOS from the corresponding resultSet",e);
 
         }
 

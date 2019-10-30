@@ -1,7 +1,8 @@
 package pro.taskana.adapter.camunda.outbox.rest.springboot.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RestController;
 import pro.taskana.adapter.camunda.outbox.rest.core.OutboxRestServiceCoreImpl;
 import pro.taskana.adapter.camunda.outbox.rest.core.dto.ReferencedTaskDTO;
@@ -13,6 +14,8 @@ import java.util.List;
 
 @RestController
 public class OutboxRestServiceSpringBootRestControllerImpl implements OutboxRestServiceSpringBootRestController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OutboxRestServiceCoreImpl.class);
 
     @Autowired
     OutboxRestServiceCoreImpl outboxRestServiceCore;
@@ -27,6 +30,7 @@ public class OutboxRestServiceSpringBootRestControllerImpl implements OutboxRest
             return outboxRestServiceCore.getCreateEvents(connection);
 
         } catch (SQLException e) {
+            LOGGER.warn("Caught {} while trying to retrieve create Events from the outbox table",e);
 
         }
 
@@ -41,7 +45,7 @@ public class OutboxRestServiceSpringBootRestControllerImpl implements OutboxRest
             outboxRestServiceCore.deleteEvents(connection, ids);
 
         } catch (SQLException e){
-            
+            LOGGER.warn("Caught {} while trying to delete events from the outbox table",e);
         }
     }
 }
