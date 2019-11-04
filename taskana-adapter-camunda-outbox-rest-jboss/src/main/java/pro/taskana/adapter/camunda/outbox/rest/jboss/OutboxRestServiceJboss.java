@@ -1,13 +1,13 @@
-package pro.taskana.adapter.camunda.outbox.rest;
+package pro.taskana.adapter.camunda.outbox.rest.jboss;
 
-import pro.taskana.adapter.camunda.outbox.rest.dto.ReferencedTaskDTO;
+import pro.taskana.adapter.camunda.outbox.rest.core.dto.ReferencedTaskDTO;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 @Path("/outbox")
-public interface OutboxRestService {
+public interface OutboxRestServiceJboss {
 
 
     @Path("/getCreateEvents")
@@ -21,4 +21,3 @@ public interface OutboxRestService {
     void deleteEvents(@QueryParam("ids") String ids);
 
 }
-

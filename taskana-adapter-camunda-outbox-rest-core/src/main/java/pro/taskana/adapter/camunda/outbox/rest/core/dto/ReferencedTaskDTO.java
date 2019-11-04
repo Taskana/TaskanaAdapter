@@ -1,4 +1,4 @@
-package pro.taskana.adapter.camunda.outbox.rest.dto;
+package pro.taskana.adapter.camunda.outbox.rest.core.dto;
 
 public class ReferencedTaskDTO {
 

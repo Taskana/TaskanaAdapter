@@ -19,8 +19,10 @@
                 <module>taskana-adapter-sample</module>
                 <module>taskana-adapter-wildfly-example</module>
                 <module>taskana-adapter-test</module>
-                <module>taskana-adapter-camunda-outbox-rest</module>
                 <module>taskana-adapter-camunda-tasklistener</module>
-            <module>taskana-adapter-tasklistener-example</module>
+                <module>taskana-adapter-tasklistener-example</module>
+                <module>taskana-adapter-camunda-outbox-rest-core</module>
+                <module>taskana-adapter-camunda-outbox-rest-spring-boot</module>
+                <module>taskana-adapter-camunda-outbox-rest-jboss</module>
         </modules>
 </project>
