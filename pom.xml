@@ -24,5 +24,6 @@
                 <module>taskana-adapter-camunda-outbox-rest-spring-boot</module>
                 <module>taskana-adapter-camunda-outbox-rest-core</module>
                 <module>taskana-adapter-camunda-outbox-rest-jboss</module>
+
         </modules>
 </project>
