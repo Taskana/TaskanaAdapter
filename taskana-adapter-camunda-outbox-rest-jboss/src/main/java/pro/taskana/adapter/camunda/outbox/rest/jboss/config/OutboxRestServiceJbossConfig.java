@@ -1,4 +1,4 @@
-package pro.taskana.adapter.camunda.outbox.rest.config;
+package pro.taskana.adapter.camunda.outbox.rest.jboss.config;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
@@ -9,6 +9,6 @@ import javax.ws.rs.core.Application;
  *
  */
 @ApplicationPath("/rest")
-public class RestApplicationConfig extends Application {
+public class OutboxRestServiceJbossConfig extends Application {
     // intentionally empty
 }
