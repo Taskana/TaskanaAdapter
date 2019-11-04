@@ -21,12 +21,12 @@ public class OutboxRestServiceSpringBootRestControllerImpl implements OutboxRest
     OutboxRestServiceCoreImpl outboxRestServiceCore;
 
     @Autowired
-    DataSource dataSource;
+    DataSource outboxRestServiceDataSource;
 
     @Override
     public List<ReferencedTaskDTO> getCreateEvents() {
 
-        try (Connection connection = dataSource.getConnection()){
+        try (Connection connection = outboxRestServiceDataSource.getConnection()){
             return outboxRestServiceCore.getCreateEvents(connection);
 
         } catch (SQLException e) {
@@ -40,7 +40,7 @@ public class OutboxRestServiceSpringBootRestControllerImpl implements OutboxRest
     @Override
     public void deleteEvents(String ids) {
 
-        try (Connection connection = dataSource.getConnection()) {
+        try (Connection connection = outboxRestServiceDataSource.getConnection()) {
 
             outboxRestServiceCore.deleteEvents(connection, ids);
 
