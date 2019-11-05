@@ -17,6 +17,8 @@ public class TaskanaTaskListener implements TaskListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskListener.class);
 
+    private static final String SQL_INSERT_CREATE_EVENT = "INSERT INTO event_store (TYPE,CREATED,PAYLOAD) VALUES (?,?,?)";
+
     private static TaskanaTaskListener instance = null;
 
     public static TaskanaTaskListener getInstance() {
@@ -61,9 +63,7 @@ public class TaskanaTaskListener implements TaskListener {
             Timestamp eventCreationTimestamp = Timestamp.from(Instant.now());
             String referencedTaskJson = getReferencedTaskJson(delegateTask);
 
-            String insertCreateEventSql = "INSERT INTO event_store (TYPE,CREATED,PAYLOAD) VALUES (?,?,?)";
-
-            PreparedStatement preparedStatement = connection.prepareStatement(insertCreateEventSql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_CREATE_EVENT, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, delegateTask.getEventName());
             preparedStatement.setTimestamp(2, eventCreationTimestamp);
             preparedStatement.setString(3, referencedTaskJson);
@@ -79,8 +79,6 @@ public class TaskanaTaskListener implements TaskListener {
     }
 
     private String getReferencedTaskJson(DelegateTask delegateTask) {
-
-        LOGGER.info("###############id is############# "+delegateTask.getId());
 
         String referencedTaskJson = "{" +
                 "\"id\":" + "\"" + delegateTask.getId() + "\"," +
@@ -113,7 +111,7 @@ public class TaskanaTaskListener implements TaskListener {
                     .get(0)
                     .getCamundaValue();
         } catch (Exception e) {
-            LOGGER.warn("Caught {} while trying to retrieve the model from a delegate task", e);
+            LOGGER.warn("Caught {} while trying to retrieve the domain from a delegate task", e);
 
         }
 
