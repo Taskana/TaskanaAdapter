@@ -2,11 +2,28 @@ language: java
 jdk:
   - openjdk8
 
+services:
+  - docker
+
 stages:
+  - name: Compile
   - Build
+  - name: Test
   - Release
 
 env:
   global:
     - DEPLOY_REPO=Taskana/TaskanaAdapter
-  
+  matrix:
+    - DB=POSTGRES_10_4
+
+stage: Test
+install: skip
+script: ci/test.sh $DB
+
+
+matrix:
+  include:
+    - stage: Test
+      script: ci/test.sh $DB
+
