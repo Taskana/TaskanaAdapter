@@ -2,8 +2,6 @@ package pro.taskana.adapter.manager;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,22 +9,16 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import pro.taskana.adapter.configuration.AdapterSchemaCreator;
-import pro.taskana.adapter.impl.ReferencedTaskCompleter;
-import pro.taskana.adapter.impl.TaskanaTaskTerminator;
-import pro.taskana.adapter.mappings.AdapterMapper;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 import pro.taskana.adapter.systemconnector.spi.SystemConnectorProvider;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
@@ -48,22 +40,23 @@ public class AdapterManager {
     private boolean isSpiInitialized = false;
     private boolean isDatabaseInitialized = false;
 
-    @Autowired
-    @Qualifier("adapterDataSource")
+    @Resource(name = "adapterDataSource")
     private DataSource adapterDataSource;
 
     @Value("${taskana.adapter.schemaName:TCA}")
     private String adapterSchemaName;
 
-   private Map<String, SystemConnector> systemConnectors;
+    private Map<String, SystemConnector> systemConnectors;
     private List<TaskanaConnector> taskanaConnectors;
-        
+
     @PostConstruct
     public void init() {
+        LOGGER.debug("### AdapterManager.init called");
         initDatabase();
         isDatabaseInitialized = true;
+        LOGGER.debug("### AdapterManager.init returned");
     }
-    
+
     public void openConnection(SqlSessionManager sqlSessionManager) {
         if (!sqlSessionManager.isManagedSessionStarted()) {
             sqlSessionManager.startManagedSession();
@@ -71,7 +64,8 @@ public class AdapterManager {
         try {
             Connection connection = sqlSessionManager.getConnection();
             connection.setSchema(adapterSchemaName);
-            LOGGER.debug("openConnection called by {} sets schemaname to {} ", Thread.currentThread().getStackTrace()[2].getMethodName(), adapterSchemaName );
+            LOGGER.debug("openConnection called by {} sets schemaname to {} ",
+                Thread.currentThread().getStackTrace()[2].getMethodName(), adapterSchemaName);
         } catch (SQLException e) {
             throw new SystemException(
                 "Method openConnection() could not open a connection to the database. No schema has been created.",
@@ -101,7 +95,6 @@ public class AdapterManager {
         return isSpiInitialized;
     }
 
-   
     public void initSPIs() {
         if (isSpiInitialized) {
             return;
@@ -112,12 +105,14 @@ public class AdapterManager {
         isSpiInitialized = true;
     }
 
-   private void initSystemConnectors() {
+    private void initSystemConnectors() {
         systemConnectors = new HashMap<>();
+        LOGGER.info("### initializing system connectors ");
+
         ServiceLoader<SystemConnectorProvider> loader = ServiceLoader.load(SystemConnectorProvider.class);
         for (SystemConnectorProvider provider : loader) {
             List<SystemConnector> connectors = provider.create();
-            LOGGER.info("initialized system connectors {} " ,LoggerUtils.listToString(connectors));
+            LOGGER.info("initialized system connectors {} ", LoggerUtils.listToString(connectors));
             for (SystemConnector conn : connectors) {
                 systemConnectors.put(conn.getSystemURL(), conn);
             }
@@ -129,13 +124,18 @@ public class AdapterManager {
         ServiceLoader<TaskanaConnectorProvider> loader = ServiceLoader.load(TaskanaConnectorProvider.class);
         for (TaskanaConnectorProvider provider : loader) {
             List<TaskanaConnector> connectors = provider.create();
-            LOGGER.info("initialized taskana connectors {} " ,LoggerUtils.listToString(connectors));
+            LOGGER.info("initialized taskana connectors {} ", LoggerUtils.listToString(connectors));
             taskanaConnectors.addAll(connectors);
         }
     }
 
     private void initDatabase() {
+        if (isDatabaseInitialized) {
+            return;
+        }
         try {
+            LOGGER.debug("### AdapterManager.initDatabase called");
+
             Connection connection = adapterDataSource.getConnection();
             String databaseProductName = connection.getMetaData().getDatabaseProductName();
             if (TaskanaEngineImpl.isPostgreSQL(databaseProductName)) {
@@ -152,10 +152,11 @@ public class AdapterManager {
                 throw new SystemException(
                     "The Database Schema Version doesn't match the expected version " + ADAPTER_SCHEMA_VERSION);
             }
-            
-            
+
         } catch (SQLException ex) {
             LOGGER.error("Caught {} when attempting to initialize the database", ex);
+        } finally {
+            LOGGER.debug("### AdapterManager.initDatabase returned");
         }
     }
 

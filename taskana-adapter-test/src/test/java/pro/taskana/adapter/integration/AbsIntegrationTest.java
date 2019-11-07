@@ -2,6 +2,7 @@ package pro.taskana.adapter.integration;
 
 import java.sql.SQLException;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -10,7 +11,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
@@ -26,7 +26,7 @@ import pro.taskana.impl.configuration.DBCleaner;
 
 /**
  * Parent class for integrationtests for the taskana adapter.
- * 
+ *
  * @author Ben Fuernrohr
  */
 public abstract class AbsIntegrationTest {
@@ -67,17 +67,14 @@ public abstract class AbsIntegrationTest {
 
     private static boolean isInitialised = false;
 
-    @Autowired
-    @Qualifier("taskanaDataSource")
+    @Resource(name = "taskanaDataSource")
     private DataSource taskanaDataSource;
 
-    @Autowired
-    @Qualifier("adapterDataSource")
-    private DataSource taskanaAdapterDataSource;
+    @Resource(name = "adapterDataSource")
+    private DataSource adapterDataSource;
 
-    @Autowired
-    @Qualifier("camundaBpmDataSource")
-    private DataSource camundaDataSource;
+    @Resource(name = "camundaBpmDataSource")
+    private DataSource camundaBpmDataSource;
 
     @Before
     public void setUp() throws SQLException {
@@ -93,8 +90,8 @@ public abstract class AbsIntegrationTest {
 
             DBCleaner cleaner = new DBCleaner();
             cleaner.clearDb(taskanaDataSource, DBCleaner.ApplicationDatabaseType.TASKANA);
-            cleaner.clearDb(taskanaAdapterDataSource, DBCleaner.ApplicationDatabaseType.TASKANA_ADAPTER);
-            cleaner.clearDb(camundaDataSource, DBCleaner.ApplicationDatabaseType.CAMUNDA);
+            cleaner.clearDb(adapterDataSource, DBCleaner.ApplicationDatabaseType.TASKANA_ADAPTER);
+            cleaner.clearDb(camundaBpmDataSource, DBCleaner.ApplicationDatabaseType.CAMUNDA);
 
             isInitialised = true;
         }

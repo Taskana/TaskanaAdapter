@@ -1,9 +1,6 @@
 package pro.taskana.adapter.camunda.outbox.rest.core;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import pro.taskana.adapter.camunda.outbox.rest.core.dto.ReferencedTaskDTO;
+import static org.camunda.spin.Spin.JSON;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +10,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.camunda.spin.Spin.JSON;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import pro.taskana.adapter.camunda.outbox.rest.core.dto.ReferencedTaskDTO;
 
 public class OutboxRestServiceCoreImpl {
 

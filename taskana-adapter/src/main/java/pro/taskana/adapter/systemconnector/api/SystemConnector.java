@@ -19,6 +19,15 @@ public interface SystemConnector {
     List<ReferencedTask> retrieveReferencedTasksStartedAfter(Instant createdAfter);
 
     /**
+     * With this call the Adapter notifies the SystemConnector that a list of Taskana Tasks has been created. Depending
+     * on the Implementation of the System Connector, it may ignore this call.
+     *
+     * @param referencedTasks
+     *            List of ReferencedTasks for which Taskana Tasks have been created.
+     */
+    void taskanaTasksHaveBeenCreatedFor(List<ReferencedTask> referencedTasks);
+
+    /**
      * Retrieve referenced tasks that were finished after a specified instant.
      *
      * @param finishedAfter  the instant after which the tasks finished.

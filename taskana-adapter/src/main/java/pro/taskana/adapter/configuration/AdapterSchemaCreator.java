@@ -1,6 +1,6 @@
 package pro.taskana.adapter.configuration;
 
-    import java.io.BufferedReader;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -97,18 +97,21 @@ import pro.taskana.impl.TaskanaEngineImpl;
             return true;
         }
 
-        public boolean isValidSchemaVersion(String expectedVersion) {
-            SqlRunner runner = null;
-            try {
-                Connection connection = dataSource.getConnection();
-                connection.setSchema(this.schemaName);
+    public boolean isValidSchemaVersion(String expectedVersion) {
+        SqlRunner runner = null;
+        Connection connection = null;
+        String oldSchemaName = this.schemaName;
+        try {
+            connection = dataSource.getConnection();
+            oldSchemaName = connection.getSchema();
+            connection.setSchema(this.schemaName);
 
                 runner = new SqlRunner(connection);
                 LOGGER.debug(connection.getMetaData().toString());
 
-                String query = "select VERSION from TCA_SCHEMA_VERSION where "
-                    + "VERSION = (select max(VERSION) from TCA_SCHEMA_VERSION) "
-                    + "AND VERSION = ?";
+            String query = "select VERSION from TCA.TCA_SCHEMA_VERSION where "
+                + "VERSION = (select max(VERSION) from TCA.TCA_SCHEMA_VERSION) "
+                + "AND VERSION = ?";
 
                 Map<String, Object> queryResult = runner.selectOne(query, expectedVersion);
                 if (queryResult == null || queryResult.isEmpty()) {
@@ -121,17 +124,24 @@ import pro.taskana.impl.TaskanaEngineImpl;
                     return true;
                 }
 
-            } catch (Exception e) {
-                LOGGER.error(
-                    "Schema version not valid. The VERSION property in table TASKANA_SCHEMA_VERSION has not the expected value {}",
-                    expectedVersion);
-                return false;
-            } finally {
-                if (runner != null) {
-                    runner.closeConnection();
+        } catch (Exception e) {
+            LOGGER.error(
+                "Schema version not valid. The VERSION property in table TASKANA_SCHEMA_VERSION has not the expected value {}",
+                expectedVersion);
+            return false;
+        } finally {
+            if (runner != null) {
+                if (connection != null) {
+                    try {
+                        connection.setSchema(oldSchemaName);
+                    } catch (SQLException e) {
+                        LOGGER.error("attempted to reset schema name to {} and got exception {}", oldSchemaName, e);
+                    }
                 }
+                runner.closeConnection();
             }
         }
+    }
 
         public DataSource getDataSource() {
             return dataSource;

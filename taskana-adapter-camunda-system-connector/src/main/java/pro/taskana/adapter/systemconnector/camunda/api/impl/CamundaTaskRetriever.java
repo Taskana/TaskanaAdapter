@@ -12,7 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,36 +28,41 @@ public class CamundaTaskRetriever {
     @Autowired
     private RestTemplate restTemplate;
 
-    public List<ReferencedTask> retrieveCamundaTasksStartedAfter(String camundaSystemURL, Instant createdAfter) {
-        LOGGER.debug("entry to retrieveActiveCamundaTasks. CamundSystemURL = {}, createdAfter = {} ",camundaSystemURL, createdAfter );
-        String requestUrl = camundaSystemURL + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS ;
-        String requestBody;
-        if (createdAfter == null) {
-            requestBody = CamundaSystemConnectorImpl.EMPTY_REQUEST_BODY;
-        } else {
-            // Instant is in UTC time, Camunda uses local time. Need to adjust ...
-            Date date = java.sql.Timestamp.valueOf(createdAfter.atZone(ZoneId.systemDefault()).toLocalDateTime());
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-            requestBody = "{\"createdAfter\": \"" + formatter.format(date) + "\"}";
-            LOGGER.debug("retrieving active camunda tasks with request body {}", requestBody);
-        }
+    public List<ReferencedTask> retrieveCamundaTasksStartedAfter(String camundaSystemTaskEventUrl,
+        Instant createdAfter) {
+
+        LOGGER.debug("entry to retrieveActiveCamundaTasks. createdAfter = {} ",
+            createdAfter);
+
+        String requestUrl = camundaSystemTaskEventUrl + CamundaSystemConnectorImpl.URL_OUTBOX_REST_PATH
+            + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_START_EVENTS;
+        // Instant is in UTC time, Camunda uses local time. Need to adjust ...
+        Date date = java.sql.Timestamp.valueOf(createdAfter.atZone(ZoneId.systemDefault()).toLocalDateTime());
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        requestUrl += formatter.format(date);
+        LOGGER.debug("retrieving active camunda tasks with url {}", requestUrl);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-        LOGGER.debug("retrieveActiveCamundaTasks posts {}, body = {}", requestUrl, requestBody );
-        ReferencedTask[] tasks = restTemplate.postForEntity(requestUrl, entity, ReferencedTask[].class).getBody();
+        LOGGER.debug("### retrieveActiveCamundaTasks url {} ", requestUrl);
+
+        ResponseEntity<ReferencedTask[]> responseEntity = restTemplate.exchange(
+            requestUrl, HttpMethod.GET, new HttpEntity<Object>(headers),
+            ReferencedTask[].class);
+
+        ReferencedTask[] tasks = responseEntity.getBody();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("exit from retrieveActiveCamundaTasks. Retrieved Tasks: {}",Arrays.toString(tasks) );
+            LOGGER.debug("exit from retrieveCamundaTasksStartedAfter. Retrieved Tasks: {}", Arrays.toString(tasks));
         }
         return Arrays.asList(tasks);
     }
-    
+
     public List<ReferencedTask> retrieveFinishedCamundaTasks(String camundaSystemURL, Instant finishedAfter) {
-        LOGGER.debug("entry to retrieveFinishedCamundaTasks. CamundSystemURL = {}, finishedAfter = {} ",camundaSystemURL, finishedAfter );
-        String requestUrl = camundaSystemURL + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_HISTORIC_TASKS ;
+        LOGGER.debug("entry to retrieveFinishedCamundaTasks. CamundSystemURL = {}, finishedAfter = {} ",
+            camundaSystemURL, finishedAfter);
+        String requestUrl = camundaSystemURL + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_HISTORIC_TASKS;
         String requestBody;
         if (finishedAfter == null) {
-            requestBody ="{ \"finished\" : \"true\"}";
+            requestBody = "{ \"finished\" : \"true\"}";
         } else {
             // Instant is in UTC time, Camunda uses local time. Need to adjust ...
             Date date = java.sql.Timestamp.valueOf(finishedAfter.atZone(ZoneId.systemDefault()).toLocalDateTime());
@@ -67,11 +74,11 @@ public class CamundaTaskRetriever {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
-        LOGGER.debug("retrieveFinishedCamundaTasks postw {}, body = {}", requestUrl, requestBody );
+        LOGGER.debug("retrieveFinishedCamundaTasks postw {}, body = {}", requestUrl, requestBody);
 
         ReferencedTask[] tasks = restTemplate.postForEntity(requestUrl, entity, ReferencedTask[].class).getBody();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("exit from retrieveFinishedCamundaTasks. Retrieved Tasks: {}",Arrays.toString(tasks) );
+            LOGGER.debug("exit from retrieveFinishedCamundaTasks. Retrieved Tasks: {}", Arrays.toString(tasks));
         }
         return Arrays.asList(tasks);
     }

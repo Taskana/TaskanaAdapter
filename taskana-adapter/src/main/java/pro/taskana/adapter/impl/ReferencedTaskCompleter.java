@@ -16,8 +16,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import pro.taskana.adapter.manager.AgentType;
 import pro.taskana.adapter.manager.AdapterManager;
+import pro.taskana.adapter.manager.AgentType;
 import pro.taskana.adapter.mappings.AdapterMapper;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
@@ -28,8 +28,8 @@ import pro.taskana.impl.util.IdGenerator;
 
 /**
  * Completes ReferencedTasks in the external system after completion of corresponding taskana tasks.
- * @author bbr
  *
+ * @author bbr
  */
 @Component
 public class ReferencedTaskCompleter {
@@ -46,10 +46,10 @@ public class ReferencedTaskCompleter {
     AdapterManager adapterManager;
 
     private AdapterMapper adapterMapper;
-    
+
     @PostConstruct
     public void init() {
-        adapterMapper = sqlSessionManager.getMapper(AdapterMapper.class);         
+        adapterMapper = sqlSessionManager.getMapper(AdapterMapper.class);
     }
 
     @Scheduled(fixedRateString = "${taskana.adapter.scheduler.run.interval.for.complete.referenced.tasks.in.milliseconds}")
@@ -79,16 +79,20 @@ public class ReferencedTaskCompleter {
         try {
             List<TaskanaConnector> taskanaConnectors = adapterManager.getTaskanaConnectors();
             Assert.assertion(taskanaConnectors.size() == 1, "taskanaConnectors.size() == 1");
-            Instant lastRetrievedMinusTransactionDuration = determineStartInstant();
+            Instant lastCompletedMinusTransactionDuration = determineStartInstant();
             TaskanaConnector taskanaSystemConnector = taskanaConnectors.get(0);
-            List<ReferencedTask> candidateTasksCompletedByTaskana = taskanaSystemConnector.retrieveCompletedTaskanaTasks(lastRetrievedMinusTransactionDuration);
-            List<ReferencedTask> tasksToBeCompletedInExternalSystem = findTasksToBeCompletedInExternalSystem(candidateTasksCompletedByTaskana);
+            List<ReferencedTask> candidateTasksCompletedByTaskana = taskanaSystemConnector
+                .retrieveCompletedTaskanaTasks(lastCompletedMinusTransactionDuration);
+            List<ReferencedTask> tasksToBeCompletedInExternalSystem = findTasksToBeCompletedInExternalSystem(
+                candidateTasksCompletedByTaskana);
             for (ReferencedTask referencedTask : tasksToBeCompletedInExternalSystem) {
                 completeReferencedTask(referencedTask);
             }
-            adapterMapper.rememberLastQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), "NONE", AgentType.HANDLE_FINISHED_TASKANA_TASKS);
+            adapterMapper.rememberLastQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), "NONE",
+                AgentType.HANDLE_FINISHED_TASKANA_TASKS);
         } finally {
-            LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
+            LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(),
+                Thread.currentThread().getStackTrace()[1].getMethodName());
         }
     }
 
@@ -96,23 +100,29 @@ public class ReferencedTaskCompleter {
         Instant now = Instant.now();
         Instant lastRetrievedMinusTransactionDuration = adapterMapper.getLatestCompletedTimestamp();
         if (lastRetrievedMinusTransactionDuration == null) {
-            lastRetrievedMinusTransactionDuration = now.minus(Duration.ofDays(1));
+            lastRetrievedMinusTransactionDuration = now.minus(Duration.ofDays(7));
         } else {
-            lastRetrievedMinusTransactionDuration = lastRetrievedMinusTransactionDuration.minus(Duration.ofSeconds(maximumTotalTransactionLifetime));
+            lastRetrievedMinusTransactionDuration = lastRetrievedMinusTransactionDuration
+                .minus(Duration.ofSeconds(maximumTotalTransactionLifetime));
         }
         return lastRetrievedMinusTransactionDuration;
     }
 
-    private List<ReferencedTask> findTasksToBeCompletedInExternalSystem(List<ReferencedTask> candidateTasksForCompletion) {
-        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
+    private List<ReferencedTask> findTasksToBeCompletedInExternalSystem(
+        List<ReferencedTask> candidateTasksForCompletion) {
+        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(),
+            Thread.currentThread().getStackTrace()[1].getMethodName());
         if (candidateTasksForCompletion.isEmpty()) {
             return candidateTasksForCompletion;
         }
-        List<String> candidateTaskIds = candidateTasksForCompletion.stream().map(ReferencedTask::getId).collect(Collectors.toList());
+        List<String> candidateTaskIds = candidateTasksForCompletion.stream()
+            .map(ReferencedTask::getId)
+            .collect(Collectors.toList());
         List<String> alreadyCompletedTaskIds = adapterMapper.findAlreadyCompletedTaskIds(candidateTaskIds);
         List<String> taskIdsToBeCompleted = candidateTaskIds;
         taskIdsToBeCompleted.removeAll(alreadyCompletedTaskIds);
-        LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
+        LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(),
+            Thread.currentThread().getStackTrace()[1].getMethodName());
         return candidateTasksForCompletion.stream()
             .filter(t -> taskIdsToBeCompleted.contains(t.getId()))
             .collect(Collectors.toList());
@@ -121,7 +131,8 @@ public class ReferencedTaskCompleter {
 
     @Transactional
     public void completeReferencedTask(ReferencedTask referencedTask) {
-        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
+        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(),
+            Thread.currentThread().getStackTrace()[1].getMethodName());
         try {
             SystemConnector connector = adapterManager.getSystemConnectors().get(referencedTask.getSystemURL());
             if (connector != null) {
@@ -133,8 +144,8 @@ public class ReferencedTaskCompleter {
         } catch (Exception ex) {
             LOGGER.error("Caught {} when attempting to complete referenced task {}", ex, referencedTask);
         }
-        LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
+        LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(),
+            Thread.currentThread().getStackTrace()[1].getMethodName());
     }
-
 
 }
