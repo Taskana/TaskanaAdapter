@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemResponse;
+import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemUrls;
 import pro.taskana.exceptions.SystemException;
 
 public class CamundaTaskCompleter {
@@ -20,9 +21,11 @@ public class CamundaTaskCompleter {
     
     @Autowired
     private RestTemplate restTemplate;
-    
-    public SystemResponse completeCamundaTask(String camundaHost, ReferencedTask camundaTask) {
-        String url = camundaHost + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS + camundaTask.getId() + CamundaSystemConnectorImpl.COMPLETE_TASK;
+
+    public SystemResponse completeCamundaTask(CamundaSystemUrls.SystemURLInfo camundaSystemUrlInfo,
+        ReferencedTask camundaTask) {
+        String url = camundaSystemUrlInfo.getSystemRestUrl() + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS
+            + camundaTask.getId() + CamundaSystemConnectorImpl.COMPLETE_TASK;
         String requestBody;
         if (camundaTask.getVariables() == null) {
             requestBody = CamundaSystemConnectorImpl.EMPTY_REQUEST_BODY;
@@ -37,12 +40,17 @@ public class CamundaTaskCompleter {
 
         try {
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, entity, String.class);
-            LOGGER.debug("completed camunda task {}. Status code = {}",camundaTask.getId(), responseEntity.getStatusCode());
-           
-            return new SystemResponse(responseEntity.getStatusCode(), null);
+            LOGGER.debug("completed camunda task {}. Status code = {}", camundaTask.getId(),
+                responseEntity.getStatusCode());
+
+            return new SystemResponse(responseEntity.getStatusCode(), null); 
+        
         } catch(HttpStatusCodeException e) {
-            LOGGER.info("tried to complete camunda task {} and caught Status code {}",camundaTask.getId(), e.getStatusCode());
-            throw new SystemException("caught HttpStatusCodeException " + e.getStatusCode() + " on the attempt to complete Camunda Task " + camundaTask.getId(), e.getMostSpecificCause() );
+            
+            LOGGER.info("tried to complete camunda task {} and caught Status code {}", camundaTask.getId(),
+                e.getStatusCode());
+            throw new SystemException("caught HttpStatusCodeException " + e.getStatusCode()
+                + " on the attempt to complete Camunda Task " + camundaTask.getId(), e.getMostSpecificCause());
         }
 
     }          

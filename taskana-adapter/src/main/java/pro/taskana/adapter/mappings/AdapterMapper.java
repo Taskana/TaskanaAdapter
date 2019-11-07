@@ -61,9 +61,10 @@ public interface AdapterMapper {
     @Results(value = {@Result(property = "taskId", column = "ID")})
     List<String> findAlreadyCompletedTaskIds(@Param("taskIdsIn") List<String> taskIdsIn);
 
-    @Insert("INSERT INTO TASKS (ID, CREATED, SYSTEM_URL) VALUES (#{id}, #{created}, #{systemUrl})")
+    @Insert("INSERT INTO TASKS (ID, CREATED, SYSTEM_URL, CREATION_EVENT_ID) VALUES (#{id}, #{created}, #{systemUrl}, #{creationEventId})")
     void registerCreatedTask(@Param("id") String id,
         @Param("created") Instant created,
+        @Param("creationEventId") String creationEventId,
         @Param("systemUrl") String systemUrl);
 
     @Insert("INSERT INTO QUERY_HISTORY (ID, QUERY_TIMESTAMP, SYSTEM_URL, AGENT_TYPE) "

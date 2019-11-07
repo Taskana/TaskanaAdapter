@@ -27,7 +27,7 @@ public class SystemConnectorCamundaProviderImpl implements SystemConnectorProvid
         CamundaSystemUrls camundaSystemURLs = AdapterSpringContextProvider.getBean(CamundaSystemUrls.class);
 
         List<SystemConnector> result = new ArrayList<>();
-        for (String camundaSystemURL : camundaSystemURLs.getUrls()) {
+        for (CamundaSystemUrls.SystemURLInfo camundaSystemURL : camundaSystemURLs.getUrls()) {
             result.add(new CamundaSystemConnectorImpl(camundaSystemURL));
         }
 

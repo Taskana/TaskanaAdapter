@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -30,10 +29,10 @@ import pro.taskana.configuration.SpringTaskanaEngineConfiguration;
 import pro.taskana.configuration.TaskanaEngineConfiguration;
 
 @Configuration
-@DependsOn(value= {"adapterSpringContextProvider"})
+@DependsOn(value = {"adapterSpringContextProvider"})
 public class TaskanaSystemConnectorConfiguration {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaSystemConnectorConfiguration.class);
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaSystemConnectorConfiguration.class);
 
     @Value("${taskana.schemaName:TASKANA}")
     public String taskanaSchemaName;
@@ -43,9 +42,9 @@ public class TaskanaSystemConnectorConfiguration {
 
     @Bean(name = "taskanaDataSource")
     @ConfigurationProperties(prefix = "taskana.datasource")
-    public DataSource adapterDataSource() throws NamingException {
+    public DataSource taskanaDataSource() throws NamingException {
         if ("no-jndi-configured".equals(jndiName)) {
-            return  DataSourceBuilder.create().build();
+            return DataSourceBuilder.create().build();
         } else {
             Context ctx = new InitialContext();
             return (DataSource) ctx.lookup(jndiName);
@@ -75,8 +74,9 @@ public class TaskanaSystemConnectorConfiguration {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public SpringTaskanaEngineConfiguration taskanaEngineConfiguration(@Qualifier("taskanaDataSource") DataSource dataSource) throws SQLException {
-        return new SpringTaskanaEngineConfiguration(dataSource, true, false, taskanaSchemaName);
+    public SpringTaskanaEngineConfiguration taskanaEngineConfiguration(
+        @Qualifier("taskanaDataSource") DataSource taskanaDataSource) throws SQLException {
+        return new SpringTaskanaEngineConfiguration(taskanaDataSource, true, false, taskanaSchemaName);
     }
 
     @Bean(name = "taskanaTransactionManager")
