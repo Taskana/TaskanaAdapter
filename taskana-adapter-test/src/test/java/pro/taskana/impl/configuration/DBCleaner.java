@@ -21,7 +21,8 @@ public class DBCleaner {
     public enum ApplicationDatabaseType {
         TASKANA,
         TASKANA_ADAPTER,
-        CAMUNDA
+        CAMUNDA,
+        OUTBOX
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBCleaner.class);
@@ -29,10 +30,14 @@ public class DBCleaner {
     private static final String TASKANA_DB_CLEAR_SCRIPT = "/sql/clear-taskana-db.sql";
 
     private static final String TASKANA_ADAPTER_DB_CLEAR_SCRIPT = "/sql/clear-taskana-adapter-db.sql";
-
     private static final String CAMUNDA_DB_CLEAR_SCRIPT = "/sql/clear-camunda-db.sql";
+    private static final String OUTBOX_DB_CLEAR_SCRIPT = "/sql/clear-outbox-db.sql";
+
+    private static final String TASKANA_ADAPTER_DB_CLEAR_POSTGRES = "/sql/clear-taskana-adapter-db-postgres.sql";
+    private static final String OUTBOX_DB_CLEAR_POSTGRES = "/sql/clear-outbox-db-postgres.sql";
 
     private Map<ApplicationDatabaseType, String> typeScriptMap = new HashMap<ApplicationDatabaseType, String>();
+    private Map<ApplicationDatabaseType, String> typeScriptMapPostgres = new HashMap<ApplicationDatabaseType, String>();
 
     private StringWriter outWriter = new StringWriter();
     private PrintWriter logWriter = new PrintWriter(outWriter);
@@ -43,6 +48,13 @@ public class DBCleaner {
         this.typeScriptMap.put(ApplicationDatabaseType.TASKANA, TASKANA_DB_CLEAR_SCRIPT);
         this.typeScriptMap.put(ApplicationDatabaseType.TASKANA_ADAPTER, TASKANA_ADAPTER_DB_CLEAR_SCRIPT);
         this.typeScriptMap.put(ApplicationDatabaseType.CAMUNDA, CAMUNDA_DB_CLEAR_SCRIPT);
+        this.typeScriptMap.put(ApplicationDatabaseType.OUTBOX, OUTBOX_DB_CLEAR_SCRIPT);
+
+        this.typeScriptMapPostgres.put(ApplicationDatabaseType.TASKANA, TASKANA_DB_CLEAR_SCRIPT);
+        this.typeScriptMapPostgres.put(ApplicationDatabaseType.TASKANA_ADAPTER, TASKANA_ADAPTER_DB_CLEAR_POSTGRES);
+        this.typeScriptMapPostgres.put(ApplicationDatabaseType.CAMUNDA, CAMUNDA_DB_CLEAR_SCRIPT);
+        this.typeScriptMapPostgres.put(ApplicationDatabaseType.OUTBOX, OUTBOX_DB_CLEAR_POSTGRES);
+
     }
 
     /**
@@ -60,7 +72,12 @@ public class DBCleaner {
             runner.setLogWriter(logWriter);
             runner.setErrorLogWriter(errorLogWriter);
 
+            String dbProductName = connection.getMetaData().getDatabaseProductName();
             String scriptName = this.typeScriptMap.get(applicationDatabaseType);
+            if ("PostgreSQL".equals(dbProductName)) {
+                scriptName = this.typeScriptMapPostgres.get(applicationDatabaseType);
+            }
+            LOGGER.debug("### using script {} to clear database", scriptName);
             runner.runScript(new InputStreamReader(this.getClass().getResourceAsStream(scriptName)));
 
         } catch (Exception e) {

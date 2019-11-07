@@ -19,13 +19,14 @@ import pro.taskana.adapter.mappings.AdapterMapper;
 
 @Component
 public class DatabaseCleaner {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseCleaner.class);
 
     @Value("${taskana.adapter.scheduler.task.age.for.cleanup.in.hours:600}")
     private long maxTaskAgeBeforeCleanup;
 
     @Autowired
-    private  SqlSessionManager sqlSessionManager;
+    private SqlSessionManager sqlSessionManager;
 
     @Autowired
     AdapterManager adapterManager;
@@ -34,17 +35,16 @@ public class DatabaseCleaner {
 
     @PostConstruct
     public void init() {
-        adapterMapper = sqlSessionManager.getMapper(AdapterMapper.class);         
+        adapterMapper = sqlSessionManager.getMapper(AdapterMapper.class);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Scheduled(cron = "${taskana.adapter.scheduler.run.interval.for.cleanup.tasks.cron}")
     public void cleanupTaskanaAdapterTables() {
-        synchronized(this.getClass()) {
+        synchronized (this.getClass()) {
             if (!adapterManager.isInitialized()) {
                 return;
             }
-
             LOGGER.debug("----------cleanupTaskanaAdapterTables started----------------------------");
             adapterManager.openConnection(sqlSessionManager);
             try {

@@ -29,13 +29,14 @@ import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.adapter.util.Assert;
+import pro.taskana.exceptions.TaskAlreadyExistException;
 import pro.taskana.impl.util.IdGenerator;
 import pro.taskana.impl.util.LoggerUtils;
 
 /**
  * Retrieves tasks in an external system and start corresponding tasks in taskana.
+ * 
  * @author bbr
- *
  */
 @Component
 public class TaskanaTaskStarter {
@@ -46,7 +47,7 @@ public class TaskanaTaskStarter {
     private int maximumTotalTransactionLifetime;
 
     @Autowired
-    private  SqlSessionManager sqlSessionManager;
+    private SqlSessionManager sqlSessionManager;
 
     private AdapterMapper adapterMapper;
 
@@ -55,17 +56,25 @@ public class TaskanaTaskStarter {
 
     @PostConstruct
     public void init() {
-        adapterMapper = sqlSessionManager.getMapper(AdapterMapper.class);         
+        adapterMapper = sqlSessionManager.getMapper(AdapterMapper.class);
     }
 
     @Scheduled(fixedRateString = "${taskana.adapter.scheduler.run.interval.for.start.taskana.tasks.in.milliseconds}")
     public void retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks() {
-        synchronized(this.getClass()) {
+        synchronized (AdapterManager.class) {
+            if (!adapterManager.isSpiInitialized()) {
+                adapterManager.initSPIs();
+                return;
+            }
+        }
+
+        synchronized (this.getClass()) {
             if (!adapterManager.isInitialized()) {
                 return;
             }
 
-            LOGGER.debug("----------retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks started----------------------------");
+            LOGGER.debug(
+                "----------retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks started----------------------------");
             adapterManager.openConnection(sqlSessionManager);
             try {
                 retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks();
@@ -73,7 +82,8 @@ public class TaskanaTaskStarter {
                 LOGGER.error("Caught {} while trying to create Taskana tasks from referenced tasks", ex);
             } finally {
 
-                LOGGER.debug("----------retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks finished----------------------------");
+                LOGGER.debug(
+                    "----------retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks finished----------------------------");
                 adapterManager.returnConnection(sqlSessionManager);
             }
         }
@@ -81,45 +91,74 @@ public class TaskanaTaskStarter {
 
     @Transactional(rollbackFor = Exception.class)
     public void retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks() {
-        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
+        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(),
+            Thread.currentThread().getStackTrace()[1].getMethodName());
         for (SystemConnector systemConnector : (adapterManager.getSystemConnectors().values())) {
             try {
                 Instant lastRetrievedMinusTransactionDuration = determineStartInstant(systemConnector);
 
-                List<ReferencedTask> candidateTasks = systemConnector.retrieveReferencedTasksStartedAfter(lastRetrievedMinusTransactionDuration);
+                List<ReferencedTask> candidateTasks = systemConnector
+                    .retrieveReferencedTasksStartedAfter(lastRetrievedMinusTransactionDuration);
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Candidate tasks retrieved from the external system {}", LoggerUtils.listToString(candidateTasks));
+                    LOGGER.debug("Candidate tasks retrieved from the external system {}",
+                        LoggerUtils.listToString(candidateTasks));
                 }
-                List<ReferencedTask> tasksToStart = findNewTasksInListOfCandidateTasks(systemConnector.getSystemURL(), candidateTasks);
+                List<ReferencedTask> tasksToStart = findNewTasksInListOfCandidateTasks(systemConnector.getSystemURL(),
+                    candidateTasks);
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("About to create taskana tasks for {} ", LoggerUtils.listToString(tasksToStart.stream().map(ReferencedTask::getId)
-                        .collect(Collectors.toList())));
+                    LOGGER.debug("About to create taskana tasks for {} ",
+                        LoggerUtils.listToString(tasksToStart.stream()
+                            .map(ReferencedTask::getId)
+                            .collect(Collectors.toList())));
                 }
 
+                List<ReferencedTask> existingAndNewlyCreatedTasks = new ArrayList<ReferencedTask>(candidateTasks);
+                existingAndNewlyCreatedTasks.removeAll(tasksToStart);
                 for (ReferencedTask referencedTask : tasksToStart) {
-                    createTaskanaTask(referencedTask, adapterManager.getTaskanaConnectors(), systemConnector);
+                    try {
+                        createTaskanaTask(referencedTask, adapterManager.getTaskanaConnectors(), systemConnector);
+                        existingAndNewlyCreatedTasks.add(referencedTask);
+                    } catch (Exception e) {
+                        if (e instanceof TaskCreationFailedException
+                            && e.getCause() instanceof TaskAlreadyExistException) {
+                            existingAndNewlyCreatedTasks.add(referencedTask);
+                        }
+
+                        LOGGER.warn("caught Exception {} when attempting to start TaskanaTask for referencedTask {}", e,
+                            referencedTask);
+                    }
                 }
-                adapterMapper.rememberLastQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(), systemConnector.getSystemURL(), AgentType.START_TASKANA_TASKS);
+                systemConnector.taskanaTasksHaveBeenCreatedFor(existingAndNewlyCreatedTasks);
+                adapterMapper.rememberLastQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(),
+                    systemConnector.getSystemURL(), AgentType.START_TASKANA_TASKS);
             } finally {
-                LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
+                LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(),
+                    Thread.currentThread().getStackTrace()[1].getMethodName());
             }
         }
     }
 
     private Instant determineStartInstant(SystemConnector systemConnector) {
-        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
-        Instant lastRetrieved = adapterMapper.getLatestQueryTimestamp(systemConnector.getSystemURL(), AgentType.START_TASKANA_TASKS);
+        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(),
+            Thread.currentThread().getStackTrace()[1].getMethodName());
+        Instant lastRetrieved = adapterMapper.getLatestQueryTimestamp(systemConnector.getSystemURL(),
+            AgentType.START_TASKANA_TASKS);
         LOGGER.debug("lastRetrieved is {}", lastRetrieved);
         Instant lastRetrievedMinusTransactionDuration = null;
         if (lastRetrieved != null) {
-            lastRetrievedMinusTransactionDuration = lastRetrieved.minus(Duration.ofSeconds(maximumTotalTransactionLifetime));
+            lastRetrievedMinusTransactionDuration = lastRetrieved
+                .minus(Duration.ofSeconds(maximumTotalTransactionLifetime));
+        } else {
+            lastRetrievedMinusTransactionDuration = Instant.now().minus(Duration.ofDays(7));
         }
         LOGGER.debug("searching for tasks started after {}", lastRetrievedMinusTransactionDuration);
         return lastRetrievedMinusTransactionDuration;
     }
 
-    private List<ReferencedTask> findNewTasksInListOfCandidateTasks(String systemURL, List<ReferencedTask> candidateTasks) {
-        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
+    private List<ReferencedTask> findNewTasksInListOfCandidateTasks(String systemURL,
+        List<ReferencedTask> candidateTasks) {
+        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(),
+            Thread.currentThread().getStackTrace()[1].getMethodName());
         if (candidateTasks == null) {
             return new ArrayList<>();
         } else if (candidateTasks.isEmpty()) {
@@ -137,42 +176,47 @@ public class TaskanaTaskStarter {
             LOGGER.debug("findNewTasks: to create Tasks = \n {}", LoggerUtils.listToString(newTaskIds));
         }
 
-        LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
+        LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(),
+            Thread.currentThread().getStackTrace()[1].getMethodName());
         return candidateTasks.stream()
             .filter(t -> newTaskIds.contains(t.getId()))
             .collect(Collectors.toList());
     }
 
     @Transactional
-    public void createTaskanaTask(ReferencedTask referencedTask, List<TaskanaConnector> taskanaConnectors, SystemConnector systemConnector) {
-        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
+    public void createTaskanaTask(ReferencedTask referencedTask, List<TaskanaConnector> taskanaConnectors,
+        SystemConnector systemConnector) throws TaskConversionFailedException, TaskCreationFailedException {
+        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(),
+            Thread.currentThread().getStackTrace()[1].getMethodName());
         Assert.assertion(taskanaConnectors.size() == 1, "taskanaConnectors.size() == 1");
         TaskanaConnector connector = taskanaConnectors.get(0);
+        referencedTask.setSystemURL(systemConnector.getSystemURL());
+        addVariablesToReferencedTask(referencedTask, systemConnector);
+        Task taskanaTask = connector.convertToTaskanaTask(referencedTask);
+        connector.createTaskanaTask(taskanaTask);
+
+        Instant created;
         try {
-            referencedTask.setSystemURL(systemConnector.getSystemURL());
-            addVariablesToReferencedTask(referencedTask, systemConnector);
-            Task taskanaTask = connector.convertToTaskanaTask(referencedTask);
-            connector.createTaskanaTask(taskanaTask);
-
-            Instant created;
-            try {
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-                created = formatter.parse(referencedTask.getCreated()).toInstant();
-            } catch (ParseException excpt) {
-                LOGGER.error("Caught {} when trying to parse created timestamp {} ", excpt, referencedTask.getCreated());
-                created = Instant.now();
-            }
-
-            adapterMapper.registerCreatedTask(referencedTask.getId(), created, referencedTask.getSystemURL());
-        } catch (TaskCreationFailedException | TaskConversionFailedException e) {
-            LOGGER.error("Caught {} when creating a task in taskana for referenced task {}", e, referencedTask);
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+            created = formatter.parse(referencedTask.getCreated()).toInstant();
+        } catch (ParseException excpt) {
+            LOGGER.error("Caught {} when trying to parse created timestamp {} ", excpt,
+                referencedTask.getCreated());
+            created = Instant.now();
         }
-        LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
+
+        adapterMapper.registerCreatedTask(referencedTask.getId(), created, referencedTask.getSystemURL(),
+            referencedTask.getCreationEventId());
+
+        LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(),
+            Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void addVariablesToReferencedTask(ReferencedTask referencedTask, SystemConnector connector) {
-        String variables = connector.retrieveVariables(referencedTask.getId());
-        referencedTask.setVariables(variables);
+        if (referencedTask.getVariables() == null) {
+            String variables = connector.retrieveVariables(referencedTask.getId());
+            referencedTask.setVariables(variables);
+        }
     }
 
 }

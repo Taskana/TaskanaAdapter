@@ -1,16 +1,19 @@
 package pro.taskana.adapter.camunda.outbox.rest.springboot.controller;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
+
 import pro.taskana.adapter.camunda.outbox.rest.core.OutboxRestServiceCoreImpl;
 import pro.taskana.adapter.camunda.outbox.rest.core.dto.ReferencedTaskDTO;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
 
 @RestController
 public class OutboxRestServiceSpringBootRestControllerImpl implements OutboxRestServiceSpringBootRestController {
@@ -20,17 +23,21 @@ public class OutboxRestServiceSpringBootRestControllerImpl implements OutboxRest
     @Autowired
     OutboxRestServiceCoreImpl outboxRestServiceCore;
 
-    @Autowired
-    DataSource outboxRestServiceDataSource;
+    @Resource(name = "camundaBpmDataSource")
+    DataSource camundaBpmDataSource;
 
     @Override
     public List<ReferencedTaskDTO> getCreateEvents() {
 
-        try (Connection connection = outboxRestServiceDataSource.getConnection()){
+        try (Connection connection = camundaBpmDataSource.getConnection()) {
+
+            LOGGER.debug("### OutboxRestCtrl uses Database with url {} ", connection.getMetaData().getURL());
+            LOGGER.debug("### OutboxRestCtrl uses Connection with schema {} ", connection.getSchema());
+
             return outboxRestServiceCore.getCreateEvents(connection);
 
         } catch (SQLException e) {
-            LOGGER.warn("Caught {} while trying to retrieve create Events from the outbox table",e);
+            LOGGER.warn("Caught {} while trying to retrieve create Events from the outbox table", e);
 
         }
 
@@ -40,12 +47,12 @@ public class OutboxRestServiceSpringBootRestControllerImpl implements OutboxRest
     @Override
     public void deleteEvents(String ids) {
 
-        try (Connection connection = outboxRestServiceDataSource.getConnection()) {
+        try (Connection connection = camundaBpmDataSource.getConnection()) {
 
             outboxRestServiceCore.deleteEvents(connection, ids);
 
-        } catch (SQLException e){
-            LOGGER.warn("Caught {} while trying to delete events from the outbox table",e);
+        } catch (SQLException e) {
+            LOGGER.warn("Caught {} while trying to delete events from the outbox table", e);
         }
     }
 }

@@ -37,17 +37,17 @@ import pro.taskana.impl.TaskImpl;
 
 @Component
 public class TaskInformationMapper {
-    
-	@Autowired
+
+    @Autowired
     private WorkbasketService workbasketService;
-    
-	@Autowired
+
+    @Autowired
     private TaskService taskService;
-    
-	@Autowired
+
+    @Autowired
     private ClassificationService classificationService;
-    
-	 private static final Logger LOGGER = LoggerFactory.getLogger(TaskInformationMapper.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskInformationMapper.class);
     private static final String DEFAULT_WORKBASKET = "DEFAULT_WORKBASKET";
     private static final String DEFAULT_CLASSIFICATION = "DEFAULT_CLASSIFICATION";
     private static final String DEFAULT_DOMAIN = "DOMAIN_A";
@@ -58,11 +58,11 @@ public class TaskInformationMapper {
     private static final String DEFAULT_TYPE = "DEFAULT_TYPE";
     private static final String DEFAULT_VALUE = "DEFAULT_VALUE";
 
-    public Task convertToTaskanaTask(ReferencedTask referencedTask) 
+    public Task convertToTaskanaTask(ReferencedTask referencedTask)
         throws DomainNotFoundException, InvalidWorkbasketException, NotAuthorizedException,
-        WorkbasketAlreadyExistException, ClassificationAlreadyExistException, InvalidArgumentException, WorkbasketNotFoundException {
-        
-        
+        WorkbasketAlreadyExistException, ClassificationAlreadyExistException, InvalidArgumentException,
+        WorkbasketNotFoundException {
+
         Workbasket workbasket = findOrCreateWorkbasket(referencedTask.getAssignee());
         Classification classification = findOrCreateClassification();
         ObjectReference objectReference = createObjectReference();
@@ -72,20 +72,20 @@ public class TaskInformationMapper {
         callbackInfo.put(TaskanaSystemConnectorImpl.REFERENCED_TASK_ID, referencedTask.getId());
         callbackInfo.put(TaskanaSystemConnectorImpl.SYSTEM_URL, referencedTask.getSystemURL());
         taskanaTask.setCallbackInfo(callbackInfo);
-        taskanaTask.setExternalId(referencedTask.getId()); 
-        
-        Map<String,String> customAttributes = new HashMap<>();
+        taskanaTask.setExternalId(referencedTask.getId());
+
+        Map<String, String> customAttributes = new HashMap<>();
         customAttributes.put(TaskanaSystemConnectorImpl.REFERENCED_TASK_VARIABLES, referencedTask.getVariables());
         taskanaTask.setCustomAttributes(customAttributes);
-        
-        if (referencedTask.getName() != null && ! referencedTask.getName().isEmpty()) {
+
+        if (referencedTask.getName() != null && !referencedTask.getName().isEmpty()) {
             taskanaTask.setName(referencedTask.getName());
         } else {
             taskanaTask.setName(referencedTask.getTaskDefinitionKey());
         }
         taskanaTask.setDescription(referencedTask.getDescription());
         setTimestampsInTaskanaTask(taskanaTask, referencedTask);
-        
+
         taskanaTask.setOwner(referencedTask.getAssignee());
         taskanaTask.setClassificationKey(classification.getKey());
         taskanaTask.setPrimaryObjRef(objectReference);
@@ -94,47 +94,47 @@ public class TaskInformationMapper {
     }
 
     private void setTimestampsInTaskanaTask(TaskImpl taskanaTask, ReferencedTask camundaTask) {
-    	Instant created = convertStringToInstant(camundaTask.getCreated(), Instant.now());
-    	taskanaTask.setCreated(created);
-    	Instant due = convertStringToInstant(camundaTask.getDue(),created.plus(Duration.ofDays(3)));
-    	taskanaTask.setDue(due);    	
-	}
+        Instant created = convertStringToInstant(camundaTask.getCreated(), Instant.now());
+        taskanaTask.setCreated(created);
+        Instant due = convertStringToInstant(camundaTask.getDue(), created.plus(Duration.ofDays(3)));
+        taskanaTask.setDue(due);
+    }
 
-	private Instant convertStringToInstant(String strTimestamp, Instant defaultTimestamp) {
-		if (strTimestamp == null || strTimestamp.isEmpty()) {
-    		return defaultTimestamp;
-    	} else { 
-    		try {
-    			return parseDate(strTimestamp);
-    		} catch (RuntimeException e) {
-    			LOGGER.error("Caught {} when attemptin to parse date {} ", e, strTimestamp);
-    			return defaultTimestamp;
-    		}
-    	}
-	}
+    private Instant convertStringToInstant(String strTimestamp, Instant defaultTimestamp) {
+        if (strTimestamp == null || strTimestamp.isEmpty() || "null".equals(strTimestamp)) {
+            return defaultTimestamp;
+        } else {
+            try {
+                return parseDate(strTimestamp);
+            } catch (RuntimeException e) {
+                LOGGER.error("Caught {} when attemptin to parse date {} ", e, strTimestamp);
+                return defaultTimestamp;
+            }
+        }
+    }
 
-	public ReferencedTask convertToReferencedTask(Task taskanaTask) {
-	    ReferencedTask referencedTask = new ReferencedTask();
-	    Map<String,String> callbackInfo = taskanaTask.getCallbackInfo();
-	    if (callbackInfo != null) {
-	        referencedTask.setSystemURL(callbackInfo.get(TaskanaSystemConnectorImpl.SYSTEM_URL));
-	        referencedTask.setId(callbackInfo.get(TaskanaSystemConnectorImpl.REFERENCED_TASK_ID));
-	    }
+    public ReferencedTask convertToReferencedTask(Task taskanaTask) {
+        ReferencedTask referencedTask = new ReferencedTask();
+        Map<String, String> callbackInfo = taskanaTask.getCallbackInfo();
+        if (callbackInfo != null) {
+            referencedTask.setSystemURL(callbackInfo.get(TaskanaSystemConnectorImpl.SYSTEM_URL));
+            referencedTask.setId(callbackInfo.get(TaskanaSystemConnectorImpl.REFERENCED_TASK_ID));
+        }
 
-	    Map<String,String> customAttributes  = taskanaTask.getCustomAttributes();
-	    if (customAttributes != null) {
-	        referencedTask.setVariables(customAttributes.get(TaskanaSystemConnectorImpl.REFERENCED_TASK_VARIABLES));
-	    }
-	    referencedTask.setName(taskanaTask.getName());
-	    referencedTask.setDescription(taskanaTask.getDescription());
-	    referencedTask.setAssignee(taskanaTask.getOwner());
-	    return referencedTask;
-	}
+        Map<String, String> customAttributes = taskanaTask.getCustomAttributes();
+        if (customAttributes != null) {
+            referencedTask.setVariables(customAttributes.get(TaskanaSystemConnectorImpl.REFERENCED_TASK_VARIABLES));
+        }
+        referencedTask.setName(taskanaTask.getName());
+        referencedTask.setDescription(taskanaTask.getDescription());
+        referencedTask.setAssignee(taskanaTask.getOwner());
+        return referencedTask;
+    }
 
     private Instant parseDate(String date) {
-    	if (date == null || date.isEmpty()) {
-    		return null;
-    	}
+        if (date == null || date.isEmpty()) {
+            return null;
+        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         TemporalAccessor temporalAccessor = formatter.parse(date);
         LocalDateTime localDateTime = LocalDateTime.from(temporalAccessor);
@@ -166,28 +166,31 @@ public class TaskInformationMapper {
         objRef.setValue(DEFAULT_VALUE);
         return objRef;
     }
-    
-    private Workbasket findOrCreateWorkbasket(String key) throws DomainNotFoundException,
-    InvalidWorkbasketException, NotAuthorizedException, WorkbasketAlreadyExistException, WorkbasketNotFoundException, InvalidArgumentException {
-    if (key == null) {
-        key = DEFAULT_WORKBASKET;
-    }
-    Workbasket wb;
-    try {
-        wb = workbasketService.getWorkbasket(key, DEFAULT_DOMAIN);
-    } catch (WorkbasketNotFoundException e) {
-        wb = workbasketService.newWorkbasket(key, DEFAULT_DOMAIN);
-        wb.setName(key);
-        wb.setOwner(key);
-        wb.setType(WorkbasketType.PERSONAL);
-        wb = workbasketService.createWorkbasket(wb);
-        createWorkbasketAccessList(wb);
-    }
-    return wb;
-}
 
-    private void createWorkbasketAccessList(Workbasket wb) throws WorkbasketNotFoundException, InvalidArgumentException, NotAuthorizedException {
-        WorkbasketAccessItem workbasketAccessItem = workbasketService.newWorkbasketAccessItem(wb.getId(), wb.getOwner());
+    private Workbasket findOrCreateWorkbasket(String key) throws DomainNotFoundException,
+        InvalidWorkbasketException, NotAuthorizedException, WorkbasketAlreadyExistException,
+        WorkbasketNotFoundException, InvalidArgumentException {
+        if (key == null) {
+            key = DEFAULT_WORKBASKET;
+        }
+        Workbasket wb;
+        try {
+            wb = workbasketService.getWorkbasket(key, DEFAULT_DOMAIN);
+        } catch (WorkbasketNotFoundException e) {
+            wb = workbasketService.newWorkbasket(key, DEFAULT_DOMAIN);
+            wb.setName(key);
+            wb.setOwner(key);
+            wb.setType(WorkbasketType.PERSONAL);
+            wb = workbasketService.createWorkbasket(wb);
+            createWorkbasketAccessList(wb);
+        }
+        return wb;
+    }
+
+    private void createWorkbasketAccessList(Workbasket wb)
+        throws WorkbasketNotFoundException, InvalidArgumentException, NotAuthorizedException {
+        WorkbasketAccessItem workbasketAccessItem = workbasketService.newWorkbasketAccessItem(wb.getId(),
+            wb.getOwner());
         workbasketAccessItem.setAccessName(wb.getOwner());
         workbasketAccessItem.setPermAppend(true);
         workbasketAccessItem.setPermTransfer(true);
@@ -195,9 +198,7 @@ public class TaskInformationMapper {
         workbasketAccessItem.setPermOpen(true);
         workbasketAccessItem.setPermDistribute(true);
         workbasketService.createWorkbasketAccessItem(workbasketAccessItem);
-        
+
     }
 
-
-    
 }
