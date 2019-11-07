@@ -25,7 +25,7 @@ public interface SystemConnector {
      * @param referencedTasks
      *            List of ReferencedTasks for which Taskana Tasks have been created.
      */
-    void taskanaTasksHaveBeenCreatedFor(List<ReferencedTask> referencedTasks);
+    void taskanaTasksHaveBeenCreatedForReferencedTasks(List<ReferencedTask> referencedTasks);
 
     /**
      * Retrieve referenced tasks that were finished after a specified instant.
