@@ -35,7 +35,7 @@ public class CamundaTaskRetriever {
             createdAfter);
 
         String requestUrl = camundaSystemTaskEventUrl + CamundaSystemConnectorImpl.URL_OUTBOX_REST_PATH
-            + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_START_EVENTS;
+            + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_CREATE_EVENTS_STARTED_AFTER;
         // Instant is in UTC time, Camunda uses local time. Need to adjust ...
         Date date = java.sql.Timestamp.valueOf(createdAfter.atZone(ZoneId.systemDefault()).toLocalDateTime());
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");

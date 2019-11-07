@@ -21,7 +21,7 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
     static final String URL_GET_CAMUNDA_VARIABLES = "/variables/";
     static final String URL_OUTBOX_REST_PATH = "/rest/outbox";
 
-    static final String URL_GET_CAMUNDA_START_EVENTS = "/getCreateEvents?startedAfter=";
+    static final String URL_GET_CAMUNDA_CREATE_EVENTS_STARTED_AFTER = "/getCreateEvents?startedAfter=";
     static final String URL_DELETE_CAMUNDA_EVENTS = "/delete?ids=";
 
     static final String BODY_SET_CAMUNDA_VARIABLES = "{\"variables\":";
@@ -73,7 +73,7 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
     }
 
     @Override
-    public void taskanaTasksHaveBeenCreatedFor(List<ReferencedTask> referencedTasks) {
+    public void taskanaTasksHaveBeenCreatedForReferencedTasks(List<ReferencedTask> referencedTasks) {
         taskEventCleaner.taskanaTasksHaveBeenCreatedFor(referencedTasks, camundaSystemURL.getSystemTaskEventUrl());
     }
 
