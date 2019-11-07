@@ -36,8 +36,7 @@ public class CamundaTaskEventCleaner {
             idsBuf.append(',');
         }
 
-        String ids = idsBuf.toString();
-        ids = removeTrailingComma(ids);
+        String ids = idsBuf.toString().replaceAll(",$", "");
         requestUrl = requestUrl + ids;
 
         LOGGER.debug("### delete Events url {} ", requestUrl);
@@ -46,14 +45,5 @@ public class CamundaTaskEventCleaner {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("exit from taskanaTasksHaveBeenCreatedFor.");
         }
-    }
-
-    private String removeTrailingComma(String ids) {
-        String last = ids.substring(ids.length() - 1, ids.length());
-
-        if (ids != null && ",".equals(last)) {
-            ids = ids.substring(0, ids.length() - 1);
-        }
-        return ids;
     }
 }

@@ -128,7 +128,7 @@ public class TaskanaTaskStarter {
                             referencedTask);
                     }
                 }
-                systemConnector.taskanaTasksHaveBeenCreatedFor(existingAndNewlyCreatedTasks);
+                systemConnector.taskanaTasksHaveBeenCreatedForReferencedTasks(existingAndNewlyCreatedTasks);
                 adapterMapper.rememberLastQueryTime(IdGenerator.generateWithPrefix("TCA"), Instant.now(),
                     systemConnector.getSystemURL(), AgentType.START_TASKANA_TASKS);
             } finally {
