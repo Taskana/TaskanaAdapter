@@ -19,9 +19,11 @@ public class CamundaTaskEventCleaner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskStarter.class);
 
-    public void taskanaTasksHaveBeenCreatedFor(List<ReferencedTask> referencedTasks, String camundaSystemTaskEventUrl) {
+    public void taskanaTasksHaveBeenCreatedForReferencedTasks(List<ReferencedTask> referencedTasks,
+        String camundaSystemTaskEventUrl) {
 
-        LOGGER.debug("entry to taskanaTasksHaveBeenCreatedFor, CamundSystemURL = {}", camundaSystemTaskEventUrl);
+        LOGGER.debug("entry to taskanaTasksHaveBeenCreatedForReferencedTasks, CamundSystemURL = {}",
+            camundaSystemTaskEventUrl);
         String requestUrl = camundaSystemTaskEventUrl + CamundaSystemConnectorImpl.URL_OUTBOX_REST_PATH
             + CamundaSystemConnectorImpl.URL_DELETE_CAMUNDA_EVENTS;
         LOGGER.debug("cleaning up camunda task events with url {}", requestUrl);
@@ -43,7 +45,7 @@ public class CamundaTaskEventCleaner {
         restTemplate.delete(requestUrl);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("exit from taskanaTasksHaveBeenCreatedFor.");
+            LOGGER.debug("exit from taskanaTasksHaveBeenCreatedForReferencedTasks.");
         }
     }
 }
