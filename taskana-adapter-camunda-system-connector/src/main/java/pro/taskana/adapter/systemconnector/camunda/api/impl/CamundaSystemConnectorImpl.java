@@ -74,7 +74,7 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
 
     @Override
     public void taskanaTasksHaveBeenCreatedForReferencedTasks(List<ReferencedTask> referencedTasks) {
-        taskEventCleaner.taskanaTasksHaveBeenCreatedFor(referencedTasks, camundaSystemURL.getSystemTaskEventUrl());
+        taskEventCleaner.taskanaTasksHaveBeenCreatedForReferencedTasks(referencedTasks, camundaSystemURL.getSystemTaskEventUrl());
     }
 
 }
