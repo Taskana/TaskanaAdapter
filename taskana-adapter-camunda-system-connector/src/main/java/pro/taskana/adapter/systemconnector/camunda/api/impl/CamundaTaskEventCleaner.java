@@ -41,7 +41,7 @@ public class CamundaTaskEventCleaner {
         String ids = idsBuf.toString().replaceAll(",$", "");
         requestUrl = requestUrl + ids;
 
-        LOGGER.debug("### delete Events url {} ", requestUrl);
+        LOGGER.debug("delete Events url {} ", requestUrl);
         restTemplate.delete(requestUrl);
 
         if (LOGGER.isDebugEnabled()) {

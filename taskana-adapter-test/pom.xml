@@ -115,7 +115,7 @@
   					<groupId>uk.co.datumedge</groupId>
 					<artifactId>hamcrest-json</artifactId>
 					<version>0.2</version>
-					<!-- type>${project.packaging</type-->
+					<scope>test</scope>
 				</dependency>
         </dependencies>
 

@@ -51,13 +51,13 @@ public class AdapterManager {
 
     @PostConstruct
     public void init() {
-        LOGGER.debug("### AdapterManager.init called");
+        LOGGER.debug("AdapterManager.init called");
         initDatabase();
         isDatabaseInitialized = true;
-        LOGGER.debug("### AdapterManager.init returned");
+        LOGGER.debug("AdapterManager.init returned");
     }
 
-    public void openConnection(SqlSessionManager sqlSessionManager) {
+    void openConnection(SqlSessionManager sqlSessionManager) {
         if (!sqlSessionManager.isManagedSessionStarted()) {
             sqlSessionManager.startManagedSession();
         }
@@ -73,7 +73,7 @@ public class AdapterManager {
         }
     }
 
-    public void returnConnection(SqlSessionManager sqlSessionManager) {
+    void returnConnection(SqlSessionManager sqlSessionManager) {
         if (sqlSessionManager.isManagedSessionStarted()) {
             sqlSessionManager.close();
         }
@@ -105,9 +105,13 @@ public class AdapterManager {
         isSpiInitialized = true;
     }
 
+    public AdapterConnection getAdapterConnection(SqlSessionManager sqlSessionManager) {
+        return new AdapterConnection(this, sqlSessionManager);
+    }
+
     private void initSystemConnectors() {
         systemConnectors = new HashMap<>();
-        LOGGER.info("### initializing system connectors ");
+        LOGGER.info("initializing system connectors ");
 
         ServiceLoader<SystemConnectorProvider> loader = ServiceLoader.load(SystemConnectorProvider.class);
         for (SystemConnectorProvider provider : loader) {
@@ -134,7 +138,7 @@ public class AdapterManager {
             return;
         }
         try {
-            LOGGER.debug("### AdapterManager.initDatabase called");
+            LOGGER.debug("AdapterManager.initDatabase called");
 
             Connection connection = adapterDataSource.getConnection();
             String databaseProductName = connection.getMetaData().getDatabaseProductName();
@@ -156,7 +160,7 @@ public class AdapterManager {
         } catch (SQLException ex) {
             LOGGER.error("Caught {} when attempting to initialize the database", ex);
         } finally {
-            LOGGER.debug("### AdapterManager.initDatabase returned");
+            LOGGER.debug("AdapterManager.initDatabase returned");
         }
     }
 
