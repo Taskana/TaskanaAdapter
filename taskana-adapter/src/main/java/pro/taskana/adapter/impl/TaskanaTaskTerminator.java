@@ -1,5 +1,6 @@
 package pro.taskana.adapter.impl;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import pro.taskana.adapter.manager.AdapterConnection;
 import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.manager.AgentType;
 import pro.taskana.adapter.mappings.AdapterMapper;
@@ -29,7 +31,7 @@ import pro.taskana.impl.util.IdGenerator;
 
 /**
  * terminates taskana tasks if the associated task in the external system was finished.
- * 
+ *
  * @author bbr
  */
 @Component
@@ -75,15 +77,13 @@ public class TaskanaTaskTerminator {
             LOGGER.debug(
                 "----------retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks started----------------------------");
 
-            adapterManager.openConnection(sqlSessionManager);
-            try {
+            try (AdapterConnection adapterConnection = adapterManager.getAdapterConnection(sqlSessionManager)) {
+
                 for (SystemConnector systemConnector : (adapterManager.getSystemConnectors().values())) {
                     retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks(systemConnector);
                 }
-            } finally {
-                LOGGER.debug(
-                    "----------retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks finished ----------------------------");
-                adapterManager.returnConnection(sqlSessionManager);
+            } catch (IOException e) {
+                LOGGER.warn("caught exception {} ", e);
             }
         }
     }

@@ -36,16 +36,16 @@ import pro.taskana.impl.util.LoggerUtils;
 
 @Component
 public class TaskanaSystemConnectorImpl implements TaskanaConnector {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaSystemConnectorImpl.class);
-    static String  REFERENCED_TASK_ID = "referenced_task_id";
-    static String  REFERENCED_TASK_VARIABLES = "referenced_task_variables";
+    static String REFERENCED_TASK_ID = "referenced_task_id";
+    static String REFERENCED_TASK_VARIABLES = "referenced_task_variables";
 
-    static String  SYSTEM_URL = "system_url";
+    static String SYSTEM_URL = "system_url";
 
-    @Autowired    
+    @Autowired
     private TaskService taskService;
-    
+
     @Autowired
     private TaskInformationMapper taskInformationMapper;
 
@@ -55,30 +55,29 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
         TimeInterval completedIn = new TimeInterval(completedAfter, now);
 
         List<TaskSummary> completedTasks = taskService.createTaskQuery()
-                                           .stateIn(TaskState.COMPLETED)
-                                           .completedWithin(completedIn)
-                                           .list();
+            .stateIn(TaskState.COMPLETED)
+            .completedWithin(completedIn)
+            .list();
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("in the time interval {} the following taskana tasks were completed {}",
-                           completedIn, LoggerUtils.listToString(completedTasks) );
+                completedIn, LoggerUtils.listToString(completedTasks));
         }
 
-        
         List<ReferencedTask> result = new ArrayList<>();
 
         for (TaskSummary taskSummary : completedTasks) {
             try {
                 Task taskanaTask = taskService.getTask(taskSummary.getTaskId());
-                Map<String,String> callbackInfo = taskanaTask.getCallbackInfo();
-                if ( callbackInfo != null && callbackInfo.get(REFERENCED_TASK_ID) != null 
-                                          && callbackInfo.get(SYSTEM_URL) != null) {
+                Map<String, String> callbackInfo = taskanaTask.getCallbackInfo();
+                if (callbackInfo != null && callbackInfo.get(REFERENCED_TASK_ID) != null
+                    && callbackInfo.get(SYSTEM_URL) != null) {
                     result.add(taskInformationMapper.convertToReferencedTask(taskanaTask));
                 }
             } catch (TaskNotFoundException | NotAuthorizedException e) {
-                LOGGER.error("Caught {} when trying to retrieve completed taskana tasks." , e);
+                LOGGER.error("Caught {} when trying to retrieve completed taskana tasks.", e);
             }
         }
-        
+
         return result;
     }
 
@@ -86,19 +85,22 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     public void createTaskanaTask(Task taskanaTask) throws TaskCreationFailedException {
         try {
             taskService.createTask(taskanaTask);
-       } catch ( NotAuthorizedException | InvalidArgumentException | ClassificationNotFoundException | WorkbasketNotFoundException | TaskAlreadyExistException e) {
-            LOGGER.error("Caught Exception {} when creating taskana task {} ", e, taskanaTask); 
-            throw new TaskCreationFailedException("Error when creationg a taskana task " + taskanaTask , e);
-        } 
+        } catch (NotAuthorizedException | InvalidArgumentException | ClassificationNotFoundException
+            | WorkbasketNotFoundException | TaskAlreadyExistException e) {
+            LOGGER.error("Caught Exception {} when creating taskana task {} ", e, taskanaTask);
+            throw new TaskCreationFailedException("Error when creationg a taskana task " + taskanaTask, e);
+        }
     }
 
     @Override
     public Task convertToTaskanaTask(ReferencedTask camundaTask) throws TaskConversionFailedException {
         try {
             return taskInformationMapper.convertToTaskanaTask(camundaTask);
-        } catch (DomainNotFoundException | InvalidWorkbasketException | NotAuthorizedException | WorkbasketNotFoundException
+        } catch (DomainNotFoundException | InvalidWorkbasketException | NotAuthorizedException
+            | WorkbasketNotFoundException
             | WorkbasketAlreadyExistException | ClassificationAlreadyExistException | InvalidArgumentException e) {
-            throw new TaskConversionFailedException("Error when converting camunda task " + camundaTask + " to taskana task.", e);
+            throw new TaskConversionFailedException(
+                "Error when converting camunda task " + camundaTask + " to taskana task.", e);
         }
     }
 

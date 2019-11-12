@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import pro.taskana.adapter.manager.AdapterConnection;
 import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.manager.AgentType;
 import pro.taskana.adapter.mappings.AdapterMapper;
@@ -40,7 +41,7 @@ public class ReferencedTaskCompleter {
     private int maximumTotalTransactionLifetime;
 
     @Autowired
-    private  SqlSessionManager sqlSessionManager;
+    private SqlSessionManager sqlSessionManager;
 
     @Autowired
     AdapterManager adapterManager;
@@ -52,7 +53,8 @@ public class ReferencedTaskCompleter {
         adapterMapper = sqlSessionManager.getMapper(AdapterMapper.class);
     }
 
-    @Scheduled(fixedRateString = "${taskana.adapter.scheduler.run.interval.for.complete.referenced.tasks.in.milliseconds}")
+    @Scheduled(
+        fixedRateString = "${taskana.adapter.scheduler.run.interval.for.complete.referenced.tasks.in.milliseconds}")
     public void retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTasks() {
 
         synchronized (this.getClass()) {
@@ -60,22 +62,20 @@ public class ReferencedTaskCompleter {
                 return;
             }
 
-            LOGGER.debug("----------retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTasks started----------------------------");
-            adapterManager.openConnection(sqlSessionManager);
-            try {
+            LOGGER.debug(
+                "----------retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTasks started----------------------------");
+            try (AdapterConnection adapterConnection = adapterManager.getAdapterConnection(sqlSessionManager)) {
                 retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTask();
             } catch (Exception ex) {
                 LOGGER.debug("Caught {} while trying to complete referenced tasks", ex);
-            } finally {
-                LOGGER.debug("----------retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTasks finished----------------------------");
-                adapterManager.returnConnection(sqlSessionManager);
             }
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTask() {
-        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
+        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(),
+            Thread.currentThread().getStackTrace()[1].getMethodName());
         try {
             List<TaskanaConnector> taskanaConnectors = adapterManager.getTaskanaConnectors();
             Assert.assertion(taskanaConnectors.size() == 1, "taskanaConnectors.size() == 1");
@@ -127,7 +127,6 @@ public class ReferencedTaskCompleter {
             .filter(t -> taskIdsToBeCompleted.contains(t.getId()))
             .collect(Collectors.toList());
     }
-
 
     @Transactional
     public void completeReferencedTask(ReferencedTask referencedTask) {
