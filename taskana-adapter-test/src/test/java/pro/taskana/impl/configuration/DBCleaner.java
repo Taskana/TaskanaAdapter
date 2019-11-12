@@ -77,7 +77,7 @@ public class DBCleaner {
             if ("PostgreSQL".equals(dbProductName)) {
                 scriptName = this.typeScriptMapPostgres.get(applicationDatabaseType);
             }
-            LOGGER.debug("### using script {} to clear database", scriptName);
+            LOGGER.debug("using script {} to clear database", scriptName);
             runner.runScript(new InputStreamReader(this.getClass().getResourceAsStream(scriptName)));
 
         } catch (Exception e) {

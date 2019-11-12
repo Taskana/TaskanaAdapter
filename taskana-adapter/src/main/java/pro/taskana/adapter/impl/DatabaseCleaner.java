@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import pro.taskana.adapter.manager.AdapterConnection;
 import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.mappings.AdapterMapper;
 
@@ -46,16 +47,12 @@ public class DatabaseCleaner {
                 return;
             }
             LOGGER.debug("----------cleanupTaskanaAdapterTables started----------------------------");
-            adapterManager.openConnection(sqlSessionManager);
-            try {
+            try (AdapterConnection connection = adapterManager.getAdapterConnection(sqlSessionManager)) {
                 Instant completedBefore = Instant.now().minus(Duration.ofHours(maxTaskAgeBeforeCleanup));
                 adapterMapper.cleanupTasksCompletedBefore(completedBefore);
                 adapterMapper.cleanupQueryHistoryEntries(completedBefore);
             } catch (Exception ex) {
                 LOGGER.error("Caught {} while cleaning up aged Taskana Adapter tables", ex);
-            } finally {
-                LOGGER.debug("----------cleanupTaskanaAdapterTables finished------------------------");
-                adapterManager.returnConnection(sqlSessionManager);
             }
         }
     }

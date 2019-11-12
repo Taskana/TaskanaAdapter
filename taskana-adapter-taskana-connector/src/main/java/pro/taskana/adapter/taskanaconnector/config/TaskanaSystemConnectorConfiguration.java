@@ -18,8 +18,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import pro.taskana.ClassificationService;
 import pro.taskana.TaskService;
@@ -79,9 +77,9 @@ public class TaskanaSystemConnectorConfiguration {
         return new SpringTaskanaEngineConfiguration(taskanaDataSource, true, false, taskanaSchemaName);
     }
 
-    @Bean(name = "taskanaTransactionManager")
-    public PlatformTransactionManager txManager(@Qualifier("taskanaDataSource") DataSource dataSource) {
-        return new DataSourceTransactionManager(dataSource);
-    }
+    // @Bean(name = "taskanaTransactionManager")
+    // public PlatformTransactionManager txManager(@Qualifier("taskanaDataSource") DataSource dataSource) {
+    // return new DataSourceTransactionManager(dataSource);
+    // }
 
 }

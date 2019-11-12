@@ -28,22 +28,15 @@ public class CamundaTaskRetriever {
     @Autowired
     private RestTemplate restTemplate;
 
-    public List<ReferencedTask> retrieveCamundaTasksStartedAfter(String camundaSystemTaskEventUrl,
-        Instant createdAfter) {
+    public List<ReferencedTask> retrieveNewStartedCamundaTasks(String camundaSystemTaskEventUrl) {
 
-        LOGGER.debug("entry to retrieveActiveCamundaTasks. createdAfter = {} ",
-            createdAfter);
+        LOGGER.debug("entry to retrieveNewStartedCamundaTasks");
 
         String requestUrl = camundaSystemTaskEventUrl + CamundaSystemConnectorImpl.URL_OUTBOX_REST_PATH
-            + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_CREATE_EVENTS_STARTED_AFTER;
-        // Instant is in UTC time, Camunda uses local time. Need to adjust ...
-        Date date = java.sql.Timestamp.valueOf(createdAfter.atZone(ZoneId.systemDefault()).toLocalDateTime());
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        requestUrl += formatter.format(date);
-        LOGGER.debug("retrieving active camunda tasks with url {}", requestUrl);
+            + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_CREATE_EVENTS;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        LOGGER.debug("### retrieveActiveCamundaTasks url {} ", requestUrl);
+        LOGGER.debug("retrieveNewStartedCamundaTasks url {} ", requestUrl);
 
         ResponseEntity<ReferencedTask[]> responseEntity = restTemplate.exchange(
             requestUrl, HttpMethod.GET, new HttpEntity<Object>(headers),
@@ -51,7 +44,7 @@ public class CamundaTaskRetriever {
 
         ReferencedTask[] tasks = responseEntity.getBody();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("exit from retrieveCamundaTasksStartedAfter. Retrieved Tasks: {}", Arrays.toString(tasks));
+            LOGGER.debug("exit from retrieveNewStartedCamundaTasks. Retrieved Tasks: {}", Arrays.toString(tasks));
         }
         return Arrays.asList(tasks);
     }
