@@ -3,8 +3,6 @@ package pro.taskana.adapter.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.ibatis.session.SqlSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +17,6 @@ import pro.taskana.adapter.exceptions.TaskConversionFailedException;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.manager.AdapterConnection;
 import pro.taskana.adapter.manager.AdapterManager;
-import pro.taskana.adapter.mappings.AdapterMapper;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
@@ -42,15 +39,8 @@ public class TaskanaTaskStarter {
     @Autowired
     private SqlSessionManager sqlSessionManager;
 
-    private AdapterMapper adapterMapper;
-
     @Autowired
     AdapterManager adapterManager;
-
-    @PostConstruct
-    public void init() {
-        adapterMapper = sqlSessionManager.getMapper(AdapterMapper.class);
-    }
 
     @Scheduled(fixedRateString = "${taskana.adapter.scheduler.run.interval.for.start.taskana.tasks.in.milliseconds}")
     public void retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks() {
@@ -73,7 +63,6 @@ public class TaskanaTaskStarter {
         }
     }
 
-    // @Transactional(rollbackFor = Exception.class)
     public void retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks() {
         LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(),
             Thread.currentThread().getStackTrace()[1].getMethodName());
@@ -82,22 +71,9 @@ public class TaskanaTaskStarter {
 
                 List<ReferencedTask> tasksToStart = systemConnector.retrieveNewStartedReferencedTasks();
 
-                List<ReferencedTask> newCreatedTasksInTaskana = new ArrayList<>();
-                for (ReferencedTask referencedTask : tasksToStart) {
-                    try {
-                        createTaskanaTask(referencedTask, adapterManager.getTaskanaConnectors(), systemConnector);
-                        newCreatedTasksInTaskana.add(referencedTask);
-                    } catch (Exception e) {
-                        if (e instanceof TaskCreationFailedException
-                            && e.getCause() instanceof TaskAlreadyExistException) {
-                            newCreatedTasksInTaskana.add(referencedTask);
-                        } else {
-                            LOGGER.warn(
-                                "caught Exception {} when attempting to start TaskanaTask for referencedTask {}", e,
-                                referencedTask);
-                        }
-                    }
-                }
+                List<ReferencedTask> newCreatedTasksInTaskana = createAndStartTaskanaTasks(systemConnector,
+                    tasksToStart);
+
                 systemConnector.taskanaTasksHaveBeenCreatedForReferencedTasks(newCreatedTasksInTaskana);
             } finally {
                 LOGGER.trace("{} {}",
@@ -105,6 +81,27 @@ public class TaskanaTaskStarter {
                     getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
             }
         }
+    }
+
+    private List<ReferencedTask> createAndStartTaskanaTasks(SystemConnector systemConnector,
+        List<ReferencedTask> tasksToStart) {
+        List<ReferencedTask> newCreatedTasksInTaskana = new ArrayList<>();
+        for (ReferencedTask referencedTask : tasksToStart) {
+            try {
+                createTaskanaTask(referencedTask, adapterManager.getTaskanaConnectors(), systemConnector);
+                newCreatedTasksInTaskana.add(referencedTask);
+            } catch (Exception e) {
+                if (e instanceof TaskCreationFailedException
+                    && e.getCause() instanceof TaskAlreadyExistException) {
+                    newCreatedTasksInTaskana.add(referencedTask);
+                } else {
+                    LOGGER.warn(
+                        "caught Exception {} when attempting to start TaskanaTask for referencedTask {}", e,
+                        referencedTask);
+                }
+            }
+        }
+        return newCreatedTasksInTaskana;
     }
 
     public void createTaskanaTask(ReferencedTask referencedTask, List<TaskanaConnector> taskanaConnectors,

@@ -7,8 +7,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -29,8 +27,6 @@ import pro.taskana.configuration.TaskanaEngineConfiguration;
 @Configuration
 @DependsOn(value = {"adapterSpringContextProvider"})
 public class TaskanaSystemConnectorConfiguration {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaSystemConnectorConfiguration.class);
 
     @Value("${taskana.schemaName:TASKANA}")
     public String taskanaSchemaName;
@@ -76,10 +72,5 @@ public class TaskanaSystemConnectorConfiguration {
         @Qualifier("taskanaDataSource") DataSource taskanaDataSource) throws SQLException {
         return new SpringTaskanaEngineConfiguration(taskanaDataSource, true, false, taskanaSchemaName);
     }
-
-    // @Bean(name = "taskanaTransactionManager")
-    // public PlatformTransactionManager txManager(@Qualifier("taskanaDataSource") DataSource dataSource) {
-    // return new DataSourceTransactionManager(dataSource);
-    // }
 
 }
