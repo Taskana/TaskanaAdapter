@@ -1,4 +1,4 @@
-package pro.taskana.adapter.configuration;
+package pro.taskana.adapter.camunda.schemaCreator;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,20 +17,16 @@ import org.apache.ibatis.jdbc.SqlRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pro.taskana.impl.TaskanaEngineImpl;
-
     /**
      * This class create the schema for the taskana adapter.
      */
-    public class AdapterSchemaCreator {
+    public class OutboxTableSchemaCreator {
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(AdapterSchemaCreator.class);
+        private static final Logger LOGGER = LoggerFactory.getLogger(OutboxTableSchemaCreator.class);
         private static final String SQL = "/sql";
-        private static final String DB_SCHEMA = SQL + "/adapter-schema.sql";
-        private static final String DB_SCHEMA_DB2 = SQL + "/adapter-schema-db2.sql";
-        private static final String DB_SCHEMA_POSTGRES = SQL + "/adapter-schema-postgres.sql";
-        private static final String DB_SCHEMA_DETECTION = SQL + "/adapter-schema-detection.sql";
-        private static final String DB_SCHEMA_DETECTION_POSTGRES = SQL + "/adapter-schema-detection-postgres.sql";
+        private static final String DB_SCHEMA = SQL + "/taskana-schema.sql";
+        private static final String DB_SCHEMA_DB2 = SQL + "/taskana-schema-db2.sql";
+        private static final String DB_SCHEMA_POSTGRES = SQL + "/taskana-schema-postgres.sql";
 
         private DataSource dataSource;
         private String schemaName;
@@ -39,7 +35,7 @@ import pro.taskana.impl.TaskanaEngineImpl;
         private StringWriter errorWriter = new StringWriter();
         private PrintWriter errorLogWriter = new PrintWriter(errorWriter);
 
-        public AdapterSchemaCreator(DataSource dataSource, String schemaName) {
+        public OutboxTableSchemaCreator(DataSource dataSource, String schemaName) {
             super();
             this.dataSource = dataSource;
             this.schemaName = schemaName;
@@ -49,10 +45,6 @@ import pro.taskana.impl.TaskanaEngineImpl;
             return "PostgreSQL".equals(dbProductName)
                 ? DB_SCHEMA_POSTGRES
                 : "H2".equals(dbProductName) ? DB_SCHEMA : DB_SCHEMA_DB2;
-        }
-
-        private static String selectDbSchemaDetectionScript(String dbProductName) {
-            return "PostgreSQL".equals(dbProductName) ? DB_SCHEMA_DETECTION_POSTGRES : DB_SCHEMA_DETECTION;
         }
 
         /**
@@ -70,11 +62,9 @@ import pro.taskana.impl.TaskanaEngineImpl;
             runner.setLogWriter(logWriter);
             runner.setErrorLogWriter(errorLogWriter);
             try {
-                if (!isSchemaPreexisting(runner, databaseProductName)) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass()
-                        .getResourceAsStream(selectDbScriptFileName(databaseProductName))));
-                    runner.runScript(getSqlSchemaNameParsed(reader, databaseProductName));
-                }
+                BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass()
+                    .getResourceAsStream(selectDbScriptFileName(databaseProductName))));
+                runner.runScript(getSqlSchemaNameParsed(reader, databaseProductName));
             } finally {
                 runner.closeConnection();
             }
@@ -84,34 +74,21 @@ import pro.taskana.impl.TaskanaEngineImpl;
             }
         }
 
-        private boolean isSchemaPreexisting(ScriptRunner runner, String productName) {
+        public boolean isValidSchemaVersion(String expectedVersion) {
+            SqlRunner runner = null;
+            Connection connection = null;
+            String oldSchemaName = this.schemaName;
             try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass()
-                    .getResourceAsStream(selectDbSchemaDetectionScript(productName))));
-                runner.runScript(getSqlSchemaNameParsed(reader,productName));
-            } catch (Exception e) {
-                LOGGER.debug("Schema does not exist.");
-                return false;
-            }
-            LOGGER.debug("Schema does exist.");
-            return true;
-        }
-
-    public boolean isValidSchemaVersion(String expectedVersion) {
-        SqlRunner runner = null;
-        Connection connection = null;
-        String oldSchemaName = this.schemaName;
-        try {
-            connection = dataSource.getConnection();
-            oldSchemaName = connection.getSchema();
-            connection.setSchema(this.schemaName);
+                connection = dataSource.getConnection();
+                oldSchemaName = connection.getSchema();
+                connection.setSchema(this.schemaName);
 
                 runner = new SqlRunner(connection);
                 LOGGER.debug(connection.getMetaData().toString());
 
-            String query = "select VERSION from " + this.schemaName + ".TCA_SCHEMA_VERSION where "
-                + "VERSION = (select max(VERSION) from " + this.schemaName + ".TCA_SCHEMA_VERSION) "
-                + "AND VERSION = ?";
+                String query = "select VERSION from " + this.schemaName + ".OUTBOX_SCHEMA_VERSION where "
+                    + "VERSION = (select max(VERSION) from " + this.schemaName + ".OUTBOX_SCHEMA_VERSION) "
+                    + "AND VERSION = ?";
 
                 Map<String, Object> queryResult = runner.selectOne(query, expectedVersion);
                 if (queryResult == null || queryResult.isEmpty()) {
@@ -124,24 +101,24 @@ import pro.taskana.impl.TaskanaEngineImpl;
                     return true;
                 }
 
-        } catch (Exception e) {
-            LOGGER.error(
-                "Schema version not valid. The VERSION property in table TASKANA_SCHEMA_VERSION has not the expected value {}",
-                expectedVersion);
-            return false;
-        } finally {
-            if (runner != null) {
-                if (connection != null) {
-                    try {
-                        connection.setSchema(oldSchemaName);
-                    } catch (SQLException e) {
-                        LOGGER.error("attempted to reset schema name to {} and got exception {}", oldSchemaName, e);
+            } catch (Exception e) {
+                LOGGER.error(
+                    "Schema version not valid. The VERSION property in table TASKANA_SCHEMA_VERSION has not the expected value {}",
+                    expectedVersion);
+                return false;
+            } finally {
+                if (runner != null) {
+                    if (connection != null) {
+                        try {
+                            connection.setSchema(oldSchemaName);
+                        } catch (SQLException e) {
+                            LOGGER.error("attempted to reset schema name to {} and got exception {}", oldSchemaName, e);
+                        }
                     }
+                    runner.closeConnection();
                 }
-                runner.closeConnection();
             }
         }
-    }
 
         public DataSource getDataSource() {
             return dataSource;
@@ -152,7 +129,7 @@ import pro.taskana.impl.TaskanaEngineImpl;
         }
 
         private StringReader getSqlSchemaNameParsed(BufferedReader reader, String dbProductName) {
-            boolean isPostGres = TaskanaEngineImpl.isPostgreSQL(dbProductName);
+            boolean isPostGres = "PostgreSQL".equals(dbProductName);
             StringBuffer content = new StringBuffer();
             String effectiveSchemaName = isPostGres ? schemaName.toLowerCase() : schemaName.toUpperCase();
             try {
