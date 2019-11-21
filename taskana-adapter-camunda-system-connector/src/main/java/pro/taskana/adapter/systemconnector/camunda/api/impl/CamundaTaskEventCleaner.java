@@ -19,7 +19,7 @@ public class CamundaTaskEventCleaner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskStarter.class);
 
-    public void taskanaTasksHaveBeenCreatedForReferencedTasks(List<ReferencedTask> referencedTasks,
+    public void cleanEventsForReferencedTasks(List<ReferencedTask> referencedTasks,
         String camundaSystemTaskEventUrl) {
 
         LOGGER.debug("entry to taskanaTasksHaveBeenCreatedForReferencedTasks, CamundSystemURL = {}",
@@ -32,7 +32,7 @@ public class CamundaTaskEventCleaner {
             return;
         }
 
-        StringBuffer idsBuf = new StringBuffer();
+        StringBuilder idsBuf = new StringBuilder();
         for (ReferencedTask referencedTask : referencedTasks) {
             idsBuf.append(referencedTask.getCreationEventId().trim());
             idsBuf.append(',');

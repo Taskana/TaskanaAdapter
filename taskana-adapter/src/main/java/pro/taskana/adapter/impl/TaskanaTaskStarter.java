@@ -3,7 +3,6 @@ package pro.taskana.adapter.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.ibatis.session.SqlSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +14,10 @@ import pro.taskana.Task;
 import pro.taskana.adapter.exceptions.ReferencedTaskDoesNotExistInExternalSystemException;
 import pro.taskana.adapter.exceptions.TaskConversionFailedException;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
-import pro.taskana.adapter.manager.AdapterConnection;
 import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
-import pro.taskana.adapter.util.Assert;
 import pro.taskana.exceptions.TaskAlreadyExistException;
 
 /**
@@ -37,25 +34,21 @@ public class TaskanaTaskStarter {
     private int maximumTotalTransactionLifetime;
 
     @Autowired
-    private SqlSessionManager sqlSessionManager;
-
-    @Autowired
     AdapterManager adapterManager;
 
     @Scheduled(fixedRateString = "${taskana.adapter.scheduler.run.interval.for.start.taskana.tasks.in.milliseconds}")
     public void retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks() {
-        if (!adapterIsSPIInitialized()) {
+        if (!adapterIsInitialized()) {
             return;
         }
-
-        synchronized (this.getClass()) {
+        synchronized (TaskanaTaskStarter.class) {
             if (!adapterManager.isInitialized()) {
                 return;
             }
 
             LOGGER.debug(
                 "----------retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks started----------------------------");
-            try (AdapterConnection connection = adapterManager.getAdapterConnection(sqlSessionManager)) {
+            try {
                 retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks();
             } catch (Exception ex) {
                 LOGGER.error("Caught {} while trying to create Taskana tasks from referenced tasks", ex);
@@ -64,8 +57,7 @@ public class TaskanaTaskStarter {
     }
 
     public void retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks() {
-        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(),
-            Thread.currentThread().getStackTrace()[1].getMethodName());
+        LOGGER.trace("TaskanaTaskStarter.retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks ENTRY ");
         for (SystemConnector systemConnector : (adapterManager.getSystemConnectors().values())) {
             try {
 
@@ -74,11 +66,10 @@ public class TaskanaTaskStarter {
                 List<ReferencedTask> newCreatedTasksInTaskana = createAndStartTaskanaTasks(systemConnector,
                     tasksToStart);
 
-                systemConnector.taskanaTasksHaveBeenCreatedForReferencedTasks(newCreatedTasksInTaskana);
+                systemConnector.taskanaTasksHaveBeenCreatedForNewReferencedTasks(newCreatedTasksInTaskana);
             } finally {
-                LOGGER.trace("{} {}",
-                    "Leaving handling of new tasks for System Connector " + systemConnector.getSystemURL(),
-                    getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName());
+                LOGGER.trace("\"TaskanaTaskStarter.retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks " +
+                    "Leaving handling of new tasks for System Connector " + systemConnector.getSystemURL());
             }
         }
     }
@@ -88,28 +79,28 @@ public class TaskanaTaskStarter {
         List<ReferencedTask> newCreatedTasksInTaskana = new ArrayList<>();
         for (ReferencedTask referencedTask : tasksToStart) {
             try {
-                createTaskanaTask(referencedTask, adapterManager.getTaskanaConnectors(), systemConnector);
+                createTaskanaTask(referencedTask, adapterManager.getTaskanaConnector(), systemConnector);
                 newCreatedTasksInTaskana.add(referencedTask);
-            } catch (Exception e) {
-                if (e instanceof TaskCreationFailedException
-                    && e.getCause() instanceof TaskAlreadyExistException) {
+            } catch (TaskCreationFailedException e) {
+                if (e.getCause() instanceof TaskAlreadyExistException) {
                     newCreatedTasksInTaskana.add(referencedTask);
                 } else {
                     LOGGER.warn(
                         "caught Exception {} when attempting to start TaskanaTask for referencedTask {}", e,
                         referencedTask);
                 }
+            } catch (Exception e) {
+                LOGGER.warn(
+                    "caught Exception {} when attempting to start TaskanaTask for referencedTask {}", e,
+                    referencedTask);
             }
         }
         return newCreatedTasksInTaskana;
     }
 
-    public void createTaskanaTask(ReferencedTask referencedTask, List<TaskanaConnector> taskanaConnectors,
+    public void createTaskanaTask(ReferencedTask referencedTask, TaskanaConnector connector,
         SystemConnector systemConnector) throws TaskConversionFailedException, TaskCreationFailedException {
-        LOGGER.trace("{} {}", "ENTRY " + getClass().getSimpleName(),
-            Thread.currentThread().getStackTrace()[1].getMethodName());
-        Assert.assertion(taskanaConnectors.size() == 1, "taskanaConnectors.size() == 1");
-        TaskanaConnector connector = taskanaConnectors.get(0);
+        LOGGER.trace("TaskanaTaskStarter.createTaskanaTask ENTRY ");
         referencedTask.setSystemURL(systemConnector.getSystemURL());
         try {
             addVariablesToReferencedTask(referencedTask, systemConnector);
@@ -119,8 +110,7 @@ public class TaskanaTaskStarter {
             LOGGER.warn("While attempting to retrieve variables for task {} caught ", referencedTask.getId(), e);
         }
 
-        LOGGER.trace("{} {}", "EXIT " + getClass().getSimpleName(),
-            Thread.currentThread().getStackTrace()[1].getMethodName());
+        LOGGER.trace("TaskanaTaskStarter.createTaskanaTask EXIT ");
     }
 
     private void addVariablesToReferencedTask(ReferencedTask referencedTask, SystemConnector connector) {
@@ -130,10 +120,10 @@ public class TaskanaTaskStarter {
         }
     }
 
-    private boolean adapterIsSPIInitialized() {
+    private boolean adapterIsInitialized() {
         synchronized (AdapterManager.class) {
-            if (!adapterManager.isSpiInitialized()) {
-                adapterManager.initSPIs();
+            if (!adapterManager.isInitialized()) {
+                adapterManager.init();
                 return false;
             }
             return true;

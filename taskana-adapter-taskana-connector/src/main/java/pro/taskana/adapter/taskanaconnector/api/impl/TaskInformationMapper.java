@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import pro.taskana.CallbackState;
 import pro.taskana.Classification;
 import pro.taskana.ClassificationService;
 import pro.taskana.ObjectReference;
@@ -69,6 +70,7 @@ public class TaskInformationMapper {
 
         TaskImpl taskanaTask = (TaskImpl) taskService.newTask(workbasket.getId());
         Map<String, String> callbackInfo = new HashMap<>();
+        callbackInfo.put(Task.CALLBACK_STATE, CallbackState.CALLBACK_PROCESSING_REQUIRED.name());
         callbackInfo.put(TaskanaSystemConnectorImpl.REFERENCED_TASK_ID, referencedTask.getId());
         callbackInfo.put(TaskanaSystemConnectorImpl.SYSTEM_URL, referencedTask.getSystemURL());
         taskanaTask.setCallbackInfo(callbackInfo);
@@ -96,8 +98,10 @@ public class TaskInformationMapper {
     private void setTimestampsInTaskanaTask(TaskImpl taskanaTask, ReferencedTask camundaTask) {
         Instant created = convertStringToInstant(camundaTask.getCreated(), Instant.now());
         taskanaTask.setCreated(created);
-        Instant due = convertStringToInstant(camundaTask.getDue(), created.plus(Duration.ofDays(3)));
-        taskanaTask.setDue(due);
+        if (created != null) {
+            Instant due = convertStringToInstant(camundaTask.getDue(), created.plus(Duration.ofDays(3)));
+            taskanaTask.setDue(due);
+        }
     }
 
     private Instant convertStringToInstant(String strTimestamp, Instant defaultTimestamp) {
@@ -118,7 +122,7 @@ public class TaskInformationMapper {
         Map<String, String> callbackInfo = taskanaTask.getCallbackInfo();
         if (callbackInfo != null) {
             referencedTask.setSystemURL(callbackInfo.get(TaskanaSystemConnectorImpl.SYSTEM_URL));
-            referencedTask.setId(callbackInfo.get(TaskanaSystemConnectorImpl.REFERENCED_TASK_ID));
+            referencedTask.setId(taskanaTask.getExternalId());
         }
 
         Map<String, String> customAttributes = taskanaTask.getCustomAttributes();
