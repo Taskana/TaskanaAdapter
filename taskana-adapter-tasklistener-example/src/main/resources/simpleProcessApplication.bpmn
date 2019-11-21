@@ -3,7 +3,7 @@
   <bpmn:process id="Process_1tkzmhz" isExecutable="true">
     <bpmn:extensionElements>
       <camunda:properties>
-        <camunda:property name="classification" value="classificationKey" />
+        <camunda:property name="classification" value="classificationValueProcess" />
       </camunda:properties>
     </bpmn:extensionElements>
     <bpmn:startEvent id="StartEvent_1">
@@ -13,6 +13,7 @@
       <bpmn:extensionElements>
         <camunda:properties>
           <camunda:property name="classification" value="classificationKey" />
+          <camunda:property name="domain" value="domainValueTask" />
         </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0tfcein</bpmn:incoming>

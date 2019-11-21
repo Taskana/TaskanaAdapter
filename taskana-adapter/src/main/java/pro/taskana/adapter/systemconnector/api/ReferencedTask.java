@@ -1,5 +1,6 @@
 package pro.taskana.adapter.systemconnector.api;
 
+
 /**
  * POJO that represents a task in the external system.
  *
@@ -74,7 +75,7 @@ public class ReferencedTask {
         this.due = due;
     }
 
-    public String getDescription() {
+   public String getDescription() {
         return description;
     }
 
@@ -82,7 +83,7 @@ public class ReferencedTask {
         this.description = description;
     }
 
-    public String getOwner() {
+     public String getOwner() {
         return owner;
     }
 

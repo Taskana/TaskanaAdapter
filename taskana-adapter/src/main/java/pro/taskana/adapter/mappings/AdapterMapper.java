@@ -64,8 +64,8 @@ public interface AdapterMapper {
     @Insert("INSERT INTO TASKS (ID, CREATED, SYSTEM_URL, CREATION_EVENT_ID) VALUES (#{id}, #{created}, #{systemUrl}, #{creationEventId})")
     void registerCreatedTask(@Param("id") String id,
         @Param("created") Instant created,
-        @Param("creationEventId") String creationEventId,
-        @Param("systemUrl") String systemUrl);
+        @Param("systemUrl") String systemUrl,
+         @Param("creationEventId") String creationEventId);
 
     @Insert("INSERT INTO QUERY_HISTORY (ID, QUERY_TIMESTAMP, SYSTEM_URL, AGENT_TYPE) "
         + "VALUES (#{id}, #{queryTimestamp}, #{systemUrl}, #{agentType})")
