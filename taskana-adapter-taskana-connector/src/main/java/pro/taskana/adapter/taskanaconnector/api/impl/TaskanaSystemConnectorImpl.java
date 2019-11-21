@@ -1,20 +1,20 @@
 package pro.taskana.adapter.taskanaconnector.api.impl;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import pro.taskana.CallbackState;
 import pro.taskana.Task;
 import pro.taskana.TaskService;
 import pro.taskana.TaskState;
 import pro.taskana.TaskSummary;
-import pro.taskana.TimeInterval;
 import pro.taskana.adapter.exceptions.TaskConversionFailedException;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
@@ -50,17 +50,15 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     private TaskInformationMapper taskInformationMapper;
 
     @Override
-    public List<ReferencedTask> retrieveCompletedTaskanaTasks(Instant completedAfter) {
-        Instant now = Instant.now();
-        TimeInterval completedIn = new TimeInterval(completedAfter, now);
+    public List<ReferencedTask> retrieveCompletedTaskanaTasks() {
 
         List<TaskSummary> completedTasks = taskService.createTaskQuery()
             .stateIn(TaskState.COMPLETED)
-            .completedWithin(completedIn)
+            .callbackStateIn(CallbackState.CALLBACK_PROCESSING_REQUIRED)
             .list();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("in the time interval {} the following taskana tasks were completed {}",
-                completedIn, LoggerUtils.listToString(completedTasks));
+            LOGGER.debug("the following taskana tasks were completed {} and must process their callback.",
+                LoggerUtils.listToString(completedTasks));
         }
 
         List<ReferencedTask> result = new ArrayList<>();
@@ -112,17 +110,30 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     @Override
     public void terminateTaskanaTask(ReferencedTask referencedTask) throws TaskTerminationFailedException {
         String taskId = null;
+        TaskSummary taskSummary = null;
         try {
-            TaskSummary taskSummary = taskService.createTaskQuery()
+            taskSummary = taskService.createTaskQuery()
                 .externalIdIn(referencedTask.getId())
                 .single();
             if (taskSummary != null) {
                 taskId = taskSummary.getTaskId();
                 taskService.forceCompleteTask(taskId);
             }
-        } catch (TaskNotFoundException | InvalidOwnerException | InvalidStateException | NotAuthorizedException ex) {
-            throw new TaskTerminationFailedException("Task termination failed for task " + taskId, ex);
+        } catch (TaskNotFoundException e1) {
+            LOGGER.debug("Nothing to do in terminateTaskanaTask. Task {} is already gone", taskId);
+        } catch (InvalidOwnerException | InvalidStateException | NotAuthorizedException e2) {
+            if (taskSummary != null && TaskState.COMPLETED.equals(taskSummary.getState())) {
+                LOGGER.debug("Nothing to do in terminateTaskanaTask. Task {} is already completed", taskId);
+            } else {
+                throw new TaskTerminationFailedException("Task termination failed for task " + taskId, e2);
+            }
         }
+    }
+
+    @Override
+    public void referencedTasksHaveBeenCompleted(List<ReferencedTask> referencedTasks) {
+        List<String> externalIds = referencedTasks.stream().map(ReferencedTask::getId).collect(Collectors.toList());
+        taskService.setCallbackStateForTasks(externalIds, CallbackState.CALLBACK_PROCESSING_COMPLETED);
     }
 
 }

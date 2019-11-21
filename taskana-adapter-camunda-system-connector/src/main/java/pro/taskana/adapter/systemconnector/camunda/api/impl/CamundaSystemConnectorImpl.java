@@ -1,6 +1,5 @@
 package pro.taskana.adapter.systemconnector.camunda.api.impl;
 
-import java.time.Instant;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -84,13 +83,19 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
     }
 
     @Override
-    public List<ReferencedTask> retrieveFinishedTasks(Instant finishedAfter) {
-        return taskRetriever.retrieveFinishedCamundaTasks(camundaSystemURL.getSystemTaskEventUrl(), finishedAfter);
+    public List<ReferencedTask> retrieveTerminatedTasks() {
+        return taskRetriever.retrieveTerminatedCamundaTasks(camundaSystemURL.getSystemTaskEventUrl());
     }
 
     @Override
-    public void taskanaTasksHaveBeenCreatedForReferencedTasks(List<ReferencedTask> referencedTasks) {
-        taskEventCleaner.taskanaTasksHaveBeenCreatedForReferencedTasks(referencedTasks,
+    public void taskanaTasksHaveBeenCreatedForNewReferencedTasks(List<ReferencedTask> referencedTasks) {
+        taskEventCleaner.cleanEventsForReferencedTasks(referencedTasks,
+            camundaSystemURL.getSystemTaskEventUrl());
+    }
+
+    @Override
+    public void taskanaTasksHaveBeenTerminatedForTerminatedReferencedTasks(List<ReferencedTask> referencedTasks) {
+        taskEventCleaner.cleanEventsForReferencedTasks(referencedTasks,
             camundaSystemURL.getSystemTaskEventUrl());
     }
 
