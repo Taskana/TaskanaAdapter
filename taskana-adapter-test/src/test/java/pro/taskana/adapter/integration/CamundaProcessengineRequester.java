@@ -119,7 +119,7 @@ public class CamundaProcessengineRequester {
      *            the id of the task to be completed.
      * @return true if completion was successful. False on failure.
      */
-    public boolean completeTaskWithId(String camundaTaskId) {
+    public boolean completeTaskWithId(String camundaTaskId) throws JSONException {
         String url = BASIC_ENGINE_PATH + this.processEngineKey + TASK_PATH + "/" + camundaTaskId + COMPLETE_TASK_PATH;
         HttpEntity<String> requestEntity = this.prepareEntityFromBody("{}");
         ResponseEntity<String> answer = this.restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
@@ -165,7 +165,7 @@ public class CamundaProcessengineRequester {
      * @return {@code true} if retrieval was successful, {@code false} if not.
      * @throws JSONException
      */
-    public boolean getTaskFromHistoryFromTaskId(String camundaTaskId) {
+    public boolean getTaskFromHistoryFromTaskId(String camundaTaskId) throws JSONException {
         String url = BASIC_ENGINE_PATH + this.processEngineKey + HISTORY_PATH + TASK_PATH + "/?taskId=" + camundaTaskId;
         HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
@@ -188,7 +188,7 @@ public class CamundaProcessengineRequester {
      *            the id of the process-instance to be delete.
      * @return true if deletion was successful. False on failure.
      */
-    public boolean deleteProcessInstanceWithId(String processInstanceId) {
+    public boolean deleteProcessInstanceWithId(String processInstanceId) throws JSONException {
         String url = BASIC_ENGINE_PATH + this.processEngineKey + PROCESS_INSTANCE_PATH + "/" + processInstanceId;
         HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
         ResponseEntity<String> answer = this.restTemplate.exchange(url, HttpMethod.DELETE, requestEntity, String.class);

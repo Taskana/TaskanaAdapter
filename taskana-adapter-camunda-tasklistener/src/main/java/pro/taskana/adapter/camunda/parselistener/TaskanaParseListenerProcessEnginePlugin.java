@@ -5,10 +5,11 @@ import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pro.taskana.adapter.camunda.schemacreator.TaskanaOutboxSchemaCreator;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.Statement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,23 +17,7 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaParseListenerProcessEnginePlugin.class);
 
-    private static final String SQL_CREATE_TASKANA_SCHEMA = "CREATE SCHEMA IF NOT EXISTS taskana_tables";
-
-    private static final String SQL_CREATE_SEQUENCE = "CREATE SEQUENCE IF NOT EXISTS taskana_tables.event_store_id_seq"
-            + " INCREMENT 1"
-            + " START 1"
-            + " MINVALUE 1"
-            + " MAXVALUE 2147483647"
-            + " CACHE 1 ";
-
-    private static final String SQL_CREATE_EVENT_STORE = "CREATE TABLE IF NOT EXISTS taskana_tables.event_store"
-            + "("
-            + " ID integer NOT NULL DEFAULT nextval('taskana_tables.event_store_id_seq'::regclass),"
-            + " TYPE text COLLATE pg_catalog.\"default\","
-            + " CREATED timestamp(4) without time zone,"
-            + " PAYLOAD text COLLATE pg_catalog.\"default\","
-            + " CONSTRAINT event_store_pkey PRIMARY KEY (id)"
-            + ")";
+    private static final String DEFAULT_SCHEMA = "taskana_tables";
 
     @Override
     public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -58,15 +43,26 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
 
         DataSource dataSource = processEngineConfiguration.getDataSource();
 
-        try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement()) {
+        String schema = getSchemaFrom(dataSource);
+        schema = (schema==null || schema.isEmpty()) ? schema : DEFAULT_SCHEMA;
 
-            statement.execute(SQL_CREATE_TASKANA_SCHEMA);
-            statement.execute(SQL_CREATE_SEQUENCE);
-            statement.execute(SQL_CREATE_EVENT_STORE);
-
+        TaskanaOutboxSchemaCreator schemaCreator = new TaskanaOutboxSchemaCreator(dataSource, schema);
+        try {
+            schemaCreator.run();
         } catch (Exception e) {
             LOGGER.warn("Caught {} while trying to initialize the outbox-table", e);
+            //processEngineConfiguration.getProcessEngine().close();
+        }
+    }
+
+    private String getSchemaFrom(DataSource dataSource) {
+        try {
+            Connection connection = dataSource.getConnection();
+            String schema = connection.getSchema();
+            connection.close();
+            return schema;
+        } catch(SQLException e) {
+            return null;
         }
     }
 

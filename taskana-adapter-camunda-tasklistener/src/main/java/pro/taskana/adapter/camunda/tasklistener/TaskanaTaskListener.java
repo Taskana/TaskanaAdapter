@@ -1,12 +1,10 @@
 package pro.taskana.adapter.camunda.tasklistener;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -14,6 +12,7 @@ import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperties;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperty;
 import org.slf4j.Logger;
@@ -23,7 +22,7 @@ public class TaskanaTaskListener implements TaskListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskListener.class);
 
-    private static final String SQL_INSERT_CREATE_EVENT = "INSERT INTO event_store (TYPE,CREATED,PAYLOAD) VALUES (?,?,?)";
+    private static final String SQL_INSERT_EVENT = "INSERT INTO event_store (TYPE,CREATED,PAYLOAD) VALUES (?,?,?)";
 
     private static TaskanaTaskListener instance = null;
 
@@ -34,144 +33,214 @@ public class TaskanaTaskListener implements TaskListener {
         return instance;
     }
 
-    @Override
     public void notify(DelegateTask delegateTask) {
 
         try (Connection connection = Context.getProcessEngineConfiguration().getDataSource().getConnection()) {
 
+
             switch (delegateTask.getEventName()) {
 
                 case "create":
-                    insertCreateEvent(delegateTask, connection);
+                    insertCreateEventIntoOutbox(delegateTask, connection);
                     break;
                 case "complete":
-                    insertCompleteEvent(delegateTask, connection);
+                    insertCompleteOrDeleteEventIntoOutbox(delegateTask, connection);
                     break;
                 case "delete":
-                    insertDeleteEvent(delegateTask, connection);
+                    insertCompleteOrDeleteEventIntoOutbox(delegateTask, connection);
                     break;
             }
 
+        } catch (SQLException e) {
+            LOGGER.warn("Caught {} while trying to process a delegate task", e);
         } catch (Exception e) {
-
             LOGGER.warn("Caught {} while trying to process a delegate task", e);
         }
 
     }
 
-    private void insertCreateEvent(DelegateTask delegateTask, Connection connection) {
+    private void insertCreateEventIntoOutbox(DelegateTask delegateTask, Connection connection) throws SQLException {
+
+        String camundaSchema = null;
 
         try {
-            LOGGER.debug("TaskanaTaskListener uses Database with url {} ", connection.getMetaData().getURL());
 
-            String camundaSchema = connection.getSchema();
+            camundaSchema = connection.getSchema();
             LOGGER.debug("camundaSchema in taskListener is {}", camundaSchema);
-            String dbProductName = connection.getMetaData().getDatabaseProductName();
-            if ("PostgreSQL".equals(dbProductName)) {
-                connection.setSchema("taskana_tables");
-            } else {
-                connection.setSchema("TASKANA_TABLES");
-            }
 
-            Timestamp eventCreationTimestamp = Timestamp.from(Instant.now());
+            setOutboxSchema (connection);
+
             String referencedTaskJson = getReferencedTaskJson(delegateTask);
 
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_CREATE_EVENT,
-                Statement.RETURN_GENERATED_KEYS);
+            prepareAndExecuteStatement(connection, delegateTask, referencedTaskJson);
+            
+        } catch (SQLException e) {
+            LOGGER.warn("Caught {} while trying to insert a \"create\" event into the outbox table", e);
+
+        } finally {
+            if (camundaSchema!=null){
+                connection.setSchema(camundaSchema);
+            }
+        }
+    }
+
+    private void insertCompleteOrDeleteEventIntoOutbox(DelegateTask delegateTask, Connection connection) throws SQLException {
+
+        if (delegateTask.getEventName().equals("complete") && taskWasCompletedByAdapter(delegateTask)) {
+            return;
+        } else {
+
+            String camundaSchema = null;
+
+            try {
+
+                camundaSchema = connection.getSchema();
+                setOutboxSchema(connection);
+
+                String taskIdJson = "{\"id\":\"" + delegateTask.getId() + "\"}";
+                prepareAndExecuteStatement(connection, delegateTask, taskIdJson);
+
+                connection.setSchema(camundaSchema);
+
+            } catch (SQLException e) {
+                LOGGER.warn("Caught {} while trying to insert a " + delegateTask.getEventName() + " event into the outbox table", e);
+            } catch (Exception e) {
+                LOGGER.warn("Caught {} while trying to insert a " + delegateTask.getEventName() + " event into the outbox table", e);
+            }
+            finally {
+                if (camundaSchema != null) {
+                    connection.setSchema(camundaSchema);
+                }
+            }
+        }
+
+    }
+
+    private void setOutboxSchema(Connection connection) throws SQLException {
+
+        String dbProductName = connection.getMetaData().getDatabaseProductName();
+        if ("PostgreSQL".equals(dbProductName)) {
+            connection.setSchema("taskana_tables");
+        } else {
+            connection.setSchema("TASKANA_TABLES");
+        }
+    }
+
+    private void prepareAndExecuteStatement(Connection connection, DelegateTask delegateTask, String payloadJson) {
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_EVENT, Statement.RETURN_GENERATED_KEYS)) {
+
+            Timestamp eventCreationTimestamp = Timestamp.from(Instant.now());
+
             preparedStatement.setString(1, delegateTask.getEventName());
             preparedStatement.setTimestamp(2, eventCreationTimestamp);
-            preparedStatement.setString(3, referencedTaskJson);
+            preparedStatement.setString(3, payloadJson);
 
             preparedStatement.execute();
-            preparedStatement.close();
 
-            connection.setSchema(camundaSchema);
         } catch (Exception e) {
-            LOGGER.warn("Caught {} while trying to insert a create event into the outbox table", e);
 
+            LOGGER.warn("Caught {} while trying to prepare and execute statement", e);
         }
     }
 
     private String getReferencedTaskJson(DelegateTask delegateTask) {
 
-        LOGGER.debug("getting referenced task for id {}" + delegateTask.getId());
+        StringBuilder referencedTaskJsonBuilder = new StringBuilder();
 
-        String referencedTaskJson = "{" +
-            "\"id\":" + "\"" + delegateTask.getId() + "\"," +
-            "\"name\":" + "\"" + delegateTask.getName() + "\"," +
-            "\"assignee\":" + "\"" + delegateTask.getAssignee() + "\"," +
-            "\"created\":" + "\"" + formatDate(delegateTask.getCreateTime()) + "\"," +
-            "\"due\":" + "\"" + formatDate(delegateTask.getDueDate()) + "\"," +
-            "\"description\":" + "\"" + delegateTask.getDescription() + "\"," +
-            "\"owner\":" + "\"" + delegateTask.getOwner() + "\"," +
-            "\"priority\":" + "\"" + delegateTask.getPriority() + "\"," +
-            "\"taskDefinitionKey\":" + "\"" + delegateTask.getTaskDefinitionKey() + "\"," +
-            "\"classificationKey\":" + "\"" + getClassification(delegateTask) + "\"," +
-            "\"domain\":" + "\"" + getDomain(delegateTask) + "\"" +
-            "}";
+        referencedTaskJsonBuilder.append("{\"id\":\"").append(delegateTask.getId())
+          .append("\",\"name\":\"").append(delegateTask.getName())
+          .append("\",\"assignee\":\"").append(delegateTask.getAssignee())
+          .append("\",\"created\":\"").append(formatDate(delegateTask.getCreateTime()))
+          .append("\",\"due\":\"").append(formatDate(delegateTask.getDueDate()))
+          .append("\",\"description\":\"").append(delegateTask.getDescription())
+          .append("\",\"owner\":\"").append(delegateTask.getOwner())
+          .append("\",\"priority\":\"").append(delegateTask.getPriority())
+          .append("\",\"taskDefinitionKey\":\"").append(delegateTask.getTaskDefinitionKey())
+          .append("\",\"classification\":\"").append(getUserTaskExtensionProperty(delegateTask, "classification"))
+          .append("\",\"domain\":\"").append(getProcessModelExtensionProperty(delegateTask, "domain"))
+          .append("\"}");
 
-        return referencedTaskJson;
+        return referencedTaskJsonBuilder.toString();
     }
 
-    private String getDomain(DelegateTask delegateTask) {
 
-        String domain = null;
+    private String getProcessModelExtensionProperty(DelegateTask delegateTask, String propertyKey) {
+
+        String propertyValue = null;
 
         BpmnModelInstance model = delegateTask.getExecution().getBpmnModelInstance();
 
         try {
-            domain = model.getModelElementsByType(CamundaProperty.class)
-                .stream()
-                .filter(camundaProperty -> camundaProperty.getCamundaName()
-                    .equals("domain"))
-                .collect(Collectors.toList())
-                .get(0)
-                .getCamundaValue();
+            List<CamundaProperty> processModelExtensionProperties =
+                    model.getModelElementsByType(CamundaProperty.class)
+                            .stream()
+                            .filter(camundaProperty ->
+                                    camundaProperty.getCamundaName()
+                                            .equals(propertyKey))
+                            .collect(Collectors.toList());
+
+            if (processModelExtensionProperties.isEmpty()) {
+                return propertyValue;
+            } else {
+                propertyValue = processModelExtensionProperties.get(0).getCamundaValue();
+            }
+
         } catch (Exception e) {
-            LOGGER.warn("Caught {} while trying to retrieve the \"domain\" property from task {}", e,
-                delegateTask.getName());
+            LOGGER.warn("Caught {} while trying to retrieve the " + propertyKey + " property from a process model", e);
 
         }
 
-        return domain;
+        return propertyValue;
 
     }
 
-    private String getClassification(DelegateTask delegateTask) {
 
-        String classification = null;
+    private String getUserTaskExtensionProperty(DelegateTask delegateTask, String propertyKey) {
+
+        String propertyValue = null;
 
         try {
-            CamundaProperties camundaProperties = delegateTask.getExecution()
-                .getBpmnModelElementInstance()
-                .getExtensionElements()
-                .getElementsQuery()
-                .filterByType(CamundaProperties.class)
-                .singleResult();
 
-            classification = camundaProperties.getCamundaProperties()
-                .stream()
-                .filter(camundaProperty -> camundaProperty.getCamundaName()
-                    .equals("classification"))
-                .collect(Collectors.toList())
-                .get(0)
-                .getCamundaValue();
+            ExtensionElements extensionElements = delegateTask.getExecution()
+                    .getBpmnModelElementInstance()
+                    .getExtensionElements();
 
+            if (extensionElements ==  null){
+                return propertyValue;
+            } else {
+                CamundaProperties camundaProperties = extensionElements.getElementsQuery()
+                        .filterByType(CamundaProperties.class).singleResult();
+
+                List<CamundaProperty> userTaskExtensionProperties = camundaProperties.getCamundaProperties()
+                        .stream()
+                        .filter(camundaProperty ->
+                                camundaProperty.getCamundaName()
+                                        .equals(propertyKey))
+                        .collect(Collectors.toList());
+
+                if (userTaskExtensionProperties.isEmpty()) {
+                    return propertyValue;
+                } else {
+                    propertyValue = userTaskExtensionProperties.get(0).getCamundaValue();
+                }
+            }
         } catch (Exception e) {
-            LOGGER.warn("Caught {} while trying to retrieve the classification of task {}", e, delegateTask.getName());
+            LOGGER.warn("Caught {} while trying to retrieve the " + propertyKey + " property of a user task", e);
         }
 
-        return classification;
+        return propertyValue;
     }
 
-    // TO-DO
-    private void insertDeleteEvent(DelegateTask delegateTask, Connection connection) {
+    private boolean taskWasCompletedByAdapter(DelegateTask delegateTask) {
 
-    }
+        String taskWasCompletedByAdapterValue = getUserTaskExtensionProperty(delegateTask, "taskWasCompletedByAdapter");
 
-    // TO-DO
-    private void insertCompleteEvent(DelegateTask delegateTask, Connection connection) {
+        if (taskWasCompletedByAdapterValue != null && taskWasCompletedByAdapterValue.equals("true")) {
+            return true;
+        }
 
+        return false;
     }
 
     private String formatDate(Date date) {
@@ -179,8 +248,8 @@ public class TaskanaTaskListener implements TaskListener {
             return null;
         } else {
             return DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-                .withZone(ZoneId.systemDefault())
-                .format(date.toInstant());
+                    .withZone(ZoneId.systemDefault())
+                    .format(date.toInstant());
 
         }
     }

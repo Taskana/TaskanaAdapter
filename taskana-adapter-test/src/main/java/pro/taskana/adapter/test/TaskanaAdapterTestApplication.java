@@ -8,7 +8,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import pro.taskana.adapter.camunda.outbox.rest.springboot.config.OutboxRestServiceSpringBootConfig;
 import pro.taskana.adapter.configuration.AdapterConfiguration;
 import pro.taskana.adapter.test.configuration.CamundaConfiguration;
 
@@ -17,13 +16,14 @@ import pro.taskana.adapter.test.configuration.CamundaConfiguration;
  *
  * @author Ben Fuernrohr
  */
-@EnableAutoConfiguration
+
 @EnableScheduling
-@ComponentScan(basePackages = {"pro.taskana.adapter", "pro.taskana.taskana_adapter_test"})
-@Import({AdapterConfiguration.class, CamundaConfiguration.class, OutboxRestServiceSpringBootConfig.class})
+@ComponentScan(basePackages = {"pro.taskana.adapter", "pro.taskana.adapter.test"})
+@Import({AdapterConfiguration.class, CamundaConfiguration.class})
 @SpringBootApplication
 @EnableProcessApplication
 public class TaskanaAdapterTestApplication {
+
 
     public static void main(String... args) {
         SpringApplication.run(TaskanaAdapterTestApplication.class, args);
