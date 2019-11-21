@@ -11,7 +11,7 @@ import pro.taskana.impl.util.LoggerUtils;
 @Component
 public class CamundaSystemUrls {
 
-    Set<SystemURLInfo> camundaSystemURLs = new HashSet<>();
+    Set<SystemURLInfo> theCamundaSystemURLs = new HashSet<>();
 
     public CamundaSystemUrls(String strUrls) {
         if (strUrls != null) {
@@ -23,18 +23,18 @@ public class CamundaSystemUrls {
                 urlInfo.setSystemTaskEventUrl(
                     currentURLPair.substring(currentURLPair.indexOf('|') + 1, currentURLPair.length()).trim());
 
-                camundaSystemURLs.add(urlInfo);
+                theCamundaSystemURLs.add(urlInfo);
             }
         }
     }
 
     public Set<SystemURLInfo> getUrls() {
-        return camundaSystemURLs;
+        return theCamundaSystemURLs;
     }
 
     @Override
     public String toString() {
-        return "CamundaSystemUrls [camundaSystemURLs=" + LoggerUtils.setToString(camundaSystemURLs) + "]";
+        return "CamundaSystemUrls [camundaSystemURLs=" + LoggerUtils.setToString(theCamundaSystemURLs) + "]";
     }
 
     public static class SystemURLInfo {

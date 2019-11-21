@@ -24,7 +24,7 @@ public class AdapterSpringContextProvider implements ApplicationContextAware {
      * Get a Spring bean by type.
      **/
     public static <T> T getBean(Class<T> beanClass) {
-       return context.getBean(beanClass);
+        return context.getBean(beanClass);
     }
 
     /**

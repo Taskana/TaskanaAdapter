@@ -70,9 +70,6 @@ public abstract class AbsIntegrationTest {
     @Resource(name = "taskanaDataSource")
     private DataSource taskanaDataSource;
 
-    @Resource(name = "adapterDataSource")
-    private DataSource adapterDataSource;
-
     @Resource(name = "camundaBpmDataSource")
     private DataSource camundaBpmDataSource;
 
@@ -90,7 +87,6 @@ public abstract class AbsIntegrationTest {
 
             DBCleaner cleaner = new DBCleaner();
             cleaner.clearDb(taskanaDataSource, DBCleaner.ApplicationDatabaseType.TASKANA);
-            cleaner.clearDb(adapterDataSource, DBCleaner.ApplicationDatabaseType.TASKANA_ADAPTER);
             cleaner.clearDb(camundaBpmDataSource, DBCleaner.ApplicationDatabaseType.CAMUNDA);
 
             isInitialised = true;

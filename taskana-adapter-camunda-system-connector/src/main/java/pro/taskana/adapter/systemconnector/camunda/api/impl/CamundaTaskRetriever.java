@@ -1,10 +1,7 @@
 package pro.taskana.adapter.systemconnector.camunda.api.impl;
 
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -46,30 +43,14 @@ public class CamundaTaskRetriever {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("exit from retrieveNewStartedCamundaTasks. Retrieved Tasks: {}", Arrays.toString(tasks));
         }
-        return Arrays.asList(tasks);
+
+        return tasks == null ? new ArrayList<>() : Arrays.asList(tasks);
     }
 
-    public List<ReferencedTask> retrieveFinishedCamundaTasks(String camundaSystemURL, Instant finishedAfter) {
-        LOGGER.debug("entry to retrieveFinishedCamundaTasks. CamundSystemURL = {}, finishedAfter = {} ",
-            camundaSystemURL, finishedAfter);
-        String requestUrl = camundaSystemURL + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_HISTORIC_TASKS;
-        String requestBody;
-        if (finishedAfter == null) {
-            requestBody = "{ \"finished\" : \"true\"}";
-        } else {
-            // Instant is in UTC time, Camunda uses local time. Need to adjust ...
-            Date date = java.sql.Timestamp.valueOf(finishedAfter.atZone(ZoneId.systemDefault()).toLocalDateTime());
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-            requestBody = "{ \"finished\" : \"true\", \"finishedAfter\": \"" + formatter.format(date) + "\"}";
-            LOGGER.debug("retrieving finished camunda tasks with request body {}", requestBody);
-        }
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-
-        LOGGER.debug("retrieveFinishedCamundaTasks postw {}, body = {}", requestUrl, requestBody);
-
-        ReferencedTask[] tasks = restTemplate.postForEntity(requestUrl, entity, ReferencedTask[].class).getBody();
+    public List<ReferencedTask> retrieveTerminatedCamundaTasks(String camundaSystemURL) {
+        LOGGER.debug("entry to retrieveFinishedCamundaTasks. CamundSystemURL = {}", camundaSystemURL);
+        // new implementation via outbox required
+        ReferencedTask[] tasks = new ReferencedTask[] {};
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("exit from retrieveFinishedCamundaTasks. Retrieved Tasks: {}", Arrays.toString(tasks));
         }
