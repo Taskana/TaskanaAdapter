@@ -93,12 +93,6 @@
                         <version>${project.version}</version>
                 </dependency>
 
-                <dependency>
-                        <groupId>pro.taskana</groupId>
-                         <artifactId>taskana-adapter-camunda-outbox-rest-spring-boot</artifactId>
-                        <version>${project.version}</version>
-                </dependency>
-
                 <!-- Database Drivers -->
                 <dependency>
                         <groupId>com.ibm.db2.jcc</groupId>
@@ -117,6 +111,16 @@
 					<version>0.2</version>
 					<scope>test</scope>
 				</dependency>
+		<dependency>
+			<groupId>pro.taskana</groupId>
+			<artifactId>taskana-adapter-outbox-rest-spring-boot-starter</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-spring-boot-starter</artifactId>
+			<version>3.0.0.Final</version>
+		</dependency>
         </dependencies>
 
         <!-- -->

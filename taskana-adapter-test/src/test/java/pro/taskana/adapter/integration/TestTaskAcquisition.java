@@ -129,7 +129,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
             .startCamundaProcessAndReturnId("simple_multiple_execution_process", "");
         List<String> camundaTaskIds = this.camundaProcessengineRequester
             .getTaskIdsFromProcessInstanceId(processInstanceId);
-        assertEquals(3, camundaTaskIds.size());
+        assertEquals(camundaTaskIds.size(), 3);
 
         Thread.sleep(this.adapterTaskPollingInterval);
 
