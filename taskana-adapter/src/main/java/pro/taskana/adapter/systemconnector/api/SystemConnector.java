@@ -40,7 +40,7 @@ public interface SystemConnector {
      * @param referencedTasks
      *            List of ReferencedTasks for which Taskana Tasks have been terminated.
      */
-    void taskanaTasksHaveBeenTerminatedForTerminatedReferencedTasks(List<ReferencedTask> referencedTasks);
+    void taskanaTasksHaveBeenCompletedForTerminatedReferencedTasks(List<ReferencedTask> referencedTasks);
 
     /**
      * Get the variables of the process the referenced task belongs to.

@@ -94,7 +94,7 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
     }
 
     @Override
-    public void taskanaTasksHaveBeenTerminatedForTerminatedReferencedTasks(List<ReferencedTask> referencedTasks) {
+    public void taskanaTasksHaveBeenCompletedForTerminatedReferencedTasks(List<ReferencedTask> referencedTasks) {
         taskEventCleaner.cleanEventsForReferencedTasks(referencedTasks,
             camundaSystemURL.getSystemTaskEventUrl());
     }
