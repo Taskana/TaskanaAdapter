@@ -79,7 +79,7 @@ public class TaskanaTaskTerminator {
                         referencedTask.getId(), ex);
                 }
             }
-            systemConnector.taskanaTasksHaveBeenTerminatedForTerminatedReferencedTasks(taskanaTasksToTerminate);
+            systemConnector.taskanaTasksHaveBeenCompletedForTerminatedReferencedTasks(taskanaTasksToTerminate);
 
         } finally {
             LOGGER.trace(
