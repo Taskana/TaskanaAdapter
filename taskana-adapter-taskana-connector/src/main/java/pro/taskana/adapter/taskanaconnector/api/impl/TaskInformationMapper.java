@@ -1,6 +1,5 @@
 package pro.taskana.adapter.taskanaconnector.api.impl;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -64,8 +63,14 @@ public class TaskInformationMapper {
         WorkbasketAlreadyExistException, ClassificationAlreadyExistException, InvalidArgumentException,
         WorkbasketNotFoundException {
 
-        Workbasket workbasket = findOrCreateWorkbasket(referencedTask.getAssignee());
-        Classification classification = findOrCreateClassification();
+        String domain = referencedTask.getDomain();
+        if (!isValidString(domain)) {
+            domain = DEFAULT_DOMAIN;
+        }
+
+        Workbasket workbasket = findOrCreateWorkbasket(referencedTask.getWorkbasketKey(), domain,
+            referencedTask.getAssignee());
+        Classification classification = findOrCreateClassification(referencedTask.getClassificationKey(), domain);
         ObjectReference objectReference = createObjectReference();
 
         TaskImpl taskanaTask = (TaskImpl) taskService.newTask(workbasket.getId());
@@ -98,10 +103,8 @@ public class TaskInformationMapper {
     private void setTimestampsInTaskanaTask(TaskImpl taskanaTask, ReferencedTask camundaTask) {
         Instant created = convertStringToInstant(camundaTask.getCreated(), Instant.now());
         taskanaTask.setCreated(created);
-        if (created != null) {
-            Instant due = convertStringToInstant(camundaTask.getDue(), created.plus(Duration.ofDays(3)));
-            taskanaTask.setDue(due);
-        }
+        Instant due = convertStringToInstant(camundaTask.getDue(), Instant.now());
+        taskanaTask.setDue(due);
     }
 
     private Instant convertStringToInstant(String strTimestamp, Instant defaultTimestamp) {
@@ -146,15 +149,21 @@ public class TaskInformationMapper {
         return Instant.from(zonedDateTime);
     }
 
-    private Classification findOrCreateClassification()
+    private Classification findOrCreateClassification(String classificationKey, String domain)
         throws ClassificationAlreadyExistException, NotAuthorizedException,
         DomainNotFoundException, InvalidArgumentException {
 
+        if (!isValidString(classificationKey)) {
+            classificationKey = DEFAULT_CLASSIFICATION;
+        }
+        if (!isValidString(domain)) {
+            domain = DEFAULT_DOMAIN;
+        }
         Classification classification;
         try {
-            classification = classificationService.getClassification(DEFAULT_CLASSIFICATION, DEFAULT_DOMAIN);
+            classification = classificationService.getClassification(classificationKey, domain);
         } catch (ClassificationNotFoundException e) {
-            classification = classificationService.newClassification(DEFAULT_CLASSIFICATION, DEFAULT_DOMAIN,
+            classification = classificationService.newClassification(classificationKey, domain,
                 CLASSIFICATION_TYPE_TASK);
             classification = classificationService.createClassification(classification);
         }
@@ -171,19 +180,24 @@ public class TaskInformationMapper {
         return objRef;
     }
 
-    private Workbasket findOrCreateWorkbasket(String key) throws DomainNotFoundException,
+    private Workbasket findOrCreateWorkbasket(String workbasketKey, String domain, String assignee)
+        throws DomainNotFoundException,
         InvalidWorkbasketException, NotAuthorizedException, WorkbasketAlreadyExistException,
         WorkbasketNotFoundException, InvalidArgumentException {
-        if (key == null) {
-            key = DEFAULT_WORKBASKET;
+        if (!isValidString(workbasketKey)) {
+            workbasketKey = DEFAULT_WORKBASKET;
+        }
+        if (!isValidString(domain)) {
+            domain = DEFAULT_DOMAIN;
         }
         Workbasket wb;
+
         try {
-            wb = workbasketService.getWorkbasket(key, DEFAULT_DOMAIN);
+            wb = workbasketService.getWorkbasket(workbasketKey, domain);
         } catch (WorkbasketNotFoundException e) {
-            wb = workbasketService.newWorkbasket(key, DEFAULT_DOMAIN);
-            wb.setName(key);
-            wb.setOwner(key);
+            wb = workbasketService.newWorkbasket(workbasketKey, domain);
+            wb.setName(workbasketKey);
+            wb.setOwner(assignee);
             wb.setType(WorkbasketType.PERSONAL);
             wb = workbasketService.createWorkbasket(wb);
             createWorkbasketAccessList(wb);
@@ -203,6 +217,10 @@ public class TaskInformationMapper {
         workbasketAccessItem.setPermDistribute(true);
         workbasketService.createWorkbasketAccessItem(workbasketAccessItem);
 
+    }
+
+    boolean isValidString(String string) {
+        return !(string == null || string.isEmpty() || "null".equals(string));
     }
 
 }
