@@ -23,8 +23,7 @@ public class TaskanaOutboxSchemaCreator {
     private static final String DB_SCHEMA = SQL + "/taskana-outbox-schema.sql";
     private static final String DB_SCHEMA_DB2 = SQL + "/taskana-outbox-schema-db2.sql";
     private static final String DB_SCHEMA_POSTGRES = SQL + "/taskana-outbox-schema-postgres.sql";
-    private static final String DB_SCHEMA_DETECTION = SQL + "/taskana-outbox-schema-detection.sql";
-    private static final String DB_SCHEMA_DETECTION_POSTGRES = SQL + "/taskana-outbox-schema-detection-postgres.sql";
+
 
     private DataSource dataSource;
     private String schemaName;
