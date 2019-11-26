@@ -86,10 +86,6 @@ public class TaskanaTaskListener implements TaskListener {
 
     private void insertCompleteOrDeleteEventIntoOutbox(DelegateTask delegateTask, Connection connection) throws SQLException {
 
-        if (delegateTask.getEventName().equals("complete") && taskWasCompletedByAdapter(delegateTask)) {
-            return;
-        } else {
-
             String camundaSchema = null;
 
             try {
@@ -114,7 +110,6 @@ public class TaskanaTaskListener implements TaskListener {
             }
         }
 
-    }
 
     private void setOutboxSchema(Connection connection) throws SQLException {
 
@@ -230,17 +225,6 @@ public class TaskanaTaskListener implements TaskListener {
         }
 
         return propertyValue;
-    }
-
-    private boolean taskWasCompletedByAdapter(DelegateTask delegateTask) {
-
-        String taskWasCompletedByAdapterValue = getUserTaskExtensionProperty(delegateTask, "taskWasCompletedByAdapter");
-
-        if (taskWasCompletedByAdapterValue != null && taskWasCompletedByAdapterValue.equals("true")) {
-            return true;
-        }
-
-        return false;
     }
 
     private String formatDate(Date date) {

@@ -58,20 +58,6 @@ public class RetrieveCamundaTaskAccTest {
 
         String timeStamp = "2019-01-14T15:22:30.811+0000";
 
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-                .withLocale(Locale.ROOT)
-                .withZone(ZoneId.of("UTC"));
-
-        Instant createdAfter = Instant.from(dateTimeFormatter.parse("2019-01-14T15:22:29.811+0000"));
-
-
-        Date date = java.sql.Timestamp.valueOf(createdAfter.atZone(ZoneId.systemDefault()).toLocalDateTime());
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-
-        String expectedBody = "{\"createdAfter\": \"" + formatter.format(date) + "\"}";
-
-
-
         ReferencedTask expectedTask = new ReferencedTask();
         expectedTask.setId("801aca2e-1b25-11e9-b283-94819a5b525c");
         expectedTask.setName("modify Request");
@@ -79,10 +65,6 @@ public class RetrieveCamundaTaskAccTest {
         expectedTask.setPriority("50");
         expectedTask.setSuspended("false");
         expectedTask.setTaskDefinitionKey("Task_0yogl0i");
-
-        ReferencedTask[] expectedResultBody = new ReferencedTask[] {expectedTask};
-        ResponseEntity<ReferencedTask[]> expectedResult = new ResponseEntity<ReferencedTask[]>(expectedResultBody,
-                HttpStatus.OK);
 
         String expectedReplyBody = "[{" +
                 "        \"id\": \"801aca2e-1b25-11e9-b283-94819a5b525c\",\r\n" +
@@ -129,7 +111,8 @@ public class RetrieveCamundaTaskAccTest {
         assertEquals(expectedTask, actualResult.get(0));
     }
 
-    //@Test
+    @Test
+    @Ignore
     public void testGetFinishedCamundaTasks() throws ParseException {
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -144,9 +127,6 @@ public class RetrieveCamundaTaskAccTest {
         expectedTask.setCreated(formatter.format(date));
         expectedTask.setPriority("50");
         expectedTask.setSuspended("false");
-
-//        ReferencedTask[] expectedResultBody = new ReferencedTask[] {expectedTask};
-//        ResponseEntity<ReferencedTask[]> expectedResult = new ResponseEntity<ReferencedTask[]>(expectedResultBody, HttpStatus.OK);
 
         String expectedReplyBody = "[{" +
                 "        \"id\": \"0146d379-fc67-11e8-84f7-94819a5b525c\",\r\n" +

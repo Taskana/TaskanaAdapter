@@ -60,9 +60,7 @@ public class CamundaTaskEventsService {
             setPreparedStatementValues(preparedStatement, idsAsIntegers);
             preparedStatement.execute();
 
-        } catch (SQLException e) {
-            LOGGER.warn("Caught {} while trying to delete events from the outbox table", e);
-        }catch (Exception e){
+        } catch (Exception e){
             LOGGER.warn("Caught {} while trying to delete events from the outbox table", e);
         }
 
@@ -74,14 +72,13 @@ public class CamundaTaskEventsService {
 
         try (
                 Connection connection = getConnection();
-                ResultSet createEventsResultSet = prepareAndExecuteCreateEventsQuery(connection)
+                PreparedStatement preparedStatement = getPreparedCreateEventsStatement(connection);
         ) {
 
-            camundaTaskEventResources = getCamundaTaskEventResources(createEventsResultSet);
+            ResultSet camundaTaskEventResultSet = preparedStatement.executeQuery();
+            camundaTaskEventResources = getCamundaTaskEventResources(camundaTaskEventResultSet);
 
-        } catch (SQLException e) {
-            LOGGER.warn("Caught {} while trying to retrieve create events from the outbox", e);
-        } catch (NullPointerException e) {
+        } catch (SQLException | NullPointerException e) {
             LOGGER.warn("Caught {} while trying to retrieve create events from the outbox", e);
         }
         return camundaTaskEventResources;
@@ -100,7 +97,7 @@ public class CamundaTaskEventsService {
     }
 
 
-    private List<CamundaTaskEventResource> getCamundaTaskEventResources(ResultSet createEventsResultSet) throws SQLException, NullPointerException {
+    private List<CamundaTaskEventResource> getCamundaTaskEventResources(ResultSet createEventsResultSet) throws SQLException {
 
         List<CamundaTaskEventResource> camundaTaskEventResources = new ArrayList<>();
 
@@ -141,13 +138,12 @@ public class CamundaTaskEventsService {
     }
 
 
-    private ResultSet prepareAndExecuteCreateEventsQuery(Connection connection) throws SQLException {
+    private PreparedStatement getPreparedCreateEventsStatement(Connection connection) throws SQLException {
 
         PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_CREATE_EVENTS);
         preparedStatement.setString(1, "create");
-        ResultSet createEventsResultSet = preparedStatement.executeQuery();
 
-        return createEventsResultSet;
+        return preparedStatement;
     }
 
     private List<CamundaTaskEventResource> getCompleteAndDeleteEvents() {
@@ -156,9 +152,10 @@ public class CamundaTaskEventsService {
 
         try (
                 Connection connection = getConnection();
-                ResultSet completeAndDeleteEventsResultSet = prepareAndExecuteCompleteAndDeleteEventsQuery(connection)
+                PreparedStatement preparedStatement = getPreparedCompleteAndDeleteEventsStatement(connection);
         ) {
 
+            ResultSet completeAndDeleteEventsResultSet = preparedStatement.executeQuery();
             camundaTaskEventResources = getCamundaTaskEventResources(completeAndDeleteEventsResultSet);
 
         } catch (SQLException e) {
@@ -170,16 +167,13 @@ public class CamundaTaskEventsService {
         return camundaTaskEventResources;
     }
 
-    private ResultSet prepareAndExecuteCompleteAndDeleteEventsQuery(Connection connection) throws SQLException, NullPointerException {
-
-        ResultSet completeAndDeleteEventsResultSet = null;
+    private PreparedStatement getPreparedCompleteAndDeleteEventsStatement(Connection connection) throws SQLException {
 
         PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_COMPLETE_AND_DELETE_EVENTS);
         preparedStatement.setString(1, "complete");
         preparedStatement.setString(2, "delete");
-        completeAndDeleteEventsResultSet = preparedStatement.executeQuery();
 
-        return completeAndDeleteEventsResultSet;
+        return preparedStatement;
     }
 
     private Connection getConnection() {
@@ -189,9 +183,7 @@ public class CamundaTaskEventsService {
         Connection connection = null;
         try {
             connection = dataSource.getConnection();
-        } catch (SQLException e) {
-            LOGGER.warn("Caught {} while trying to retrieve a connection from the provided datasource", e);
-        } catch (NullPointerException e) {
+        } catch (SQLException | NullPointerException e) {
             LOGGER.warn("Caught {} while trying to retrieve a connection from the provided datasource", e);
         }
 
@@ -223,11 +215,7 @@ public class CamundaTaskEventsService {
                                 properties.getProperty("taskana.adapter.outbox.rest.datasource.password"));
             }
 
-        } catch (IOException e) {
-            LOGGER.warn("Caught {} while trying to retrieve the datasource from the provided properties file", e);
-        } catch (NamingException e) {
-            LOGGER.warn("Caught {} while trying to retrieve the datasource from the provided properties file", e);
-        } catch (NullPointerException e) {
+        } catch (IOException | NamingException | NullPointerException e) {
             LOGGER.warn("Caught {} while trying to retrieve the datasource from the provided properties file", e);
         }
 

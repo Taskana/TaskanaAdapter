@@ -20,19 +20,17 @@ public class TaskanaParseListener extends AbstractBpmnParseListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskListener.class);
 
 
-
     @Override
     public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
         ActivityBehavior behavior = activity.getActivityBehavior();
         if (behavior instanceof UserTaskActivityBehavior) {
 
-           if  (((UserTaskActivityBehavior) behavior).getTaskDefinition().getTaskListeners().isEmpty()){
             TaskDefinition userTask = ((UserTaskActivityBehavior) behavior).getTaskDefinition();
 
                     userTask.addTaskListener(TaskListener.EVENTNAME_CREATE, TaskanaTaskListener.getInstance());
                     userTask.addTaskListener(TaskListener.EVENTNAME_COMPLETE,TaskanaTaskListener.getInstance());
                     userTask.addTaskListener(TaskListener.EVENTNAME_DELETE,TaskanaTaskListener.getInstance());
-        }}
+        }
 
     }
 }
