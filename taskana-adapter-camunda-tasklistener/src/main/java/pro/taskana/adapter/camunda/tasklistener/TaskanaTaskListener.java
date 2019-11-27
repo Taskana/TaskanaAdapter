@@ -1,11 +1,15 @@
 package pro.taskana.adapter.camunda.tasklistener;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
@@ -33,10 +37,10 @@ public class TaskanaTaskListener implements TaskListener {
         return instance;
     }
 
+    @Override
     public void notify(DelegateTask delegateTask) {
 
         try (Connection connection = Context.getProcessEngineConfiguration().getDataSource().getConnection()) {
-
 
             switch (delegateTask.getEventName()) {
 
@@ -51,8 +55,6 @@ public class TaskanaTaskListener implements TaskListener {
                     break;
             }
 
-        } catch (SQLException e) {
-            LOGGER.warn("Caught {} while trying to process a delegate task", e);
         } catch (Exception e) {
             LOGGER.warn("Caught {} while trying to process a delegate task", e);
         }
@@ -68,48 +70,47 @@ public class TaskanaTaskListener implements TaskListener {
             camundaSchema = connection.getSchema();
             LOGGER.debug("camundaSchema in taskListener is {}", camundaSchema);
 
-            setOutboxSchema (connection);
+            setOutboxSchema(connection);
 
             String referencedTaskJson = getReferencedTaskJson(delegateTask);
 
             prepareAndExecuteStatement(connection, delegateTask, referencedTaskJson);
-            
+
         } catch (SQLException e) {
             LOGGER.warn("Caught {} while trying to insert a \"create\" event into the outbox table", e);
 
         } finally {
-            if (camundaSchema!=null){
+            if (camundaSchema != null) {
                 connection.setSchema(camundaSchema);
             }
         }
     }
 
-    private void insertCompleteOrDeleteEventIntoOutbox(DelegateTask delegateTask, Connection connection) throws SQLException {
+    private void insertCompleteOrDeleteEventIntoOutbox(DelegateTask delegateTask, Connection connection)
+        throws SQLException {
 
-            String camundaSchema = null;
+        String camundaSchema = null;
 
-            try {
+        try {
 
-                camundaSchema = connection.getSchema();
-                setOutboxSchema(connection);
+            camundaSchema = connection.getSchema();
+            setOutboxSchema(connection);
 
-                String taskIdJson = "{\"id\":\"" + delegateTask.getId() + "\"}";
-                prepareAndExecuteStatement(connection, delegateTask, taskIdJson);
+            String taskIdJson = "{\"id\":\"" + delegateTask.getId() + "\"}";
+            prepareAndExecuteStatement(connection, delegateTask, taskIdJson);
 
+            connection.setSchema(camundaSchema);
+
+        } catch (Exception e) {
+            LOGGER.warn(
+                "Caught {} while trying to insert a " + delegateTask.getEventName() + " event into the outbox table",
+                e);
+        } finally {
+            if (camundaSchema != null) {
                 connection.setSchema(camundaSchema);
-
-            } catch (SQLException e) {
-                LOGGER.warn("Caught {} while trying to insert a " + delegateTask.getEventName() + " event into the outbox table", e);
-            } catch (Exception e) {
-                LOGGER.warn("Caught {} while trying to insert a " + delegateTask.getEventName() + " event into the outbox table", e);
-            }
-            finally {
-                if (camundaSchema != null) {
-                    connection.setSchema(camundaSchema);
-                }
             }
         }
-
+    }
 
     private void setOutboxSchema(Connection connection) throws SQLException {
 
@@ -123,7 +124,8 @@ public class TaskanaTaskListener implements TaskListener {
 
     private void prepareAndExecuteStatement(Connection connection, DelegateTask delegateTask, String payloadJson) {
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_EVENT, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_EVENT,
+            Statement.RETURN_GENERATED_KEYS)) {
 
             Timestamp eventCreationTimestamp = Timestamp.from(Instant.now());
 
@@ -143,22 +145,50 @@ public class TaskanaTaskListener implements TaskListener {
 
         StringBuilder referencedTaskJsonBuilder = new StringBuilder();
 
-        referencedTaskJsonBuilder.append("{\"id\":\"").append(delegateTask.getId())
-          .append("\",\"name\":\"").append(delegateTask.getName())
-          .append("\",\"assignee\":\"").append(delegateTask.getAssignee())
-          .append("\",\"created\":\"").append(formatDate(delegateTask.getCreateTime()))
-          .append("\",\"due\":\"").append(formatDate(delegateTask.getDueDate()))
-          .append("\",\"description\":\"").append(delegateTask.getDescription())
-          .append("\",\"owner\":\"").append(delegateTask.getOwner())
-          .append("\",\"priority\":\"").append(delegateTask.getPriority())
-          .append("\",\"taskDefinitionKey\":\"").append(delegateTask.getTaskDefinitionKey())
-          .append("\",\"classification\":\"").append(getUserTaskExtensionProperty(delegateTask, "classification"))
-          .append("\",\"domain\":\"").append(getProcessModelExtensionProperty(delegateTask, "domain"))
-          .append("\"}");
+        referencedTaskJsonBuilder.append("{\"id\":\"")
+            .append(delegateTask.getId())
+            .append("\",\"created\":\"")
+            .append(formatDate(delegateTask.getCreateTime()))
+            .append("\",\"priority\":\"")
+            .append(delegateTask.getPriority());
+        if (delegateTask.getName() != null) {
+            referencedTaskJsonBuilder.append("\",\"name\":\"")
+                .append(delegateTask.getName().replace("\n", "\\n"));
+        }
+        if (delegateTask.getAssignee() != null) {
+            referencedTaskJsonBuilder.append("\",\"assignee\":\"")
+                .append(delegateTask.getAssignee().replace("\n", "\\n"));
+        }
+        if (delegateTask.getDueDate() != null) {
+            referencedTaskJsonBuilder.append("\",\"due\":\"")
+                .append(formatDate(delegateTask.getDueDate()));
+        }
+        if (delegateTask.getDescription() != null) {
+            referencedTaskJsonBuilder.append("\",\"description\":\"")
+                .append(delegateTask.getDescription().replace("\n", "\\n"));
+        }
+        if (delegateTask.getOwner() != null) {
+            referencedTaskJsonBuilder.append("\",\"owner\":\"")
+                .append(delegateTask.getOwner().replace("\n", "\\n"));
+        }
+        if (delegateTask.getTaskDefinitionKey() != null) {
+            referencedTaskJsonBuilder.append("\",\"taskDefinitionKey\":\"")
+                .append(delegateTask.getTaskDefinitionKey());
+        }
+        String classificationKey = getUserTaskExtensionProperty(delegateTask, "classification-key");
+        if (classificationKey != null) {
+            referencedTaskJsonBuilder.append("\",\"classificationKey\":\"")
+                .append(classificationKey);
+        }
+        String domain = getProcessModelExtensionProperty(delegateTask, "domain");
+        if (domain != null) {
+            referencedTaskJsonBuilder.append("\",\"domain\":\"")
+                .append(domain);
+        }
+        referencedTaskJsonBuilder.append("\"}");
 
         return referencedTaskJsonBuilder.toString();
     }
-
 
     private String getProcessModelExtensionProperty(DelegateTask delegateTask, String propertyKey) {
 
@@ -167,13 +197,11 @@ public class TaskanaTaskListener implements TaskListener {
         BpmnModelInstance model = delegateTask.getExecution().getBpmnModelInstance();
 
         try {
-            List<CamundaProperty> processModelExtensionProperties =
-                    model.getModelElementsByType(CamundaProperty.class)
-                            .stream()
-                            .filter(camundaProperty ->
-                                    camundaProperty.getCamundaName()
-                                            .equals(propertyKey))
-                            .collect(Collectors.toList());
+            List<CamundaProperty> processModelExtensionProperties = model.getModelElementsByType(CamundaProperty.class)
+                .stream()
+                .filter(camundaProperty -> camundaProperty.getCamundaName()
+                    .equals(propertyKey))
+                .collect(Collectors.toList());
 
             if (processModelExtensionProperties.isEmpty()) {
                 return propertyValue;
@@ -190,7 +218,6 @@ public class TaskanaTaskListener implements TaskListener {
 
     }
 
-
     private String getUserTaskExtensionProperty(DelegateTask delegateTask, String propertyKey) {
 
         String propertyValue = null;
@@ -198,21 +225,21 @@ public class TaskanaTaskListener implements TaskListener {
         try {
 
             ExtensionElements extensionElements = delegateTask.getExecution()
-                    .getBpmnModelElementInstance()
-                    .getExtensionElements();
+                .getBpmnModelElementInstance()
+                .getExtensionElements();
 
-            if (extensionElements ==  null){
+            if (extensionElements == null) {
                 return propertyValue;
             } else {
                 CamundaProperties camundaProperties = extensionElements.getElementsQuery()
-                        .filterByType(CamundaProperties.class).singleResult();
+                    .filterByType(CamundaProperties.class)
+                    .singleResult();
 
                 List<CamundaProperty> userTaskExtensionProperties = camundaProperties.getCamundaProperties()
-                        .stream()
-                        .filter(camundaProperty ->
-                                camundaProperty.getCamundaName()
-                                        .equals(propertyKey))
-                        .collect(Collectors.toList());
+                    .stream()
+                    .filter(camundaProperty -> camundaProperty.getCamundaName()
+                        .equals(propertyKey))
+                    .collect(Collectors.toList());
 
                 if (userTaskExtensionProperties.isEmpty()) {
                     return propertyValue;
@@ -232,8 +259,8 @@ public class TaskanaTaskListener implements TaskListener {
             return null;
         } else {
             return DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-                    .withZone(ZoneId.systemDefault())
-                    .format(date.toInstant());
+                .withZone(ZoneId.systemDefault())
+                .format(date.toInstant());
 
         }
     }

@@ -2,11 +2,8 @@ package pro.taskana.adapter.systemconnector.camunda.api.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import pro.taskana.adapter.systemconnector.api.ReferencedTask;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventResource;
+import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 
 @Component
 public class CamundaTaskRetriever {
@@ -32,13 +31,15 @@ public class CamundaTaskRetriever {
     @Autowired
     ObjectMapper objectMapper;
 
-    public List<ReferencedTask> retrieveActiveCamundaTasks(String camundaSystemTaskEventUrl)  {
+    public List<ReferencedTask> retrieveNewStartedCamundaTasks(String camundaSystemTaskEventUrl) {
 
-        LOGGER.debug("### entry to retrieveActiveCamundaTasks. createdAfter = {} ###");
+        LOGGER.debug("### entry to retrieveNewStartedCamundaTasks. createdAfter = {} ###");
 
-        CamundaTaskEventResource[] camundaTaskEventResources = getCamundaTaskEventResources(camundaSystemTaskEventUrl);
+        CamundaTaskEventResource[] camundaTaskEventResources = getCamundaTaskEventResources(camundaSystemTaskEventUrl,
+            CamundaSystemConnectorImpl.URL_GET_CAMUNDA_CREATE_EVENTS);
 
-        List<ReferencedTask> referencedTasks = getReferencedTasksFromCamundaTaskEventResources(camundaTaskEventResources);
+        List<ReferencedTask> referencedTasks = getReferencedTasksFromCamundaTaskEventResources(
+            camundaTaskEventResources);
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("exit from retrieveActiveCamundaTasks. Retrieved Tasks: {}", referencedTasks);
@@ -46,54 +47,65 @@ public class CamundaTaskRetriever {
         return referencedTasks;
     }
 
-    private CamundaTaskEventResource[] getCamundaTaskEventResources(String camundaSystemTaskEventUrl) {
+    private CamundaTaskEventResource[] getCamundaTaskEventResources(String camundaSystemTaskEventUrl,
+        String eventSelector) {
 
         String requestUrl = camundaSystemTaskEventUrl + CamundaSystemConnectorImpl.URL_OUTBOX_REST_PATH
-                + CamundaSystemConnectorImpl.URL_GET_CAMUNDA_CREATE_EVENTS;
+            + eventSelector;
 
-        LOGGER.debug("### retrieving active camunda task event resources with url {} ###", requestUrl);
+        LOGGER.debug("### retrieving camunda task event resources with url {} ###", requestUrl);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        LOGGER.debug("retrieveNewStartedCamundaTasks url {} ", requestUrl);
 
         ResponseEntity<CamundaTaskEventResource[]> responseEntity = restTemplate.exchange(
-                requestUrl, HttpMethod.GET, new HttpEntity<Object>(headers),
-                CamundaTaskEventResource[].class);
+            requestUrl, HttpMethod.GET, new HttpEntity<Object>(headers),
+            CamundaTaskEventResource[].class);
 
         CamundaTaskEventResource[] camundaTaskEventResources = responseEntity.getBody();
 
         return camundaTaskEventResources;
     }
-    private List<ReferencedTask> getReferencedTasksFromCamundaTaskEventResources(CamundaTaskEventResource[] camundaTaskEventResources) {
+
+    private List<ReferencedTask> getReferencedTasksFromCamundaTaskEventResources(
+        CamundaTaskEventResource[] camundaTaskEventResources) {
 
         List<ReferencedTask> referencedTasks = new ArrayList<>();
 
-        for (CamundaTaskEventResource camundaTaskEventResource : camundaTaskEventResources){
+        for (CamundaTaskEventResource camundaTaskEventResource : camundaTaskEventResources) {
 
             String referencedTaskJson = camundaTaskEventResource.getPayload();
-            camundaTaskEventResource.getId();
 
             try {
 
                 ReferencedTask referencedTask = objectMapper.readValue(referencedTaskJson, ReferencedTask.class);
-                referencedTask.setCreationEventId(String.valueOf(camundaTaskEventResource.getId()));
+                referencedTask.setOutboxEventId(String.valueOf(camundaTaskEventResource.getId()));
+                referencedTask.setOutboxEventType(String.valueOf(camundaTaskEventResource.getType()));
                 referencedTasks.add(referencedTask);
 
-            }catch(IOException e){
-                LOGGER.warn("Caught {} while trying to create ReferencedTasks out of CamundaTaskEventResources");
+            } catch (IOException e) {
+
+                LOGGER.warn(
+                    "Caught {} while trying to create ReferencedTasks out of CamundaTaskEventResources. RefTaskJson = {}",
+                    e, referencedTaskJson);
             }
         }
         return referencedTasks;
     }
 
     public List<ReferencedTask> retrieveTerminatedCamundaTasks(String camundaSystemURL) {
-        LOGGER.debug("entry to retrieveFinishedCamundaTasks. CamundSystemURL = {}", camundaSystemURL);
-        // new implementation via outbox required
-        ReferencedTask[] tasks = new ReferencedTask[] {};
+        LOGGER.debug("entry to retrieveFinishedCamundaTasks. CamundSystemURL = {} ", camundaSystemURL);
+
+        CamundaTaskEventResource[] camundaTaskEventResources = getCamundaTaskEventResources(camundaSystemURL,
+            CamundaSystemConnectorImpl.URL_GET_CAMUNDA_COMPLETE_EVENTS);
+
+        List<ReferencedTask> referencedTasks = getReferencedTasksFromCamundaTaskEventResources(
+            camundaTaskEventResources);
+
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("exit from retrieveFinishedCamundaTasks. Retrieved Tasks: {}", Arrays.toString(tasks));
+            LOGGER.debug("exit from retrieveTerminatedCamundaTasks. Retrieved Tasks: {}", referencedTasks);
         }
-        return Arrays.asList(tasks);
+        return referencedTasks;
+
     }
 }

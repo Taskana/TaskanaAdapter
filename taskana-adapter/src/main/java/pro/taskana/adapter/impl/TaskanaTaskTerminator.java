@@ -6,7 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
@@ -25,12 +25,11 @@ public class TaskanaTaskTerminator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskTerminator.class);
 
-    @Value("${taskanaAdapter.total.transaction.lifetime.in.seconds:120}")
-    private int maximumTotalTransactionLifetime;
-
     @Autowired
     AdapterManager adapterManager;
 
+    @Scheduled(
+        fixedRateString = "${taskana.adapter.scheduler.run.interval.for.check.cancelled.referenced.tasks.in.milliseconds:1000}")
     public void retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks() {
 
         synchronized (AdapterManager.class) {
