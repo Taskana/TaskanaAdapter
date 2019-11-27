@@ -1,6 +1,5 @@
 package pro.taskana.adapter.systemconnector.api;
 
-
 /**
  * POJO that represents a task in the external system.
  *
@@ -10,7 +9,8 @@ package pro.taskana.adapter.systemconnector.api;
 public class ReferencedTask {
 
     private String id;
-    private String creationEventId;
+    private String outboxEventId;
+    private String outboxEventType;
     private String name;
     private String assignee;
     private String created;
@@ -35,12 +35,20 @@ public class ReferencedTask {
         this.id = id;
     }
 
-    public String getCreationEventId() {
-        return creationEventId;
+    public String getOutboxEventId() {
+        return outboxEventId;
     }
 
-    public void setCreationEventId(String creationEventId) {
-        this.creationEventId = creationEventId;
+    public void setOutboxEventId(String outboxEventId) {
+        this.outboxEventId = outboxEventId;
+    }
+
+    public String getOutboxEventType() {
+        return outboxEventType;
+    }
+
+    public void setOutboxEventType(String outboxEventType) {
+        this.outboxEventType = outboxEventType;
     }
 
     public String getName() {
@@ -75,7 +83,7 @@ public class ReferencedTask {
         this.due = due;
     }
 
-   public String getDescription() {
+    public String getDescription() {
         return description;
     }
 
@@ -83,7 +91,7 @@ public class ReferencedTask {
         this.description = description;
     }
 
-     public String getOwner() {
+    public String getOwner() {
         return owner;
     }
 
@@ -157,41 +165,11 @@ public class ReferencedTask {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("ReferencedTask [id=");
-        builder.append(id);
-        builder.append(", creationEventId=");
-        builder.append(creationEventId);
-        builder.append(", name=");
-        builder.append(name);
-        builder.append(", assignee=");
-        builder.append(assignee);
-        builder.append(", created=");
-        builder.append(created);
-        builder.append(", due=");
-        builder.append(due);
-        builder.append(", description=");
-        builder.append(description);
-        builder.append(", owner=");
-        builder.append(owner);
-        builder.append(", priority=");
-        builder.append(priority);
-        builder.append(", suspended=");
-        builder.append(suspended);
-        builder.append(", systemURL=");
-        builder.append(systemURL);
-        builder.append(", taskDefinitionKey=");
-        builder.append(taskDefinitionKey);
-        builder.append(", variables=");
-        builder.append(variables);
-        builder.append(", domain=");
-        builder.append(domain);
-        builder.append(", classificationKey=");
-        builder.append(classificationKey);
-        builder.append(", workbasketKey=");
-        builder.append(workbasketKey);
-        builder.append("]");
-        return builder.toString();
+        return "ReferencedTask [id=" + id + ", outboxEventId=" + outboxEventId + ", outboxEventType=" + outboxEventType
+            + ", name=" + name + ", assignee=" + assignee + ", created=" + created + ", due=" + due + ", description="
+            + description + ", owner=" + owner + ", priority=" + priority + ", suspended=" + suspended + ", systemURL="
+            + systemURL + ", taskDefinitionKey=" + taskDefinitionKey + ", variables=" + variables + ", domain=" + domain
+            + ", classificationKey=" + classificationKey + ", workbasketKey=" + workbasketKey + "]";
     }
 
     @Override
@@ -201,12 +179,13 @@ public class ReferencedTask {
         result = prime * result + ((assignee == null) ? 0 : assignee.hashCode());
         result = prime * result + ((classificationKey == null) ? 0 : classificationKey.hashCode());
         result = prime * result + ((created == null) ? 0 : created.hashCode());
-        result = prime * result + ((creationEventId == null) ? 0 : creationEventId.hashCode());
         result = prime * result + ((description == null) ? 0 : description.hashCode());
         result = prime * result + ((domain == null) ? 0 : domain.hashCode());
         result = prime * result + ((due == null) ? 0 : due.hashCode());
         result = prime * result + ((id == null) ? 0 : id.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((outboxEventId == null) ? 0 : outboxEventId.hashCode());
+        result = prime * result + ((outboxEventType == null) ? 0 : outboxEventType.hashCode());
         result = prime * result + ((owner == null) ? 0 : owner.hashCode());
         result = prime * result + ((priority == null) ? 0 : priority.hashCode());
         result = prime * result + ((suspended == null) ? 0 : suspended.hashCode());
@@ -241,11 +220,6 @@ public class ReferencedTask {
                 return false;
         } else if (!created.equals(other.created))
             return false;
-        if (creationEventId == null) {
-            if (other.creationEventId != null)
-                return false;
-        } else if (!creationEventId.equals(other.creationEventId))
-            return false;
         if (description == null) {
             if (other.description != null)
                 return false;
@@ -270,6 +244,16 @@ public class ReferencedTask {
             if (other.name != null)
                 return false;
         } else if (!name.equals(other.name))
+            return false;
+        if (outboxEventId == null) {
+            if (other.outboxEventId != null)
+                return false;
+        } else if (!outboxEventId.equals(other.outboxEventId))
+            return false;
+        if (outboxEventType == null) {
+            if (other.outboxEventType != null)
+                return false;
+        } else if (!outboxEventType.equals(other.outboxEventType))
             return false;
         if (owner == null) {
             if (other.owner != null)

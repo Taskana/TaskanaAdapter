@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1trlihz" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.3.5">
   <bpmn:process id="simple_multiple_execution_process" name="Simple multiple execution process" isExecutable="true">
+    <bpmn:extensionElements>
+      <camunda:properties>
+        <camunda:property name="domain" value="DOMAIN_A" />
+      </camunda:properties>
+    </bpmn:extensionElements>
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>SequenceFlow_0ddzcfj</bpmn:outgoing>
     </bpmn:startEvent>
@@ -11,14 +16,29 @@
       <bpmn:outgoing>SequenceFlow_0mtkh6d</bpmn:outgoing>
     </bpmn:parallelGateway>
     <bpmn:userTask id="Task_1efadp1" camunda:assignee="otherProcess">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="classification-key" value="L110102" />
+        </camunda:properties>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0tscivq</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0fz886a</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:userTask id="Task_1xfgnpy" camunda:assignee="otherProcess">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="classification-key" value="T6310" />
+        </camunda:properties>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0zri4u9</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0qbwfxn</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:userTask id="Task_1qi5ffh" camunda:assignee="otherPrcoess">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="classification-key" value="L1050" />
+        </camunda:properties>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0mtkh6d</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0aqghdx</bpmn:outgoing>
     </bpmn:userTask>

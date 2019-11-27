@@ -3,7 +3,7 @@
   <bpmn:process id="taskListenerTest" name="TASKANATaskListenerUpdated" isExecutable="true">
     <bpmn:extensionElements>
       <camunda:properties>
-        <camunda:property name="domain" value="domainValue" />
+        <camunda:property name="domain" value="DOMAIN_A" />
       </camunda:properties>
     </bpmn:extensionElements>
     <bpmn:startEvent id="StartEventProcessStarted" name="Process&#10;started">
@@ -22,7 +22,7 @@
     <bpmn:userTask id="Task_02zcf5t" name="listenertask1 test" camunda:assignee="demo">
       <bpmn:extensionElements>
         <camunda:properties>
-          <camunda:property name="classification" value="classificationValue" />
+          <camunda:property name="classification" value="L1050" />
         </camunda:properties>
         <camunda:taskListener class="pro.taskana.adapter.camunda.tasklistener.TaskanaTaskListener" event="create" />
       </bpmn:extensionElements>

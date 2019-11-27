@@ -12,6 +12,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import pro.taskana.CallbackState;
@@ -48,24 +49,44 @@ public class TaskInformationMapper {
     private ClassificationService classificationService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskInformationMapper.class);
-    private static final String DEFAULT_WORKBASKET = "DEFAULT_WORKBASKET";
-    private static final String DEFAULT_CLASSIFICATION = "DEFAULT_CLASSIFICATION";
-    private static final String DEFAULT_DOMAIN = "DOMAIN_A";
-    private static final String CLASSIFICATION_TYPE_TASK = "TASK";
-    private static final String DEFAULT_COMPANY = "DEFAULT_COMPANY";
-    private static final String DEFAULT_SYSTEM = "DEFAULT_SYSTEM";
-    private static final String DEFAULT_SYSTEM_INSTANCE = "DEFAULT_SYSTEM_INSTANCE";
-    private static final String DEFAULT_TYPE = "DEFAULT_TYPE";
-    private static final String DEFAULT_VALUE = "DEFAULT_VALUE";
+
+    @Value("${taskana.adapter.mapping.default.domain:DOMAIN_A}")
+    private String defaultDomain;
+
+    @Value("${taskana.adapter.mapping.default.workbasket.key:DEFAULT_WORKBASKET}")
+    private String defaultWorkbasketKey;
+
+    @Value("${taskana.adapter.mapping.default.classification.key:DEFAULT_CLASSIFICATION}")
+    private String defaultClassificationKey;
+
+    @Value("${taskana.adapter.mapping.default.classification.type:TASK}")
+    private String defaultClassificationType;
+
+    @Value("${taskana.adapter.mapping.default.objectreference.company:DEFAULT_COMPANY}")
+    private String defaultCompany;
+
+    @Value("${taskana.adapter.mapping.default.objectreference.system:DEFAULT_SYSTEM}")
+    private String defaultSystem;
+
+    @Value("${taskana.adapter.mapping.default.objectreference.system.instance:DEFAULT_SYSTEM_INSTANCE}")
+    private String defaultSystemInstance;
+
+    @Value("${taskana.adapter.mapping.default.objectreference.type:DEFAULT_TYPE}")
+    private String defaultType;
+
+    @Value("${taskana.adapter.mapping.default.objectreference.value:DEFAULT_VALUE}")
+    private String defaultValue;
 
     public Task convertToTaskanaTask(ReferencedTask referencedTask)
         throws DomainNotFoundException, InvalidWorkbasketException, NotAuthorizedException,
         WorkbasketAlreadyExistException, ClassificationAlreadyExistException, InvalidArgumentException,
         WorkbasketNotFoundException {
 
+        LOGGER.debug("entry to TaskInformationMapper.convertToTaskanaTask {}", this.toString());
+
         String domain = referencedTask.getDomain();
         if (!isValidString(domain)) {
-            domain = DEFAULT_DOMAIN;
+            domain = defaultDomain;
         }
 
         Workbasket workbasket = findOrCreateWorkbasket(referencedTask.getWorkbasketKey(), domain,
@@ -154,17 +175,19 @@ public class TaskInformationMapper {
         DomainNotFoundException, InvalidArgumentException {
 
         if (!isValidString(classificationKey)) {
-            classificationKey = DEFAULT_CLASSIFICATION;
+            classificationKey = defaultClassificationKey;
         }
         if (!isValidString(domain)) {
-            domain = DEFAULT_DOMAIN;
+            domain = defaultDomain;
         }
         Classification classification;
         try {
             classification = classificationService.getClassification(classificationKey, domain);
         } catch (ClassificationNotFoundException e) {
             classification = classificationService.newClassification(classificationKey, domain,
-                CLASSIFICATION_TYPE_TASK);
+                defaultClassificationType);
+            classification.setApplicationEntryPoint("");
+            classification.setName("DefaultClassification");
             classification = classificationService.createClassification(classification);
         }
         return classification;
@@ -172,11 +195,11 @@ public class TaskInformationMapper {
 
     private ObjectReference createObjectReference() {
         ObjectReference objRef = new ObjectReference();
-        objRef.setCompany(DEFAULT_COMPANY);
-        objRef.setSystem(DEFAULT_SYSTEM);
-        objRef.setSystemInstance(DEFAULT_SYSTEM_INSTANCE);
-        objRef.setType(DEFAULT_TYPE);
-        objRef.setValue(DEFAULT_VALUE);
+        objRef.setCompany(defaultCompany);
+        objRef.setSystem(defaultCompany);
+        objRef.setSystemInstance(defaultSystemInstance);
+        objRef.setType(defaultType);
+        objRef.setValue(defaultValue);
         return objRef;
     }
 
@@ -185,10 +208,10 @@ public class TaskInformationMapper {
         InvalidWorkbasketException, NotAuthorizedException, WorkbasketAlreadyExistException,
         WorkbasketNotFoundException, InvalidArgumentException {
         if (!isValidString(workbasketKey)) {
-            workbasketKey = DEFAULT_WORKBASKET;
+            workbasketKey = defaultWorkbasketKey;
         }
         if (!isValidString(domain)) {
-            domain = DEFAULT_DOMAIN;
+            domain = defaultDomain;
         }
         Workbasket wb;
 
@@ -199,7 +222,14 @@ public class TaskInformationMapper {
             wb.setName(workbasketKey);
             wb.setOwner(assignee);
             wb.setType(WorkbasketType.PERSONAL);
-            wb = workbasketService.createWorkbasket(wb);
+            try {
+                wb = workbasketService.createWorkbasket(wb);
+            } catch (DomainNotFoundException | InvalidWorkbasketException | NotAuthorizedException
+                | WorkbasketAlreadyExistException ex) {
+                LOGGER.warn("caught {} when attempting to create workbasket {}", ex, wb);
+                throw ex;
+            }
+
             createWorkbasketAccessList(wb);
         }
         return wb;
@@ -221,6 +251,15 @@ public class TaskInformationMapper {
 
     boolean isValidString(String string) {
         return !(string == null || string.isEmpty() || "null".equals(string));
+    }
+
+    @Override
+    public String toString() {
+        return "TaskInformationMapper [defaultDomain=" + defaultDomain + ", defaultWorkbasketKey="
+            + defaultWorkbasketKey + ", defaultClassificationKey=" + defaultClassificationKey
+            + ", defaultClassificationType=" + defaultClassificationType + ", defaultCompany=" + defaultCompany
+            + ", defaultSystem=" + defaultSystem + ", defaultSystemInstance=" + defaultSystemInstance + ", defaultType="
+            + defaultType + ", defaultValue=" + defaultValue + "]";
     }
 
 }

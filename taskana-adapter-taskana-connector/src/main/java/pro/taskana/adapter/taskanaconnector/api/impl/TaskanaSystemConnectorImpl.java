@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,6 +119,9 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
             if (taskSummary != null) {
                 taskId = taskSummary.getTaskId();
                 taskService.forceCompleteTask(taskId);
+                // take care that the adapter doesn't attempt to finish the corresponding camunda task
+                List<String> externalIds = Stream.of(referencedTask.getId()).collect(Collectors.toList());
+                taskService.setCallbackStateForTasks(externalIds, CallbackState.CALLBACK_PROCESSING_COMPLETED);
             }
         } catch (TaskNotFoundException e1) {
             LOGGER.debug("Nothing to do in terminateTaskanaTask. Task {} is already gone", taskId);

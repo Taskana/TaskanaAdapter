@@ -1,5 +1,6 @@
 package pro.taskana.adapter.integration;
 
+import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -9,7 +10,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.json.JSONException;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,6 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
         userName = "teamlead_1",
         groupNames = {"admin"})
     @Test
-    @Ignore // Known issue, referenced by TSK-839
     public void deletion_of_taskana_task_should_delete_camunda_task_and_process() throws TaskNotFoundException,
         NotAuthorizedException, JSONException, InterruptedException, InvalidOwnerException, InvalidStateException {
         String processInstanceId = this.camundaProcessengineRequester
@@ -67,7 +66,12 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
             // complete taskana-task and wait
             this.taskService.claim(taskanaTaskId);
             this.taskService.completeTask(taskanaTaskId);
-            this.taskService.deleteTask(taskanaTaskId);
+            try {
+                this.taskService.deleteTask(taskanaTaskId);
+                fail("expected an InvalidStateExcpetion but no Exception was thrown");
+            } catch (InvalidStateException e) {
+                assertTrue(e.getMessage().endsWith("cannot be deleted because its callback is not yet processed"));
+            }
             Thread.sleep(this.adapterCancelPollingInterval);
 
             // assert camunda task was deleted
@@ -86,7 +90,6 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
         userName = "teamlead_1",
         groupNames = {"admin"})
     @Test
-    @Ignore // Temporary disable - not yet implemented
     public void deletion_of_camunda_process_instance_should_complete_taskana_task()
         throws JSONException, InterruptedException {
         String processInstanceId = this.camundaProcessengineRequester
@@ -130,7 +133,6 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
         userName = "teamlead_1",
         groupNames = {"admin"})
     @Test
-    @Ignore // Temporary disable - not yet implemented
     public void interruption_of_camunda_task_by_timer_should_complete_taskana_task() throws InterruptedException {
         String processInstanceId = this.camundaProcessengineRequester
             .startCamundaProcessAndReturnId("simple_timed_user_task_process", "");

@@ -25,7 +25,7 @@ public class CamundaTaskEventCleaner {
     public void cleanEventsForReferencedTasks(List<ReferencedTask> referencedTasks,
         String camundaSystemTaskEventUrl) {
 
-        LOGGER.debug("### entry to taskanaTasksHaveBeenCreatedForReferencedTasks, CamundSystemURL = {} ###",
+        LOGGER.debug("### entry to cleanEventsForReferencedTasks, CamundSystemURL = {} ###",
             camundaSystemTaskEventUrl);
 
         String requestUrl = camundaSystemTaskEventUrl + CamundaSystemConnectorImpl.URL_OUTBOX_REST_PATH
@@ -40,11 +40,10 @@ public class CamundaTaskEventCleaner {
         String idsOfCamundaTaskEventsToDeleteFromOutbox = getIdsOfCamundaTaskEventsToDeleteFromOutbox(referencedTasks);
         LOGGER.debug("delete Events url {} ", requestUrl);
 
-        deleteCamundaTaskEventsFromOutbox(requestUrl,idsOfCamundaTaskEventsToDeleteFromOutbox);
-        deleteCamundaTaskEventsFromOutbox(requestUrl,idsOfCamundaTaskEventsToDeleteFromOutbox);
+        deleteCamundaTaskEventsFromOutbox(requestUrl, idsOfCamundaTaskEventsToDeleteFromOutbox);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("exit from taskanaTasksHaveBeenCreatedForReferencedTasks.");
+            LOGGER.debug("exit from cleanEventsForReferencedTasks.");
         }
     }
 
@@ -53,11 +52,9 @@ public class CamundaTaskEventCleaner {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<String> request =
-                new HttpEntity<String>(idsOfCamundaTaskEventsToDeleteFromOutbox, headers);
+        HttpEntity<String> request = new HttpEntity<String>(idsOfCamundaTaskEventsToDeleteFromOutbox, headers);
 
-
-        restTemplate.postForObject(requestUrl,request, String.class);
+        restTemplate.postForObject(requestUrl, request, String.class);
     }
 
     private String getIdsOfCamundaTaskEventsToDeleteFromOutbox(List<ReferencedTask> referencedTasks) {
@@ -67,7 +64,7 @@ public class CamundaTaskEventCleaner {
         idsBuf.append("{\"taskCreationIds\":[");
 
         for (ReferencedTask referencedTask : referencedTasks) {
-            idsBuf.append(referencedTask.getCreationEventId().trim());
+            idsBuf.append(referencedTask.getOutboxEventId().trim());
             idsBuf.append(',');
         }
         idsBuf.append("]}");
