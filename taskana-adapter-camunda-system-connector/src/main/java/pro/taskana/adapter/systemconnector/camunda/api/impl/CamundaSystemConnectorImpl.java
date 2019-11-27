@@ -25,9 +25,10 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
     static final String URL_GET_CAMUNDA_TASKS = "/task/";
     static final String URL_GET_CAMUNDA_HISTORIC_TASKS = "/history/task/";
     static final String URL_GET_CAMUNDA_VARIABLES = "/variables/";
-    static final String URL_OUTBOX_REST_PATH = "taskana-outbox/rest/";
+    static final String URL_OUTBOX_REST_PATH = "/taskana-outbox/rest/";
 
     static final String URL_GET_CAMUNDA_CREATE_EVENTS = "events?type=create";
+    static final String URL_GET_CAMUNDA_COMPLETE_EVENTS = "events?type=complete&type=delete";
     static final String URL_DELETE_CAMUNDA_EVENTS = "events/delete";
 
     static final String BODY_SET_CAMUNDA_VARIABLES = "{\"variables\":";
@@ -54,7 +55,7 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
 
     @Override
     public List<ReferencedTask> retrieveNewStartedReferencedTasks() {
-        return taskRetriever.retrieveActiveCamundaTasks(camundaSystemURL.getSystemTaskEventUrl());
+        return taskRetriever.retrieveNewStartedCamundaTasks(camundaSystemURL.getSystemTaskEventUrl());
     }
 
     @Override
