@@ -79,7 +79,7 @@ public class CamundaTaskEventsService {
 
         try (
             Connection connection = getConnection();
-            PreparedStatement preparedStatement = getPreparedCreateEventsStatement(connection);) {
+            PreparedStatement preparedStatement = getPreparedCreateEventsStatement(connection)) {
 
             ResultSet camundaTaskEventResultSet = preparedStatement.executeQuery();
             camundaTaskEventResources = getCamundaTaskEventResources(camundaTaskEventResultSet);
@@ -183,7 +183,7 @@ public class CamundaTaskEventsService {
 
         Connection connection = null;
         try {
-            connection = getDataSourceFromPropertiesFile().getConnection();
+            connection = getDataSource().getConnection();
         } catch (SQLException | NullPointerException e) {
             LOGGER.warn("Caught {} while trying to retrieve a connection from the provided datasource", e);
         }
@@ -191,19 +191,26 @@ public class CamundaTaskEventsService {
         return connection;
     }
 
-    private DataSource getDataSourceFromPropertiesFile() {
+    private DataSource getDataSource() {
 
         synchronized (CamundaTaskEventsService.class) {
             if (dataSource == null) {
+                return getDataSourceFromPropertiesFile();
+            }
+        }
+        return dataSource;
+    }
 
-                InputStream config = CamundaTaskEventsController.class.getClassLoader()
+    private DataSource getDataSourceFromPropertiesFile() {
+
+                InputStream datasourceConfig = CamundaTaskEventsController.class.getClassLoader()
                     .getResourceAsStream("datasource.properties");
 
                 Properties properties = new Properties();
 
                 try {
 
-                    properties.load(config);
+                    properties.load(datasourceConfig);
                     String jndiUrl = properties.getProperty("taskana.adapter.outbox.rest.datasource.jndi");
 
                     if (jndiUrl != null) {
@@ -222,8 +229,7 @@ public class CamundaTaskEventsService {
                     LOGGER.warn("Caught {} while trying to retrieve the datasource from the provided properties file",
                         e);
                 }
-            }
-        }
+
         return dataSource;
     }
 
