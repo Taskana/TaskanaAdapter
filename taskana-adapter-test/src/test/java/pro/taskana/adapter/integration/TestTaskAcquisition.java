@@ -46,7 +46,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
         List<String> camundaTaskIds = this.camundaProcessengineRequester
             .getTaskIdsFromProcessInstanceId(processInstanceId);
 
-        Thread.sleep(this.adapterTaskPollingInterval);
+        Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
         for (String camundaTaskId : camundaTaskIds) {
             List<TaskSummary> taskanaTasks = this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
@@ -70,7 +70,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
             camundaTaskIdsList
                 .add(this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId));
         }
-        Thread.sleep(this.adapterTaskPollingInterval);
+        Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
         for (List<String> camundaTaskIds : camundaTaskIdsList) {
             for (String camundaTaskId : camundaTaskIds) {
@@ -94,7 +94,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
         List<String> camundaTaskIds = this.camundaProcessengineRequester
             .getTaskIdsFromProcessInstanceId(processInstanceId);
 
-        Thread.sleep(this.adapterTaskPollingInterval);
+        Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
         for (String camundaTaskId : camundaTaskIds) {
             List<TaskSummary> taskanaTasks = this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
@@ -131,7 +131,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
             .getTaskIdsFromProcessInstanceId(processInstanceId);
         assertEquals(3, camundaTaskIds.size());
 
-        Thread.sleep(this.adapterTaskPollingInterval);
+        Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
         for (String camundaTaskId : camundaTaskIds) {
             List<TaskSummary> taskanaTasks = this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();

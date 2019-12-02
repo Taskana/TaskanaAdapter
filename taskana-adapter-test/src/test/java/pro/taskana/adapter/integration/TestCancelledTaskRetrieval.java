@@ -53,7 +53,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
         List<String> camundaTaskIds = this.camundaProcessengineRequester
             .getTaskIdsFromProcessInstanceId(processInstanceId);
 
-        Thread.sleep(this.adapterTaskPollingInterval);
+        Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
         for (String camundaTaskId : camundaTaskIds) {
             // retrieve and check taskanaTaskId
@@ -72,7 +72,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
             } catch (InvalidStateException e) {
                 assertTrue(e.getMessage().endsWith("cannot be deleted because its callback is not yet processed"));
             }
-            Thread.sleep(this.adapterCancelPollingInterval);
+            Thread.sleep((long) (this.adapterCancelPollingInterval * 1.2));
 
             // assert camunda task was deleted
             boolean taskRetrievalSuccessful = this.camundaProcessengineRequester.getTaskFromTaskId(camundaTaskId);
@@ -97,7 +97,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
         List<String> camundaTaskIds = this.camundaProcessengineRequester
             .getTaskIdsFromProcessInstanceId(processInstanceId);
 
-        Thread.sleep(this.adapterTaskPollingInterval);
+        Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
         for (String camundaTaskId : camundaTaskIds) {
             // retrieve and check taskanaTaskId
@@ -139,7 +139,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
         List<String> camundaTaskIds = this.camundaProcessengineRequester
             .getTaskIdsFromProcessInstanceId(processInstanceId);
 
-        Thread.sleep(this.adapterTaskPollingInterval);
+        Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
         for (String camundaTaskId : camundaTaskIds) {
             // retrieve and check taskanaTaskId
