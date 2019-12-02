@@ -46,7 +46,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
         List<String> camundaTaskIds = this.camundaProcessengineRequester
             .getTaskIdsFromProcessInstanceId(processInstanceId);
 
-        Thread.sleep(this.adapterTaskPollingInterval);
+        Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
         for (String camundaTaskId : camundaTaskIds) {
             // retrieve and check taskanaTaskId
@@ -80,7 +80,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
         List<String> camundaTaskIds = this.camundaProcessengineRequester
             .getTaskIdsFromProcessInstanceId(processInstanceId);
 
-        Thread.sleep(this.adapterTaskPollingInterval);
+        Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
         for (String camundaTaskId : camundaTaskIds) {
             // retrieve and check taskanaTaskId
@@ -93,7 +93,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
             boolean camundaTaskCompletionSucessful = this.camundaProcessengineRequester
                 .completeTaskWithId(camundaTaskId);
             assertTrue(camundaTaskCompletionSucessful);
-            Thread.sleep(this.adapterCompletionPollingInterval);
+            Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
 
             // assert taskana task was completed and still exists
             taskanaTasks = this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
