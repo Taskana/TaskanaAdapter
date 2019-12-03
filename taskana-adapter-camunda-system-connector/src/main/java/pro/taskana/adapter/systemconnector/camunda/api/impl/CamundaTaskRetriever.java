@@ -33,7 +33,7 @@ public class CamundaTaskRetriever {
 
     public List<ReferencedTask> retrieveNewStartedCamundaTasks(String camundaSystemTaskEventUrl) {
 
-        LOGGER.debug("### entry to retrieveNewStartedCamundaTasks. createdAfter = {} ###");
+        LOGGER.debug("ntry to retrieveNewStartedCamundaTasks. createdAfter = {}");
 
         CamundaTaskEventResource[] camundaTaskEventResources = getCamundaTaskEventResources(camundaSystemTaskEventUrl,
             CamundaSystemConnectorImpl.URL_GET_CAMUNDA_CREATE_EVENTS);
@@ -53,7 +53,7 @@ public class CamundaTaskRetriever {
         String requestUrl = camundaSystemTaskEventUrl + CamundaSystemConnectorImpl.URL_OUTBOX_REST_PATH
             + eventSelector;
 
-        LOGGER.debug("### retrieving camunda task event resources with url {} ###", requestUrl);
+        LOGGER.debug("retrieving camunda task event resources with url {}", requestUrl);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
