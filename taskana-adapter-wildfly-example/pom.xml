@@ -1,30 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <parent>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-parent</artifactId>
-                <version>2.0.2.RELEASE</version>
-                <relativePath/> <!-- lookup parent from repository -->
+                <artifactId>taskana-adapter-parent</artifactId>
+                <groupId>pro.taskana</groupId>
+                <version>0.0.2-SNAPSHOT</version>
+                <relativePath>../pom.xml</relativePath>
         </parent>
         <modelVersion>4.0.0</modelVersion>
-        <groupId>pro.taskana</groupId>
         <artifactId>taskana-adapter-wildfly-example</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
         <name>taskana-adapter-wildfly-example-Webapp</name>
         <packaging>war</packaging>
+
         <properties>
-                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-                <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-                <java.version>1.8</java.version>
-                <taskana.version>1.0.8-SNAPSHOT</taskana.version>
-                <maven.compiler.source>1.8</maven.compiler.source>
-                <maven.compiler.target>1.8</maven.compiler.target>
+                <failOnMissingWebXml>false</failOnMissingWebXml>
         </properties>
 
         <dependencies>
-
                 <dependency>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-web</artifactId>
@@ -34,11 +26,14 @@
                                         <artifactId>spring-boot-starter-tomcat</artifactId>
                                 </exclusion>
                         </exclusions>
+                      <!--  <version>${version.spring.boot}</version> -->
+
                 </dependency>
                 <dependency>
-                       <groupId>org.springframework.boot</groupId>
-                       <artifactId>spring-boot-configuration-processor</artifactId>
-                       <optional>true</optional>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-configuration-processor</artifactId>
+                        <optional>true</optional>
+                      <!--  <version>${version.spring.boot}</version> -->
                 </dependency>
                 <dependency>
                         <groupId>pro.taskana</groupId>
@@ -55,36 +50,45 @@
                         <artifactId>taskana-adapter-taskana-connector</artifactId>
                         <version>${project.version}</version>
                 </dependency>
+             <!--
+                <dependency>
+                        <groupId>pro.taskana</groupId>
+                        <artifactId>taskana-adapter-camunda-outbox-rest</artifactId>
+                        <version>${project.version}</version>
+                        <classifier>classes</classifier>
+                </dependency>
+             -->
                 <dependency>
                         <groupId>com.ibm.db2.jcc</groupId>
                         <artifactId>db2jcc4</artifactId>
-                        <version>11.1.1.1</version>
+                        <version>${version.db2}</version>
                 </dependency>
-             <dependency>
-                   <groupId>pro.taskana</groupId>
-                   <artifactId>taskana-spring</artifactId>
-                   <version>1.1.5-SNAPSHOT</version>
-              </dependency>
+                <dependency>
+                        <groupId>pro.taskana</groupId>
+                        <artifactId>taskana-spring</artifactId>
+                        <version>${version.taskana}</version>
+                </dependency>
 
                 <dependency>
                         <groupId>org.postgresql</groupId>
                         <artifactId>postgresql</artifactId>
-                        <version>42.2.5</version>
+                        <version>${version.postgres}</version>
                 </dependency>
                 <dependency>
                         <groupId>com.h2database</groupId>
                         <artifactId>h2</artifactId>
-                        <version>1.4.196</version>
+                        <version>${version.h2database}</version>
                 </dependency>
 
                 <dependency>
                         <groupId>org.springframework.plugin</groupId>
                         <artifactId>spring-plugin-core</artifactId>
+                        <version>${version.spring.core}</version>
                 </dependency>
                 <dependency>
                         <groupId>javax.servlet</groupId>
                         <artifactId>javax.servlet-api</artifactId>
-                        <version>3.1.0</version>
+                        <version>${version.javax.servlet.api}</version>
                         <scope>provided</scope>
                 </dependency>
 
@@ -98,6 +102,7 @@
                                         <artifactId>android-json</artifactId>
                                 </exclusion>
                         </exclusions>
+                      <!--  <version>${version.spring.boot}</version> -->
                 </dependency>
         </dependencies>
 
@@ -152,17 +157,18 @@
                         <plugin>
                                 <groupId>org.springframework.boot</groupId>
                                 <artifactId>spring-boot-maven-plugin</artifactId>
+                                <version>${version.spring.boot.maven.plugin}</version>
                         </plugin>
                         <plugin>
                                 <groupId>org.wildfly.plugins</groupId>
                                 <artifactId>wildfly-maven-plugin</artifactId>
-                                <version>2.0.0.Final</version>
+                                <version>${version.wildfly.maven.plugin}</version>
                                 <configuration>
-                                        <version>11.0.0.Final</version>
+                                        <version>${version.wildfly}</version>
                                         <javaOpts>-Djboss.http.port=8089</javaOpts>
                                 </configuration>
                                 <executions>
-                                    <!--
+                                        <!--
                                         <execution>
                                                 <id>run-wildfly</id>
                                                 <phase>install</phase>
@@ -172,7 +178,7 @@
                                         </execution>
                                     -->
                                         <!-- Deploy the JDBC library in JBoss -->
-                                    <!--
+                                        <!--
                                         <execution>
                                                 <id>deploy-driver-postgres</id>
                                                 <phase>install</phase>
@@ -199,7 +205,7 @@
                                         </execution>
                                     -->
                                         <!-- Add a data source -->
-                                    <!--
+                                        <!--
                                         <execution>
                                                 <id>add-datasource-taskanads</id>
                                                 <phase>install</phase>
@@ -249,7 +255,7 @@
                                     -->
                                         <!-- Deploy the application on install -->
 
-                                    <!--
+                                        <!--
                                         <execution>
                                                 <id>wildfly-deploy</id>
                                                 <phase>install</phase>
@@ -259,7 +265,7 @@
                                         </execution>
                                     -->
                                         <!-- undeploy the application on install -->
-                                    <!--
+                                        <!--
                                         <execution>
                                                 <id>wildfly-undeploy</id>
                                                 <phase>install</phase>
@@ -269,7 +275,7 @@
                                         </execution>
                                     -->
                                         <!-- shutdown the application on install -->
-                                    <!--
+                                        <!--
                                         <execution>
                                                 <id>wildfly-shutdown</id>
                                                 <phase>install</phase>

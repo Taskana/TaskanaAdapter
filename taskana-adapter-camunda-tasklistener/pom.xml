@@ -1,35 +1,36 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>taskana-adapter-parent</artifactId>
-        <groupId>pro.taskana</groupId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+        <parent>
+                <artifactId>taskana-adapter-parent</artifactId>
+                <groupId>pro.taskana</groupId>
+                <version>0.0.2-SNAPSHOT</version>
+                <relativePath>../pom.xml</relativePath>
+        </parent>
 
-    <artifactId>taskana-adapter-camunda-tasklistener</artifactId>
+        <modelVersion>4.0.0</modelVersion>
+        <artifactId>taskana-adapter-camunda-tasklistener</artifactId>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.camunda.bpm</groupId>
-            <artifactId>camunda-engine</artifactId>
-            <version>7.11.0</version>
-        </dependency>
-    </dependencies>
-    <build>
-        <finalName>taskana-parse-listener</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+        <dependencies>
+                <dependency>
+                        <groupId>org.camunda.bpm</groupId>
+                        <artifactId>camunda-engine</artifactId>
+                        <version>${version.camunda}</version>
+                </dependency>
+        </dependencies>
+        <build>
+                <finalName>taskana-parse-listener</finalName>
+                <plugins>
+                        <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <version>${version.maven-compiler-plugin}</version>
+                                <configuration>
+                                        <source>${maven.compiler.source}</source>
+                                        <target>${maven.compiler.target}</target>
+                                </configuration>
+                        </plugin>
+                </plugins>
+        </build>
 
 </project>

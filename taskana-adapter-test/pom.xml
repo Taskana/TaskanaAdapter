@@ -1,75 +1,54 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<groupId>pro.taskana</groupId>
-	<artifactId>taskana-adapter-test</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+        <parent>
+                <artifactId>taskana-adapter-parent</artifactId>
+                <groupId>pro.taskana</groupId>
+                <version>0.0.2-SNAPSHOT</version>
+                <relativePath>../pom.xml</relativePath>
+        </parent>
 
-	<name>taskana-adapter-test</name>
-	<description>Test for the integration of taskana adapter with camunda</description>
+        <modelVersion>4.0.0</modelVersion>
+        <artifactId>taskana-adapter-test</artifactId>
+        <packaging>jar</packaging>
+        <name>taskana-adapter-test</name>
+        <description>Test for the integration of taskana adapter with camunda</description>
 
-	<developers>
-		<developer>
-			<name>Benjamin Fuernrohr</name>
-		</developer>
-	</developers>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<camunda.version>7.10.0</camunda.version>
-		<java.version>1.8</java.version>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-	</properties>
+        <dependencies>
+                <!-- Camunda BPM -->
+                <dependency>
+                        <groupId>org.camunda.bpm.springboot</groupId>
+                        <artifactId>camunda-bpm-spring-boot-starter</artifactId>
+                        <version>${version.camunda.bpm.spring.boot}</version>
+                </dependency>
+                <dependency>
+                        <groupId>com.h2database</groupId>
+                        <artifactId>h2</artifactId>
+                        <version>${version.h2database}</version>
+                        <scope>test</scope>
+                </dependency>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-dependencies</artifactId>
-				<version>2.1.1.RELEASE</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+                <!-- Camunda REST Api -->
+                <dependency>
+                        <groupId>org.camunda.bpm.springboot</groupId>
+                        <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
+                        <version>${version.camunda.bpm.spring.boot}</version>
+                        <exclusions>
+                                <exclusion>
+                                        <groupId>org.skyscreamer</groupId>
+                                        <artifactId>jsonassert</artifactId>
+                                </exclusion>
+                        </exclusions>
+                </dependency>
 
-	<dependencies>
-		<!-- Camunda BPM -->
-		<dependency>
-			<groupId>org.camunda.bpm.springboot</groupId>
-			<artifactId>camunda-bpm-spring-boot-starter</artifactId>
-			<version>3.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-		</dependency>
-
-		<!-- Camunda REST Api -->
-		<dependency>
-			<groupId>org.camunda.bpm.springboot</groupId>
-			<artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
-			<version>3.2.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.skyscreamer</groupId>
-					<artifactId>jsonassert</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-	
-		<!-- Camunda webapps for manual debugging -->
-		<dependency>
-			<groupId>org.camunda.bpm.springboot</groupId>
-			<artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
-			<version>3.2.0</version>
-		</dependency> 
+                <!-- Camunda webapps for manual debugging -->
+                <dependency>
+                        <groupId>org.camunda.bpm.springboot</groupId>
+                        <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
+                        <version>${version.camunda.bpm.spring.boot}</version>
+                </dependency>
 
                 <!-- Adapter modules -->
                 <dependency>
@@ -87,9 +66,9 @@
                         <artifactId>taskana-adapter-taskana-connector</artifactId>
                         <version>${project.version}</version>
                 </dependency>
-               <dependency>
+                <dependency>
                         <groupId>pro.taskana</groupId>
-                         <artifactId>taskana-adapter-camunda-tasklistener</artifactId>
+                        <artifactId>taskana-adapter-camunda-tasklistener</artifactId>
                         <version>${project.version}</version>
                 </dependency>
 
@@ -97,30 +76,32 @@
                 <dependency>
                         <groupId>com.ibm.db2.jcc</groupId>
                         <artifactId>db2jcc4</artifactId>
-                        <version>11.1.1.1</version>
+                        <version>${version.db2}</version>
+                        <scope>test</scope>
                 </dependency>
                 <dependency>
                         <groupId>org.postgresql</groupId>
                         <artifactId>postgresql</artifactId>
-                        <version>42.2.5</version>
+                        <version>${version.postgres}</version>
+                        <scope>test</scope>
                 </dependency>
-                
+
                 <dependency>
-  					<groupId>uk.co.datumedge</groupId>
-					<artifactId>hamcrest-json</artifactId>
-					<version>0.2</version>
-					<scope>test</scope>
-				</dependency>
-		<dependency>
-			<groupId>pro.taskana</groupId>
-			<artifactId>taskana-adapter-outbox-rest-spring-boot-starter</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>resteasy-spring-boot-starter</artifactId>
-			<version>3.0.0.Final</version>
-		</dependency>
+                        <groupId>uk.co.datumedge</groupId>
+                        <artifactId>hamcrest-json</artifactId>
+                        <version>${version.hamcrest.json}</version>
+                        <scope>test</scope>
+                </dependency>
+                <dependency>
+                        <groupId>pro.taskana</groupId>
+                        <artifactId>taskana-adapter-outbox-rest-spring-boot-starter</artifactId>
+                        <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                        <groupId>org.jboss.resteasy</groupId>
+                        <artifactId>resteasy-spring-boot-starter</artifactId>
+                        <version>${version.resteasy.spring.boot}</version>
+                </dependency>
         </dependencies>
 
         <!-- -->
@@ -129,6 +110,7 @@
                         <plugin>
                                 <groupId>org.springframework.boot</groupId>
                                 <artifactId>spring-boot-maven-plugin</artifactId>
+                                <version>${version.spring.boot}</version>
                                 <configuration>
                                         <layout>ZIP</layout>
                                 </configuration>
@@ -144,13 +126,13 @@
         </build>
         <!-- -->
 
-	<!-- this repository is needed to fetch com.ibm.db2.jcc -->
-	<repositories>
-		<repository>
-			<id>novatec public</id>
-			<name>novatec-repository</name>
-			<url>https://repository.novatec-gmbh.de/content/repositories/novatec/</url>
-		</repository>
-	</repositories>
+        <!-- this repository is needed to fetch com.ibm.db2.jcc -->
+        <repositories>
+                <repository>
+                        <id>novatec public</id>
+                        <name>novatec-repository</name>
+                        <url>https://repository.novatec-gmbh.de/content/repositories/novatec/</url>
+                </repository>
+        </repositories>
 
 </project>
