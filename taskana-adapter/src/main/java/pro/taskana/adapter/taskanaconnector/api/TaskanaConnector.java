@@ -18,7 +18,7 @@ public interface TaskanaConnector {
     /**
      * retrieve completed taskana tasks.
      *
-     * @return
+     * @return a list of completed taskana tasks
      */
     List<ReferencedTask> retrieveCompletedTaskanaTasks();
 
@@ -37,7 +37,7 @@ public interface TaskanaConnector {
      *
      * @param taskanaTask
      *            The taskana task to be created.
-     * @throws TaskCreationFailedExceptioin
+     * @throws TaskCreationFailedException
      *             if the attempt to create a taskana task failed.
      */
     void createTaskanaTask(Task taskanaTask) throws TaskCreationFailedException;
@@ -48,6 +48,8 @@ public interface TaskanaConnector {
      * @param referencedTask
      *            the referenced task that is to be converted.
      * @return the taskana task that will be created started on behalf of the referenced task.
+     * @throws TaskConversionFailedException
+     *             if conversion of the task into a taskana task fails
      */
     Task convertToTaskanaTask(ReferencedTask referencedTask) throws TaskConversionFailedException;
 
@@ -65,7 +67,7 @@ public interface TaskanaConnector {
      *
      * @param referencedTask
      *            The external task on behalf of which the taskana task is running.
-     * @throws TaskTerminationFailedExceptioin
+     * @throws TaskTerminationFailedException
      *             if the attempt to terminate a taskana task failed.
      */
     void terminateTaskanaTask(ReferencedTask referencedTask) throws TaskTerminationFailedException;

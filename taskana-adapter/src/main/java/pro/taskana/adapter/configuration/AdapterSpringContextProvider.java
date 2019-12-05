@@ -22,6 +22,12 @@ public class AdapterSpringContextProvider implements ApplicationContextAware {
 
     /**
      * Get a Spring bean by type.
+     *
+     * @param <T>
+     *            the type of the bean class
+     * @param beanClass
+     *            the class of the bean
+     * @return the bean
      **/
     public static <T> T getBean(Class<T> beanClass) {
         return context.getBean(beanClass);
@@ -29,6 +35,10 @@ public class AdapterSpringContextProvider implements ApplicationContextAware {
 
     /**
      * Get a Spring bean by name.
+     *
+     * @param beanName
+     *            the name of the bean
+     * @return the bean
      **/
     public static Object getBean(String beanName) {
         return context.getBean(beanName);
