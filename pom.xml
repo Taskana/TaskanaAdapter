@@ -20,10 +20,15 @@
                 <version.adapter>0.0.2-SNAPSHOT</version.adapter>
                 <version.taskana>1.1.6-SNAPSHOT</version.taskana>
 
+                <version.maven.jar>3.1.1</version.maven.jar>
                 <version.maven-war-plugin>3.2.2</version.maven-war-plugin>
+                <version.maven.source>3.0.1</version.maven.source>
+                <version.maven.compiler>3.8.1</version.maven.compiler>
                 <version.maven-compiler-plugin>3.5.1</version.maven-compiler-plugin>
+                <version.maven.javadoc>3.1.0</version.maven.javadoc>
                 <version.maven.failsafe.plugin>3.0.0-M4</version.maven.failsafe.plugin>
-                <version.maven.surfire.plugin>3.0.0-M4</version.maven.surfire.plugin>
+                <version.maven.surefire.plugin>3.0.0-M4</version.maven.surefire.plugin>
+                <version.maven.checkstyle>3.0.0</version.maven.checkstyle>
                 <version.spring.boot.maven.plugin>2.0.2.RELEASE</version.spring.boot.maven.plugin>
                 <version.mybatis>3.4.6</version.mybatis>
                 <version.spring.mybatis>1.3.2</version.spring.mybatis>
@@ -51,6 +56,9 @@
 
                 <version.junit>4.12</version.junit>
                 <version.hamcrest.json>0.2</version.hamcrest.json>
+
+                <version.maven.gpg>1.5</version.maven.gpg>
+                <version.sonatype>1.6.8</version.sonatype>
 
         </properties>
 
@@ -95,6 +103,210 @@
                 <module>taskana-adapter-outbox-rest-spring-boot-starter</module>
                 <module>taskana-adapter-wildfly-example</module>
                 <module>taskana-adapter-test</module>
-
         </modules>
+
+
+        <profiles>
+                <profile>
+                        <id>snapshot</id>
+                        <build>
+                                <plugins>
+                                        <plugin>
+                                                <groupId>org.apache.maven.plugins</groupId>
+                                                <artifactId>maven-gpg-plugin</artifactId>
+                                                <version>${version.maven.gpg}</version>
+                                                <executions>
+                                                        <execution>
+                                                                <id>sign-artifacts</id>
+                                                                <phase>verify</phase>
+                                                                <goals>
+                                                                        <goal>sign</goal>
+                                                                </goals>
+                                                        </execution>
+                                                </executions>
+                                        </plugin>
+                                        <plugin>
+                                                <groupId>org.sonatype.plugins</groupId>
+                                                <artifactId>nexus-staging-maven-plugin</artifactId>
+                                                <version>${version.sonatype}</version>
+                                                <extensions>true</extensions>
+                                                <configuration>
+                                                        <serverId>ossrh</serverId>
+                                                        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                                                        <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                                                </configuration>
+                                        </plugin>
+                                </plugins>
+                        </build>
+                        <distributionManagement>
+                                <snapshotRepository>
+                                        <id>ossrh</id>
+                                        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                                </snapshotRepository>
+                        </distributionManagement>
+                </profile>
+                <profile>
+                        <id>release</id>
+                        <build>
+                                <plugins>
+                                        <plugin>
+                                                <groupId>org.apache.maven.plugins</groupId>
+                                                <artifactId>maven-gpg-plugin</artifactId>
+                                                <version>${version.maven.gpg}</version>
+                                                <executions>
+                                                        <execution>
+                                                                <id>sign-artifacts</id>
+                                                                <phase>verify</phase>
+                                                                <goals>
+                                                                        <goal>sign</goal>
+                                                                </goals>
+                                                        </execution>
+                                                </executions>
+                                        </plugin>
+                                        <plugin>
+                                                <groupId>org.sonatype.plugins</groupId>
+                                                <artifactId>nexus-staging-maven-plugin</artifactId>
+                                                <version>${version.sonatype}</version>
+                                                <extensions>true</extensions>
+                                                <configuration>
+                                                        <serverId>ossrh</serverId>
+                                                        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                                                        <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                                                </configuration>
+                                        </plugin>
+                                </plugins>
+                        </build>
+                        <distributionManagement>
+                                <repository>
+                                        <id>ossrh</id>
+                                        <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                                </repository>
+                        </distributionManagement>
+                </profile>
+                <profile>
+                        <id>eclipse</id>
+                        <build>
+                                <pluginManagement>
+                                        <plugins>
+                                                <plugin>
+                                                        <groupId>org.eclipse.m2e</groupId>
+                                                        <artifactId>lifecycle-mapping</artifactId>
+                                                        <version>1.0.0</version>
+                                                        <configuration>
+                                                                <lifecycleMappingMetadata>
+                                                                        <pluginExecutions>
+                                                                                <pluginExecution>
+                                                                                        <pluginExecutionFilter>
+                                                                                                <groupId>org.apache.maven.plugins</groupId>
+                                                                                                <artifactId>maven-checkstyle-plugin</artifactId>
+                                                                                                <versionRange>[1.0.0,)</versionRange>
+                                                                                                <goals>
+                                                                                                        <goal>check</goal>
+                                                                                                </goals>
+                                                                                        </pluginExecutionFilter>
+                                                                                        <action>
+                                                                                                <ignore/>
+                                                                                        </action>
+                                                                                </pluginExecution>
+                                                                        </pluginExecutions>
+                                                                </lifecycleMappingMetadata>
+                                                        </configuration>
+                                                </plugin>
+                                        </plugins>
+                                </pluginManagement>
+                        </build>
+                </profile>
+        </profiles>
+
+        <build>
+                <plugins>
+                        <!--
+                        This plugin appends version information into the jar, so that it can be extracted from the jar.
+                        See TSK-837 for more information
+                        -->
+                        <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-jar-plugin</artifactId>
+                                <version>${version.maven.jar}</version>
+                                <configuration>
+                                        <archive>
+                                                <manifest>
+                                                        <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                                </manifest>
+                                        </archive>
+                                </configuration>
+                        </plugin>
+                        <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <version>${version.maven.compiler}</version>
+                                <configuration>
+                                        <showWarnings>true</showWarnings>
+                                        <failOnWarning>true</failOnWarning>
+                                        <compilerArgs>
+                                                <arg>-Xlint:all</arg>
+                                                <arg>-proc:none</arg>
+                                        </compilerArgs>
+                                </configuration>
+                        </plugin>
+                        <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-source-plugin</artifactId>
+                                <version>${version.maven.source}</version>
+                                <executions>
+                                        <execution>
+                                                <id>attach-sources</id>
+                                                <goals>
+                                                        <goal>jar-no-fork</goal>
+                                                </goals>
+                                        </execution>
+                                </executions>
+                        </plugin>
+                     <!--
+                        <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-javadoc-plugin</artifactId>
+                                <version>${version.maven.javadoc}</version>
+                                <executions>
+                                        <execution>
+                                                <id>attach-javadocs</id>
+                                                <goals>
+                                                        <goal>jar</goal>
+                                                </goals>
+                                        </execution>
+                                </executions>
+                        </plugin>
+                     -->
+                        <!-- JUnit 5 requires Surefire version 2.22.0 or higher -->
+                        <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-surefire-plugin</artifactId>
+                                <version>${version.maven.surefire.plugin}</version>
+                        </plugin>
+                     <!--
+                        <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-checkstyle-plugin</artifactId>
+                                <version>${version.maven.checkstyle}</version>
+                                <executions>
+                                        <execution>
+                                                <id>validate</id>
+                                                <phase>validate</phase>
+                                                <configuration>
+                                                        <configLocation>qa/checkstyle/checkstyle.xml</configLocation>
+                                                        <encoding>UTF-8</encoding>
+                                                        <consoleOutput>true</consoleOutput>
+                                                        <failsOnError>true</failsOnError>
+                                                        <failOnViolation>true</failOnViolation>
+                                                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                                                </configuration>
+                                                <goals>
+                                                        <goal>check</goal>
+                                                </goals>
+                                        </execution>
+                                </executions>
+                        </plugin>
+                     -->
+                </plugins>
+        </build>
 </project>
