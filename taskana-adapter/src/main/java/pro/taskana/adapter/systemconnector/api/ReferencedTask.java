@@ -198,98 +198,135 @@ public class ReferencedTask {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (!(obj instanceof ReferencedTask)) {
             return false;
+        }
         ReferencedTask other = (ReferencedTask) obj;
         if (assignee == null) {
-            if (other.assignee != null)
+            if (other.assignee != null) {
                 return false;
-        } else if (!assignee.equals(other.assignee))
+            }
+        } else if (!assignee.equals(other.assignee)) {
             return false;
+        }
         if (classificationKey == null) {
-            if (other.classificationKey != null)
+            if (other.classificationKey != null) {
                 return false;
-        } else if (!classificationKey.equals(other.classificationKey))
+            }
+        } else if (!classificationKey.equals(other.classificationKey)) {
             return false;
+        }
         if (created == null) {
-            if (other.created != null)
+            if (other.created != null) {
                 return false;
-        } else if (!created.equals(other.created))
+            }
+        } else if (!created.equals(other.created)) {
             return false;
+        }
         if (description == null) {
-            if (other.description != null)
+            if (other.description != null) {
                 return false;
-        } else if (!description.equals(other.description))
+            }
+        } else if (!description.equals(other.description)) {
             return false;
+        }
         if (domain == null) {
-            if (other.domain != null)
+            if (other.domain != null) {
                 return false;
-        } else if (!domain.equals(other.domain))
+            }
+        } else if (!domain.equals(other.domain)) {
             return false;
+        }
         if (due == null) {
-            if (other.due != null)
+            if (other.due != null) {
                 return false;
-        } else if (!due.equals(other.due))
+            }
+        } else if (!due.equals(other.due)) {
             return false;
+        }
         if (id == null) {
-            if (other.id != null)
+            if (other.id != null) {
                 return false;
-        } else if (!id.equals(other.id))
+            }
+        } else if (!id.equals(other.id)) {
             return false;
+        }
         if (name == null) {
-            if (other.name != null)
+            if (other.name != null) {
                 return false;
-        } else if (!name.equals(other.name))
+            }
+        } else if (!name.equals(other.name)) {
             return false;
+        }
         if (outboxEventId == null) {
-            if (other.outboxEventId != null)
+            if (other.outboxEventId != null) {
                 return false;
-        } else if (!outboxEventId.equals(other.outboxEventId))
+            }
+        } else if (!outboxEventId.equals(other.outboxEventId)) {
             return false;
+        }
         if (outboxEventType == null) {
-            if (other.outboxEventType != null)
+            if (other.outboxEventType != null) {
                 return false;
-        } else if (!outboxEventType.equals(other.outboxEventType))
+            }
+        } else if (!outboxEventType.equals(other.outboxEventType)) {
             return false;
+        }
         if (owner == null) {
-            if (other.owner != null)
+            if (other.owner != null) {
                 return false;
-        } else if (!owner.equals(other.owner))
+            }
+        } else if (!owner.equals(other.owner)) {
             return false;
+        }
         if (priority == null) {
-            if (other.priority != null)
+            if (other.priority != null) {
                 return false;
-        } else if (!priority.equals(other.priority))
+            }
+        } else if (!priority.equals(other.priority)) {
             return false;
+        }
         if (suspended == null) {
-            if (other.suspended != null)
+            if (other.suspended != null) {
                 return false;
-        } else if (!suspended.equals(other.suspended))
+            }
+        } else if (!suspended.equals(other.suspended)) {
             return false;
+        }
         if (systemURL == null) {
-            if (other.systemURL != null)
+            if (other.systemURL != null) {
                 return false;
-        } else if (!systemURL.equals(other.systemURL))
+            }
+        } else if (!systemURL.equals(other.systemURL)) {
             return false;
+        }
         if (taskDefinitionKey == null) {
-            if (other.taskDefinitionKey != null)
+            if (other.taskDefinitionKey != null) {
                 return false;
-        } else if (!taskDefinitionKey.equals(other.taskDefinitionKey))
+            }
+        } else if (!taskDefinitionKey.equals(other.taskDefinitionKey)) {
             return false;
+        }
         if (variables == null) {
-            if (other.variables != null)
+            if (other.variables != null) {
                 return false;
-        } else if (!variables.equals(other.variables))
+            }
+        } else if (!variables.equals(other.variables)) {
             return false;
+        }
         if (workbasketKey == null) {
-            if (other.workbasketKey != null)
+            if (other.workbasketKey != null) {
                 return false;
-        } else if (!workbasketKey.equals(other.workbasketKey))
+            }
+        } else if (!workbasketKey.equals(other.workbasketKey)) {
             return false;
+        }
         return true;
     }
 
