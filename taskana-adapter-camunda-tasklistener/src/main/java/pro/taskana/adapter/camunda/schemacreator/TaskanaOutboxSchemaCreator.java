@@ -16,6 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * Creates the outbox schema in the Camunda database.
+ * @author jhe
+ */
 public class TaskanaOutboxSchemaCreator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaOutboxSchemaCreator.class);

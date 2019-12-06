@@ -8,6 +8,11 @@ import org.springframework.stereotype.Component;
 
 import pro.taskana.impl.util.LoggerUtils;
 
+/**
+ * Holds the URlS (Camunda REST Api and outbox REST) of the configured camunda systems.
+ *
+ * @author bbr
+ */
 @Component
 public class CamundaSystemUrls {
 
@@ -37,6 +42,11 @@ public class CamundaSystemUrls {
         return "CamundaSystemUrls [camundaSystemURLs=" + LoggerUtils.setToString(theCamundaSystemURLs) + "]";
     }
 
+    /**
+     * Holds the URS (Camunda REST Api and outbox REST) of a specific camunda system.
+     *
+     * @author bbr
+     */
     public static class SystemURLInfo {
 
         private String systemRestUrl;

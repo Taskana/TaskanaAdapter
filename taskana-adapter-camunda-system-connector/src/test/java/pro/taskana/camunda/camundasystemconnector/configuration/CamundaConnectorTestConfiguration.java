@@ -12,6 +12,11 @@ import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskCompleter
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskRetriever;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaVariableRetriever;
 
+/**
+ * Configuration for test of Camunda System Connector.
+ *
+ * @author bbr
+ */
 @Configuration
 public class CamundaConnectorTestConfiguration {
 

@@ -35,14 +35,19 @@ import pro.taskana.exceptions.WorkbasketAlreadyExistException;
 import pro.taskana.exceptions.WorkbasketNotFoundException;
 import pro.taskana.impl.util.LoggerUtils;
 
+
+/**
+ * Implements TaskanaConnector.
+ * @author bbr
+ */
 @Component
 public class TaskanaSystemConnectorImpl implements TaskanaConnector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaSystemConnectorImpl.class);
-    static String REFERENCED_TASK_ID = "referenced_task_id";
-    static String REFERENCED_TASK_VARIABLES = "referenced_task_variables";
+    static final String REFERENCED_TASK_ID = "referenced_task_id";
+    static final String REFERENCED_TASK_VARIABLES = "referenced_task_variables";
 
-    static String SYSTEM_URL = "system_url";
+    static final String SYSTEM_URL = "system_url";
 
     @Autowired
     private TaskService taskService;

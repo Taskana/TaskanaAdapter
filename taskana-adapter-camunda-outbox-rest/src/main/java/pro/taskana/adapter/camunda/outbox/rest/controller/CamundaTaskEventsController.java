@@ -14,6 +14,10 @@ import javax.ws.rs.core.Response;
 import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventResource;
 import pro.taskana.adapter.camunda.outbox.rest.service.CamundaTaskEventsService;
 
+/**
+ * Controller for the Outbox REST service.
+ * @author jhe
+ */
 @Path("/taskana-outbox/rest/events")
 public class CamundaTaskEventsController {
 

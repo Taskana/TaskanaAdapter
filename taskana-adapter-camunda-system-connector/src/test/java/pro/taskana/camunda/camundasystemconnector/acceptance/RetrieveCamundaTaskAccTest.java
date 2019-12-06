@@ -28,6 +28,12 @@ import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskRetriever;
 import pro.taskana.camunda.camundasystemconnector.configuration.CamundaConnectorTestConfiguration;
 
+
+/**
+ * Unit test class for Camunda System Connector.
+ *
+ * @author bbr
+ */
 @RunWith(SpringRunner.class) // SpringRunner is an alias for the SpringJUnit4ClassRunner
 @ContextConfiguration(classes = {CamundaConnectorTestConfiguration.class})
 @SpringBootTest
@@ -118,14 +124,14 @@ public class RetrieveCamundaTaskAccTest {
         expectedTask.setOutboxEventId("16");
         expectedTask.setOutboxEventType("complete");
 
-        String expectedReplyBody = "[\n" +
-            "    {\n" +
-            "        \"id\": 16,\n" +
-            "        \"type\": \"complete\",\n" +
-            "        \"created\": \"2019-11-26T16:55:52.460+0100\",\n" +
-            "        \"payload\": \"{\\\"id\\\":\\\"2275fb87-1065-11ea-a7a0-02004c4f4f50\\\"}\"\n" +
-            "    }\n" +
-            "]";
+        String expectedReplyBody = "[\n"
+                +  "    {\n"
+                +  "        \"id\": 16,\n"
+                +  "        \"type\": \"complete\",\n"
+                +  "        \"created\": \"2019-11-26T16:55:52.460+0100\",\n"
+                +  "        \"payload\": \"{\\\"id\\\":\\\"2275fb87-1065-11ea-a7a0-02004c4f4f50\\\"}\"\n"
+                +  "    }\n"
+                +  "]";
 
         String camundaSystemUrl = "http://localhost:8080";
         mockServer.expect(requestTo(camundaSystemUrl + "/taskana-outbox/rest/events?type=complete&type=delete"))
@@ -140,3 +146,4 @@ public class RetrieveCamundaTaskAccTest {
     }
 
 }
+

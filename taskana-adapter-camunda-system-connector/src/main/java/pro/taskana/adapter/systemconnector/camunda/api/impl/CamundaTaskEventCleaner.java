@@ -14,6 +14,11 @@ import org.springframework.web.client.RestTemplate;
 import pro.taskana.adapter.impl.TaskanaTaskStarter;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 
+/**
+ * Clears events in the Camunda outbox after the corresponding action has been carried out by taskana.
+ *
+ * @author bbr
+ */
 @Component
 public class CamundaTaskEventCleaner {
 
