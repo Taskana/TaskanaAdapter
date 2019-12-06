@@ -18,11 +18,16 @@ import org.slf4j.LoggerFactory;
  */
 public class DBCleaner {
 
+    /**
+     * encapsulates the type of the application database.
+     *
+     * @author bbr
+     */
     public enum ApplicationDatabaseType {
-        TASKANA,
-        TASKANA_ADAPTER,
-        CAMUNDA,
-        OUTBOX
+    TASKANA,
+    TASKANA_ADAPTER,
+    CAMUNDA,
+    OUTBOX
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBCleaner.class);
@@ -60,8 +65,10 @@ public class DBCleaner {
     /**
      * Clears the db.
      *
-     * @param dropTables
-     *            if true drop tables, else clean tables
+     * @param dataSource
+     *            the datasource
+     * @param applicationDatabaseType
+     *            the type of the application database that is to be cleared
      */
     public void clearDb(DataSource dataSource, ApplicationDatabaseType applicationDatabaseType) {
         try (Connection connection = dataSource.getConnection()) {

@@ -2,7 +2,6 @@ package pro.taskana.adapter.test;
 
 import org.camunda.bpm.spring.boot.starter.annotation.EnableProcessApplication;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
@@ -24,8 +23,11 @@ import pro.taskana.adapter.test.configuration.CamundaConfiguration;
 @EnableProcessApplication
 public class TaskanaAdapterTestApplication {
 
-
     public static void main(String... args) {
         SpringApplication.run(TaskanaAdapterTestApplication.class, args);
+    }
+
+    // this method prevents checkstyle from thinking this class is a utility class
+    public void dummy() {
     }
 }

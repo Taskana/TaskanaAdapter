@@ -36,6 +36,10 @@ import pro.taskana.exceptions.WorkbasketAlreadyExistException;
 import pro.taskana.exceptions.WorkbasketNotFoundException;
 import pro.taskana.impl.TaskImpl;
 
+/**
+ * Maps properties between ReferencedTasks from external systems and corresponding taskana tasks.
+ * @author bbr
+ */
 @Component
 public class TaskInformationMapper {
 

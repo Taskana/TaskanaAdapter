@@ -27,6 +27,10 @@ import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventResource
 import spinjar.com.fasterxml.jackson.databind.JsonNode;
 import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Implementation of the Outbox REST service.
+ * @author jhe
+ */
 public class CamundaTaskEventsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskEventsService.class);
@@ -58,11 +62,11 @@ public class CamundaTaskEventsService {
 
         List<Integer> idsAsIntegers = getIdsAsIntegers(idsAsJsonArray);
 
-        String DeleteEventsSqlWithPlaceholders = String.format(SQL_WITHOUT_PLACEHOLDERS_DELETE_EVENTS,
+        String deleteEventsSqlWithPlaceholders = String.format(SQL_WITHOUT_PLACEHOLDERS_DELETE_EVENTS,
             preparePlaceHolders(idsAsIntegers.size()));
 
         try (Connection connection = getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(DeleteEventsSqlWithPlaceholders)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(deleteEventsSqlWithPlaceholders)) {
 
             setPreparedStatementValues(preparedStatement, idsAsIntegers);
             preparedStatement.execute();

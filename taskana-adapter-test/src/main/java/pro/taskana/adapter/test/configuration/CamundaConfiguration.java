@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 /**
- * Configuration for Camunda BPM
- * 
+ * Configuration for Camunda BPM.
+ *
  * @author Ben Fuernrohr
  */
 @Configuration

@@ -7,7 +7,6 @@ import pro.taskana.adapter.systemconnector.api.SystemConnector;
 /**
  * The interface for the SystemConnector provider.
  * @author bbr
- *
  */
 public interface SystemConnectorProvider {
 

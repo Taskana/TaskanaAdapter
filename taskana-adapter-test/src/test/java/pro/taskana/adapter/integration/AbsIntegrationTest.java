@@ -33,7 +33,7 @@ public abstract class AbsIntegrationTest {
 
     // use rules instead of running with SpringRunner to allow for running with JAASRunner
     @ClassRule
-    public static final SpringClassRule springClassRule = new SpringClassRule();
+    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
 
     @Rule
     public final SpringMethodRule springMethodRule = new SpringMethodRule();

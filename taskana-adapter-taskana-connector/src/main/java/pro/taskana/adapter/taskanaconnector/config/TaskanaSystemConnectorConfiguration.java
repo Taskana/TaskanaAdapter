@@ -24,6 +24,10 @@ import pro.taskana.WorkbasketService;
 import pro.taskana.configuration.SpringTaskanaEngineConfiguration;
 import pro.taskana.configuration.TaskanaEngineConfiguration;
 
+/**
+ * Configuration for taskana task system connector.
+ * @author bbr
+ */
 @Configuration
 @DependsOn(value = {"adapterSpringContextProvider"})
 public class TaskanaSystemConnectorConfiguration {

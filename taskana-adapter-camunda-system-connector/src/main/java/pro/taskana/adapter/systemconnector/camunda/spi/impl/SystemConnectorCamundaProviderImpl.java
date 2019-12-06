@@ -9,6 +9,11 @@ import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaSystemConnect
 import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemUrls;
 import pro.taskana.adapter.systemconnector.spi.SystemConnectorProvider;
 
+/**
+ * Implements SystemConnectorProvider for camunda.
+ *
+ * @author bbr
+ */
 public class SystemConnectorCamundaProviderImpl implements SystemConnectorProvider {
 
     @Override

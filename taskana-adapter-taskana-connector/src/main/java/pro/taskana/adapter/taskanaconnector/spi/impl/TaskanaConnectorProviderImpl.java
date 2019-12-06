@@ -10,6 +10,10 @@ import pro.taskana.adapter.configuration.AdapterSpringContextProvider;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.adapter.taskanaconnector.spi.TaskanaConnectorProvider;
 
+/**
+ * The implementation of TaskanaConnectorProvider.
+ * @author bbr
+ */
 public class TaskanaConnectorProviderImpl implements TaskanaConnectorProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaConnectorProviderImpl.class);

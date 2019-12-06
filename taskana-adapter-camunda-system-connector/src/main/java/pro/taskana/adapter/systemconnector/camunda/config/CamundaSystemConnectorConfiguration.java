@@ -11,8 +11,13 @@ import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskCompleter
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskRetriever;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaVariableRetriever;
 
+/**
+ * Configures the camunda system connector.
+ *
+ * @author bbr
+ */
 @Configuration
-@DependsOn(value= {"adapterSpringContextProvider"})
+@DependsOn(value = {"adapterSpringContextProvider"})
 public class CamundaSystemConnectorConfiguration {
 
     @Bean
