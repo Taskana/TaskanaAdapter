@@ -15,6 +15,12 @@ import pro.taskana.adapter.systemconnector.api.SystemResponse;
 import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemUrls;
 import pro.taskana.exceptions.SystemException;
 
+
+/**
+ * Completes Camunda Tasks via the Camunda REST Api.
+ *
+ * @author bbr
+ */
 public class CamundaTaskCompleter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskCompleter.class);

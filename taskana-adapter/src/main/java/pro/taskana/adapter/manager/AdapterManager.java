@@ -25,7 +25,7 @@ import pro.taskana.impl.util.LoggerUtils;
 @Component
 public class AdapterManager {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(AdapterManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdapterManager.class);
     private boolean isInitialized = false;
 
     private Map<String, SystemConnector> systemConnectors;

@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * Specify user id for JUnit JAASRunner.
- * 
+ *
  * @author bbr
  */
 @Retention(RetentionPolicy.RUNTIME)

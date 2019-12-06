@@ -20,6 +20,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventResource;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 
+/**
+ * Retrieves tasks from camunda that have been new started or terminated by camunda.
+ *
+ * @author bbr
+ */
 @Component
 public class CamundaTaskRetriever {
 

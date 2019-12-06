@@ -22,6 +22,11 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Camunda task listner that records task events in the outbox database table.
+ *
+ * @author jhe
+ */
 public class TaskanaTaskListener implements TaskListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskListener.class);
@@ -52,6 +57,8 @@ public class TaskanaTaskListener implements TaskListener {
                     break;
                 case "delete":
                     insertCompleteOrDeleteEventIntoOutbox(delegateTask, connection);
+                    break;
+                default:
                     break;
             }
 

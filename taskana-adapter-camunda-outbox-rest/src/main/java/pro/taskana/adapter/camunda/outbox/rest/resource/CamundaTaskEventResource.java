@@ -1,5 +1,10 @@
 package pro.taskana.adapter.camunda.outbox.rest.resource;
 
+/**
+ * POJO that represents an event in the camunda outbox table.
+ *
+ * @author jhe.
+ */
 public class CamundaTaskEventResource {
 
     int id;
@@ -41,10 +46,17 @@ public class CamundaTaskEventResource {
 
     @Override
     public String toString() {
-        return "CamundaTaskEventResource{" +
-            "id=" + id +
-            ", type='" + type + '\'' +
-            ", payload='" + payload + '\'' +
-            '}';
+        StringBuilder builder = new StringBuilder();
+        builder.append("CamundaTaskEventResource [id=")
+            .append(id)
+            .append(", type=")
+            .append(type)
+            .append(", created=")
+            .append(created)
+            .append(", payload=")
+            .append(payload)
+            .append("]");
+        return builder.toString();
     }
+
 }

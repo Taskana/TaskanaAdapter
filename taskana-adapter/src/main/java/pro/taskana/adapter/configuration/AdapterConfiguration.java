@@ -12,7 +12,7 @@ import pro.taskana.adapter.impl.TaskanaTaskTerminator;
 import pro.taskana.adapter.manager.AdapterManager;
 
 /**
- * Configures the adapter .
+ * Configures the adapter.
  */
 @Configuration
 public class AdapterConfiguration {

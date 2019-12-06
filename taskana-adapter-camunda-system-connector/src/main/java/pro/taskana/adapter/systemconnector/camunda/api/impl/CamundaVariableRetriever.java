@@ -7,6 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * Retrieves variables from camunda.
+ *
+ * @author bbr
+ */
 @Component
 public class CamundaVariableRetriever {
 
