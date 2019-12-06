@@ -104,7 +104,6 @@
                 </dependency>
         </dependencies>
 
-        <!-- -->
         <build>
                 <plugins>
                         <plugin>
@@ -124,7 +123,6 @@
                         </plugin>
                 </plugins>
         </build>
-        <!-- -->
 
         <!-- this repository is needed to fetch com.ibm.db2.jcc -->
         <repositories>

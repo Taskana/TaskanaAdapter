@@ -59,7 +59,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
             // claim and complete taskanaTask and wait
             this.taskService.claim(taskanaTaskId);
             this.taskService.completeTask(taskanaTaskId);
-            Thread.sleep(this.adapterCompletionPollingInterval);
+            Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
 
             // assert camunda task was completed; it should no longer exists as an active task but in the history
             boolean taskRetrievalSuccessful = this.camundaProcessengineRequester.getTaskFromTaskId(camundaTaskId);
