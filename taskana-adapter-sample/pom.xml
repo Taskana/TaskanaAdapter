@@ -55,47 +55,33 @@
 
                 <dependency>
                         <groupId>com.ibm.db2.jcc</groupId>
-			<artifactId>db2jcc4</artifactId>
-			<version>${version.db2}</version>
-		</dependency>
+                        <artifactId>db2jcc4</artifactId>
+                        <version>${version.db2}</version>
+                </dependency>
 
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>${version.postgres}</version>
-		</dependency>
-	</dependencies>
+                <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>${version.postgres}</version>
+                </dependency>
+        </dependencies>
 
-	<!--
         <build>
                 <plugins>
-                        <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-compiler-plugin</artifactId>
-                                <version>${version.maven-compiler-plugin}</version>
-                                <configuration>
-                                        <showWarnings>true</showWarnings>
-                                        <debug>true</debug>
-                                        <compilerArgs>
-                                                <arg>-Xlint:all</arg>
-                                        </compilerArgs>
-                                </configuration>
-                        </plugin>
                         <plugin>
                                 <groupId>org.springframework.boot</groupId>
                                 <artifactId>spring-boot-maven-plugin</artifactId>
                         </plugin>
                 </plugins>
         </build>
-        -->
-	<!--
+        <!--
           this repository is needed to fetch com.ibm.db2.jcc
         -->
-	<repositories>
-		<repository>
-			<id>novatec public</id>
-			<name>novatec-repository</name>
-			<url>https://repository.novatec-gmbh.de/content/repositories/novatec/</url>
-		</repository>
-	</repositories>
+        <repositories>
+                <repository>
+                        <id>novatec public</id>
+                        <name>novatec-repository</name>
+                        <url>https://repository.novatec-gmbh.de/content/repositories/novatec/</url>
+                </repository>
+        </repositories>
 </project>
