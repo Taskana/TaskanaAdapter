@@ -26,14 +26,12 @@
                                         <artifactId>spring-boot-starter-tomcat</artifactId>
                                 </exclusion>
                         </exclusions>
-                      <!--  <version>${version.spring.boot}</version> -->
 
                 </dependency>
                 <dependency>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-configuration-processor</artifactId>
                         <optional>true</optional>
-                      <!--  <version>${version.spring.boot}</version> -->
                 </dependency>
                 <dependency>
                         <groupId>pro.taskana</groupId>
@@ -50,14 +48,6 @@
                         <artifactId>taskana-adapter-taskana-connector</artifactId>
                         <version>${project.version}</version>
                 </dependency>
-             <!--
-                <dependency>
-                        <groupId>pro.taskana</groupId>
-                        <artifactId>taskana-adapter-camunda-outbox-rest</artifactId>
-                        <version>${project.version}</version>
-                        <classifier>classes</classifier>
-                </dependency>
-             -->
                 <dependency>
                         <groupId>com.ibm.db2.jcc</groupId>
                         <artifactId>db2jcc4</artifactId>
@@ -102,7 +92,6 @@
                                         <artifactId>android-json</artifactId>
                                 </exclusion>
                         </exclusions>
-                      <!--  <version>${version.spring.boot}</version> -->
                 </dependency>
         </dependencies>
 
@@ -141,7 +130,6 @@
                                 <driver-name>h2driver</driver-name>
                                 <user-name>sa</user-name>
                                 <password>sa</password>
-                                <!-- activatedProperties>h2</activatedProperties-->
                         </properties>
                 </profile>
         </profiles>
@@ -166,125 +154,7 @@
                                 <configuration>
                                         <version>${version.wildfly}</version>
                                         <javaOpts>-Djboss.http.port=8089</javaOpts>
-                                </configuration>
-                                <executions>
-                                        <!--
-                                        <execution>
-                                                <id>run-wildfly</id>
-                                                <phase>install</phase>
-                                                <goals>
-                                                        <goal>start</goal>
-                                                </goals>
-                                        </execution>
-                                    -->
-                                        <!-- Deploy the JDBC library in JBoss -->
-                                        <!--
-                                        <execution>
-                                                <id>deploy-driver-postgres</id>
-                                                <phase>install</phase>
-                                                <configuration>
-                                                        <groupId>org.postgresql</groupId>
-                                                        <artifactId>postgresql</artifactId>
-                                                        <name>postgresqldriver</name>
-                                                </configuration>
-                                                <goals>
-                                                        <goal>deploy-artifact</goal>
-                                                </goals>
-                                        </execution>
-                                        <execution>
-                                                <id>deploy-driver-h2</id>
-                                                <phase>install</phase>
-                                                <configuration>
-                                                        <groupId>com.h2database</groupId>
-                                                        <artifactId>h2</artifactId>
-                                                        <name>h2driver</name>
-                                                </configuration>
-                                                <goals>
-                                                        <goal>deploy-artifact</goal>
-                                                </goals>
-                                        </execution>
-                                    -->
-                                        <!-- Add a data source -->
-                                        <!--
-                                        <execution>
-                                                <id>add-datasource-taskanads</id>
-                                                <phase>install</phase>
-                                                <configuration>
-                                                        <address>subsystem=datasources,data-source=java:/TaskanaDS</address>
-                                                        <resources>
-                                                                <resource>
-                                                                        <properties>
-                                                                                <jndi-name>java:/TaskanaDS</jndi-name>
-                                                                                <enabled>true</enabled>
-                                                                                <connection-url>${connection-url}</connection-url>
-                                                                                <driver-class>${driver-class}</driver-class>
-                                                                                <driver-name>${driver-name}</driver-name>
-                                                                                <user-name>${user-name}</user-name>
-                                                                                <password>${password}</password>
-                                                                        </properties>
-                                                                </resource>
-                                                        </resources>
-                                                </configuration>
-                                                <goals>
-                                                        <goal>add-resource</goal>
-                                                </goals>
-                                        </execution>
-                                        <execution>
-                                                <id>add-datasource=adapterDS</id>
-                                                <phase>install</phase>
-                                                <configuration>
-                                                        <address>subsystem=datasources,data-source=java:/TaskanaAdapterDS</address>
-                                                        <resources>
-                                                                <resource>
-                                                                        <properties>
-                                                                                <jndi-name>java:/TaskanaAdapterDS</jndi-name>
-                                                                                <enabled>true</enabled>
-                                                                                <connection-url>${connection-url}</connection-url>
-                                                                                <driver-class>${driver-class}</driver-class>
-                                                                                <driver-name>${driver-name}</driver-name>
-                                                                                <user-name>${user-name}</user-name>
-                                                                                <password>${password}</password>
-                                                                        </properties>
-                                                                </resource>
-                                                        </resources>
-                                                </configuration>
-                                                <goals>
-                                                        <goal>add-resource</goal>
-                                                </goals>
-                                        </execution>
-                                    -->
-                                        <!-- Deploy the application on install -->
-
-                                        <!--
-                                        <execution>
-                                                <id>wildfly-deploy</id>
-                                                <phase>install</phase>
-                                                <goals>
-                                                        <goal>deploy</goal>
-                                                </goals>
-                                        </execution>
-                                    -->
-                                        <!-- undeploy the application on install -->
-                                        <!--
-                                        <execution>
-                                                <id>wildfly-undeploy</id>
-                                                <phase>install</phase>
-                                                <goals>
-                                                        <goal>undeploy</goal>
-                                                </goals>
-                                        </execution>
-                                    -->
-                                        <!-- shutdown the application on install -->
-                                        <!--
-                                        <execution>
-                                                <id>wildfly-shutdown</id>
-                                                <phase>install</phase>
-                                                <goals>
-                                                        <goal>shutdown</goal>
-                                                </goals>
-                                        </execution>
-                                    -->
-                                </executions>
+                                </configuration>                                
                         </plugin>
                 </plugins>
         </build>

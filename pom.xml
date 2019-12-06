@@ -58,18 +58,6 @@
                 <developer>
                         <name>Holger Hagen</name>
                 </developer>
-                <developer>
-                        <name>Konstantin Klaeger</name>
-                </developer>
-                <developer>
-                        <name>Bernd Breier</name>
-                </developer>
-                <developer>
-                        <name>Joerg Heffner</name>
-                </developer>
-                <developer>
-                        <name>Benjamin Fuernrohr</name>
-                </developer>
         </developers>
 
         <scm>
