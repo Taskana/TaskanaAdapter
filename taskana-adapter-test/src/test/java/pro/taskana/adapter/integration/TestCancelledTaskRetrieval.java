@@ -115,7 +115,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
             boolean camundaProcessCancellationSucessful2 = this.camundaProcessengineRequester
                 .deleteProcessInstanceWithId(processInstanceId);
             assertFalse(camundaProcessCancellationSucessful2);
-            Thread.sleep(this.adapterCompletionPollingInterval);
+            Thread.sleep((long) (this.adapterCancelPollingInterval * 1.2));
 
             // assert taskana task was completed but still exists
             taskanaTasks = this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
@@ -155,7 +155,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
             assertFalse(taskRetrievalSuccessful);
 
             // wait for the adapter to register the interruption
-            Thread.sleep(this.adapterCompletionPollingInterval);
+            Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
 
             // assert taskana task was completed but still exists
             taskanaTasks = this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();

@@ -13,7 +13,6 @@ cache:
     - $HOME/.m2
 
 stages:
-  - name: Compile
   - name: Test
   - name: Release / Deploy
     if: repo = 'Taskana/TaskanaAdapter' AND (tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ OR branch = master) AND type != pull_request
@@ -33,12 +32,17 @@ matrix:
     # We are using the environment variable 'MODULE' to force travis into using a different cache for each build.
     # See https://docs.travis-ci.com/user/caching/#caches-and-build-matrices for detailed information on
     # which characteristics determine the cache selection.
-    - stage: Compile
-      name: taskana-adapter-parent
+#    - stage: Compile
+#      name: taskana-adapter-parent
+#      install: skip
+#      env: MODULE=ADAPTER
+#      script: ci/compile.sh $MODULE
+#      before_cache: rm -rf $HOME/.m2/repository/pro/taskana
+
+    - stage: Test
       install: skip
-      env: MODULE=ADAPTER
-      script: ci/compile.sh $MODULE
-      before_cache: rm -rf $HOME/.m2/repository/pro/taskana
+      script: ci/test.sh $DB
+      before_cache: rm -rf $HOME/.m2/repository/pro/taskan
 
     - stage: Release / Deploy
       name: release / deploy / commit
@@ -49,7 +53,7 @@ matrix:
       script: |
         mvn deploy -T 4C -P `[[ "$TRAVIS_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && echo "release" || echo "snapshot"` \
         --settings ci/mvnsettings.xml -DskipTests -Dcheckstyle.skip \
-	-pl !:taskana-adapter-tasklistener-example,!:taskana-adapter-test
+        -pl !:taskana-adapter-tasklistener-example,!:taskana-adapter-test
       before_cache: rm -rf $HOME/.m2/repository/pro/taskana
       after_success: ci/change_version.sh -i -m . && ci/commitPoms.sh
 

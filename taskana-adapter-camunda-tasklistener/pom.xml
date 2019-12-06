@@ -20,17 +20,6 @@
         </dependencies>
         <build>
                 <finalName>taskana-parse-listener</finalName>
-                <plugins>
-                        <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-compiler-plugin</artifactId>
-                                <version>${version.maven-compiler-plugin}</version>
-                                <configuration>
-                                        <source>${maven.compiler.source}</source>
-                                        <target>${maven.compiler.target}</target>
-                                </configuration>
-                        </plugin>
-                </plugins>
         </build>
 
 </project>
