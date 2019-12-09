@@ -8,9 +8,10 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
@@ -77,9 +78,9 @@ public class TaskanaTaskListener implements TaskListener {
             camundaSchema = connection.getSchema();
             LOGGER.debug("camundaSchema in taskListener is {}", camundaSchema);
 
-            setOutboxSchema(connection);
-
             String referencedTaskJson = getReferencedTaskJson(delegateTask);
+
+            setOutboxSchema(connection);
 
             prepareAndExecuteStatement(connection, delegateTask, referencedTaskJson);
 
@@ -96,16 +97,19 @@ public class TaskanaTaskListener implements TaskListener {
     private void insertCompleteOrDeleteEventIntoOutbox(DelegateTask delegateTask, Connection connection)
         throws SQLException {
 
+        if (delegateTask.getEventName().equals("complete") && taskWasCompletedByTaskanaAdapter(delegateTask)) {
+            return;
+        }
+
         String camundaSchema = null;
 
         try {
 
+            String taskIdJson = "{\"id\":\"" + delegateTask.getId() + "\"}";
+
             camundaSchema = connection.getSchema();
             setOutboxSchema(connection);
-
-            String taskIdJson = "{\"id\":\"" + delegateTask.getId() + "\"}";
             prepareAndExecuteStatement(connection, delegateTask, taskIdJson);
-
             connection.setSchema(camundaSchema);
 
         } catch (Exception e) {
@@ -117,6 +121,14 @@ public class TaskanaTaskListener implements TaskListener {
                 connection.setSchema(camundaSchema);
             }
         }
+    }
+
+    private boolean taskWasCompletedByTaskanaAdapter(DelegateTask delegateTask) {
+
+        if (delegateTask.getVariableNamesLocal().contains("completedByTaskanaAdapter")) {
+            return true;
+        }
+        return false;
     }
 
     private void setOutboxSchema(Connection connection) throws SQLException {
@@ -192,9 +204,75 @@ public class TaskanaTaskListener implements TaskListener {
             referencedTaskJsonBuilder.append("\",\"domain\":\"")
                 .append(domain);
         }
-        referencedTaskJsonBuilder.append("\"}");
+
+        referencedTaskJsonBuilder.append("\",\"variables\":\"{")
+            .append(getProcessVariables(delegateTask));
+
+        referencedTaskJsonBuilder.append("}");
 
         return referencedTaskJsonBuilder.toString();
+    }
+
+    private String getProcessVariables(DelegateTask delegateTask) {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JacksonConfigurator.configureObjectMapper(objectMapper);
+        StringBuilder processVariablesBuilder = new StringBuilder();
+
+        String processVariablesConcatenated = getProcessModelExtensionProperty(delegateTask, "taskana-attributes");
+
+        if (processVariablesConcatenated != null) {
+            List<String> processVariables = splitProcessVariablesString(processVariablesConcatenated);
+
+            processVariables.forEach(
+                processVariable -> addToProcessVariablesBuilder(delegateTask, objectMapper, processVariablesBuilder,
+                    processVariable));
+
+            //check if someone sets the taskana-attributes extension property, but enters no values
+            if (processVariablesBuilder.length() > 0) {
+                processVariablesBuilder.deleteCharAt(processVariablesBuilder.length() - 1).append("}\"");
+            } else {
+                return "}\"";
+            }
+
+        } else {
+            return "}\"";
+        }
+
+        return processVariablesBuilder.toString();
+    }
+
+    private void addToProcessVariablesBuilder(DelegateTask delegateTask, ObjectMapper objectMapper,
+        StringBuilder processVariablesBuilder, String processVariable2) {
+
+        Object processVariable = delegateTask.getVariable(processVariable2);
+
+        if (processVariable != null) {
+
+            try {
+
+                Map<String, Object> valueInfo = new HashMap<>();
+                valueInfo.put("objectTypeName", processVariable.getClass());
+                VariableValueDto variableValueDto = new VariableValueDto(processVariable.getClass().getSimpleName(),
+                    objectMapper.writeValueAsString(processVariable), valueInfo);
+
+                String processVariableValueJson = objectMapper.writeValueAsString(variableValueDto)
+                    .replace("\"", "\\\"");
+                processVariablesBuilder.append("\\\"")
+                    .append(processVariable2)
+                    .append("\\\":")
+                    .append(processVariableValueJson)
+                    .append(",");
+
+            } catch (Exception ex) {
+                LOGGER.warn("Caught {} while trying to create JSON-String out of process variable object", ex);
+            }
+        }
+    }
+
+    private List<String> splitProcessVariablesString(String processVariablesConcatenated) {
+        List<String> processVariables = Arrays.asList(processVariablesConcatenated.trim().split("\\s*,\\s*"));
+        return processVariables;
     }
 
     private String getProcessModelExtensionProperty(DelegateTask delegateTask, String propertyKey) {

@@ -13,6 +13,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventResource;
 
 /**
  * Class to assist with building requests against the Camunda REST API.
@@ -31,7 +32,11 @@ public class CamundaProcessengineRequester {
 
     private static final String TASK_PATH = "/task";
 
+    private static final String LOCAL_VARIABLE_PATH = "/localVariables";
+
     private static final String COMPLETE_TASK_PATH = "/complete";
+
+    private static final String OUTBOX_REST_GET_EVENTS_PATH = "/taskana-outbox/rest/events";
 
     private static final String PROCESS_INSTANCE_PATH = "/process-instance";
 
@@ -187,7 +192,7 @@ public class CamundaProcessengineRequester {
     }
 
     /**
-     * Deletes the camunda-process-instance the given Id. Returns true if successful.
+     * Deletes the camunda-process-instance with the given Id. Returns true if successful.
      *
      * @param processInstanceId
      *            the id of the process-instance to be delete.
