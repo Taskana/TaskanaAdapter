@@ -49,6 +49,15 @@ function change_version() {
   mvn -q versions:set -f "$1" -DnewVersion="$2" -DartifactId=* -DgroupId=* versions:commit
 }
 
+# chaning version im pom of a specific property
+# Arguments:
+#  $1: direcotry of pom
+#  $2: property name
+#  $3: new version
+function change_version_of_property() {
+  mvn -q versions:set-property -f "$1" -Dproperty="$2" -DnewVersion="$3" versions:commit
+}
+
 function main() {
   [[ $# -eq 0 || "$1" == '-h' || "$1" == '--help' ]] && helpAndExit 0
 
@@ -79,10 +88,12 @@ function main() {
     helpAndExit 1
   fi
 
-  if [[ "$TRAVIS_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    version=$([[ -n "$INCREMENT" ]] && echo $(increment_version "${TRAVIS_TAG##v}")-SNAPSHOT || echo "${TRAVIS_TAG##v}")
+  if [[ "$TRAVIS_TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    version=$([[ -n "$INCREMENT" ]] && echo $(increment_version "${TRAVIS_TAG%%/*}")-SNAPSHOT || echo "${TRAVIS_TAG%%/*}")
+    propversion=$([[ -n "$INCREMENT" ]] && echo $(increment_version "${TRAVIS_TAG##*/}")-SNAPSHOT || echo "${TRAVIS_TAG##*/}")
     for dir in ${MODULES[@]}; do
       change_version "$dir" "$version"
+      change_version_of_property "$dir" "version.taskana" "$propversion"
     done
   else
     echo "skipped version change because this is not a release build"
