@@ -3,6 +3,7 @@ package pro.taskana.adapter.integration;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.Instant;
@@ -150,7 +151,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
 
             // wait for the camunda task to be interrupted by the timer event (1 second), then the camunda job poll.
             // Assert it was interrupted.
-            Thread.sleep(1000 + this.jobExecutor.getMaxWait());
+            Thread.sleep(1000 + (long) (this.jobExecutor.getMaxWait() * 1.2));
             boolean taskRetrievalSuccessful = this.camundaProcessengineRequester.getTaskFromTaskId(camundaTaskId);
             assertFalse(taskRetrievalSuccessful);
 
@@ -163,9 +164,9 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
             Instant taskanaTaskCompletion = taskanaTasks.get(0).getCompleted();
             Instant taskanaTaskCreation = taskanaTasks.get(0).getCreated();
             TaskState taskanaTaskState = taskanaTasks.get(0).getState();
-            assertFalse(taskanaTaskCompletion == null);
+            assertNotNull(taskanaTaskCompletion);
             assertEquals(1, taskanaTaskCompletion.compareTo(taskanaTaskCreation));
-            assertTrue(TaskState.COMPLETED.equals(taskanaTaskState));
+            assertEquals(TaskState.COMPLETED, taskanaTaskState);
         }
     }
 }
