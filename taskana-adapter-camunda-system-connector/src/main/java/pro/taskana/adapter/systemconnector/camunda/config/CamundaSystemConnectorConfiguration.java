@@ -9,7 +9,6 @@ import org.springframework.web.client.RestTemplate;
 
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskCompleter;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskRetriever;
-import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaVariableRetriever;
 
 /**
  * Configures the camunda system connector.
@@ -34,12 +33,6 @@ public class CamundaSystemConnectorConfiguration {
     CamundaTaskCompleter camundaTaskCompleter() {
         return new CamundaTaskCompleter();
     }
-
-    @Bean
-    CamundaVariableRetriever camundaVariableRetriever() {
-        return new CamundaVariableRetriever();
-    }
-
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
