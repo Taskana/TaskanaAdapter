@@ -4,10 +4,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.client.HttpStatusCodeException;
 
 import pro.taskana.adapter.configuration.AdapterSpringContextProvider;
-import pro.taskana.adapter.exceptions.ReferencedTaskDoesNotExistInExternalSystemException;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 import pro.taskana.adapter.systemconnector.api.SystemResponse;
@@ -31,6 +29,7 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
     static final String URL_DELETE_CAMUNDA_EVENTS = "/events/delete";
 
     static final String BODY_SET_CAMUNDA_VARIABLES = "{\"variables\":";
+    static final String LOCAL_VARIABLE_PATH = "/localVariables";
     static final String COMPLETE_TASK = "/complete/";
     static final String EMPTY_REQUEST_BODY = "{}";
 
@@ -40,14 +39,11 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
 
     private CamundaTaskCompleter taskCompleter;
 
-    private CamundaVariableRetriever variableRetriever;
-
     private CamundaTaskEventCleaner taskEventCleaner;
 
     public CamundaSystemConnectorImpl(CamundaSystemUrls.SystemURLInfo camundaSystemURL) {
         this.camundaSystemURL = camundaSystemURL;
         taskRetriever = AdapterSpringContextProvider.getBean(CamundaTaskRetriever.class);
-        variableRetriever = AdapterSpringContextProvider.getBean(CamundaVariableRetriever.class);
         taskCompleter = AdapterSpringContextProvider.getBean(CamundaTaskCompleter.class);
         taskEventCleaner = AdapterSpringContextProvider.getBean(CamundaTaskEventCleaner.class);
     }
@@ -69,17 +65,7 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
 
     @Override
     public String retrieveVariables(String taskId) {
-        try {
-            return variableRetriever.retrieveVariables(taskId, camundaSystemURL.getSystemRestUrl());
-        } catch (HttpStatusCodeException e) {
-            if (e.getStatusCode().value() == 500) {
-                LOGGER.debug("Attempted to retrieve variables of non existing task {}.", taskId);
-                throw new ReferencedTaskDoesNotExistInExternalSystemException(e.getMessage());
-            } else {
-                LOGGER.warn("While attempting to retrieve variables for task {} caught ", taskId, e);
-                throw e;
-            }
-        }
+        return null;
     }
 
     @Override
