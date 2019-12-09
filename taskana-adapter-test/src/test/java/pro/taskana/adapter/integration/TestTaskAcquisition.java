@@ -96,8 +96,8 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
     }
 
     @WithAccessId(
-        userName = "teamlead_1",
-        groupNames = {"admin"})
+            userName = "teamlead_1",
+            groupNames = {"admin"})
     @Test
     public void task_with_primitive_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
         throws JSONException, InterruptedException, TaskNotFoundException, NotAuthorizedException,
@@ -106,9 +106,9 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
 
         String variables = "\"variables\": {\"amount\": {\"value\":555, \"type\":\"long\"},\"item\": {\"value\": \"item-xyz\"}}";
         String processInstanceId = this.camundaProcessengineRequester
-            .startCamundaProcessAndReturnId("simple_user_task_process", variables);
+                .startCamundaProcessAndReturnId("simple_user_task_process", variables);
         List<String> camundaTaskIds = this.camundaProcessengineRequester
-            .getTaskIdsFromProcessInstanceId(processInstanceId);
+                .getTaskIdsFromProcessInstanceId(processInstanceId);
 
         Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
@@ -117,6 +117,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
             camundaTaskId -> retrieveTaskanaTaskAndVerifyTaskVariables(camundaTaskId, assumedVariablesString));
 
     }
+            throws JSONException, InterruptedException {
 
     @WithAccessId(
         userName = "teamlead_1",
@@ -219,6 +220,8 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
 
         } catch (TaskNotFoundException | NotAuthorizedException e) {
             LOGGER.info("Caught {}, while trying to create a taskana task and verify its variables", e);
+        }
+
         }
 
     }
