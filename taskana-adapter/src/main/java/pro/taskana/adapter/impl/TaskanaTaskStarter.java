@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import pro.taskana.Task;
 import pro.taskana.adapter.exceptions.ReferencedTaskDoesNotExistInExternalSystemException;
-import pro.taskana.adapter.exceptions.TaskConversionFailedException;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
@@ -95,7 +94,7 @@ public class TaskanaTaskStarter {
     }
 
     public void createTaskanaTask(ReferencedTask referencedTask, TaskanaConnector connector,
-        SystemConnector systemConnector) throws TaskConversionFailedException, TaskCreationFailedException {
+        SystemConnector systemConnector) throws TaskCreationFailedException {
         LOGGER.trace("TaskanaTaskStarter.createTaskanaTask ENTRY ");
         referencedTask.setSystemURL(systemConnector.getSystemURL());
         try {

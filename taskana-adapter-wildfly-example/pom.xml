@@ -4,7 +4,7 @@
         <parent>
                 <artifactId>taskana-adapter-parent</artifactId>
                 <groupId>pro.taskana</groupId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>0.1.1-SNAPSHOT</version>
                 <relativePath>../pom.xml</relativePath>
         </parent>
         <modelVersion>4.0.0</modelVersion>
@@ -154,7 +154,7 @@
                                 <configuration>
                                         <version>${version.wildfly}</version>
                                         <javaOpts>-Djboss.http.port=8089</javaOpts>
-                                </configuration>                                
+                                </configuration>
                         </plugin>
                 </plugins>
         </build>
