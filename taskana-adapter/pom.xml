@@ -5,7 +5,7 @@
         <parent>
                 <artifactId>taskana-adapter-parent</artifactId>
                 <groupId>pro.taskana</groupId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>0.1.1-SNAPSHOT</version>
                 <relativePath>../pom.xml</relativePath>
         </parent>
 
@@ -46,13 +46,11 @@
                         <version>${version.junit}</version>
                         <scope>test</scope>
                 </dependency>
-
                 <dependency>
                         <groupId>pro.taskana</groupId>
                         <artifactId>taskana-spring</artifactId>
                         <version>${version.taskana}</version>
                 </dependency>
-
         </dependencies>
 
 </project>

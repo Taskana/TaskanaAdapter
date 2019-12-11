@@ -16,28 +16,23 @@ import pro.taskana.Task;
 import pro.taskana.TaskService;
 import pro.taskana.TaskState;
 import pro.taskana.TaskSummary;
-import pro.taskana.adapter.exceptions.TaskConversionFailedException;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
-import pro.taskana.exceptions.ClassificationAlreadyExistException;
 import pro.taskana.exceptions.ClassificationNotFoundException;
-import pro.taskana.exceptions.DomainNotFoundException;
 import pro.taskana.exceptions.InvalidArgumentException;
 import pro.taskana.exceptions.InvalidOwnerException;
 import pro.taskana.exceptions.InvalidStateException;
-import pro.taskana.exceptions.InvalidWorkbasketException;
 import pro.taskana.exceptions.NotAuthorizedException;
 import pro.taskana.exceptions.TaskAlreadyExistException;
 import pro.taskana.exceptions.TaskNotFoundException;
-import pro.taskana.exceptions.WorkbasketAlreadyExistException;
 import pro.taskana.exceptions.WorkbasketNotFoundException;
 import pro.taskana.impl.util.LoggerUtils;
 
-
 /**
  * Implements TaskanaConnector.
+ *
  * @author bbr
  */
 @Component
@@ -97,15 +92,8 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     }
 
     @Override
-    public Task convertToTaskanaTask(ReferencedTask camundaTask) throws TaskConversionFailedException {
-        try {
-            return taskInformationMapper.convertToTaskanaTask(camundaTask);
-        } catch (DomainNotFoundException | InvalidWorkbasketException | NotAuthorizedException
-            | WorkbasketNotFoundException
-            | WorkbasketAlreadyExistException | ClassificationAlreadyExistException | InvalidArgumentException e) {
-            throw new TaskConversionFailedException(
-                "Error when converting camunda task " + camundaTask + " to taskana task.", e);
-        }
+    public Task convertToTaskanaTask(ReferencedTask camundaTask) {
+        return taskInformationMapper.convertToTaskanaTask(camundaTask);
     }
 
     @Override

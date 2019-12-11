@@ -29,6 +29,7 @@ import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Implementation of the Outbox REST service.
+ *
  * @author jhe
  */
 public class CamundaTaskEventsService {
@@ -207,32 +208,32 @@ public class CamundaTaskEventsService {
 
     private DataSource getDataSourceFromPropertiesFile() {
 
-                InputStream datasourceConfig = CamundaTaskEventsController.class.getClassLoader()
-                    .getResourceAsStream("datasource.properties");
+        InputStream datasourceConfig = CamundaTaskEventsController.class.getClassLoader()
+            .getResourceAsStream("datasource.properties");
 
-                Properties properties = new Properties();
+        Properties properties = new Properties();
 
-                try {
+        try {
 
-                    properties.load(datasourceConfig);
-                    String jndiUrl = properties.getProperty("taskana.adapter.outbox.rest.datasource.jndi");
+            properties.load(datasourceConfig);
+            String jndiUrl = properties.getProperty("taskana.adapter.outbox.rest.datasource.jndi");
 
-                    if (jndiUrl != null) {
-                        dataSource = (DataSource) new InitialContext().lookup(jndiUrl);
+            if (jndiUrl != null) {
+                dataSource = (DataSource) new InitialContext().lookup(jndiUrl);
 
-                    } else {
+            } else {
 
-                        dataSource = createDatasource(
-                            properties.getProperty("taskana.adapter.outbox.rest.datasource.driver"),
-                            properties.getProperty("taskana.adapter.outbox.rest.datasource.url"),
-                            properties.getProperty("taskana.adapter.outbox.rest.datasource.username"),
-                            properties.getProperty("taskana.adapter.outbox.rest.datasource.password"));
-                    }
+                dataSource = createDatasource(
+                    properties.getProperty("taskana.adapter.outbox.rest.datasource.driver"),
+                    properties.getProperty("taskana.adapter.outbox.rest.datasource.url"),
+                    properties.getProperty("taskana.adapter.outbox.rest.datasource.username"),
+                    properties.getProperty("taskana.adapter.outbox.rest.datasource.password"));
+            }
 
-                } catch (IOException | NamingException | NullPointerException e) {
-                    LOGGER.warn("Caught {} while trying to retrieve the datasource from the provided properties file",
-                        e);
-                }
+        } catch (IOException | NamingException | NullPointerException e) {
+            LOGGER.warn("Caught {} while trying to retrieve the datasource from the provided properties file",
+                e);
+        }
 
         return dataSource;
     }
