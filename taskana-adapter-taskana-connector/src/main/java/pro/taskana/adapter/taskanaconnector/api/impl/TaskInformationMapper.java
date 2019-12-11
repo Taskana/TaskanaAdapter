@@ -16,24 +16,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import pro.taskana.CallbackState;
-import pro.taskana.Classification;
-import pro.taskana.ClassificationService;
 import pro.taskana.ObjectReference;
 import pro.taskana.Task;
 import pro.taskana.TaskService;
-import pro.taskana.Workbasket;
-import pro.taskana.WorkbasketAccessItem;
-import pro.taskana.WorkbasketService;
-import pro.taskana.WorkbasketType;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
-import pro.taskana.exceptions.ClassificationAlreadyExistException;
-import pro.taskana.exceptions.ClassificationNotFoundException;
-import pro.taskana.exceptions.DomainNotFoundException;
-import pro.taskana.exceptions.InvalidArgumentException;
-import pro.taskana.exceptions.InvalidWorkbasketException;
-import pro.taskana.exceptions.NotAuthorizedException;
-import pro.taskana.exceptions.WorkbasketAlreadyExistException;
-import pro.taskana.exceptions.WorkbasketNotFoundException;
 import pro.taskana.impl.TaskImpl;
 
 /**
@@ -44,21 +30,12 @@ import pro.taskana.impl.TaskImpl;
 public class TaskInformationMapper {
 
     @Autowired
-    private WorkbasketService workbasketService;
-
-    @Autowired
     private TaskService taskService;
-
-    @Autowired
-    private ClassificationService classificationService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskInformationMapper.class);
 
     @Value("${taskana.adapter.mapping.default.domain:DOMAIN_A}")
     private String defaultDomain;
-
-    @Value("${taskana.adapter.mapping.default.workbasket.key:DEFAULT_WORKBASKET}")
-    private String defaultWorkbasketKey;
 
     @Value("${taskana.adapter.mapping.default.classification.key:DEFAULT_CLASSIFICATION}")
     private String defaultClassificationKey;
@@ -81,10 +58,7 @@ public class TaskInformationMapper {
     @Value("${taskana.adapter.mapping.default.objectreference.value:DEFAULT_VALUE}")
     private String defaultValue;
 
-    public Task convertToTaskanaTask(ReferencedTask referencedTask)
-        throws DomainNotFoundException, InvalidWorkbasketException, NotAuthorizedException,
-        WorkbasketAlreadyExistException, ClassificationAlreadyExistException, InvalidArgumentException,
-        WorkbasketNotFoundException {
+    public Task convertToTaskanaTask(ReferencedTask referencedTask)  {
 
         LOGGER.debug("entry to TaskInformationMapper.convertToTaskanaTask {}", this.toString());
 
@@ -93,12 +67,15 @@ public class TaskInformationMapper {
             domain = defaultDomain;
         }
 
-        Workbasket workbasket = findOrCreateWorkbasket(referencedTask.getWorkbasketKey(), domain,
-            referencedTask.getAssignee());
-        Classification classification = findOrCreateClassification(referencedTask.getClassificationKey(), domain);
+        String classificationKey = referencedTask.getClassificationKey();
+        if (!isValidString(classificationKey)) {
+            classificationKey = defaultClassificationKey;
+        }
+
         ObjectReference objectReference = createObjectReference();
 
-        TaskImpl taskanaTask = (TaskImpl) taskService.newTask(workbasket.getId());
+        TaskImpl taskanaTask = (TaskImpl) taskService.newTask(null, domain);
+        taskanaTask.setClassificationKey(classificationKey);
         Map<String, String> callbackInfo = new HashMap<>();
         callbackInfo.put(Task.CALLBACK_STATE, CallbackState.CALLBACK_PROCESSING_REQUIRED.name());
         callbackInfo.put(TaskanaSystemConnectorImpl.REFERENCED_TASK_ID, referencedTask.getId());
@@ -119,7 +96,6 @@ public class TaskInformationMapper {
         setTimestampsInTaskanaTask(taskanaTask, referencedTask);
 
         taskanaTask.setOwner(referencedTask.getAssignee());
-        taskanaTask.setClassificationKey(classification.getKey());
         taskanaTask.setPrimaryObjRef(objectReference);
 
         return taskanaTask;
@@ -174,84 +150,16 @@ public class TaskInformationMapper {
         return Instant.from(zonedDateTime);
     }
 
-    private Classification findOrCreateClassification(String classificationKey, String domain)
-        throws ClassificationAlreadyExistException, NotAuthorizedException,
-        DomainNotFoundException, InvalidArgumentException {
-
-        if (!isValidString(classificationKey)) {
-            classificationKey = defaultClassificationKey;
-        }
-        if (!isValidString(domain)) {
-            domain = defaultDomain;
-        }
-        Classification classification;
-        try {
-            classification = classificationService.getClassification(classificationKey, domain);
-        } catch (ClassificationNotFoundException e) {
-            classification = classificationService.newClassification(classificationKey, domain,
-                defaultClassificationType);
-            classification.setApplicationEntryPoint("");
-            classification.setName("DefaultClassification");
-            classification = classificationService.createClassification(classification);
-        }
-        return classification;
-    }
-
     private ObjectReference createObjectReference() {
         ObjectReference objRef = new ObjectReference();
         objRef.setCompany(defaultCompany);
-        objRef.setSystem(defaultCompany);
+        objRef.setSystem(defaultSystem);
         objRef.setSystemInstance(defaultSystemInstance);
         objRef.setType(defaultType);
         objRef.setValue(defaultValue);
         return objRef;
     }
 
-    private Workbasket findOrCreateWorkbasket(String workbasketKey, String domain, String assignee)
-        throws DomainNotFoundException,
-        InvalidWorkbasketException, NotAuthorizedException, WorkbasketAlreadyExistException,
-        WorkbasketNotFoundException, InvalidArgumentException {
-        if (!isValidString(workbasketKey)) {
-            workbasketKey = defaultWorkbasketKey;
-        }
-        if (!isValidString(domain)) {
-            domain = defaultDomain;
-        }
-        Workbasket wb;
-
-        try {
-            wb = workbasketService.getWorkbasket(workbasketKey, domain);
-        } catch (WorkbasketNotFoundException e) {
-            wb = workbasketService.newWorkbasket(workbasketKey, domain);
-            wb.setName(workbasketKey);
-            wb.setOwner(assignee);
-            wb.setType(WorkbasketType.PERSONAL);
-            try {
-                wb = workbasketService.createWorkbasket(wb);
-            } catch (DomainNotFoundException | InvalidWorkbasketException | NotAuthorizedException
-                | WorkbasketAlreadyExistException ex) {
-                LOGGER.warn("caught {} when attempting to create workbasket {}", ex, wb);
-                throw ex;
-            }
-
-            createWorkbasketAccessList(wb);
-        }
-        return wb;
-    }
-
-    private void createWorkbasketAccessList(Workbasket wb)
-        throws WorkbasketNotFoundException, InvalidArgumentException, NotAuthorizedException {
-        WorkbasketAccessItem workbasketAccessItem = workbasketService.newWorkbasketAccessItem(wb.getId(),
-            wb.getOwner());
-        workbasketAccessItem.setAccessName(wb.getOwner());
-        workbasketAccessItem.setPermAppend(true);
-        workbasketAccessItem.setPermTransfer(true);
-        workbasketAccessItem.setPermRead(true);
-        workbasketAccessItem.setPermOpen(true);
-        workbasketAccessItem.setPermDistribute(true);
-        workbasketService.createWorkbasketAccessItem(workbasketAccessItem);
-
-    }
 
     boolean isValidString(String string) {
         return !(string == null || string.isEmpty() || "null".equals(string));
@@ -259,11 +167,11 @@ public class TaskInformationMapper {
 
     @Override
     public String toString() {
-        return "TaskInformationMapper [defaultDomain=" + defaultDomain + ", defaultWorkbasketKey="
-            + defaultWorkbasketKey + ", defaultClassificationKey=" + defaultClassificationKey
-            + ", defaultClassificationType=" + defaultClassificationType + ", defaultCompany=" + defaultCompany
-            + ", defaultSystem=" + defaultSystem + ", defaultSystemInstance=" + defaultSystemInstance + ", defaultType="
-            + defaultType + ", defaultValue=" + defaultValue + "]";
+        return "TaskInformationMapper [taskService=" + taskService + ", defaultDomain=" + defaultDomain
+            + ", defaultClassificationKey=" + defaultClassificationKey + ", defaultClassificationType="
+            + defaultClassificationType + ", defaultCompany=" + defaultCompany + ", defaultSystem=" + defaultSystem
+            + ", defaultSystemInstance=" + defaultSystemInstance + ", defaultType=" + defaultType + ", defaultValue="
+            + defaultValue + "]";
     }
 
 }

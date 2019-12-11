@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import pro.taskana.adapter.impl.ReferencedTaskCompleter;
 import pro.taskana.adapter.impl.TaskanaTaskStarter;
@@ -14,6 +16,8 @@ import pro.taskana.adapter.manager.AdapterManager;
 /**
  * Configures the adapter.
  */
+@EnableScheduling
+@Import({SchedulerConfiguration.class})
 @Configuration
 public class AdapterConfiguration {
 

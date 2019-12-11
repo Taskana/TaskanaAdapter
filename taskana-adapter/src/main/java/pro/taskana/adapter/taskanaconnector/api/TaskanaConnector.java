@@ -3,7 +3,6 @@ package pro.taskana.adapter.taskanaconnector.api;
 import java.util.List;
 
 import pro.taskana.Task;
-import pro.taskana.adapter.exceptions.TaskConversionFailedException;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
@@ -48,10 +47,8 @@ public interface TaskanaConnector {
      * @param referencedTask
      *            the referenced task that is to be converted.
      * @return the taskana task that will be created started on behalf of the referenced task.
-     * @throws TaskConversionFailedException
-     *             if conversion of the task into a taskana task fails
      */
-    Task convertToTaskanaTask(ReferencedTask referencedTask) throws TaskConversionFailedException;
+    Task convertToTaskanaTask(ReferencedTask referencedTask);
 
     /**
      * Convert a taskana task into a referenced task.
