@@ -24,6 +24,7 @@ import pro.taskana.impl.TaskImpl;
 
 /**
  * Maps properties between ReferencedTasks from external systems and corresponding taskana tasks.
+ *
  * @author bbr
  */
 @Component
@@ -58,7 +59,7 @@ public class TaskInformationMapper {
     @Value("${taskana.adapter.mapping.default.objectreference.value:DEFAULT_VALUE}")
     private String defaultValue;
 
-    public Task convertToTaskanaTask(ReferencedTask referencedTask)  {
+    public Task convertToTaskanaTask(ReferencedTask referencedTask) {
 
         LOGGER.debug("entry to TaskInformationMapper.convertToTaskanaTask {}", this.toString());
 
@@ -74,7 +75,8 @@ public class TaskInformationMapper {
 
         ObjectReference objectReference = createObjectReference();
 
-        TaskImpl taskanaTask = (TaskImpl) taskService.newTask(null, domain);
+        String workbasketKey = referencedTask.getWorkbasketKey();
+        TaskImpl taskanaTask = (TaskImpl) taskService.newTask(workbasketKey, domain);
         taskanaTask.setClassificationKey(classificationKey);
         Map<String, String> callbackInfo = new HashMap<>();
         callbackInfo.put(Task.CALLBACK_STATE, CallbackState.CALLBACK_PROCESSING_REQUIRED.name());
@@ -159,7 +161,6 @@ public class TaskInformationMapper {
         objRef.setValue(defaultValue);
         return objRef;
     }
-
 
     boolean isValidString(String string) {
         return !(string == null || string.isEmpty() || "null".equals(string));
