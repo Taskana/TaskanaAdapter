@@ -2,7 +2,12 @@ package pro.taskana.impl;
 
 import java.io.Serializable;
 
+/**
+ * Test entity for a complex process variable.
+ */
 public class ProcessVariableTestObject implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     String stringField;
     int intField;

@@ -1,13 +1,14 @@
 package pro.taskana.adapter.camunda.dto;
 
-import com.fasterxml.jackson.annotation.JsonRawValue;
-
 import java.util.Map;
 
+/**
+ * This class is represents a DTO which contains a process variable and its info.
+ */
 public class VariableValueDto {
 
     protected String type;
-    @JsonRawValue
+
     protected Object value;
     protected Map<String, Object> valueInfo;
 

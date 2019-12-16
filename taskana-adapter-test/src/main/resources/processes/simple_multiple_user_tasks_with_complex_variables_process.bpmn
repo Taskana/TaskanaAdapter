@@ -38,7 +38,7 @@
     <bpmn:userTask id="Task_08mt113">
       <bpmn:extensionElements>
         <camunda:properties>
-          <camunda:property name="classification-key" value="L1050" />
+          <camunda:property name="taskana.classification-key" value="L1050" />
         </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_04ppm3w</bpmn:incoming>

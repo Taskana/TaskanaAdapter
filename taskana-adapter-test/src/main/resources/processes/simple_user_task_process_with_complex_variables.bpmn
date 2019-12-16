@@ -12,7 +12,7 @@
     <bpmn:userTask id="UserTask_1kfz8x" name="Check Request" camunda:assignee="admin">
       <bpmn:extensionElements>
         <camunda:properties>
-          <camunda:property name="classification-key" value="L1050" />
+          <camunda:property name="taskana.classification-key" value="L1050" />
         </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0ncfypl</bpmn:incoming>

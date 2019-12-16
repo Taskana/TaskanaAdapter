@@ -3,7 +3,7 @@
   <bpmn:process id="Process_1tkzmhz" isExecutable="true">
     <bpmn:extensionElements>
       <camunda:properties>
-        <camunda:property name="classification" value="L1050" />
+        <camunda:property name="taskana.classification" value="L1050" />
       </camunda:properties>
     </bpmn:extensionElements>
     <bpmn:startEvent id="StartEvent_1">
@@ -12,14 +12,18 @@
     <bpmn:userTask id="Task_0vbim3j" name="userTask1" camunda:assignee="Demo" camunda:priority="100">
       <bpmn:extensionElements>
         <camunda:properties>
-          <camunda:property name="classification" value="L1050" />
-          <camunda:property name="domain" value="DOMAIN_A" />
+          <camunda:property name="taskana.classification" value="L1050" />
         </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0tfcein</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1i58e0s</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:userTask id="Task_1bgsrrk" name="userTask2" camunda:assignee="Demo" camunda:priority="100">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="taskana.classification-key" value="L1050" />
+        </camunda:properties>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_1i58e0s</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0odnfb6</bpmn:outgoing>
     </bpmn:userTask>
