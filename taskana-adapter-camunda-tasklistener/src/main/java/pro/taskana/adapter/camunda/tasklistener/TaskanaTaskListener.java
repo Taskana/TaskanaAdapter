@@ -15,9 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -27,6 +24,9 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperties;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import pro.taskana.adapter.camunda.dto.ReferencedTask;
 import pro.taskana.adapter.camunda.dto.VariableValueDto;
@@ -187,10 +187,10 @@ public class TaskanaTaskListener implements TaskListener {
         referencedTask.setTaskDefinitionKey(delegateTask.getTaskDefinitionKey());
         referencedTask.setClassificationKey(getUserTaskExtensionProperty(delegateTask, "taskana.classification-key"));
         referencedTask.setDomain(getProcessModelExtensionProperty(delegateTask, "taskana.domain"));
+        referencedTask.setWorkbasketKey(getWorkbasketKey(delegateTask));
         referencedTask.setVariables(getProcessVariables(delegateTask));
-
         String referencedTaskJson = objectMapper.writeValueAsString(referencedTask);
-
+        LOGGER.debug("Exit from getReferencedTaskJson. Returning {}.", referencedTaskJson);
         return referencedTaskJson;
     }
 
@@ -204,10 +204,11 @@ public class TaskanaTaskListener implements TaskListener {
             List<String> processVariablenames = splitProcessVariableNamesString(processVariablesConcatenated);
 
             processVariablenames.forEach(
-                nameOfProcessVariableToAdd -> addToProcessVariablesBuilder(delegateTask, objectMapper, processVariablesBuilder,
+                nameOfProcessVariableToAdd -> addToProcessVariablesBuilder(delegateTask, objectMapper,
+                    processVariablesBuilder,
                     nameOfProcessVariableToAdd));
 
-            //check if someone sets the taskana-attributes extension property, but enters no values
+            // check if someone sets the taskana-attributes extension property, but enters no values
             if (processVariablesBuilder.length() > 0) {
                 processVariablesBuilder.deleteCharAt(processVariablesBuilder.length() - 1).append("}");
                 processVariablesBuilder.insert(0, "{");
@@ -236,7 +237,6 @@ public class TaskanaTaskListener implements TaskListener {
                 VariableValueDto variableValueDto = new VariableValueDto(processVariable.getClass().getSimpleName(),
                     processVariable, valueInfo);
 
-
                 String processVariableValueJson = objectMapper.writeValueAsString(variableValueDto);
                 processVariablesBuilder.append("\"")
                     .append(nameOfprocessVariableToAdd)
@@ -253,6 +253,19 @@ public class TaskanaTaskListener implements TaskListener {
     private List<String> splitProcessVariableNamesString(String processVariableNamesConcatenated) {
         List<String> processVariableNames = Arrays.asList(processVariableNamesConcatenated.trim().split("\\s*,\\s*"));
         return processVariableNames;
+    }
+
+    private String getWorkbasketKey(DelegateTask delegateTask) {
+        String workbasketKey = null;
+        try {
+            Object workbasketKeyObj = delegateTask.getVariable("taskana.workbasket-key");
+            if (workbasketKeyObj != null && workbasketKeyObj instanceof String) {
+                workbasketKey = (String) workbasketKeyObj;
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Caught {} while trying to retrieve taskana.workbasket-key", e);
+        }
+        return workbasketKey;
     }
 
     private String getProcessModelExtensionProperty(DelegateTask delegateTask, String propertyKey) {
