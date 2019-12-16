@@ -3,7 +3,7 @@
   <bpmn:process id="simple_timed_user_task_process" name="Simple Timed User Task Process" isExecutable="true">
     <bpmn:extensionElements>
       <camunda:properties>
-        <camunda:property name="domain" value="DOMAIN_A" />
+        <camunda:property name="taskana.domain" value="DOMAIN_A" />
       </camunda:properties>
     </bpmn:extensionElements>
     <bpmn:startEvent id="StartEvent_1" name="Request Received">
@@ -17,7 +17,7 @@
     <bpmn:userTask id="Task_0k5trao" name="Check Request" camunda:assignee="admin">
       <bpmn:extensionElements>
         <camunda:properties>
-          <camunda:property name="classification-key" value="T2000" />
+          <camunda:property name="taskana.classification-key" value="T2000" />
         </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_1wir7ao</bpmn:incoming>

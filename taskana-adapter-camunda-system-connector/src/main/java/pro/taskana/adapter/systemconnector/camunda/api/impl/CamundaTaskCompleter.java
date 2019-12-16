@@ -3,7 +3,11 @@ package pro.taskana.adapter.systemconnector.camunda.api.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,7 +27,7 @@ public class CamundaTaskCompleter {
     private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskCompleter.class);
 
     private static final String COMPLETED_BY_TASKANA_ADAPTER_LOCAL_VARIABLE = "completedByTaskanaAdapter";
-    
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -32,8 +36,8 @@ public class CamundaTaskCompleter {
 
         StringBuilder requestUrlBuilder = new StringBuilder();
 
-        setCompletionByTaskanaAdapterAsLocalVariable(camundaSystemUrlInfo,camundaTask,requestUrlBuilder);
-        SystemResponse systemResponse = performCompletion(camundaSystemUrlInfo,camundaTask,requestUrlBuilder);
+        setCompletionByTaskanaAdapterAsLocalVariable(camundaSystemUrlInfo, camundaTask, requestUrlBuilder);
+        SystemResponse systemResponse = performCompletion(camundaSystemUrlInfo, camundaTask, requestUrlBuilder);
 
         return systemResponse;
 
@@ -52,7 +56,7 @@ public class CamundaTaskCompleter {
             LOGGER.debug("Set local Variable \"completedByTaskanaAdapter\" for camunda task {}. Status code = {}", camundaTask.getId(),
                     responseEntity.getStatusCode());
 
-        } catch(HttpStatusCodeException e) {
+        } catch (HttpStatusCodeException e) {
             LOGGER.info("tried to set local Variable \"completedByTaskanaAdapter\" for camunda task {} and caught Status code {}", camundaTask.getId(),
                     e.getStatusCode());
         }

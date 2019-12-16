@@ -49,7 +49,8 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
         groupNames = {"admin"})
     @Test
     public void user_task_process_instance_started_in_camunda_via_rest_should_result_in_taskanaTask()
-        throws JSONException, InterruptedException, DomainNotFoundException, WorkbasketNotFoundException, NotAuthorizedException, InvalidWorkbasketException, WorkbasketAlreadyExistException, InvalidArgumentException {
+        throws JSONException, InterruptedException, DomainNotFoundException, WorkbasketNotFoundException,
+        NotAuthorizedException, InvalidWorkbasketException, WorkbasketAlreadyExistException, InvalidArgumentException {
 
         String processInstanceId = this.camundaProcessengineRequester
             .startCamundaProcessAndReturnId("simple_user_task_process", "");
@@ -71,7 +72,8 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
         groupNames = {"admin"})
     @Test
     public void multiple_user_task_process_instances_started_in_camunda_via_rest_should_result_in_multiple_taskanaTasks()
-        throws JSONException, InterruptedException, DomainNotFoundException, WorkbasketNotFoundException, NotAuthorizedException, InvalidWorkbasketException, WorkbasketAlreadyExistException, InvalidArgumentException {
+        throws JSONException, InterruptedException, DomainNotFoundException, WorkbasketNotFoundException,
+        NotAuthorizedException, InvalidWorkbasketException, WorkbasketAlreadyExistException, InvalidArgumentException {
 
         int numberOfProcesses = 10;
         List<List<String>> camundaTaskIdsList = new ArrayList<List<String>>();
@@ -94,73 +96,78 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
     }
 
     @WithAccessId(
-            userName = "teamlead_1",
-            groupNames = {"admin"})
+        userName = "teamlead_1",
+        groupNames = {"admin"})
     @Test
     public void task_with_primitive_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
-        throws JSONException, InterruptedException, TaskNotFoundException, NotAuthorizedException, DomainNotFoundException, WorkbasketNotFoundException, InvalidWorkbasketException, WorkbasketAlreadyExistException, InvalidArgumentException {
+        throws JSONException, InterruptedException, TaskNotFoundException, NotAuthorizedException,
+        DomainNotFoundException, WorkbasketNotFoundException, InvalidWorkbasketException,
+        WorkbasketAlreadyExistException, InvalidArgumentException {
 
         String variables = "\"variables\": {\"amount\": {\"value\":555, \"type\":\"long\"},\"item\": {\"value\": \"item-xyz\"}}";
         String processInstanceId = this.camundaProcessengineRequester
-                .startCamundaProcessAndReturnId("simple_user_task_process", variables);
+            .startCamundaProcessAndReturnId("simple_user_task_process", variables);
         List<String> camundaTaskIds = this.camundaProcessengineRequester
-                .getTaskIdsFromProcessInstanceId(processInstanceId);
+            .getTaskIdsFromProcessInstanceId(processInstanceId);
 
         Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
         String assumedVariablesString = "{\"amount\":{\"type\":\"Long\",\"value\":555,\"valueInfo\":{\"objectTypeName\":\"java.lang.Long\"}},\"item\":{\"type\":\"String\",\"value\":\"item-xyz\",\"valueInfo\":{\"objectTypeName\":\"java.lang.String\"}}}";
-        camundaTaskIds.forEach(camundaTaskId -> createTaskanaTaskAndVerifyTaskVariables(camundaTaskId,assumedVariablesString));
+        camundaTaskIds.forEach(
+            camundaTaskId -> retrieveTaskanaTaskAndVerifyTaskVariables(camundaTaskId, assumedVariablesString));
 
     }
+
     @WithAccessId(
-            userName = "teamlead_1",
-            groupNames = {"admin"})
+        userName = "teamlead_1",
+        groupNames = {"admin"})
     @Test
     public void task_with_complex_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
-            throws JSONException, InterruptedException {
+        throws JSONException, InterruptedException {
 
         String processInstanceId = this.camundaProcessengineRequester
-                .startCamundaProcessAndReturnId("simple_user_task_with_complex_variables_process", "");
+            .startCamundaProcessAndReturnId("simple_user_task_with_complex_variables_process", "");
         List<String> camundaTaskIds = this.camundaProcessengineRequester
-                .getTaskIdsFromProcessInstanceId(processInstanceId);
+            .getTaskIdsFromProcessInstanceId(processInstanceId);
 
-        Thread.sleep(this.adapterTaskPollingInterval);
+        Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
-        String assumedVariablesString = "{\"attribute1\":{\"type\":\"ProcessVariableTestObject\",\"value\":{\"stringField\":\"stringValue\",\"intField\":1,\"doubleField\":1.1,\"booleanField\":false,\"processVariableTestObjectTwoField\":{\"intFieldObjectTwo\":2,\"doubleFieldObjectTwo\":2.2,\"booleanFieldObjectTwo\":true,\"dateFieldObjectTwo\":\"1970-01-01 13:12:11\",\"stringFieldObjectTwo\":\"stringValueObjectTwo\"}},\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\"}},\"attribute2\":{\"type\":\"String\",\"value\":\"attribute2Value\",\"valueInfo\":{\"objectTypeName\":\"java.lang.String\"}},\"attribute3\":{\"type\":\"String\",\"value\":\"attribute3Value\",\"valueInfo\":{\"objectTypeName\":\"java.lang.String\"}}}";
-        camundaTaskIds.forEach(camundaTaskId -> createTaskanaTaskAndVerifyTaskVariables(camundaTaskId,assumedVariablesString));
+        String assumedVariablesString = "{\"attribute1\":{\"type\":\"ProcessVariableTestObject\",\"value\":{\"stringField\":\"\\fForm feed \\b Backspace \\t Tab \\\\Backslash \\n newLine \\r Carriage return \\\" DoubleQuote\",\"intField\":1,\"doubleField\":1.1,\"booleanField\":false,\"processVariableTestObjectTwoField\":{\"intFieldObjectTwo\":2,\"doubleFieldObjectTwo\":2.2,\"booleanFieldObjectTwo\":true,\"dateFieldObjectTwo\":\"1970-01-01 13:12:11\",\"stringFieldObjectTwo\":\"stringValueObjectTwo\"}},\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\"}},\"attribute2\":{\"type\":\"String\",\"value\":\"attribute2Value\",\"valueInfo\":{\"objectTypeName\":\"java.lang.String\"}},\"attribute3\":{\"type\":\"String\",\"value\":\"attribute3Value\",\"valueInfo\":{\"objectTypeName\":\"java.lang.String\"}}}";
+        camundaTaskIds.forEach(
+            camundaTaskId -> retrieveTaskanaTaskAndVerifyTaskVariables(camundaTaskId, assumedVariablesString));
     }
 
-
     @WithAccessId(
-            userName = "teamlead_1",
-            groupNames = {"admin"})
+        userName = "teamlead_1",
+        groupNames = {"admin"})
     @Test
     public void task_with_complex_variables_from_parent_execution_should_result_in_taskanaTasks_with_those_variables_in_custom_attributes()
-            throws JSONException, InterruptedException {
+        throws JSONException, InterruptedException {
 
         String processInstanceId = this.camundaProcessengineRequester
-                .startCamundaProcessAndReturnId("simple_multiple_user_tasks_with_complex_variables_process", "");
+            .startCamundaProcessAndReturnId("simple_multiple_user_tasks_with_complex_variables_process", "");
 
-           List<String> camundaTaskIds = this.camundaProcessengineRequester
-                   .getTaskIdsFromProcessInstanceId(processInstanceId);
-
-           Thread.sleep(this.adapterTaskPollingInterval);
-
-           assertEquals(3,camundaTaskIds.size());
-
-           //complete first 3 parallel tasks, one of which starts another task after completion that will be checked for the process variables
-       camundaTaskIds.forEach(camundaTaskId -> this.camundaProcessengineRequester
-               .completeTaskWithId(camundaTaskId));
-
-        camundaTaskIds = this.camundaProcessengineRequester
-                .getTaskIdsFromProcessInstanceId(processInstanceId);
-
-        assertEquals(1,camundaTaskIds.size());
+        List<String> camundaTaskIds = this.camundaProcessengineRequester
+            .getTaskIdsFromProcessInstanceId(processInstanceId);
 
         Thread.sleep(this.adapterTaskPollingInterval);
 
-        String assumedVariablesString = "{\"attribute1\":{\"type\":\"ProcessVariableTestObject\",\"value\":{\"stringField\":\"stringValue\",\"intField\":1,\"doubleField\":1.1,\"booleanField\":false,\"processVariableTestObjectTwoField\":{\"intFieldObjectTwo\":2,\"doubleFieldObjectTwo\":2.2,\"booleanFieldObjectTwo\":true,\"dateFieldObjectTwo\":\"1970-01-01 13:12:11\",\"stringFieldObjectTwo\":\"stringValueObjectTwo\"}},\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\"}},\"attribute2\":{\"type\":\"String\",\"value\":\"attribute2Value\",\"valueInfo\":{\"objectTypeName\":\"java.lang.String\"}},\"attribute3\":{\"type\":\"String\",\"value\":\"attribute3Value\",\"valueInfo\":{\"objectTypeName\":\"java.lang.String\"}}}";
-        camundaTaskIds.forEach(camundaTaskId -> createTaskanaTaskAndVerifyTaskVariables(camundaTaskId,assumedVariablesString));
+        assertEquals(3, camundaTaskIds.size());
+
+        //complete first 3 parallel tasks, one of which starts another task after completion that will be checked for the process variables
+        camundaTaskIds.forEach(camundaTaskId -> this.camundaProcessengineRequester
+            .completeTaskWithId(camundaTaskId));
+
+        camundaTaskIds = this.camundaProcessengineRequester
+            .getTaskIdsFromProcessInstanceId(processInstanceId);
+
+        assertEquals(1, camundaTaskIds.size());
+
+        Thread.sleep(this.adapterTaskPollingInterval);
+
+        String assumedVariablesString = "{\"attribute1\":{\"type\":\"ProcessVariableTestObject\",\"value\":{\"stringField\":\"\\fForm feed \\b Backspace \\t Tab \\\\Backslash \\n newLine \\r Carriage return \\\" DoubleQuote\",\"intField\":1,\"doubleField\":1.1,\"booleanField\":false,\"processVariableTestObjectTwoField\":{\"intFieldObjectTwo\":2,\"doubleFieldObjectTwo\":2.2,\"booleanFieldObjectTwo\":true,\"dateFieldObjectTwo\":\"1970-01-01 13:12:11\",\"stringFieldObjectTwo\":\"stringValueObjectTwo\"}},\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\"}},\"attribute2\":{\"type\":\"String\",\"value\":\"attribute2Value\",\"valueInfo\":{\"objectTypeName\":\"java.lang.String\"}},\"attribute3\":{\"type\":\"String\",\"value\":\"attribute3Value\",\"valueInfo\":{\"objectTypeName\":\"java.lang.String\"}}}";
+        camundaTaskIds.forEach(
+            camundaTaskId -> retrieveTaskanaTaskAndVerifyTaskVariables(camundaTaskId, assumedVariablesString));
     }
 
     @WithAccessId(
@@ -168,7 +175,8 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
         groupNames = {"admin"})
     @Test
     public void process_instance_with_multiple_executions_should_result_in_multiple_taskanaTasks()
-        throws JSONException, InterruptedException, DomainNotFoundException, WorkbasketNotFoundException, NotAuthorizedException, InvalidWorkbasketException, WorkbasketAlreadyExistException, InvalidArgumentException {
+        throws JSONException, InterruptedException, DomainNotFoundException, WorkbasketNotFoundException,
+        NotAuthorizedException, InvalidWorkbasketException, WorkbasketAlreadyExistException, InvalidArgumentException {
 
         String processInstanceId = this.camundaProcessengineRequester
             .startCamundaProcessAndReturnId("simple_multiple_execution_process", "");
@@ -186,7 +194,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
         }
     }
 
-    private void createTaskanaTaskAndVerifyTaskVariables(String camundaTaskId, String assumedVariablesString) {
+    private void retrieveTaskanaTaskAndVerifyTaskVariables(String camundaTaskId, String assumedVariablesString) {
 
         try {
 
@@ -206,12 +214,10 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
             // comparison of the strings doesn't work.
             // rather use SameJSONAs.sameJSONAs from hamcrest-json to compare Json strings independent of child order
             Assert.assertThat(
-                    assumedVariablesString,
-                    SameJSONAs.sameJSONAs(taskanaVariablesString));
+                assumedVariablesString,
+                SameJSONAs.sameJSONAs(taskanaVariablesString));
 
-
-
-        }catch(TaskNotFoundException | NotAuthorizedException e){
+        } catch (TaskNotFoundException | NotAuthorizedException e) {
             LOGGER.info("Caught {}, while trying to create a taskana task and verify its variables", e);
         }
 
