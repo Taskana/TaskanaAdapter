@@ -20,7 +20,7 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CamundaSystemConnectorImpl.class);
 
-    static final String URL_GET_CAMUNDA_TASKS = "/task";
+    static final String URL_GET_CAMUNDA_TASKS = "/task/";
     static final String URL_GET_CAMUNDA_VARIABLES = "/variables";
     static final String URL_OUTBOX_REST_PATH = "/taskana-outbox/rest";
 

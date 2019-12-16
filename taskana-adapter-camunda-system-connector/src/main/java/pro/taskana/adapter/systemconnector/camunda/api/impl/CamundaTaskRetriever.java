@@ -38,7 +38,7 @@ public class CamundaTaskRetriever {
 
     public List<ReferencedTask> retrieveNewStartedCamundaTasks(String camundaSystemTaskEventUrl) {
 
-        LOGGER.debug("entry to retrieveNewStartedCamundaTasks. createdAfter = {}");
+        LOGGER.debug("entry to retrieveNewStartedCamundaTasks.");
 
         CamundaTaskEventResource[] camundaTaskEventResources = getCamundaTaskEventResources(camundaSystemTaskEventUrl,
             CamundaSystemConnectorImpl.URL_GET_CAMUNDA_CREATE_EVENTS);

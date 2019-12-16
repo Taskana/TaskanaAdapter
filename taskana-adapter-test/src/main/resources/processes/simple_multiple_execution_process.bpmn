@@ -3,7 +3,7 @@
   <bpmn:process id="simple_multiple_execution_process" name="Simple multiple execution process" isExecutable="true">
     <bpmn:extensionElements>
       <camunda:properties>
-        <camunda:property name="domain" value="DOMAIN_A" />
+        <camunda:property name="taskana.domain" value="DOMAIN_A" />
       </camunda:properties>
     </bpmn:extensionElements>
     <bpmn:startEvent id="StartEvent_1">
@@ -18,7 +18,7 @@
     <bpmn:userTask id="Task_1efadp1" camunda:assignee="otherProcess">
       <bpmn:extensionElements>
         <camunda:properties>
-          <camunda:property name="classification-key" value="L110102" />
+          <camunda:property name="taskana.classification-key" value="L110102" />
         </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0tscivq</bpmn:incoming>
@@ -27,7 +27,7 @@
     <bpmn:userTask id="Task_1xfgnpy" camunda:assignee="otherProcess">
       <bpmn:extensionElements>
         <camunda:properties>
-          <camunda:property name="classification-key" value="T6310" />
+          <camunda:property name="taskana.classification-key" value="T6310" />
         </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0zri4u9</bpmn:incoming>
@@ -36,7 +36,7 @@
     <bpmn:userTask id="Task_1qi5ffh" camunda:assignee="otherPrcoess">
       <bpmn:extensionElements>
         <camunda:properties>
-          <camunda:property name="classification-key" value="L1050" />
+          <camunda:property name="taskana.classification-key" value="L1050" />
         </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0mtkh6d</bpmn:incoming>
