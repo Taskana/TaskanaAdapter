@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import pro.taskana.CallbackState;
 import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
@@ -53,11 +54,11 @@ public class ReferencedTaskCompleter {
         try {
             TaskanaConnector taskanaSystemConnector = adapterManager.getTaskanaConnector();
 
-            List<ReferencedTask> tasksCompletedByTaskana = taskanaSystemConnector.retrieveCompletedTaskanaTasks();
+            List<ReferencedTask> tasksCompletedByTaskana = taskanaSystemConnector.retrieveCompletedTaskanaTasksAsReferencedTasks();
             List<ReferencedTask> tasksCompletedInExternalSystem = completeReferencedTasksInExternalSystem(
                 tasksCompletedByTaskana);
 
-            taskanaSystemConnector.referencedTasksHaveBeenCompleted(tasksCompletedInExternalSystem);
+            taskanaSystemConnector.changeReferencedTaskCallbackState(tasksCompletedInExternalSystem, CallbackState.CALLBACK_PROCESSING_COMPLETED);
         } finally {
             LOGGER.trace(
                 "ReferencedTaskCompleter.retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTask EXIT ");

@@ -50,21 +50,64 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     @Autowired
     private TaskInformationMapper taskInformationMapper;
 
-    @Override
-    public List<ReferencedTask> retrieveCompletedTaskanaTasks() {
+    public List<ReferencedTask> retrieveCompletedTaskanaTasksAsReferencedTasks() {
 
         List<TaskSummary> completedTasks = taskService.createTaskQuery()
             .stateIn(TaskState.COMPLETED)
-            .callbackStateIn(CallbackState.CALLBACK_PROCESSING_REQUIRED)
+            .callbackStateIn(CallbackState.CALLBACK_PROCESSING_REQUIRED, CallbackState.CLAIMED)
             .list();
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("the following taskana tasks were completed {} and must process their callback.",
                 LoggerUtils.listToString(completedTasks));
         }
 
+        List<ReferencedTask> result = retrieveTaskanaTasksAndConvertToReferencedTasks(completedTasks);
+
+        return result;
+    }
+
+    @Override
+    public List<ReferencedTask> retrieveClaimedTaskanaTasksAsReferencedTasks() {
+
+        List<TaskSummary> claimedTasks = taskService.createTaskQuery()
+            .stateIn(TaskState.CLAIMED)
+            .callbackStateIn(CallbackState.CALLBACK_PROCESSING_REQUIRED)
+            .list();
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("the following taskana tasks were claimed {} and must process their callback.",
+                LoggerUtils.listToString(claimedTasks));
+        }
+
+        List<ReferencedTask> result = retrieveTaskanaTasksAndConvertToReferencedTasks(claimedTasks);
+
+        return result;
+    }
+
+    @Override
+    public List<ReferencedTask> retrieveCancelledClaimTaskanaTasksAsReferencedTasks() {
+
+        List<TaskSummary> claimedTasks = taskService.createTaskQuery()
+            .stateIn(TaskState.READY)
+            .callbackStateIn(CallbackState.CLAIMED)
+            .list();
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("the claims of the following taskana tasks were cancelled {} and must process their callback.",
+                LoggerUtils.listToString(claimedTasks));
+        }
+
+        List<ReferencedTask> result = retrieveTaskanaTasksAndConvertToReferencedTasks(claimedTasks);
+
+        return result;
+    }
+
+    private List<ReferencedTask> retrieveTaskanaTasksAndConvertToReferencedTasks(List<TaskSummary> requestedTasks) {
+
         List<ReferencedTask> result = new ArrayList<>();
 
-        for (TaskSummary taskSummary : completedTasks) {
+        for (TaskSummary taskSummary : requestedTasks) {
             try {
                 Task taskanaTask = taskService.getTask(taskSummary.getTaskId());
                 Map<String, String> callbackInfo = taskanaTask.getCallbackInfo();
@@ -73,7 +116,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
                     result.add(taskInformationMapper.convertToReferencedTask(taskanaTask));
                 }
             } catch (TaskNotFoundException | NotAuthorizedException e) {
-                LOGGER.error("Caught {} when trying to retrieve completed taskana tasks.", e);
+                LOGGER.error("Caught {} when trying to retrieve requested taskana tasks.", e);
             }
         }
 
@@ -128,9 +171,12 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     }
 
     @Override
-    public void referencedTasksHaveBeenCompleted(List<ReferencedTask> referencedTasks) {
+    public void changeReferencedTaskCallbackState(List<ReferencedTask> referencedTasks, CallbackState callbackState) {
+
         List<String> externalIds = referencedTasks.stream().map(ReferencedTask::getId).collect(Collectors.toList());
-        taskService.setCallbackStateForTasks(externalIds, CallbackState.CALLBACK_PROCESSING_COMPLETED);
+        if (!externalIds.isEmpty()) {
+            taskService.setCallbackStateForTasks(externalIds, callbackState);
+        }
     }
 
 }
