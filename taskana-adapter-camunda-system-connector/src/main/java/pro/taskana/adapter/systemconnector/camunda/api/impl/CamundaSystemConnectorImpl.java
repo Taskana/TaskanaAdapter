@@ -2,9 +2,6 @@ package pro.taskana.adapter.systemconnector.camunda.api.impl;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import pro.taskana.adapter.configuration.AdapterSpringContextProvider;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
@@ -17,8 +14,6 @@ import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemUrls;
  * @author bbr
  */
 public class CamundaSystemConnectorImpl implements SystemConnector {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CamundaSystemConnectorImpl.class);
 
     static final String URL_GET_CAMUNDA_TASKS = "/task/";
     static final String URL_OUTBOX_REST_PATH = "/taskana-outbox/rest-api";
