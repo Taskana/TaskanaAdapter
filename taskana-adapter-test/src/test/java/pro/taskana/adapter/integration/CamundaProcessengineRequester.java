@@ -187,6 +187,23 @@ public class CamundaProcessengineRequester {
         return false;
     }
 
+    public boolean isCorrectAssigneeFromHistory(String camundaTaskId, String assignee) throws JSONException {
+        String url = BASIC_ENGINE_PATH + this.processEngineKey + HISTORY_PATH + TASK_PATH + "/?taskId=" + camundaTaskId;
+        HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
+        // no task found will only show in empty body
+        JSONArray taskHistoryRetrievalAnswerJSON = new JSONArray(response.getBody());
+        if (taskHistoryRetrievalAnswerJSON.length() == 0) {
+            return false;
+        } else {
+            String camundaTaskAssignee = (String) ((JSONObject) taskHistoryRetrievalAnswerJSON.get(0)).get("assignee");
+            if (assignee.equals(camundaTaskAssignee)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Deletes the camunda-process-instance with the given Id. Returns true if successful.
      *

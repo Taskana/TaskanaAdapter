@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 
+import pro.taskana.Task;
 import pro.taskana.TaskSummary;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
 import pro.taskana.exceptions.InvalidOwnerException;
@@ -69,6 +70,45 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
             assertTrue(taskRetrievalFromHistorySuccessful);
         }
     }
+
+    @WithAccessId(
+        userName = "teamlead_1",
+        groupNames = {"admin"})
+    @Test
+    public void forced_completion_of_taskana_task_should_set_assignee_and_complete_camunda_task() throws TaskNotFoundException,
+        NotAuthorizedException, JSONException, InterruptedException, InvalidOwnerException, InvalidStateException {
+        String processInstanceId = this.camundaProcessengineRequester
+            .startCamundaProcessAndReturnId("simple_user_task_process", "");
+        List<String> camundaTaskIds = this.camundaProcessengineRequester
+            .getTaskIdsFromProcessInstanceId(processInstanceId);
+
+        Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+        for (String camundaTaskId : camundaTaskIds) {
+
+            // retrieve and check taskanaTaskId
+            List<TaskSummary> taskanaTasks = this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
+            assertEquals(1, taskanaTasks.size());
+            String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
+            assertEquals(taskanaTaskExternalId, camundaTaskId);
+            String taskanaTaskId = taskanaTasks.get(0).getTaskId();
+
+            // verify that assignee is not yet set for camunda task
+            boolean assigneeNotYetSet = this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, null);
+            assertTrue(assigneeNotYetSet);
+
+            // force complete taskanaTask and wait
+            this.taskService.forceCompleteTask(taskanaTaskId);
+
+            Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
+
+            //verify that assignee got set with forced completion
+            Task taskanaTask = this.taskService.getTask(taskanaTaskId);
+            boolean assigneeUpdatedSuccessfully = this.camundaProcessengineRequester.isCorrectAssigneeFromHistory(camundaTaskId, taskanaTask.getOwner());
+            assertTrue(assigneeUpdatedSuccessfully);
+        }
+    }
+
 
     @WithAccessId(
         userName = "teamlead_1",

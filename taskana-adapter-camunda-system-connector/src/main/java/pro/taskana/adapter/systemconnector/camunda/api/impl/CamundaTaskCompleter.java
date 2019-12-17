@@ -32,32 +32,57 @@ public class CamundaTaskCompleter {
     private RestTemplate restTemplate;
 
     public SystemResponse completeCamundaTask(CamundaSystemUrls.SystemURLInfo camundaSystemUrlInfo,
-        ReferencedTask camundaTask) {
+        ReferencedTask referencedTask) {
 
         StringBuilder requestUrlBuilder = new StringBuilder();
 
-        setCompletionByTaskanaAdapterAsLocalVariable(camundaSystemUrlInfo, camundaTask, requestUrlBuilder);
-        SystemResponse systemResponse = performCompletion(camundaSystemUrlInfo, camundaTask, requestUrlBuilder);
+        setAssigneeToOwnerOfReferencedTask(camundaSystemUrlInfo, referencedTask, requestUrlBuilder);
+        setCompletionByTaskanaAdapterAsLocalVariable(camundaSystemUrlInfo, referencedTask, requestUrlBuilder);
+        SystemResponse systemResponse = performCompletion(camundaSystemUrlInfo, referencedTask, requestUrlBuilder);
 
         return systemResponse;
 
     }
 
-    private void setCompletionByTaskanaAdapterAsLocalVariable(CamundaSystemUrls.SystemURLInfo camundaSystemUrlInfo, ReferencedTask camundaTask, StringBuilder requestUrlBuilder) {
+    private void setAssigneeToOwnerOfReferencedTask(CamundaSystemUrls.SystemURLInfo camundaSystemUrlInfo, ReferencedTask referencedTask, StringBuilder requestUrlBuilder) {
+
 
         requestUrlBuilder.append(camundaSystemUrlInfo.getSystemRestUrl()).append(CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS)
-                         .append(camundaTask.getId()).append(CamundaSystemConnectorImpl.LOCAL_VARIABLE_PATH).append("/")
+            .append(referencedTask.getId()).append(CamundaSystemConnectorImpl.SET_ASSIGNEE);
+
+        String requestBody = CamundaSystemConnectorImpl.BODY_SET_ASSIGNEE + "\"" + referencedTask.getAssignee() + "\"}";
+
+        HttpEntity<String> requestEntity = prepareEntityFromBody(requestBody);
+
+        try {
+            ResponseEntity<String> responseEntity = this.restTemplate.exchange(requestUrlBuilder.toString(), HttpMethod.POST, requestEntity, String.class);
+            LOGGER.debug("Set assignee for camunda task {}. Status code = {}", referencedTask.getId(),
+                responseEntity.getStatusCode());
+
+        } catch (HttpStatusCodeException e) {
+            LOGGER.info("tried to set assignee for camunda task {} and caught Status code {}", referencedTask.getId(),
+                e.getStatusCode());
+        }
+
+    }
+
+    private void setCompletionByTaskanaAdapterAsLocalVariable(CamundaSystemUrls.SystemURLInfo camundaSystemUrlInfo, ReferencedTask referencedTask, StringBuilder requestUrlBuilder) {
+
+        requestUrlBuilder.setLength(0);
+
+        requestUrlBuilder.append(camundaSystemUrlInfo.getSystemRestUrl()).append(CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS)
+                         .append(referencedTask.getId()).append(CamundaSystemConnectorImpl.LOCAL_VARIABLE_PATH).append("/")
                          .append(COMPLETED_BY_TASKANA_ADAPTER_LOCAL_VARIABLE);
 
         HttpEntity<String> requestEntity = prepareEntityFromBody("{\"value\" : true, \"type\": \"Boolean\"}");
 
         try {
             ResponseEntity<String> responseEntity = this.restTemplate.exchange(requestUrlBuilder.toString(), HttpMethod.PUT, requestEntity, String.class);
-            LOGGER.debug("Set local Variable \"completedByTaskanaAdapter\" for camunda task {}. Status code = {}", camundaTask.getId(),
+            LOGGER.debug("Set local Variable \"completedByTaskanaAdapter\" for camunda task {}. Status code = {}", referencedTask.getId(),
                     responseEntity.getStatusCode());
 
         } catch (HttpStatusCodeException e) {
-            LOGGER.info("tried to set local Variable \"completedByTaskanaAdapter\" for camunda task {} and caught Status code {}", camundaTask.getId(),
+            LOGGER.info("tried to set local Variable \"completedByTaskanaAdapter\" for camunda task {} and caught Status code {}", referencedTask.getId(),
                     e.getStatusCode());
         }
 
