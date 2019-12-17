@@ -20,13 +20,8 @@ import org.springframework.test.context.ContextConfiguration;
 import pro.taskana.Task;
 import pro.taskana.TaskSummary;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
-import pro.taskana.exceptions.DomainNotFoundException;
-import pro.taskana.exceptions.InvalidArgumentException;
-import pro.taskana.exceptions.InvalidWorkbasketException;
 import pro.taskana.exceptions.NotAuthorizedException;
 import pro.taskana.exceptions.TaskNotFoundException;
-import pro.taskana.exceptions.WorkbasketAlreadyExistException;
-import pro.taskana.exceptions.WorkbasketNotFoundException;
 import pro.taskana.security.JAASRunner;
 import pro.taskana.security.WithAccessId;
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
@@ -49,8 +44,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
         groupNames = {"admin"})
     @Test
     public void user_task_process_instance_started_in_camunda_via_rest_should_result_in_taskanaTask()
-        throws JSONException, InterruptedException, DomainNotFoundException, WorkbasketNotFoundException,
-        NotAuthorizedException, InvalidWorkbasketException, WorkbasketAlreadyExistException, InvalidArgumentException {
+        throws JSONException, InterruptedException {
 
         String processInstanceId = this.camundaProcessengineRequester
             .startCamundaProcessAndReturnId("simple_user_task_process", "");
@@ -72,8 +66,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
         groupNames = {"admin"})
     @Test
     public void multiple_user_task_process_instances_started_in_camunda_via_rest_should_result_in_multiple_taskanaTasks()
-        throws JSONException, InterruptedException, DomainNotFoundException, WorkbasketNotFoundException,
-        NotAuthorizedException, InvalidWorkbasketException, WorkbasketAlreadyExistException, InvalidArgumentException {
+        throws JSONException, InterruptedException {
 
         int numberOfProcesses = 10;
         List<List<String>> camundaTaskIdsList = new ArrayList<List<String>>();
@@ -96,19 +89,17 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
     }
 
     @WithAccessId(
-            userName = "teamlead_1",
-            groupNames = {"admin"})
+        userName = "teamlead_1",
+        groupNames = {"admin"})
     @Test
     public void task_with_primitive_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
-        throws JSONException, InterruptedException, TaskNotFoundException, NotAuthorizedException,
-        DomainNotFoundException, WorkbasketNotFoundException, InvalidWorkbasketException,
-        WorkbasketAlreadyExistException, InvalidArgumentException {
+        throws JSONException, InterruptedException {
 
         String variables = "\"variables\": {\"amount\": {\"value\":555, \"type\":\"long\"},\"item\": {\"value\": \"item-xyz\"}}";
         String processInstanceId = this.camundaProcessengineRequester
-                .startCamundaProcessAndReturnId("simple_user_task_process", variables);
+            .startCamundaProcessAndReturnId("simple_user_task_process", variables);
         List<String> camundaTaskIds = this.camundaProcessengineRequester
-                .getTaskIdsFromProcessInstanceId(processInstanceId);
+            .getTaskIdsFromProcessInstanceId(processInstanceId);
 
         Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
@@ -117,7 +108,6 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
             camundaTaskId -> retrieveTaskanaTaskAndVerifyTaskVariables(camundaTaskId, assumedVariablesString));
 
     }
-            throws JSONException, InterruptedException {
 
     @WithAccessId(
         userName = "teamlead_1",
@@ -176,8 +166,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
         groupNames = {"admin"})
     @Test
     public void process_instance_with_multiple_executions_should_result_in_multiple_taskanaTasks()
-        throws JSONException, InterruptedException, DomainNotFoundException, WorkbasketNotFoundException,
-        NotAuthorizedException, InvalidWorkbasketException, WorkbasketAlreadyExistException, InvalidArgumentException {
+        throws JSONException, InterruptedException {
 
         String processInstanceId = this.camundaProcessengineRequester
             .startCamundaProcessAndReturnId("simple_multiple_execution_process", "");
@@ -220,8 +209,6 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
 
         } catch (TaskNotFoundException | NotAuthorizedException e) {
             LOGGER.info("Caught {}, while trying to create a taskana task and verify its variables", e);
-        }
-
         }
 
     }

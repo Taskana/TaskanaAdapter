@@ -15,7 +15,7 @@
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1a4uckm" sourceRef="Task_0k5trao" targetRef="EndEvent_0lef4tl" />
     <bpmn:sequenceFlow id="SequenceFlow_1wir7ao" sourceRef="StartEvent_1" targetRef="Task_0k5trao" />
-    <bpmn:userTask id="Task_0k5trao" name="Check&#10;Request" camunda:assignee="admin">
+    <bpmn:userTask id="Task_0k5trao" name="Check&#10;Request">
       <bpmn:extensionElements>
         <camunda:properties>
           <camunda:property name="taskana.classification-key" value="L1050" />

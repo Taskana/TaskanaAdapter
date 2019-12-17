@@ -2,6 +2,7 @@ package pro.taskana.adapter.taskanaconnector.api;
 
 import java.util.List;
 
+import pro.taskana.CallbackState;
 import pro.taskana.Task;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
@@ -19,17 +20,34 @@ public interface TaskanaConnector {
      *
      * @return a list of completed taskana tasks
      */
-    List<ReferencedTask> retrieveCompletedTaskanaTasks();
+    List<ReferencedTask> retrieveCompletedTaskanaTasksAsReferencedTasks();
 
     /**
-     * With this call the Adapter notifies the TaskanaConnector that a list of Referenced Tasks has been completed on
-     * behalf of completion of Taskana Tasks. Depending on the Implementation of the System Connector, it may ignore
-     * this call.
+     * retrieve claimed taskana tasks.
+     *
+     * @return a list of claimed taskana tasks
+     */
+    List<ReferencedTask> retrieveClaimedTaskanaTasksAsReferencedTasks();
+
+    /**
+     * retrieve forcefully unclaimed taskana tasks.
+     *
+     * @return a list of cancelled taskana tasks
+     */
+    List<ReferencedTask> retrieveCancelledClaimTaskanaTasksAsReferencedTasks();
+
+
+    /**
+     * With this call the Adapter notifies the TaskanaConnector that the CallbackState of a list of ReferencedTasks
+     * needs to be modified due to completion or claim of tasks of Taskana Tasks.
+     * Depending on the Implementation of the System Connector, it may ignore this call.
      *
      * @param referencedTasks
      *            List of ReferencedTasks that have been completed on the external system
+     * @param desiredCallbackState
+     *            the CallbackState that needs to be set for the list of referencedTasks
      */
-    void referencedTasksHaveBeenCompleted(List<ReferencedTask> referencedTasks);
+    void changeReferencedTaskCallbackState(List<ReferencedTask> referencedTasks, CallbackState desiredCallbackState);
 
     /**
      * create a task in taskana on behalf of an external task.
