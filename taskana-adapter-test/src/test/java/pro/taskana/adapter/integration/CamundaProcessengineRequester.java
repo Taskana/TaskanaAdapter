@@ -13,7 +13,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventResource;
 
 
 /**
@@ -33,11 +32,7 @@ public class CamundaProcessengineRequester {
 
     private static final String TASK_PATH = "/task";
 
-    private static final String LOCAL_VARIABLE_PATH = "/localVariables";
-
     private static final String COMPLETE_TASK_PATH = "/complete";
-
-    private static final String OUTBOX_REST_GET_EVENTS_PATH = "/taskana-outbox/rest/events";
 
     private static final String PROCESS_INSTANCE_PATH = "/process-instance";
 
@@ -217,9 +212,50 @@ public class CamundaProcessengineRequester {
         return false;
     }
 
-    private HttpEntity<String> prepareEntityFromBody(String jSONBody) {
+    /**
+     * Helper method to create an HttpEntity from a provided body in JSON-format.
+     *
+     * @param jsonBody
+     *            the body of the HttpEntity
+     * @return the created HttpEntity
+     *
+     */
+    private HttpEntity<String> prepareEntityFromBody(String jsonBody) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        return new HttpEntity<String>(jSONBody, headers);
+        return new HttpEntity<String>(jsonBody, headers);
     }
+
+    /**
+     * Determines if a provided assignee equals the assignee of a camunda task.
+     *
+     * @param assigneeValueToVerify
+     *            a String of the assignee to verify
+     * @param camundaTaskId
+     *            the ID of the camunda task which will be checked for its assignee
+     * @return true if the provided assignee equals the assignee of the camunda task, otherwise false
+     *
+     */
+    public boolean isCorrectAssignee(String camundaTaskId, String assigneeValueToVerify) {
+
+        String requestUrl = BASIC_ENGINE_PATH + this.processEngineKey + TASK_PATH + "/" + camundaTaskId;
+        HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
+        ResponseEntity<String> responseEntity = restTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, String.class);
+        JSONObject taskRetrievalAnswerJSON = new JSONObject(responseEntity.getBody());
+
+        if (!taskRetrievalAnswerJSON.get("assignee").equals(null)) {
+
+            String assignee = taskRetrievalAnswerJSON.getString("assignee");
+
+            if (assignee.equals(assigneeValueToVerify)) {
+                return true;
+            }
+
+        } else if (assigneeValueToVerify == null) {
+            return true;
+        }
+
+        return false;
+    }
+
 }

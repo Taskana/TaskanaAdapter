@@ -21,7 +21,6 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
     private static final Logger LOGGER = LoggerFactory.getLogger(CamundaSystemConnectorImpl.class);
 
     static final String URL_GET_CAMUNDA_TASKS = "/task/";
-    static final String URL_GET_CAMUNDA_VARIABLES = "/variables";
     static final String URL_OUTBOX_REST_PATH = "/taskana-outbox/rest";
 
     static final String URL_GET_CAMUNDA_CREATE_EVENTS = "/events?type=create";
@@ -30,8 +29,13 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
 
     static final String BODY_SET_CAMUNDA_VARIABLES = "{\"variables\":";
     static final String LOCAL_VARIABLE_PATH = "/localVariables";
-    static final String COMPLETE_TASK = "/complete/";
     static final String EMPTY_REQUEST_BODY = "{}";
+
+    static final String COMPLETE_TASK = "/complete/";
+    static final String SET_ASSIGNEE = "/assignee/";
+    static final String BODY_SET_ASSIGNEE = "{\"userId\":";
+    static final String UNCLAIM_TASK = "/unclaim/";
+
 
     private CamundaSystemUrls.SystemURLInfo camundaSystemURL;
 
@@ -39,12 +43,18 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
 
     private CamundaTaskCompleter taskCompleter;
 
+    private CamundaTaskClaimer taskClaimer;
+
+    private CamundaTaskClaimCanceler taskClaimCanceler;
+
     private CamundaTaskEventCleaner taskEventCleaner;
 
     public CamundaSystemConnectorImpl(CamundaSystemUrls.SystemURLInfo camundaSystemURL) {
         this.camundaSystemURL = camundaSystemURL;
         taskRetriever = AdapterSpringContextProvider.getBean(CamundaTaskRetriever.class);
         taskCompleter = AdapterSpringContextProvider.getBean(CamundaTaskCompleter.class);
+        taskClaimer = AdapterSpringContextProvider.getBean(CamundaTaskClaimer.class);
+        taskClaimCanceler = AdapterSpringContextProvider.getBean(CamundaTaskClaimCanceler.class);
         taskEventCleaner = AdapterSpringContextProvider.getBean(CamundaTaskEventCleaner.class);
     }
 
@@ -59,9 +69,20 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
     }
 
     @Override
+    public SystemResponse claimReferencedTask(ReferencedTask camundaTask) {
+        return taskClaimer.claimCamundaTask(camundaSystemURL, camundaTask);
+    }
+
+    @Override
+    public SystemResponse cancelClaimReferencedTask(ReferencedTask camundaTask) {
+        return taskClaimCanceler.cancelClaimOfCamundaTask(camundaSystemURL, camundaTask);
+    }
+
+    @Override
     public String getSystemURL() {
         return camundaSystemURL.getSystemRestUrl();
     }
+
 
     @Override
     public String retrieveVariables(String taskId) {

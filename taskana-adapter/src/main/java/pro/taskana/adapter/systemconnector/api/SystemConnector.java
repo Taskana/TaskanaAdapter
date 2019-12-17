@@ -10,7 +10,7 @@ import java.util.List;
 public interface SystemConnector {
 
     /**
-     * Retrieve referenced tasks that were started after a specified instant.
+     * Retrieve referenced tasks that were started since the last polling interval.
      *
      * @return a list of referenced tasks that were created and have not yet an associated taskana task.
      */
@@ -59,6 +59,24 @@ public interface SystemConnector {
      * @return the response from the external system.
      */
     SystemResponse completeReferencedTask(ReferencedTask task);
+
+    /**
+     * Instruct the external system to claim a human task.
+     *
+     * @param task
+     *            the task to be claimed.
+     * @return the response from the external system.
+     */
+    SystemResponse claimReferencedTask(ReferencedTask task);
+
+    /**
+     * Instruct the external system to claim a human task.
+     *
+     * @param task
+     *            the task to cancel the claim on.
+     * @return the response from the external system.
+     */
+    SystemResponse cancelClaimReferencedTask(ReferencedTask task);
 
     /**
      * Get the URL of the external system this connector connects to.

@@ -61,6 +61,9 @@ public abstract class AbsIntegrationTest {
     @Value("${taskana.adapter.scheduler.run.interval.for.complete.referenced.tasks.in.milliseconds}")
     protected long adapterCompletionPollingInterval;
 
+    @Value("1000")
+    protected long adapterClaimPollingInterval;
+
     @Value("${taskana.adapter.scheduler.run.interval.for.check.cancelled.referenced.tasks.in.milliseconds}")
     protected long adapterCancelPollingInterval;
 

@@ -9,7 +9,9 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -247,74 +249,10 @@ public class TaskanaTaskListener implements TaskListener {
             }
         }
     }
-        referencedTaskJsonBuilder.append("\",\"variables\":\"{")
-            .append(getProcessVariables(delegateTask));
-
-        referencedTaskJsonBuilder.append("}");
 
     private List<String> splitProcessVariableNamesString(String processVariableNamesConcatenated) {
         List<String> processVariableNames = Arrays.asList(processVariableNamesConcatenated.trim().split("\\s*,\\s*"));
         return processVariableNames;
-    private String getProcessVariables(DelegateTask delegateTask) {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        JacksonConfigurator.configureObjectMapper(objectMapper);
-        StringBuilder processVariablesBuilder = new StringBuilder();
-
-        String processVariablesConcatenated = getProcessModelExtensionProperty(delegateTask, "taskana-attributes");
-
-        if (processVariablesConcatenated != null) {
-            List<String> processVariables = splitProcessVariablesString(processVariablesConcatenated);
-
-            processVariables.forEach(
-                processVariable -> addToProcessVariablesBuilder(delegateTask, objectMapper, processVariablesBuilder,
-                    processVariable));
-
-            //check if someone sets the taskana-attributes extension property, but enters no values
-            if (processVariablesBuilder.length() > 0) {
-                processVariablesBuilder.deleteCharAt(processVariablesBuilder.length() - 1).append("}\"");
-            } else {
-                return "}\"";
-            }
-
-        } else {
-            return "}\"";
-        }
-
-        return processVariablesBuilder.toString();
-    }
-
-    private void addToProcessVariablesBuilder(DelegateTask delegateTask, ObjectMapper objectMapper,
-        StringBuilder processVariablesBuilder, String processVariable2) {
-
-        Object processVariable = delegateTask.getVariable(processVariable2);
-
-        if (processVariable != null) {
-
-            try {
-
-                Map<String, Object> valueInfo = new HashMap<>();
-                valueInfo.put("objectTypeName", processVariable.getClass());
-                VariableValueDto variableValueDto = new VariableValueDto(processVariable.getClass().getSimpleName(),
-                    objectMapper.writeValueAsString(processVariable), valueInfo);
-
-                String processVariableValueJson = objectMapper.writeValueAsString(variableValueDto)
-                    .replace("\"", "\\\"");
-                processVariablesBuilder.append("\\\"")
-                    .append(processVariable2)
-                    .append("\\\":")
-                    .append(processVariableValueJson)
-                    .append(",");
-
-            } catch (Exception ex) {
-                LOGGER.warn("Caught {} while trying to create JSON-String out of process variable object", ex);
-            }
-        }
-    }
-
-    private List<String> splitProcessVariablesString(String processVariablesConcatenated) {
-        List<String> processVariables = Arrays.asList(processVariablesConcatenated.trim().split("\\s*,\\s*"));
-        return processVariables;
     }
 
     private String getProcessModelExtensionProperty(DelegateTask delegateTask, String propertyKey) {
