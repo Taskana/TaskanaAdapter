@@ -20,10 +20,17 @@ import pro.taskana.adapter.camunda.tasklistener.TaskanaTaskListener;
  */
 public class TaskanaParseListener extends AbstractBpmnParseListener {
 
+    private boolean gotActivated = false;
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskListener.class);
 
     @Override
     public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
+
+        if (!gotActivated) {
+            gotActivated = true;
+            LOGGER.info("TaskanaParseListener activated successfully");
+        }
+
         ActivityBehavior behavior = activity.getActivityBehavior();
         if (behavior instanceof UserTaskActivityBehavior) {
 
