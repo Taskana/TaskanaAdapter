@@ -1,4 +1,4 @@
-package pro.taskana.adapter.camunda.outbox.rest.resource;
+package pro.taskana.adapter.camunda.outbox.rest.resources;
 
 /**
  * POJO that represents an event in the camunda outbox table.

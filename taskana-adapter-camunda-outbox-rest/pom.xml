@@ -75,7 +75,7 @@
                         <groupId>org.jboss.resteasy</groupId>
                         <artifactId>jaxrs-api</artifactId>
                         <version>${version.resteasy.jaxrs}</version>
-                        <scope>compile</scope>
+                        <scope>provided</scope>
                 </dependency>
                 <dependency>
                         <groupId>org.mybatis</groupId>

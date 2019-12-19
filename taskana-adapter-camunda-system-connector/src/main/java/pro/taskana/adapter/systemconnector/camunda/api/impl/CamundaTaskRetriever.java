@@ -17,7 +17,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventResource;
+import pro.taskana.adapter.camunda.outbox.rest.resources.CamundaTaskEventResource;
+import pro.taskana.adapter.camunda.outbox.rest.resources.CamundaTaskEventResourcesWrapper;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 
 /**
@@ -40,7 +41,7 @@ public class CamundaTaskRetriever {
 
         LOGGER.debug("entry to retrieveNewStartedCamundaTasks.");
 
-        CamundaTaskEventResource[] camundaTaskEventResources = getCamundaTaskEventResources(camundaSystemTaskEventUrl,
+        List<CamundaTaskEventResource> camundaTaskEventResources = getCamundaTaskEventResources(camundaSystemTaskEventUrl,
             CamundaSystemConnectorImpl.URL_GET_CAMUNDA_CREATE_EVENTS);
 
         List<ReferencedTask> referencedTasks = getReferencedTasksFromCamundaTaskEventResources(
@@ -52,7 +53,7 @@ public class CamundaTaskRetriever {
         return referencedTasks;
     }
 
-    private CamundaTaskEventResource[] getCamundaTaskEventResources(String camundaSystemTaskEventUrl,
+    private List<CamundaTaskEventResource> getCamundaTaskEventResources(String camundaSystemTaskEventUrl,
         String eventSelector) {
 
         String requestUrl = camundaSystemTaskEventUrl + CamundaSystemConnectorImpl.URL_OUTBOX_REST_PATH
@@ -63,17 +64,19 @@ public class CamundaTaskRetriever {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        ResponseEntity<CamundaTaskEventResource[]> responseEntity = restTemplate.exchange(
+        ResponseEntity<CamundaTaskEventResourcesWrapper> responseEntity = restTemplate.exchange(
             requestUrl, HttpMethod.GET, new HttpEntity<Object>(headers),
-            CamundaTaskEventResource[].class);
+            CamundaTaskEventResourcesWrapper.class);
 
-        CamundaTaskEventResource[] camundaTaskEventResources = responseEntity.getBody();
+        CamundaTaskEventResourcesWrapper camundaTaskEventResourcesWrapper = responseEntity.getBody();
+
+        List <CamundaTaskEventResource> camundaTaskEventResources = camundaTaskEventResourcesWrapper.getCamundaTaskEventResources();
 
         return camundaTaskEventResources;
     }
 
     private List<ReferencedTask> getReferencedTasksFromCamundaTaskEventResources(
-        CamundaTaskEventResource[] camundaTaskEventResources) {
+        List<CamundaTaskEventResource> camundaTaskEventResources) {
 
         List<ReferencedTask> referencedTasks = new ArrayList<>();
 
@@ -101,7 +104,7 @@ public class CamundaTaskRetriever {
     public List<ReferencedTask> retrieveTerminatedCamundaTasks(String camundaSystemURL) {
         LOGGER.debug("entry to retrieveFinishedCamundaTasks. CamundSystemURL = {} ", camundaSystemURL);
 
-        CamundaTaskEventResource[] camundaTaskEventResources = getCamundaTaskEventResources(camundaSystemURL,
+        List<CamundaTaskEventResource> camundaTaskEventResources = getCamundaTaskEventResources(camundaSystemURL,
             CamundaSystemConnectorImpl.URL_GET_CAMUNDA_COMPLETE_EVENTS);
 
         List<ReferencedTask> referencedTasks = getReferencedTasksFromCamundaTaskEventResources(

@@ -12,13 +12,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventResource;
+import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventResourcesWrapper;
 import pro.taskana.adapter.camunda.outbox.rest.service.CamundaTaskEventsService;
 
 /**
  * Controller for the Outbox REST service.
  * @author jhe
  */
-@Path("/taskana-outbox/rest/events")
+@Path("/rest/events")
 public class CamundaTaskEventsController {
 
     CamundaTaskEventsService camundaTaskEventService = new CamundaTaskEventsService();
@@ -30,7 +31,10 @@ public class CamundaTaskEventsController {
         List<CamundaTaskEventResource> camundaTaskEventResources = camundaTaskEventService
             .getEvents(requestedEventTypes);
 
-        return Response.status(200).entity(camundaTaskEventResources).build();
+        CamundaTaskEventResourcesWrapper camundaTaskEventResourcesWrapper = new CamundaTaskEventResourcesWrapper();
+        camundaTaskEventResourcesWrapper.setCamundaTaskEventResources(camundaTaskEventResources);
+
+        return Response.status(200).entity(camundaTaskEventResourcesWrapper).build();
     }
 
     @Path("/delete")
