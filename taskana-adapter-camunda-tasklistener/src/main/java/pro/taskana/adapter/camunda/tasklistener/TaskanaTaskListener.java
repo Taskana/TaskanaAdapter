@@ -37,6 +37,7 @@ import pro.taskana.adapter.camunda.mapper.JacksonConfigurator;
  */
 public class TaskanaTaskListener implements TaskListener {
 
+    private boolean gotActivated = false;
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskListener.class);
 
     private static final String SQL_INSERT_EVENT = "INSERT INTO event_store (TYPE,CREATED,PAYLOAD) VALUES (?,?,?)";
@@ -56,6 +57,11 @@ public class TaskanaTaskListener implements TaskListener {
     public void notify(DelegateTask delegateTask) {
 
         try (Connection connection = Context.getProcessEngineConfiguration().getDataSource().getConnection()) {
+
+            if (!gotActivated) {
+                gotActivated = true;
+                LOGGER.info("TaskanaTaskListener activated successfully, connected to " + connection.getMetaData().getURL());
+            }
 
             switch (delegateTask.getEventName()) {
 
