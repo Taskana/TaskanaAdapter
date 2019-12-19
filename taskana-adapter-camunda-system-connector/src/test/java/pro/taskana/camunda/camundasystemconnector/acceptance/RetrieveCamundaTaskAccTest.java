@@ -76,25 +76,28 @@ public class RetrieveCamundaTaskAccTest {
 
         String expectedReplyBody =
 
-            "[\n "
-                + " {\n"
-                + "   \"id\": 1,\n"
-                + "   \"type\": \"create\",\n"
-                + "   \"created\": \"1970-01-01T10:48:16.436+0100\",\n"
-                + "   \"payload\": "
-                + " \"{\\\"id\\\":\\\"801aca2e-1b25-11e9-b283-94819a5b525c\\\","
-                + "            \\\"created\\\":\\\"2019-01-14T15:22:30.811+0000\\\","
-                + "            \\\"priority\\\":\\\"50\\\","
-                + "            \\\"name\\\":\\\"modify Request\\\","
-                + "            \\\"assignee\\\":\\\"admin\\\","
-                + "            \\\"description\\\":\\\"blabla\\\","
-                + "            \\\"owner\\\":\\\"admin\\\","
-                + "            \\\"taskDefinitionKey\\\":\\\"Task_0yogl0i\\\", "
-                + "            \\\"classificationKey\\\":\\\"Schaden_1\\\","
-                + "            \\\"domain\\\":\\\"DOMAIN_B\\\""
-                + "           }\"\n"
-                + " }\n"
-                + "]";
+          "{"
+              + "\n" + "\"camundaTaskEventResources\":"
+                                 + "[\n "
+                                      + " {\n"
+                                      + "   \"id\": 1,\n"
+                                      + "   \"type\": \"create\",\n"
+                                      + "   \"created\": \"1970-01-01T10:48:16.436+0100\",\n"
+                                      + "   \"payload\": "
+                                        + " \"{\\\"id\\\":\\\"801aca2e-1b25-11e9-b283-94819a5b525c\\\","
+                                        + "            \\\"created\\\":\\\"2019-01-14T15:22:30.811+0000\\\","
+                                        + "            \\\"priority\\\":\\\"50\\\","
+                                        + "            \\\"name\\\":\\\"modify Request\\\","
+                                        + "            \\\"assignee\\\":\\\"admin\\\","
+                                        + "            \\\"description\\\":\\\"blabla\\\","
+                                        + "            \\\"owner\\\":\\\"admin\\\","
+                                        + "            \\\"taskDefinitionKey\\\":\\\"Task_0yogl0i\\\", "
+                                        + "            \\\"classificationKey\\\":\\\"Schaden_1\\\","
+                                        + "            \\\"domain\\\":\\\"DOMAIN_B\\\""
+                                        + "           }\"\n"
+                                        + " }\n"
+                                 + "]"
+          + "}";
 
         String camundaSystemUrl = "http://localhost:8080/";
         String requestUrl = camundaSystemUrl + "taskana-outbox/rest/events?type=create";
@@ -124,14 +127,19 @@ public class RetrieveCamundaTaskAccTest {
         expectedTask.setOutboxEventId("16");
         expectedTask.setOutboxEventType("complete");
 
-        String expectedReplyBody = "[\n"
-                +  "    {\n"
-                +  "        \"id\": 16,\n"
-                +  "        \"type\": \"complete\",\n"
-                +  "        \"created\": \"2019-11-26T16:55:52.460+0100\",\n"
-                +  "        \"payload\": \"{\\\"id\\\":\\\"2275fb87-1065-11ea-a7a0-02004c4f4f50\\\"}\"\n"
-                +  "    }\n"
-                +  "]";
+        String expectedReplyBody =
+            "{"
+                    + "\n"
+                 + "\"camundaTaskEventResources\":"
+                     + "[\n"
+                     +  "    {\n"
+                     +  "        \"id\": 16,\n"
+                     +  "        \"type\": \"complete\",\n"
+                     +  "        \"created\": \"2019-11-26T16:55:52.460+0100\",\n"
+                     +  "        \"payload\": \"{\\\"id\\\":\\\"2275fb87-1065-11ea-a7a0-02004c4f4f50\\\"}\"\n"
+                     +  "    }\n"
+                     +  "]"
+             + "}";
 
         String camundaSystemUrl = "http://localhost:8080";
         mockServer.expect(requestTo(camundaSystemUrl + "/taskana-outbox/rest/events?type=complete&type=delete"))
