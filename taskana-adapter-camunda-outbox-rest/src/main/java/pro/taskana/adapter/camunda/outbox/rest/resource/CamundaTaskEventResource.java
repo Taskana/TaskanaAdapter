@@ -3,7 +3,7 @@ package pro.taskana.adapter.camunda.outbox.rest.resource;
 /**
  * POJO that represents an event in the camunda outbox table.
  *
- * @author jhe.
+ *
  */
 public class CamundaTaskEventResource {
 

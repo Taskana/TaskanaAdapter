@@ -39,6 +39,12 @@
                         <version>${version.postgres}</version>
                         <scope>test</scope>
                 </dependency>
+				<dependency>
+						<groupId>org.jboss.resteasy</groupId>
+						<artifactId>jaxrs-api</artifactId>
+						<version>${version.resteasy.jaxrs}</version>
+						<scope>provided</scope>
+				</dependency>
 
         </dependencies>
 </project>
