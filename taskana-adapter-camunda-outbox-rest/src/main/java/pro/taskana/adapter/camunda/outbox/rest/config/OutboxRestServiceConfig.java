@@ -12,7 +12,7 @@ import pro.taskana.adapter.camunda.outbox.rest.controller.CamundaTaskEventsContr
  * Configures the outbox REST service.
  *
  */
-@ApplicationPath("/taskana-outbox/")
+@ApplicationPath("")
 public class OutboxRestServiceConfig extends Application {
 
     @Override

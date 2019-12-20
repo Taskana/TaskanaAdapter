@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pro.taskana.adapter.camunda.outbox.rest.controller.CamundaTaskEventsController;
-import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventResource;
+import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
 import spinjar.com.fasterxml.jackson.databind.JsonNode;
 import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,20 +42,20 @@ public class CamundaTaskEventsService {
 
     private DataSource dataSource = null;
 
-    public List<CamundaTaskEventResource> getEvents(List<String> requestedEventTypes) {
+    public List<CamundaTaskEvent> getEvents(List<String> requestedEventTypes) {
 
-        List<CamundaTaskEventResource> camundaTaskEventResources = new ArrayList<>();
+        List<CamundaTaskEvent> camundaTaskEvents = new ArrayList<>();
 
         if (requestedEventTypes.contains("create")) {
 
-            camundaTaskEventResources = getCreateEvents();
+            camundaTaskEvents = getCreateEvents();
 
         } else if (requestedEventTypes.contains("delete") && requestedEventTypes.contains("complete")) {
 
-            camundaTaskEventResources = getCompleteAndDeleteEvents();
+            camundaTaskEvents = getCompleteAndDeleteEvents();
         }
 
-        return camundaTaskEventResources;
+        return camundaTaskEvents;
 
     }
 
@@ -78,21 +78,21 @@ public class CamundaTaskEventsService {
 
     }
 
-    private List<CamundaTaskEventResource> getCreateEvents() {
+    private List<CamundaTaskEvent> getCreateEvents() {
 
-        List<CamundaTaskEventResource> camundaTaskEventResources = new ArrayList<>();
+        List<CamundaTaskEvent> camundaTaskEvents = new ArrayList<>();
 
         try (
             Connection connection = getConnection();
             PreparedStatement preparedStatement = getPreparedCreateEventsStatement(connection)) {
 
             ResultSet camundaTaskEventResultSet = preparedStatement.executeQuery();
-            camundaTaskEventResources = getCamundaTaskEventResources(camundaTaskEventResultSet);
+            camundaTaskEvents = getCamundaTaskEvents(camundaTaskEventResultSet);
 
         } catch (SQLException | NullPointerException e) {
             LOGGER.warn("Caught {} while trying to retrieve create events from the outbox", e);
         }
-        return camundaTaskEventResources;
+        return camundaTaskEvents;
     }
 
     private String preparePlaceHolders(int length) {
@@ -107,25 +107,25 @@ public class CamundaTaskEventsService {
         }
     }
 
-    private List<CamundaTaskEventResource> getCamundaTaskEventResources(ResultSet createEventsResultSet)
+    private List<CamundaTaskEvent> getCamundaTaskEvents(ResultSet createEventsResultSet)
         throws SQLException {
 
-        List<CamundaTaskEventResource> camundaTaskEventResources = new ArrayList<>();
+        List<CamundaTaskEvent> camundaTaskEvents = new ArrayList<>();
 
         while (createEventsResultSet.next()) {
 
-            CamundaTaskEventResource camundaTaskEventResource = new CamundaTaskEventResource();
+            CamundaTaskEvent camundaTaskEvent = new CamundaTaskEvent();
 
-            camundaTaskEventResource.setId(createEventsResultSet.getInt(1));
-            camundaTaskEventResource.setType(createEventsResultSet.getString(2));
-            camundaTaskEventResource.setCreated(formatDate(createEventsResultSet.getTimestamp(3)));
-            camundaTaskEventResource.setPayload(createEventsResultSet.getString(4));
+            camundaTaskEvent.setId(createEventsResultSet.getInt(1));
+            camundaTaskEvent.setType(createEventsResultSet.getString(2));
+            camundaTaskEvent.setCreated(formatDate(createEventsResultSet.getTimestamp(3)));
+            camundaTaskEvent.setPayload(createEventsResultSet.getString(4));
 
-            camundaTaskEventResources.add(camundaTaskEventResource);
+            camundaTaskEvents.add(camundaTaskEvent);
 
         }
 
-        return camundaTaskEventResources;
+        return camundaTaskEvents;
 
     }
 
@@ -157,22 +157,22 @@ public class CamundaTaskEventsService {
         return preparedStatement;
     }
 
-    private List<CamundaTaskEventResource> getCompleteAndDeleteEvents() {
+    private List<CamundaTaskEvent> getCompleteAndDeleteEvents() {
 
-        List<CamundaTaskEventResource> camundaTaskEventResources = new ArrayList<>();
+        List<CamundaTaskEvent> camundaTaskEvents = new ArrayList<>();
 
         try (
             Connection connection = getConnection();
             PreparedStatement preparedStatement = getPreparedCompleteAndDeleteEventsStatement(connection);) {
 
             ResultSet completeAndDeleteEventsResultSet = preparedStatement.executeQuery();
-            camundaTaskEventResources = getCamundaTaskEventResources(completeAndDeleteEventsResultSet);
+            camundaTaskEvents = getCamundaTaskEvents(completeAndDeleteEventsResultSet);
 
         } catch (SQLException | NullPointerException e) {
             LOGGER.warn("Caught {} while trying to retrieve complete/delete events from the outbox", e);
         }
 
-        return camundaTaskEventResources;
+        return camundaTaskEvents;
     }
 
     private PreparedStatement getPreparedCompleteAndDeleteEventsStatement(Connection connection) throws SQLException {

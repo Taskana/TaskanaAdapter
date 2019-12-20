@@ -11,30 +11,35 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventResource;
-import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventResourcesWrapper;
+import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
+import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEventList;
+import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventListResource;
+import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventListResourceAssembler;
 import pro.taskana.adapter.camunda.outbox.rest.service.CamundaTaskEventsService;
 
 /**
  * Controller for the Outbox REST service.
- * @author jhe
+ *
  */
-@Path("/rest/events")
+@Path("/rest-api/events")
 public class CamundaTaskEventsController {
 
     CamundaTaskEventsService camundaTaskEventService = new CamundaTaskEventsService();
+    CamundaTaskEventListResourceAssembler camundaTaskEventListResourceAssembler = new CamundaTaskEventListResourceAssembler();
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEvents(@QueryParam("type") final List<String> requestedEventTypes) {
 
-        List<CamundaTaskEventResource> camundaTaskEventResources = camundaTaskEventService
+        List<CamundaTaskEvent> camundaTaskEvents = camundaTaskEventService
             .getEvents(requestedEventTypes);
 
-        CamundaTaskEventResourcesWrapper camundaTaskEventResourcesWrapper = new CamundaTaskEventResourcesWrapper();
-        camundaTaskEventResourcesWrapper.setCamundaTaskEventResources(camundaTaskEventResources);
+        CamundaTaskEventList camundaTaskEventList = new CamundaTaskEventList();
+        camundaTaskEventList.setCamundaTaskEvents(camundaTaskEvents);
 
-        return Response.status(200).entity(camundaTaskEventResourcesWrapper).build();
+        CamundaTaskEventListResource camundaTaskEventListResource = camundaTaskEventListResourceAssembler.toResource(camundaTaskEventList);
+
+        return Response.status(200).entity(camundaTaskEventListResource).build();
     }
 
     @Path("/delete")
