@@ -77,7 +77,7 @@ public class RetrieveCamundaTaskAccTest {
         String expectedReplyBody =
 
           "{"
-              + "\n" + "\"camundaTaskEventResources\":"
+              + "\n" + "\"camundaTaskEvents\":"
                                  + "[\n "
                                       + " {\n"
                                       + "   \"id\": 1,\n"
@@ -100,7 +100,7 @@ public class RetrieveCamundaTaskAccTest {
           + "}";
 
         String camundaSystemUrl = "http://localhost:8080/";
-        String requestUrl = camundaSystemUrl + "taskana-outbox/rest/events?type=create";
+        String requestUrl = camundaSystemUrl + "taskana-outbox/rest-api/events?type=create";
 
         mockServer
             .expect(requestTo(requestUrl))
@@ -130,7 +130,7 @@ public class RetrieveCamundaTaskAccTest {
         String expectedReplyBody =
             "{"
                     + "\n"
-                 + "\"camundaTaskEventResources\":"
+                 + "\"camundaTaskEvents\":"
                      + "[\n"
                      +  "    {\n"
                      +  "        \"id\": 16,\n"
@@ -142,7 +142,7 @@ public class RetrieveCamundaTaskAccTest {
              + "}";
 
         String camundaSystemUrl = "http://localhost:8080";
-        mockServer.expect(requestTo(camundaSystemUrl + "/taskana-outbox/rest/events?type=complete&type=delete"))
+        mockServer.expect(requestTo(camundaSystemUrl + "/taskana-outbox/rest-api/events?type=complete&type=delete"))
             .andExpect(method(HttpMethod.GET))
             .andExpect(content().contentType(org.springframework.http.MediaType.APPLICATION_JSON))
             .andRespond(withSuccess(expectedReplyBody, MediaType.APPLICATION_JSON));
