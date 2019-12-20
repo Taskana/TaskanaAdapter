@@ -5,6 +5,6 @@
                   xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app
                                       http://xmlns.oracle.com/weblogic/weblogic-web-app/1.4/weblogic-web-app.xsd">
 
-  <context-root>/</context-root>
+  <context-root>/taskana-outbox</context-root>
 
 </weblogic-web-app>
