@@ -49,6 +49,9 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
     private void initOutbox(ProcessEngineConfigurationImpl processEngineConfiguration) {
 
         DataSource dataSource = processEngineConfiguration.getDataSource();
+        if (dataSource == null) {
+            return;
+        }
 
         String schema = getSchemaFrom(dataSource);
         schema = (schema == null || schema.isEmpty()) ? schema : DEFAULT_SCHEMA;
