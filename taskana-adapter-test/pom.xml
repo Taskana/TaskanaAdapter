@@ -78,7 +78,7 @@
                 </dependency>
                 <dependency>
                         <groupId>pro.taskana</groupId>
-                        <artifactId>taskana-adapter-camunda-tasklistener</artifactId>
+                        <artifactId>taskana-adapter-camunda-listener</artifactId>
                         <version>${project.version}</version>
                 </dependency>
 
