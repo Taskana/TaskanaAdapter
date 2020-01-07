@@ -20,7 +20,7 @@
                 </dependency>
                 <dependency>
                         <groupId>pro.taskana</groupId>
-                        <artifactId>taskana-adapter-camunda-tasklistener</artifactId>
+                        <artifactId>taskana-adapter-camunda-listener</artifactId>
                         <version>${project.version}</version>
                 </dependency>
                 <dependency>
@@ -39,12 +39,12 @@
                         <version>${version.postgres}</version>
                         <scope>test</scope>
                 </dependency>
-				<dependency>
-						<groupId>org.jboss.resteasy</groupId>
-						<artifactId>jaxrs-api</artifactId>
-						<version>${version.resteasy.jaxrs}</version>
-						<scope>provided</scope>
-				</dependency>
+                                <dependency>
+                                                <groupId>org.jboss.resteasy</groupId>
+                                                <artifactId>jaxrs-api</artifactId>
+                                                <version>${version.resteasy.jaxrs}</version>
+                                                <scope>provided</scope>
+                                </dependency>
 
         </dependencies>
 </project>

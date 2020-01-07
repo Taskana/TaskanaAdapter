@@ -96,7 +96,7 @@
                 <module>taskana-adapter-camunda-system-connector</module>
                 <module>taskana-adapter-taskana-connector</module>
                 <module>taskana-adapter-sample</module>
-                <module>taskana-adapter-camunda-tasklistener</module>
+                <module>taskana-adapter-camunda-listener</module>
                 <module>taskana-adapter-tasklistener-example</module>
                 <module>taskana-adapter-camunda-outbox-rest</module>
                 <module>taskana-adapter-outbox-rest-spring-boot-starter</module>
@@ -104,14 +104,14 @@
                 <module>taskana-adapter-test</module>
         </modules>
 
-		<repositories>
-			<repository>
-				<id>snapshots-repo</id>
-				<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-				<releases><enabled>false</enabled></releases>
-				<snapshots><enabled>true</enabled></snapshots>
-			</repository>
-		</repositories>
+                <repositories>
+                        <repository>
+                                <id>snapshots-repo</id>
+                                <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                                <releases><enabled>false</enabled></releases>
+                                <snapshots><enabled>true</enabled></snapshots>
+                        </repository>
+                </repositories>
 
         <profiles>
                 <profile>
