@@ -24,37 +24,49 @@ import pro.taskana.exceptions.SystemException;
 @Component
 public class CamundaTaskClaimer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskClaimer.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskClaimer.class);
 
-    @Autowired
-    private RestTemplate restTemplate;
+  @Autowired private RestTemplate restTemplate;
 
-    public SystemResponse claimCamundaTask(CamundaSystemUrls.SystemURLInfo camundaSystemUrlInfo, ReferencedTask referencedTask) {
+  public SystemResponse claimCamundaTask(
+      CamundaSystemUrls.SystemUrlInfo camundaSystemUrlInfo, ReferencedTask referencedTask) {
 
-        StringBuilder requestUrlBuilder = new StringBuilder();
+    StringBuilder requestUrlBuilder = new StringBuilder();
 
-        requestUrlBuilder.append(camundaSystemUrlInfo.getSystemRestUrl()).append(CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS)
-            .append(referencedTask.getId()).append(CamundaSystemConnectorImpl.SET_ASSIGNEE);
+    requestUrlBuilder
+        .append(camundaSystemUrlInfo.getSystemRestUrl())
+        .append(CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS)
+        .append(referencedTask.getId())
+        .append(CamundaSystemConnectorImpl.SET_ASSIGNEE);
 
-        String requestBody = CamundaSystemConnectorImpl.BODY_SET_ASSIGNEE + "\"" + referencedTask.getAssignee() + "\"}";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+    String requestBody =
+        CamundaSystemConnectorImpl.BODY_SET_ASSIGNEE + "\"" + referencedTask.getAssignee() + "\"}";
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
 
-        try {
-            ResponseEntity<String> responseEntity = restTemplate.postForEntity(requestUrlBuilder.toString(), requestEntity, String.class);
-            LOGGER.debug("claimed camunda task {}. Status code = {}", referencedTask.getId(),
-                responseEntity.getStatusCode());
+    try {
+      ResponseEntity<String> responseEntity =
+          restTemplate.postForEntity(requestUrlBuilder.toString(), requestEntity, String.class);
+      LOGGER.debug(
+          "claimed camunda task {}. Status code = {}",
+          referencedTask.getId(),
+          responseEntity.getStatusCode());
 
-            return new SystemResponse(responseEntity.getStatusCode(), null);
+      return new SystemResponse(responseEntity.getStatusCode(), null);
 
-        } catch (HttpStatusCodeException e) {
+    } catch (HttpStatusCodeException e) {
 
-            LOGGER.info("tried to claim camunda task {} and caught Status code {}", referencedTask.getId(),
-                e.getStatusCode());
-            throw new SystemException("caught HttpStatusCodeException " + e.getStatusCode()
-                + " on the attempt to claim Camunda Task " + referencedTask.getId(), e.getMostSpecificCause());
-        }
+      LOGGER.info(
+          "tried to claim camunda task {} and caught Status code {}",
+          referencedTask.getId(),
+          e.getStatusCode());
+      throw new SystemException(
+          "caught HttpStatusCodeException "
+              + e.getStatusCode()
+              + " on the attempt to claim Camunda Task "
+              + referencedTask.getId(),
+          e.getMostSpecificCause());
     }
-
+  }
 }

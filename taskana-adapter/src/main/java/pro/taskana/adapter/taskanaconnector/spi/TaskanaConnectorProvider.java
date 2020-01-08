@@ -6,9 +6,9 @@ import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 
 /**
  * The interface, a Provider for TaskanaSystemConnectors must implement.
- * @author bbr
  *
+ * @author bbr
  */
 public interface TaskanaConnectorProvider {
-    List<TaskanaConnector> create();
+  List<TaskanaConnector> create();
 }

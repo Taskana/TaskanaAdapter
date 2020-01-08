@@ -2,44 +2,41 @@ package pro.taskana.adapter.camunda.dto;
 
 import java.util.Map;
 
-/**
- * This class is represents a DTO which contains a process variable and its info.
- */
+/** This class is represents a DTO which contains a process variable and its info. */
 public class VariableValueDto {
 
-    protected String type;
+  protected String type;
 
-    protected Object value;
-    protected Map<String, Object> valueInfo;
+  protected Object value;
+  protected Map<String, Object> valueInfo;
 
-    public String getType() {
-        return type;
-    }
+  public VariableValueDto(String type, Object value, Map<String, Object> valueInfo) {
+    this.type = type;
+    this.value = value;
+    this.valueInfo = valueInfo;
+  }
 
-    public void setType(String type) {
-        this.type = type;
-    }
+  public String getType() {
+    return type;
+  }
 
-    public Object getValue() {
-        return value;
-    }
+  public void setType(String type) {
+    this.type = type;
+  }
 
-    public void setValue(Object value) {
-        this.value = value;
-    }
+  public Object getValue() {
+    return value;
+  }
 
-    public Map<String, Object> getValueInfo() {
-        return valueInfo;
-    }
+  public void setValue(Object value) {
+    this.value = value;
+  }
 
-    public void setValueInfo(Map<String, Object> valueInfo) {
-        this.valueInfo = valueInfo;
-    }
+  public Map<String, Object> getValueInfo() {
+    return valueInfo;
+  }
 
-
-    public VariableValueDto(String type, Object value, Map<String, Object> valueInfo) {
-        this.type = type;
-        this.value = value;
-        this.valueInfo = valueInfo;
-    }
+  public void setValueInfo(Map<String, Object> valueInfo) {
+    this.valueInfo = valueInfo;
+  }
 }
