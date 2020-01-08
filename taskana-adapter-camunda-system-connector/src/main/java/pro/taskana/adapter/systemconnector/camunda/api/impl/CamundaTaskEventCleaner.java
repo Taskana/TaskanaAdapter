@@ -1,7 +1,6 @@
 package pro.taskana.adapter.systemconnector.camunda.api.impl;
 
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,62 +14,68 @@ import pro.taskana.adapter.impl.TaskanaTaskStarter;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 
 /**
- * Clears events in the Camunda outbox after the corresponding action has been carried out by taskana.
+ * Clears events in the Camunda outbox after the corresponding action has been carried out by
+ * taskana.
  *
  * @author bbr
  */
 @Component
 public class CamundaTaskEventCleaner {
 
-    @Autowired
-    private RestTemplate restTemplate;
+  private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskStarter.class);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskStarter.class);
+  @Autowired private RestTemplate restTemplate;
 
-    public void cleanEventsForReferencedTasks(List<ReferencedTask> referencedTasks,
-        String camundaSystemTaskEventUrl) {
+  public void cleanEventsForReferencedTasks(
+      List<ReferencedTask> referencedTasks, String camundaSystemTaskEventUrl) {
 
-        LOGGER.debug("entry to cleanEventsForReferencedTasks, CamundSystemURL = {}", camundaSystemTaskEventUrl);
+    LOGGER.debug(
+        "entry to cleanEventsForReferencedTasks, CamundSystemURL = {}", camundaSystemTaskEventUrl);
 
-        String requestUrl = camundaSystemTaskEventUrl + CamundaSystemConnectorImpl.URL_OUTBOX_REST_PATH
+    String requestUrl =
+        camundaSystemTaskEventUrl
+            + CamundaSystemConnectorImpl.URL_OUTBOX_REST_PATH
             + CamundaSystemConnectorImpl.URL_DELETE_CAMUNDA_EVENTS;
 
-        if (referencedTasks == null || referencedTasks.isEmpty()) {
-            return;
-        }
-
-        String idsOfCamundaTaskEventsToDeleteFromOutbox = getIdsOfCamundaTaskEventsToDeleteFromOutbox(referencedTasks);
-        LOGGER.debug("delete Events url {} ", requestUrl);
-
-        deleteCamundaTaskEventsFromOutbox(requestUrl, idsOfCamundaTaskEventsToDeleteFromOutbox);
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("exit from cleanEventsForReferencedTasks.");
-        }
+    if (referencedTasks == null || referencedTasks.isEmpty()) {
+      return;
     }
 
-    private void deleteCamundaTaskEventsFromOutbox(String requestUrl, String idsOfCamundaTaskEventsToDeleteFromOutbox) {
+    String idsOfCamundaTaskEventsToDeleteFromOutbox =
+        getIdsOfCamundaTaskEventsToDeleteFromOutbox(referencedTasks);
+    LOGGER.debug("delete Events url {} ", requestUrl);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+    deleteCamundaTaskEventsFromOutbox(requestUrl, idsOfCamundaTaskEventsToDeleteFromOutbox);
 
-        HttpEntity<String> request = new HttpEntity<String>(idsOfCamundaTaskEventsToDeleteFromOutbox, headers);
-
-        restTemplate.postForObject(requestUrl, request, String.class);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("exit from cleanEventsForReferencedTasks.");
     }
+  }
 
-    private String getIdsOfCamundaTaskEventsToDeleteFromOutbox(List<ReferencedTask> referencedTasks) {
+  private void deleteCamundaTaskEventsFromOutbox(
+      String requestUrl, String idsOfCamundaTaskEventsToDeleteFromOutbox) {
 
-        StringBuilder idsBuf = new StringBuilder();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
 
-        idsBuf.append("{\"taskCreationIds\":[");
+    HttpEntity<String> request =
+        new HttpEntity<String>(idsOfCamundaTaskEventsToDeleteFromOutbox, headers);
 
-        for (ReferencedTask referencedTask : referencedTasks) {
-            idsBuf.append(referencedTask.getOutboxEventId().trim());
-            idsBuf.append(',');
-        }
-        idsBuf.append("]}");
-        String idsOfCamundaTaskEventsToDeleteFromOutbox = idsBuf.toString().replaceAll(",]", "]");
-        return idsOfCamundaTaskEventsToDeleteFromOutbox;
+    restTemplate.postForObject(requestUrl, request, String.class);
+  }
+
+  private String getIdsOfCamundaTaskEventsToDeleteFromOutbox(List<ReferencedTask> referencedTasks) {
+
+    StringBuilder idsBuf = new StringBuilder();
+
+    idsBuf.append("{\"taskCreationIds\":[");
+
+    for (ReferencedTask referencedTask : referencedTasks) {
+      idsBuf.append(referencedTask.getOutboxEventId().trim());
+      idsBuf.append(',');
     }
+    idsBuf.append("]}");
+    String idsOfCamundaTaskEventsToDeleteFromOutbox = idsBuf.toString().replaceAll(",]", "]");
+    return idsOfCamundaTaskEventsToDeleteFromOutbox;
+  }
 }

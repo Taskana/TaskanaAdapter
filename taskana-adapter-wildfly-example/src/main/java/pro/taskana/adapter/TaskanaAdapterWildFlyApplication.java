@@ -16,15 +16,22 @@ import pro.taskana.adapter.taskanaconnector.config.TaskanaSystemConnectorConfigu
  */
 @SpringBootApplication
 @EnableScheduling
-@ComponentScan(basePackages = {"pro.taskana.adapter", "pro.taskana.adapter.configuration", "pro.taskana",
-    "pro.taskana.adapter.systemconnector.camunda.config", "pro.taskana.adapter.taskanaconnector.config"})
-
-@Import({AdapterConfiguration.class, CamundaSystemConnectorConfiguration.class,
-    TaskanaSystemConnectorConfiguration.class})
+@ComponentScan(
+    basePackages = {
+      "pro.taskana.adapter",
+      "pro.taskana.adapter.configuration",
+      "pro.taskana",
+      "pro.taskana.adapter.systemconnector.camunda.config",
+      "pro.taskana.adapter.taskanaconnector.config"
+    })
+@Import({
+    AdapterConfiguration.class,
+    CamundaSystemConnectorConfiguration.class,
+    TaskanaSystemConnectorConfiguration.class
+})
 public class TaskanaAdapterWildFlyApplication extends SpringBootServletInitializer {
 
-    public static void main(String[] args) {
-        SpringApplication.run(TaskanaAdapterWildFlyApplication.class, args);
-    }
-
+  public static void main(String[] args) {
+    SpringApplication.run(TaskanaAdapterWildFlyApplication.class, args);
+  }
 }

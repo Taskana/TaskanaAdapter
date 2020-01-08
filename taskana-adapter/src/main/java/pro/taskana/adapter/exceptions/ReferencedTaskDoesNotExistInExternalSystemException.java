@@ -3,20 +3,20 @@ package pro.taskana.adapter.exceptions;
 import pro.taskana.exceptions.TaskanaRuntimeException;
 
 /**
- * This exception is thrown when an attempt is made to create a Taskana task for a referenced task that does not exist.
+ * This exception is thrown when an attempt is made to create a Taskana task for a referenced task
+ * that does not exist.
  *
  * @author bbr
  */
 public class ReferencedTaskDoesNotExistInExternalSystemException extends TaskanaRuntimeException {
 
-    public ReferencedTaskDoesNotExistInExternalSystemException(String msg) {
-        super(msg);
-    }
+  private static final long serialVersionUID = 1L;
 
-    public ReferencedTaskDoesNotExistInExternalSystemException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
+  public ReferencedTaskDoesNotExistInExternalSystemException(String msg) {
+    super(msg);
+  }
 
-    private static final long serialVersionUID = 1L;
-
+  public ReferencedTaskDoesNotExistInExternalSystemException(String msg, Throwable cause) {
+    super(msg, cause);
+  }
 }

@@ -4,9 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.sql.DataSource;
-
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -22,58 +20,58 @@ import pro.taskana.adapter.camunda.schemacreator.TaskanaOutboxSchemaCreator;
  */
 public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEnginePlugin {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaParseListenerProcessEnginePlugin.class);
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(TaskanaParseListenerProcessEnginePlugin.class);
 
-    private static final String DEFAULT_SCHEMA = "taskana_tables";
+  private static final String DEFAULT_SCHEMA = "taskana_tables";
 
-    @Override
-    public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  @Override
+  public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
 
-        initParseListeners(processEngineConfiguration);
-        initOutbox(processEngineConfiguration);
+    initParseListeners(processEngineConfiguration);
+    initOutbox(processEngineConfiguration);
+  }
+
+  private void initParseListeners(ProcessEngineConfigurationImpl processEngineConfiguration) {
+
+    List<BpmnParseListener> preParseListeners =
+        processEngineConfiguration.getCustomPreBPMNParseListeners();
+
+    if (preParseListeners == null) {
+      preParseListeners = new ArrayList<BpmnParseListener>();
+      processEngineConfiguration.setCustomPreBPMNParseListeners(preParseListeners);
     }
 
-    private void initParseListeners(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    preParseListeners.add(new TaskanaParseListener());
+  }
 
-        List<BpmnParseListener> preParseListeners = processEngineConfiguration.getCustomPreBPMNParseListeners();
+  private void initOutbox(ProcessEngineConfigurationImpl processEngineConfiguration) {
 
-        if (preParseListeners == null) {
-            preParseListeners = new ArrayList<BpmnParseListener>();
-            processEngineConfiguration.setCustomPreBPMNParseListeners(preParseListeners);
-        }
-
-        preParseListeners.add(new TaskanaParseListener());
-
+    DataSource dataSource = processEngineConfiguration.getDataSource();
+    if (dataSource == null) {
+      return;
     }
 
-    private void initOutbox(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    String schema = getSchemaFrom(dataSource);
+    schema = (schema == null || schema.isEmpty()) ? schema : DEFAULT_SCHEMA;
 
-        DataSource dataSource = processEngineConfiguration.getDataSource();
-        if (dataSource == null) {
-            return;
-        }
-
-        String schema = getSchemaFrom(dataSource);
-        schema = (schema == null || schema.isEmpty()) ? schema : DEFAULT_SCHEMA;
-
-        TaskanaOutboxSchemaCreator schemaCreator = new TaskanaOutboxSchemaCreator(dataSource, schema);
-        try {
-            schemaCreator.run();
-        } catch (Exception e) {
-            LOGGER.warn("Caught {} while trying to initialize the outbox-table", e);
-            // processEngineConfiguration.getProcessEngine().close();
-        }
+    TaskanaOutboxSchemaCreator schemaCreator = new TaskanaOutboxSchemaCreator(dataSource, schema);
+    try {
+      schemaCreator.run();
+    } catch (Exception e) {
+      LOGGER.warn("Caught {} while trying to initialize the outbox-table", e);
+      // processEngineConfiguration.getProcessEngine().close();
     }
+  }
 
-    private String getSchemaFrom(DataSource dataSource) {
-        try {
-            Connection connection = dataSource.getConnection();
-            String schema = connection.getSchema();
-            connection.close();
-            return schema;
-        } catch (SQLException e) {
-            return null;
-        }
+  private String getSchemaFrom(DataSource dataSource) {
+    try {
+      Connection connection = dataSource.getConnection();
+      String schema = connection.getSchema();
+      connection.close();
+      return schema;
+    } catch (SQLException e) {
+      return null;
     }
-
+  }
 }

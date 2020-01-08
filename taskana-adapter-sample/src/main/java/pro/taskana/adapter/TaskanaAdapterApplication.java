@@ -14,20 +14,17 @@ import pro.taskana.adapter.configuration.AdapterConfiguration;
  *
  * @author kkl
  */
-
 @SpringBootApplication
 @EnableAutoConfiguration
 @EnableScheduling
 @ComponentScan(basePackages = "pro.taskana.adapter")
 @Import({AdapterConfiguration.class})
-
 public class TaskanaAdapterApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(TaskanaAdapterApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(TaskanaAdapterApplication.class, args);
+  }
 
-    // this method prevents checkstyle from thinking this class is a utility class
-    public void dummy() {
-    }
+  // this method prevents checkstyle from thinking this class is a utility class
+  public void dummy() {}
 }

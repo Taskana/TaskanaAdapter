@@ -2,7 +2,6 @@ package pro.taskana.adapter.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,74 +22,80 @@ import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 @Component
 public class TaskanaTaskTerminator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskTerminator.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskTerminator.class);
 
-    @Autowired
-    AdapterManager adapterManager;
+  @Autowired AdapterManager adapterManager;
 
-    @Scheduled(
-        fixedRateString = "${taskana.adapter.scheduler.run.interval.for.check.cancelled.referenced.tasks.in.milliseconds:1000}")
-    public void retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks() {
+  @Scheduled(
+      fixedRateString =
+          "${taskana.adapter.scheduler.run.interval.for.check."
+              + "cancelled.referenced.tasks.in.milliseconds:1000}")
+  public void retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks() {
 
-        synchronized (AdapterManager.class) {
-            if (!adapterManager.isInitialized()) {
-                adapterManager.init();
-                return;
-            }
-        }
-
-        synchronized (TaskanaTaskTerminator.class) {
-
-            if (!adapterManager.isInitialized()) {
-                return;
-            }
-
-            LOGGER.debug(
-                "----------retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks started----------------------------");
-
-            try {
-
-                for (SystemConnector systemConnector : (adapterManager.getSystemConnectors().values())) {
-                    retrieveTerminatedReferencedTasksAndTerminateCorrespondingTaskanaTasks(systemConnector);
-                }
-            } catch (Exception e) {
-                LOGGER.warn("caught exception {} ", e);
-            }
-        }
+    synchronized (AdapterManager.class) {
+      if (!adapterManager.isInitialized()) {
+        adapterManager.init();
+        return;
+      }
     }
 
-    public void retrieveTerminatedReferencedTasksAndTerminateCorrespondingTaskanaTasks(
-        SystemConnector systemConnector) {
-        LOGGER
-            .trace("TaskanaTaskTerminator.retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks ENTRY ");
+    synchronized (TaskanaTaskTerminator.class) {
+      if (!adapterManager.isInitialized()) {
+        return;
+      }
 
-        List<ReferencedTask> tasksSuccessfullyTerminatedInTaskana = new ArrayList<>();
+      LOGGER.debug(
+          "--retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks started-----");
 
+      try {
+
+        for (SystemConnector systemConnector : (adapterManager.getSystemConnectors().values())) {
+          retrieveTerminatedReferencedTasksAndTerminateCorrespondingTaskanaTasks(systemConnector);
+        }
+      } catch (Exception e) {
+        LOGGER.warn("caught exception {} ", e);
+      }
+    }
+  }
+
+  public void retrieveTerminatedReferencedTasksAndTerminateCorrespondingTaskanaTasks(
+      SystemConnector systemConnector) {
+    LOGGER.trace(
+        "TaskanaTaskTerminator."
+            + "retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks ENTRY ");
+
+    List<ReferencedTask> tasksSuccessfullyTerminatedInTaskana = new ArrayList<>();
+
+    try {
+      List<ReferencedTask> taskanaTasksToTerminate = systemConnector.retrieveTerminatedTasks();
+
+      for (ReferencedTask referencedTask : taskanaTasksToTerminate) {
         try {
-            List<ReferencedTask> taskanaTasksToTerminate = systemConnector.retrieveTerminatedTasks();
-
-            for (ReferencedTask referencedTask : taskanaTasksToTerminate) {
-                try {
-                    terminateTaskanaTask(referencedTask);
-                    tasksSuccessfullyTerminatedInTaskana.add(referencedTask);
-                } catch (TaskTerminationFailedException ex) {
-                    LOGGER.error("attempted to terminate task with external Id {} and caught {}",
-                        referencedTask.getId(), ex);
-                }
-            }
-            systemConnector.taskanaTasksHaveBeenCompletedForTerminatedReferencedTasks(taskanaTasksToTerminate);
-
-        } finally {
-            LOGGER.trace(
-                "TaskanaTaskTerminator.retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks EXIT ");
+          terminateTaskanaTask(referencedTask);
+          tasksSuccessfullyTerminatedInTaskana.add(referencedTask);
+        } catch (TaskTerminationFailedException ex) {
+          LOGGER.error(
+              "attempted to terminate task with external Id {} and caught {}",
+              referencedTask.getId(),
+              ex);
         }
-    }
+      }
+      systemConnector.taskanaTasksHaveBeenCompletedForTerminatedReferencedTasks(
+          taskanaTasksToTerminate);
 
-    private void terminateTaskanaTask(ReferencedTask referencedTask) throws TaskTerminationFailedException {
-        LOGGER.trace("TaskanaTaskTerminator.terminateTaskanaTask ENTRY ");
-        TaskanaConnector taskanaConnector = adapterManager.getTaskanaConnector();
-        taskanaConnector.terminateTaskanaTask(referencedTask);
-
-        LOGGER.trace("TaskanaTaskTerminator.terminateTaskanaTask EXIT ");
+    } finally {
+      LOGGER.trace(
+          "TaskanaTaskTerminator."
+              + "retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks EXIT ");
     }
+  }
+
+  private void terminateTaskanaTask(ReferencedTask referencedTask)
+      throws TaskTerminationFailedException {
+    LOGGER.trace("TaskanaTaskTerminator.terminateTaskanaTask ENTRY ");
+    TaskanaConnector taskanaConnector = adapterManager.getTaskanaConnector();
+    taskanaConnector.terminateTaskanaTask(referencedTask);
+
+    LOGGER.trace("TaskanaTaskTerminator.terminateTaskanaTask EXIT ");
+  }
 }

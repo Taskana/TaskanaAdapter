@@ -5,10 +5,9 @@ package pro.taskana.adapter.exceptions;
  */
 public class UnsupportedDatabaseException extends RuntimeException {
 
-    public UnsupportedDatabaseException(String name) {
-        super("Database with '" + name + "' not found");
-    }
+  private static final long serialVersionUID = 1L;
 
-    private static final long serialVersionUID = 1L;
+  public UnsupportedDatabaseException(String name) {
+    super("Database with '" + name + "' not found");
+  }
 }
-
