@@ -27,7 +27,8 @@
                 <version.maven.javadoc>3.1.0</version.maven.javadoc>
                 <version.maven.failsafe.plugin>3.0.0-M4</version.maven.failsafe.plugin>
                 <version.maven.surefire.plugin>3.0.0-M4</version.maven.surefire.plugin>
-                <version.maven.checkstyle>3.0.0</version.maven.checkstyle>
+                <version.checkstyle>8.26</version.checkstyle>
+                <version.maven.checkstyle>3.1.0</version.maven.checkstyle>
                 <version.spring.boot.maven.plugin>2.0.2.RELEASE</version.spring.boot.maven.plugin>
                 <version.mybatis>3.4.6</version.mybatis>
                 <version.spring.mybatis>1.3.2</version.spring.mybatis>
@@ -294,18 +295,25 @@
                                 <groupId>org.apache.maven.plugins</groupId>
                                 <artifactId>maven-checkstyle-plugin</artifactId>
                                 <version>${version.maven.checkstyle}</version>
+                                <dependencies>
+                                        <dependency>
+                                                <artifactId>checkstyle</artifactId>
+                                                <groupId>com.puppycrawl.tools</groupId>
+                                                <version>${version.checkstyle}</version>
+                                        </dependency>
+                                </dependencies>
+                                <configuration>
+                                        <configLocation>qa/checkstyle/checkstyle.xml</configLocation>
+                                        <encoding>UTF-8</encoding>
+                                        <consoleOutput>true</consoleOutput>
+                                        <failsOnError>true</failsOnError>
+                                        <failOnViolation>true</failOnViolation>
+                                        <violationSeverity>warning</violationSeverity>
+                                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                                </configuration>
                                 <executions>
                                         <execution>
-                                                <id>validate</id>
-                                                <phase>validate</phase>
-                                                <configuration>
-                                                        <configLocation>qa/checkstyle/checkstyle.xml</configLocation>
-                                                        <encoding>UTF-8</encoding>
-                                                        <consoleOutput>true</consoleOutput>
-                                                        <failsOnError>true</failsOnError>
-                                                        <failOnViolation>true</failOnViolation>
-                                                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                                                </configuration>
+                                                <phase>process-classes</phase>
                                                 <goals>
                                                         <goal>check</goal>
                                                 </goals>

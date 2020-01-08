@@ -17,47 +17,56 @@ import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemUrls;
 import pro.taskana.exceptions.SystemException;
 
 /**
- * Cancels claims of tasks in camunda through the camunda REST-API that have a canceled claim in TASKANA.
+ * Cancels claims of tasks in camunda through the camunda REST-API that have a canceled claim in
+ * TASKANA.
  *
  * @author jhe
  */
 @Component
 public class CamundaTaskClaimCanceler {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskClaimer.class);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskClaimer.class);
+  @Autowired private RestTemplate restTemplate;
 
-    @Autowired
-    private RestTemplate restTemplate;
+  public SystemResponse cancelClaimOfCamundaTask(
+      CamundaSystemUrls.SystemUrlInfo camundaSystemUrlInfo, ReferencedTask referencedTask) {
 
-    public SystemResponse cancelClaimOfCamundaTask(
-        CamundaSystemUrls.SystemURLInfo camundaSystemUrlInfo, ReferencedTask referencedTask) {
+    StringBuilder requestUrlBuilder = new StringBuilder();
 
-        StringBuilder requestUrlBuilder = new StringBuilder();
+    requestUrlBuilder
+        .append(camundaSystemUrlInfo.getSystemRestUrl())
+        .append(CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS)
+        .append(referencedTask.getId())
+        .append(CamundaSystemConnectorImpl.UNCLAIM_TASK);
 
-        requestUrlBuilder.append(camundaSystemUrlInfo.getSystemRestUrl()).append(CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS)
-            .append(referencedTask.getId()).append(CamundaSystemConnectorImpl.UNCLAIM_TASK);
+    String requestBody = "{}";
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
 
-        String requestBody = "{}";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+    try {
+      ResponseEntity<String> responseEntity =
+          restTemplate.postForEntity(requestUrlBuilder.toString(), requestEntity, String.class);
+      LOGGER.debug(
+          "cancel claimed camunda task {}. Status code = {}",
+          referencedTask.getId(),
+          responseEntity.getStatusCode());
 
-        try {
-            ResponseEntity<String> responseEntity = restTemplate.postForEntity(requestUrlBuilder.toString(), requestEntity, String.class);
-            LOGGER.debug("cancel claimed camunda task {}. Status code = {}", referencedTask.getId(),
-                responseEntity.getStatusCode());
+      return new SystemResponse(responseEntity.getStatusCode(), null);
 
-            return new SystemResponse(responseEntity.getStatusCode(), null);
+    } catch (HttpStatusCodeException e) {
 
-        } catch (HttpStatusCodeException e) {
-
-            LOGGER.info("tried to cancel claim camunda task {} and caught Status code {}", referencedTask.getId(),
-                e.getStatusCode());
-            throw new SystemException("caught HttpStatusCodeException " + e.getStatusCode()
-                + " on the attempt to cancel claim Camunda Task " + referencedTask.getId(), e.getMostSpecificCause());
-        }
-
+      LOGGER.info(
+          "tried to cancel claim camunda task {} and caught Status code {}",
+          referencedTask.getId(),
+          e.getStatusCode());
+      throw new SystemException(
+          "caught HttpStatusCodeException "
+              + e.getStatusCode()
+              + " on the attempt to cancel claim Camunda Task "
+              + referencedTask.getId(),
+          e.getMostSpecificCause());
     }
-
+  }
 }

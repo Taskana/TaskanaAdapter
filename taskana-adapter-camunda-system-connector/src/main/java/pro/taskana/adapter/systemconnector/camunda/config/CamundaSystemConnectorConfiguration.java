@@ -19,24 +19,24 @@ import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskRetriever
 @DependsOn(value = {"adapterSpringContextProvider"})
 public class CamundaSystemConnectorConfiguration {
 
-    @Bean
-    CamundaSystemUrls camundaSystemUrls(@Value("${taskana-system-connector-camundaSystemURLs}") final String strUrls) {
-        return new CamundaSystemUrls(strUrls);
-    }
+  @Bean
+  CamundaSystemUrls camundaSystemUrls(
+      @Value("${taskana-system-connector-camundaSystemURLs}") final String strUrls) {
+    return new CamundaSystemUrls(strUrls);
+  }
 
-    @Bean
-    CamundaTaskRetriever camundaTaskRetriever() {
-        return new CamundaTaskRetriever();
-    }
+  @Bean
+  CamundaTaskRetriever camundaTaskRetriever() {
+    return new CamundaTaskRetriever();
+  }
 
-    @Bean
-    CamundaTaskCompleter camundaTaskCompleter() {
-        return new CamundaTaskCompleter();
-    }
+  @Bean
+  CamundaTaskCompleter camundaTaskCompleter() {
+    return new CamundaTaskCompleter();
+  }
 
-    @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        return builder.build();
-    }
-
+  @Bean
+  public RestTemplate restTemplate(RestTemplateBuilder builder) {
+    return builder.build();
+  }
 }

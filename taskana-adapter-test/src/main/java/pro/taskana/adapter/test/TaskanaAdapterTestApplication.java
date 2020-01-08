@@ -15,7 +15,6 @@ import pro.taskana.adapter.test.configuration.CamundaConfiguration;
  *
  * @author Ben Fuernrohr
  */
-
 @EnableScheduling
 @ComponentScan(basePackages = {"pro.taskana.adapter", "pro.taskana.adapter.test"})
 @Import({AdapterConfiguration.class, CamundaConfiguration.class})
@@ -23,11 +22,10 @@ import pro.taskana.adapter.test.configuration.CamundaConfiguration;
 @EnableProcessApplication
 public class TaskanaAdapterTestApplication {
 
-    public static void main(String... args) {
-        SpringApplication.run(TaskanaAdapterTestApplication.class, args);
-    }
+  public static void main(String... args) {
+    SpringApplication.run(TaskanaAdapterTestApplication.class, args);
+  }
 
-    // this method prevents checkstyle from thinking this class is a utility class
-    public void dummy() {
-    }
+  // this method prevents checkstyle from thinking this class is a utility class
+  public void dummy() {}
 }
