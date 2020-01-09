@@ -31,6 +31,7 @@ import uk.co.datumedge.hamcrest.json.SameJSONAs;
 @AutoConfigureWebTestClient
 @RunWith(JaasRunner.class)
 @ContextConfiguration
+@SuppressWarnings("checkstyle:LineLength")
 public class TestTaskAcquisition extends AbsIntegrationTest {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TestTaskAcquisition.class);
@@ -63,8 +64,9 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void multiple_user_task_process_insts_result_in_multiple_taskanaTasks()
-      throws JSONException, InterruptedException {
+  public void
+      multiple_user_task_process_instances_started_in_camunda_via_rest_should_result_in_multiple_taskanaTasks()
+          throws JSONException, InterruptedException {
 
     int numberOfProcesses = 10;
     List<List<String>> camundaTaskIdsList = new ArrayList<List<String>>();
@@ -92,12 +94,12 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void task_with_prim_vars_results_in_taskanaTask_with_those_variables()
-      throws JSONException, InterruptedException {
+  public void
+      task_with_primitive_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
+          throws JSONException, InterruptedException {
 
     String variables =
-        "\"variables\": {\"amount\": {\"value\":555, \"type\":\"long\"},"
-            + "\"item\": {\"value\": \"item-xyz\"}}";
+        "\"variables\": {\"amount\": {\"value\":555, \"type\":\"long\"},\"item\": {\"value\": \"item-xyz\"}}";
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", variables);
@@ -107,9 +109,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
     Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
     String assumedVariablesString =
-        "{\"amount\":{\"type\":\"Long\",\"value\":555,\"valueInfo\":{\"objectTypeName\":"
-            + "\"java.lang.Long\"}},\"item\":{\"type\":\"String\",\"value\":\"item-xyz\","
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.String\"}}}";
+        "{\"amount\":{\"type\":\"Long\",\"value\":555,\"valueInfo\":{\"objectTypeName\":\"java.lang.Long\"}},\"item\":{\"type\":\"String\",\"value\":\"item-xyz\",\"valueInfo\":{\"objectTypeName\":\"java.lang.String\"}}}";
     camundaTaskIds.forEach(
         camundaTaskId ->
             retrieveTaskanaTaskAndVerifyTaskVariables(camundaTaskId, assumedVariablesString));
@@ -119,8 +119,9 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void task_with_compl_vars_results_in_taskanaTask_with_those_variables()
-      throws JSONException, InterruptedException {
+  public void
+      task_with_complex_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
+          throws JSONException, InterruptedException {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -131,17 +132,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
     Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
     String assumedVariablesString =
-        "{\"attribute1\":{\"type\":\"ProcessVariableTestObject\",\"value\":{\"stringField\":"
-            + "\"\\fForm feed \\b Backspace \\t Tab \\\\Backslash \\n newLine \\r Carriage"
-            + " return \\\" DoubleQuote\",\"intField\":1,\"doubleField\":1.1,\"booleanField"
-            + "\":false,\"processVariableTestObjectTwoField\":{\"intFieldObjectTwo\":2,"
-            + "\"doubleFieldObjectTwo\":2.2,\"booleanFieldObjectTwo\":true,\"dateFieldObjectTwo"
-            + "\":\"1970-01-01 13:12:11\",\"stringFieldObjectTwo\":\"stringValueObjectTwo\"}},"
-            + "\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\"}"
-            + "},\"attribute2\":{\"type\":\"String\",\"value\":\"attribute2Value\",\"valueInfo\":"
-            + "{\"objectTypeName\":\"java.lang.String\"}},\"attribute3\":{\"type\":\"String\","
-            + "\"value\":\"attribute3Value\",\"valueInfo\":{\"objectTypeName\":\"java."
-            + "lang.String\"}}}";
+        "{\"attribute1\":{\"type\":\"ProcessVariableTestObject\",\"value\":{\"stringField\":\"\\fForm feed \\b Backspace \\t Tab \\\\Backslash \\n newLine \\r Carriage return \\\" DoubleQuote\",\"intField\":1,\"doubleField\":1.1,\"booleanField\":false,\"processVariableTestObjectTwoField\":{\"intFieldObjectTwo\":2,\"doubleFieldObjectTwo\":2.2,\"booleanFieldObjectTwo\":true,\"dateFieldObjectTwo\":\"1970-01-01 13:12:11\",\"stringFieldObjectTwo\":\"stringValueObjectTwo\"}},\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\"}},\"attribute2\":{\"type\":\"String\",\"value\":\"attribute2Value\",\"valueInfo\":{\"objectTypeName\":\"java.lang.String\"}},\"attribute3\":{\"type\":\"String\",\"value\":\"attribute3Value\",\"valueInfo\":{\"objectTypeName\":\"java.lang.String\"}}}";
     camundaTaskIds.forEach(
         camundaTaskId ->
             retrieveTaskanaTaskAndVerifyTaskVariables(camundaTaskId, assumedVariablesString));
@@ -151,8 +142,9 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void task_with_cmp_vars_from_par_exc_result_in_taskanaTasks_with_those_variables()
-      throws JSONException, InterruptedException {
+  public void
+      task_with_complex_variables_from_parent_execution_should_result_in_taskanaTasks_with_those_variables_in_custom_attributes()
+          throws JSONException, InterruptedException {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -178,17 +170,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
     Thread.sleep(this.adapterTaskPollingInterval);
 
     String assumedVariablesString =
-        "{\"attribute1\":{\"type\":\"ProcessVariableTestObject\",\"value\":{\"stringField\""
-            + ":\"\\fForm feed \\b Backspace \\t Tab \\\\Backslash \\n newLine \\r Carriage"
-            + " return \\\" DoubleQuote\",\"intField\":1,\"doubleField\":1.1,\"booleanField"
-            + "\":false,\"processVariableTestObjectTwoField\":{\"intFieldObjectTwo\":2,"
-            + "\"doubleFieldObjectTwo\":2.2,\"booleanFieldObjectTwo\":true,\"dateFieldObjectTwo\":"
-            + "\"1970-01-01 13:12:11\",\"stringFieldObjectTwo\":\"stringValueObjectTwo\"}},"
-            + "\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\"}"
-            + "},\"attribute2\":{\"type\":\"String\",\"value\":\"attribute2Value\",\"valueInfo\":"
-            + "{\"objectTypeName\":\"java.lang.String\"}},\"attribute3\":{\"type\":\"String\","
-            + "\"value\":\"attribute3Value\",\"valueInfo\":{\"objectTypeName\":"
-            + "\"java.lang.String\"}}}";
+        "{\"attribute1\":{\"type\":\"ProcessVariableTestObject\",\"value\":{\"stringField\":\"\\fForm feed \\b Backspace \\t Tab \\\\Backslash \\n newLine \\r Carriage return \\\" DoubleQuote\",\"intField\":1,\"doubleField\":1.1,\"booleanField\":false,\"processVariableTestObjectTwoField\":{\"intFieldObjectTwo\":2,\"doubleFieldObjectTwo\":2.2,\"booleanFieldObjectTwo\":true,\"dateFieldObjectTwo\":\"1970-01-01 13:12:11\",\"stringFieldObjectTwo\":\"stringValueObjectTwo\"}},\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\"}},\"attribute2\":{\"type\":\"String\",\"value\":\"attribute2Value\",\"valueInfo\":{\"objectTypeName\":\"java.lang.String\"}},\"attribute3\":{\"type\":\"String\",\"value\":\"attribute3Value\",\"valueInfo\":{\"objectTypeName\":\"java.lang.String\"}}}";
     camundaTaskIds.forEach(
         camundaTaskId ->
             retrieveTaskanaTaskAndVerifyTaskVariables(camundaTaskId, assumedVariablesString));

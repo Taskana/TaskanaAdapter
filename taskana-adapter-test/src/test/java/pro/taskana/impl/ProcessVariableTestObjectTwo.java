@@ -20,7 +20,7 @@ public class ProcessVariableTestObjectTwo implements Serializable {
       double doubleFieldObjectTwo,
       boolean booleanFieldObjectTwo,
       Date dateFieldObjectTwo) {
-    stringFieldObjectTwo = stringFieldObjectTwo;
+    this.stringFieldObjectTwo = stringFieldObjectTwo;
     this.intFieldObjectTwo = intFieldObjectTwo;
     this.doubleFieldObjectTwo = doubleFieldObjectTwo;
     this.booleanFieldObjectTwo = booleanFieldObjectTwo;
