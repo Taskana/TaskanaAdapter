@@ -58,6 +58,30 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
   }
 
   @Override
+  public void taskanaTasksHaveBeenCreatedForNewReferencedTasks(
+      List<ReferencedTask> referencedTasks) {
+    taskEventCleaner.cleanEventsForReferencedTasks(
+        referencedTasks, camundaSystemUrl.getSystemTaskEventUrl());
+  }
+
+  @Override
+  public List<ReferencedTask> retrieveTerminatedTasks() {
+    return taskRetriever.retrieveTerminatedCamundaTasks(camundaSystemUrl.getSystemTaskEventUrl());
+  }
+
+  @Override
+  public void taskanaTasksHaveBeenCompletedForTerminatedReferencedTasks(
+      List<ReferencedTask> referencedTasks) {
+    taskEventCleaner.cleanEventsForReferencedTasks(
+        referencedTasks, camundaSystemUrl.getSystemTaskEventUrl());
+  }
+
+  @Override
+  public String retrieveVariables(String taskId) {
+    return null;
+  }
+
+  @Override
   public SystemResponse completeReferencedTask(ReferencedTask camundaTask) {
     return taskCompleter.completeCamundaTask(camundaSystemUrl, camundaTask);
   }
@@ -75,29 +99,5 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
   @Override
   public String getSystemUrl() {
     return camundaSystemUrl.getSystemRestUrl();
-  }
-
-  @Override
-  public String retrieveVariables(String taskId) {
-    return null;
-  }
-
-  @Override
-  public List<ReferencedTask> retrieveTerminatedTasks() {
-    return taskRetriever.retrieveTerminatedCamundaTasks(camundaSystemUrl.getSystemTaskEventUrl());
-  }
-
-  @Override
-  public void taskanaTasksHaveBeenCreatedForNewReferencedTasks(
-      List<ReferencedTask> referencedTasks) {
-    taskEventCleaner.cleanEventsForReferencedTasks(
-        referencedTasks, camundaSystemUrl.getSystemTaskEventUrl());
-  }
-
-  @Override
-  public void taskanaTasksHaveBeenCompletedForTerminatedReferencedTasks(
-      List<ReferencedTask> referencedTasks) {
-    taskEventCleaner.cleanEventsForReferencedTasks(
-        referencedTasks, camundaSystemUrl.getSystemTaskEventUrl());
   }
 }

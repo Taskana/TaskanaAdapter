@@ -17,40 +17,22 @@ import org.slf4j.LoggerFactory;
  */
 public class DbCleaner {
 
-  /**
-   * encapsulates the type of the application database.
-   *
-   * @author bbr
-   */
-  public enum ApplicationDatabaseType {
-    TASKANA,
-    TASKANA_ADAPTER,
-    CAMUNDA,
-    OUTBOX
-  }
-
   private static final Logger LOGGER = LoggerFactory.getLogger(DbCleaner.class);
-
   private static final String TASKANA_DB_CLEAR_SCRIPT = "/sql/clear-taskana-db.sql";
-
   private static final String TASKANA_ADAPTER_DB_CLEAR_SCRIPT = "/sql/clear-taskana-adapter-db.sql";
   private static final String CAMUNDA_DB_CLEAR_SCRIPT = "/sql/clear-camunda-db.sql";
   private static final String OUTBOX_DB_CLEAR_SCRIPT = "/sql/clear-outbox-db.sql";
-
   private static final String TASKANA_ADAPTER_DB_CLEAR_POSTGRES =
       "/sql/clear-taskana-adapter-db-postgres.sql";
   private static final String OUTBOX_DB_CLEAR_POSTGRES = "/sql/clear-outbox-db-postgres.sql";
-
   private Map<ApplicationDatabaseType, String> typeScriptMap =
       new HashMap<ApplicationDatabaseType, String>();
   private Map<ApplicationDatabaseType, String> typeScriptMapPostgres =
       new HashMap<ApplicationDatabaseType, String>();
-
   private StringWriter outWriter = new StringWriter();
   private PrintWriter logWriter = new PrintWriter(outWriter);
   private StringWriter errorWriter = new StringWriter();
   private PrintWriter errorLogWriter = new PrintWriter(errorWriter);
-
   public DbCleaner() {
     this.typeScriptMap.put(ApplicationDatabaseType.TASKANA, TASKANA_DB_CLEAR_SCRIPT);
     this.typeScriptMap.put(
@@ -97,5 +79,17 @@ public class DbCleaner {
     if (!errorMsg.isEmpty() && errorMsg.indexOf("SQLCODE=-204, SQLSTATE=42704") == -1) {
       LOGGER.error(errorWriter.toString());
     }
+  }
+
+  /**
+   * encapsulates the type of the application database.
+   *
+   * @author bbr
+   */
+  public enum ApplicationDatabaseType {
+    TASKANA,
+    TASKANA_ADAPTER,
+    CAMUNDA,
+    OUTBOX
   }
 }

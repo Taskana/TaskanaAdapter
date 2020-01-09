@@ -19,10 +19,11 @@ import javax.sql.DataSource;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pro.taskana.adapter.camunda.outbox.rest.controller.CamundaTaskEventsController;
-import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
 import spinjar.com.fasterxml.jackson.databind.JsonNode;
 import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
+
+import pro.taskana.adapter.camunda.outbox.rest.controller.CamundaTaskEventsController;
+import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
 
 /**
  * Implementation of the Outbox REST service.
@@ -76,6 +77,11 @@ public class CamundaTaskEventsService {
     } catch (Exception e) {
       LOGGER.warn("Caught {} while trying to delete events from the outbox table", e);
     }
+  }
+
+  public static DataSource createDatasource(
+      String driver, String jdbcUrl, String username, String password) {
+    return new PooledDataSource(driver, jdbcUrl, username, password);
   }
 
   private List<CamundaTaskEvent> getCreateEvents() {
@@ -240,11 +246,6 @@ public class CamundaTaskEventsService {
     }
 
     return dataSource;
-  }
-
-  public static DataSource createDatasource(
-      String driver, String jdbcUrl, String username, String password) {
-    return new PooledDataSource(driver, jdbcUrl, username, password);
   }
 
   private String formatDate(Date date) {

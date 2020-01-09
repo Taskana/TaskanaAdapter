@@ -244,18 +244,6 @@ public class CamundaProcessengineRequester {
   }
 
   /**
-   * Helper method to create an HttpEntity from a provided body in JSON-format.
-   *
-   * @param jsonBody the body of the HttpEntity
-   * @return the created HttpEntity
-   */
-  private HttpEntity<String> prepareEntityFromBody(String jsonBody) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    return new HttpEntity<String>(jsonBody, headers);
-  }
-
-  /**
    * Determines if a provided assignee equals the assignee of a camunda task.
    *
    * @param assigneeValueToVerify a String of the assignee to verify
@@ -283,5 +271,17 @@ public class CamundaProcessengineRequester {
     }
 
     return false;
+  }
+
+  /**
+   * Helper method to create an HttpEntity from a provided body in JSON-format.
+   *
+   * @param jsonBody the body of the HttpEntity
+   * @return the created HttpEntity
+   */
+  private HttpEntity<String> prepareEntityFromBody(String jsonBody) {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    return new HttpEntity<String>(jsonBody, headers);
   }
 }
