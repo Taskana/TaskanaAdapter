@@ -163,45 +163,6 @@ public class ReferencedTask {
   }
 
   @Override
-  public String toString() {
-    return "ReferencedTask [id="
-        + id
-        + ", outboxEventId="
-        + outboxEventId
-        + ", outboxEventType="
-        + outboxEventType
-        + ", name="
-        + name
-        + ", assignee="
-        + assignee
-        + ", created="
-        + created
-        + ", due="
-        + due
-        + ", description="
-        + description
-        + ", owner="
-        + owner
-        + ", priority="
-        + priority
-        + ", suspended="
-        + suspended
-        + ", systemUrl="
-        + systemUrl
-        + ", taskDefinitionKey="
-        + taskDefinitionKey
-        + ", variables="
-        + variables
-        + ", domain="
-        + domain
-        + ", classificationKey="
-        + classificationKey
-        + ", workbasketKey="
-        + workbasketKey
-        + "]";
-  }
-
-  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
@@ -357,5 +318,44 @@ public class ReferencedTask {
       return false;
     }
     return true;
+  }
+
+  @Override
+  public String toString() {
+    return "ReferencedTask [id="
+        + id
+        + ", outboxEventId="
+        + outboxEventId
+        + ", outboxEventType="
+        + outboxEventType
+        + ", name="
+        + name
+        + ", assignee="
+        + assignee
+        + ", created="
+        + created
+        + ", due="
+        + due
+        + ", description="
+        + description
+        + ", owner="
+        + owner
+        + ", priority="
+        + priority
+        + ", suspended="
+        + suspended
+        + ", systemUrl="
+        + systemUrl
+        + ", taskDefinitionKey="
+        + taskDefinitionKey
+        + ", variables="
+        + variables
+        + ", domain="
+        + domain
+        + ", classificationKey="
+        + classificationKey
+        + ", workbasketKey="
+        + workbasketKey
+        + "]";
   }
 }

@@ -101,7 +101,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug(
           "the claims of the following taskana tasks were cancelled {} and "
-          + " must process their callback.",
+              + " must process their callback.",
           LoggerUtils.listToString(claimedTasks));
     }
 
@@ -110,26 +110,15 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     return result;
   }
 
-  private List<ReferencedTask> retrieveTaskanaTasksAndConvertToReferencedTasks(
-      List<TaskSummary> requestedTasks) {
+  @Override
+  public void changeReferencedTaskCallbackState(
+      List<ReferencedTask> referencedTasks, CallbackState callbackState) {
 
-    List<ReferencedTask> result = new ArrayList<>();
-
-    for (TaskSummary taskSummary : requestedTasks) {
-      try {
-        Task taskanaTask = taskService.getTask(taskSummary.getTaskId());
-        Map<String, String> callbackInfo = taskanaTask.getCallbackInfo();
-        if (callbackInfo != null
-            && callbackInfo.get(REFERENCED_TASK_ID) != null
-            && callbackInfo.get(SYSTEM_URL) != null) {
-          result.add(taskInformationMapper.convertToReferencedTask(taskanaTask));
-        }
-      } catch (TaskNotFoundException | NotAuthorizedException e) {
-        LOGGER.error("Caught {} when trying to retrieve requested taskana tasks.", e);
-      }
+    List<String> externalIds =
+        referencedTasks.stream().map(ReferencedTask::getId).collect(Collectors.toList());
+    if (!externalIds.isEmpty()) {
+      taskService.setCallbackStateForTasks(externalIds, callbackState);
     }
-
-    return result;
   }
 
   @Override
@@ -183,14 +172,25 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     }
   }
 
-  @Override
-  public void changeReferencedTaskCallbackState(
-      List<ReferencedTask> referencedTasks, CallbackState callbackState) {
+  private List<ReferencedTask> retrieveTaskanaTasksAndConvertToReferencedTasks(
+      List<TaskSummary> requestedTasks) {
 
-    List<String> externalIds =
-        referencedTasks.stream().map(ReferencedTask::getId).collect(Collectors.toList());
-    if (!externalIds.isEmpty()) {
-      taskService.setCallbackStateForTasks(externalIds, callbackState);
+    List<ReferencedTask> result = new ArrayList<>();
+
+    for (TaskSummary taskSummary : requestedTasks) {
+      try {
+        Task taskanaTask = taskService.getTask(taskSummary.getTaskId());
+        Map<String, String> callbackInfo = taskanaTask.getCallbackInfo();
+        if (callbackInfo != null
+            && callbackInfo.get(REFERENCED_TASK_ID) != null
+            && callbackInfo.get(SYSTEM_URL) != null) {
+          result.add(taskInformationMapper.convertToReferencedTask(taskanaTask));
+        }
+      } catch (TaskNotFoundException | NotAuthorizedException e) {
+        LOGGER.error("Caught {} when trying to retrieve requested taskana tasks.", e);
+      }
     }
+
+    return result;
   }
 }

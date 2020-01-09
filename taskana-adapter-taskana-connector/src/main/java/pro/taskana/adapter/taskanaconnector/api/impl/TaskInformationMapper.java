@@ -102,6 +102,29 @@ public class TaskInformationMapper {
     return taskanaTask;
   }
 
+  public ReferencedTask convertToReferencedTask(Task taskanaTask) {
+    ReferencedTask referencedTask = new ReferencedTask();
+    Map<String, String> callbackInfo = taskanaTask.getCallbackInfo();
+    if (callbackInfo != null) {
+      referencedTask.setSystemUrl(callbackInfo.get(TaskanaSystemConnectorImpl.SYSTEM_URL));
+      referencedTask.setId(taskanaTask.getExternalId());
+    }
+
+    Map<String, String> customAttributes = taskanaTask.getCustomAttributes();
+    if (customAttributes != null) {
+      referencedTask.setVariables(
+          customAttributes.get(TaskanaSystemConnectorImpl.REFERENCED_TASK_VARIABLES));
+    }
+    referencedTask.setName(taskanaTask.getName());
+    referencedTask.setDescription(taskanaTask.getDescription());
+    referencedTask.setAssignee(taskanaTask.getOwner());
+    return referencedTask;
+  }
+
+  boolean isValidString(String string) {
+    return !(string == null || string.isEmpty() || "null".equals(string));
+  }
+
   private void setTimestampsInTaskanaTask(TaskImpl taskanaTask, ReferencedTask camundaTask) {
     Instant created = convertStringToInstant(camundaTask.getCreated(), Instant.now());
     taskanaTask.setCreated(created);
@@ -120,25 +143,6 @@ public class TaskInformationMapper {
         return defaultTimestamp;
       }
     }
-  }
-
-  public ReferencedTask convertToReferencedTask(Task taskanaTask) {
-    ReferencedTask referencedTask = new ReferencedTask();
-    Map<String, String> callbackInfo = taskanaTask.getCallbackInfo();
-    if (callbackInfo != null) {
-      referencedTask.setSystemUrl(callbackInfo.get(TaskanaSystemConnectorImpl.SYSTEM_URL));
-      referencedTask.setId(taskanaTask.getExternalId());
-    }
-
-    Map<String, String> customAttributes = taskanaTask.getCustomAttributes();
-    if (customAttributes != null) {
-      referencedTask.setVariables(
-          customAttributes.get(TaskanaSystemConnectorImpl.REFERENCED_TASK_VARIABLES));
-    }
-    referencedTask.setName(taskanaTask.getName());
-    referencedTask.setDescription(taskanaTask.getDescription());
-    referencedTask.setAssignee(taskanaTask.getOwner());
-    return referencedTask;
   }
 
   private Instant parseDate(String date) {
@@ -160,10 +164,6 @@ public class TaskInformationMapper {
     objRef.setType(defaultType);
     objRef.setValue(defaultValue);
     return objRef;
-  }
-
-  boolean isValidString(String string) {
-    return !(string == null || string.isEmpty() || "null".equals(string));
   }
 
   @Override

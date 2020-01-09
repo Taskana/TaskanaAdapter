@@ -50,6 +50,23 @@ public class CamundaTaskRetriever {
     return referencedTasks;
   }
 
+  public List<ReferencedTask> retrieveTerminatedCamundaTasks(String camundaSystemUrl) {
+    LOGGER.debug("entry to retrieveFinishedCamundaTasks. CamundSystemURL = {} ", camundaSystemUrl);
+
+    List<CamundaTaskEvent> camundaTaskEvents =
+        getCamundaTaskEvents(
+            camundaSystemUrl, CamundaSystemConnectorImpl.URL_GET_CAMUNDA_COMPLETE_EVENTS);
+
+    List<ReferencedTask> referencedTasks =
+        getReferencedTasksFromCamundaTaskEvents(camundaTaskEvents);
+
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(
+          "exit from retrieveTerminatedCamundaTasks. Retrieved Tasks: {}", referencedTasks);
+    }
+    return referencedTasks;
+  }
+
   private List<CamundaTaskEvent> getCamundaTaskEvents(
       String camundaSystemTaskEventUrl, String eventSelector) {
 
@@ -100,23 +117,6 @@ public class CamundaTaskRetriever {
             e,
             referencedTaskJson);
       }
-    }
-    return referencedTasks;
-  }
-
-  public List<ReferencedTask> retrieveTerminatedCamundaTasks(String camundaSystemUrl) {
-    LOGGER.debug("entry to retrieveFinishedCamundaTasks. CamundSystemURL = {} ", camundaSystemUrl);
-
-    List<CamundaTaskEvent> camundaTaskEvents =
-        getCamundaTaskEvents(
-            camundaSystemUrl, CamundaSystemConnectorImpl.URL_GET_CAMUNDA_COMPLETE_EVENTS);
-
-    List<ReferencedTask> referencedTasks =
-        getReferencedTasksFromCamundaTaskEvents(camundaTaskEvents);
-
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(
-          "exit from retrieveTerminatedCamundaTasks. Retrieved Tasks: {}", referencedTasks);
     }
     return referencedTasks;
   }

@@ -18,5 +18,4 @@ public class TaskTerminationFailedException extends TaskanaException {
   public TaskTerminationFailedException(String msg, Throwable cause) {
     super(msg, cause);
   }
-
 }

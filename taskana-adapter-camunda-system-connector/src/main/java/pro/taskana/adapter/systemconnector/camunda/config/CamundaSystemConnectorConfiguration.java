@@ -20,6 +20,11 @@ import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskRetriever
 public class CamundaSystemConnectorConfiguration {
 
   @Bean
+  public RestTemplate restTemplate(RestTemplateBuilder builder) {
+    return builder.build();
+  }
+
+  @Bean
   CamundaSystemUrls camundaSystemUrls(
       @Value("${taskana-system-connector-camundaSystemURLs}") final String strUrls) {
     return new CamundaSystemUrls(strUrls);
@@ -33,10 +38,5 @@ public class CamundaSystemConnectorConfiguration {
   @Bean
   CamundaTaskCompleter camundaTaskCompleter() {
     return new CamundaTaskCompleter();
-  }
-
-  @Bean
-  public RestTemplate restTemplate(RestTemplateBuilder builder) {
-    return builder.build();
   }
 }

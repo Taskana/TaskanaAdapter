@@ -45,6 +45,37 @@ public class TaskanaOutboxSchemaCreator {
     this.schemaName = schemaName;
   }
 
+  /**
+   * Run all db scripts.
+   *
+   * @throws SQLException will be thrown if there will be some incorrect SQL statements invoked.
+   */
+  public void run() throws SQLException {
+    Connection connection = dataSource.getConnection();
+    ScriptRunner runner = new ScriptRunner(connection);
+    LOGGER.debug(connection.getMetaData().toString());
+    String databaseProductName = connection.getMetaData().getDatabaseProductName();
+    runner.setStopOnError(true);
+    runner.setLogWriter(logWriter);
+    runner.setErrorLogWriter(errorLogWriter);
+    try {
+      if (!isSchemaPreexisting(connection, databaseProductName)) {
+        BufferedReader reader =
+            new BufferedReader(
+                new InputStreamReader(
+                    this.getClass()
+                        .getResourceAsStream(selectDbScriptFileName(databaseProductName))));
+        runner.runScript(getSqlSchemaNameParsed(reader, databaseProductName));
+      }
+    } finally {
+      runner.closeConnection();
+    }
+    LOGGER.debug(outWriter.toString());
+    if (!errorWriter.toString().trim().isEmpty()) {
+      LOGGER.error(errorWriter.toString());
+    }
+  }
+
   private ScriptRunner getScriptRunnerInstance(Connection connection) {
     ScriptRunner runner = new ScriptRunner(connection);
     runner.setStopOnError(true);
@@ -97,37 +128,6 @@ public class TaskanaOutboxSchemaCreator {
       return DB_SCHEMA_ORACLE;
     } else {
       return DB_SCHEMA_DB2;
-    }
-  }
-
-  /**
-   * Run all db scripts.
-   *
-   * @throws SQLException will be thrown if there will be some incorrect SQL statements invoked.
-   */
-  public void run() throws SQLException {
-    Connection connection = dataSource.getConnection();
-    ScriptRunner runner = new ScriptRunner(connection);
-    LOGGER.debug(connection.getMetaData().toString());
-    String databaseProductName = connection.getMetaData().getDatabaseProductName();
-    runner.setStopOnError(true);
-    runner.setLogWriter(logWriter);
-    runner.setErrorLogWriter(errorLogWriter);
-    try {
-      if (!isSchemaPreexisting(connection, databaseProductName)) {
-        BufferedReader reader =
-            new BufferedReader(
-                new InputStreamReader(
-                    this.getClass()
-                        .getResourceAsStream(selectDbScriptFileName(databaseProductName))));
-        runner.runScript(getSqlSchemaNameParsed(reader, databaseProductName));
-      }
-    } finally {
-      runner.closeConnection();
-    }
-    LOGGER.debug(outWriter.toString());
-    if (!errorWriter.toString().trim().isEmpty()) {
-      LOGGER.error(errorWriter.toString());
     }
   }
 
