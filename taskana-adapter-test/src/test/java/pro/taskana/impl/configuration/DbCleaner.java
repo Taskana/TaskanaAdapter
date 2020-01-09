@@ -33,6 +33,7 @@ public class DbCleaner {
   private PrintWriter logWriter = new PrintWriter(outWriter);
   private StringWriter errorWriter = new StringWriter();
   private PrintWriter errorLogWriter = new PrintWriter(errorWriter);
+
   public DbCleaner() {
     this.typeScriptMap.put(ApplicationDatabaseType.TASKANA, TASKANA_DB_CLEAR_SCRIPT);
     this.typeScriptMap.put(
