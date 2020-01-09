@@ -25,9 +25,9 @@ import pro.taskana.adapter.taskanaconnector.config.TaskanaSystemConnectorConfigu
       "pro.taskana.adapter.taskanaconnector.config"
     })
 @Import({
-    AdapterConfiguration.class,
-    CamundaSystemConnectorConfiguration.class,
-    TaskanaSystemConnectorConfiguration.class
+  AdapterConfiguration.class,
+  CamundaSystemConnectorConfiguration.class,
+  TaskanaSystemConnectorConfiguration.class
 })
 public class TaskanaAdapterWildFlyApplication extends SpringBootServletInitializer {
 

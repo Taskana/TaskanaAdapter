@@ -68,17 +68,6 @@ public class ReferencedTaskCompleter {
     }
   }
 
-  private List<ReferencedTask> completeReferencedTasksInExternalSystem(
-      List<ReferencedTask> tasksCompletedByTaskana) {
-    List<ReferencedTask> tasksCompletedInExternalSystem = new ArrayList<>();
-    for (ReferencedTask referencedTask : tasksCompletedByTaskana) {
-      if (completeReferencedTask(referencedTask)) {
-        tasksCompletedInExternalSystem.add(referencedTask);
-      }
-    }
-    return tasksCompletedInExternalSystem;
-  }
-
   public boolean completeReferencedTask(ReferencedTask referencedTask) {
     LOGGER.trace(
         "ENTRY to ReferencedTaskCompleter.completeReferencedTask, TaskId = {} ",
@@ -100,5 +89,16 @@ public class ReferencedTaskCompleter {
     LOGGER.trace(
         "Exit from ReferencedTaskCompleter.completeReferencedTask, Success = {} ", success);
     return success;
+  }
+
+  private List<ReferencedTask> completeReferencedTasksInExternalSystem(
+      List<ReferencedTask> tasksCompletedByTaskana) {
+    List<ReferencedTask> tasksCompletedInExternalSystem = new ArrayList<>();
+    for (ReferencedTask referencedTask : tasksCompletedByTaskana) {
+      if (completeReferencedTask(referencedTask)) {
+        tasksCompletedInExternalSystem.add(referencedTask);
+      }
+    }
+    return tasksCompletedInExternalSystem;
   }
 }

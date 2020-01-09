@@ -64,7 +64,7 @@ public abstract class AbsIntegrationTest {
 
   @Value(
       "${taskana.adapter.scheduler.run.interval.for.check.cancelled.referenced."
-      + "tasks.in.milliseconds}")
+          + "tasks.in.milliseconds}")
   protected long adapterCancelPollingInterval;
 
   @Value("${adapter.polling.inverval.adjustment.factor}")
@@ -77,7 +77,6 @@ public abstract class AbsIntegrationTest {
   @Autowired private TestRestTemplate restTemplate;
 
   @Autowired private ProcessEngineConfiguration processEngineConfiguration;
-
 
   @Resource(name = "taskanaDataSource")
   private DataSource taskanaDataSource;

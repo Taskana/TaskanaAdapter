@@ -19,6 +19,16 @@ import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskRetriever
 public class CamundaConnectorTestConfiguration {
 
   @Bean
+  public RestTemplate restTemplate(RestTemplateBuilder builder) {
+    return builder.build();
+  }
+
+  @Bean
+  public RestTemplateBuilder restTemplateBuilder() {
+    return new RestTemplateBuilder(new MockServerRestTemplateCustomizer());
+  }
+
+  @Bean
   ObjectMapper objectMapper() {
     return new ObjectMapper();
   }
@@ -31,15 +41,5 @@ public class CamundaConnectorTestConfiguration {
   @Bean
   CamundaTaskCompleter camundaTaskCompleter() {
     return new CamundaTaskCompleter();
-  }
-
-  @Bean
-  public RestTemplate restTemplate(RestTemplateBuilder builder) {
-    return builder.build();
-  }
-
-  @Bean
-  public RestTemplateBuilder restTemplateBuilder() {
-    return new RestTemplateBuilder(new MockServerRestTemplateCustomizer());
   }
 }

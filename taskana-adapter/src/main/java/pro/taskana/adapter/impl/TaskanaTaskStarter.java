@@ -72,6 +72,23 @@ public class TaskanaTaskStarter {
     }
   }
 
+  public void createTaskanaTask(
+      ReferencedTask referencedTask, TaskanaConnector connector, SystemConnector systemConnector)
+      throws TaskCreationFailedException {
+    LOGGER.trace("TaskanaTaskStarter.createTaskanaTask ENTRY ");
+    referencedTask.setSystemUrl(systemConnector.getSystemUrl());
+    try {
+      addVariablesToReferencedTask(referencedTask, systemConnector);
+      Task taskanaTask = connector.convertToTaskanaTask(referencedTask);
+      connector.createTaskanaTask(taskanaTask);
+    } catch (ReferencedTaskDoesNotExistInExternalSystemException e) {
+      LOGGER.warn(
+          "While attempting to retrieve variables for task {} caught ", referencedTask.getId(), e);
+    }
+
+    LOGGER.trace("TaskanaTaskStarter.createTaskanaTask EXIT ");
+  }
+
   private List<ReferencedTask> createAndStartTaskanaTasks(
       SystemConnector systemConnector, List<ReferencedTask> tasksToStart) {
     List<ReferencedTask> newCreatedTasksInTaskana = new ArrayList<>();
@@ -96,23 +113,6 @@ public class TaskanaTaskStarter {
       }
     }
     return newCreatedTasksInTaskana;
-  }
-
-  public void createTaskanaTask(
-      ReferencedTask referencedTask, TaskanaConnector connector, SystemConnector systemConnector)
-      throws TaskCreationFailedException {
-    LOGGER.trace("TaskanaTaskStarter.createTaskanaTask ENTRY ");
-    referencedTask.setSystemUrl(systemConnector.getSystemUrl());
-    try {
-      addVariablesToReferencedTask(referencedTask, systemConnector);
-      Task taskanaTask = connector.convertToTaskanaTask(referencedTask);
-      connector.createTaskanaTask(taskanaTask);
-    } catch (ReferencedTaskDoesNotExistInExternalSystemException e) {
-      LOGGER.warn(
-          "While attempting to retrieve variables for task {} caught ", referencedTask.getId(), e);
-    }
-
-    LOGGER.trace("TaskanaTaskStarter.createTaskanaTask EXIT ");
   }
 
   private void addVariablesToReferencedTask(
