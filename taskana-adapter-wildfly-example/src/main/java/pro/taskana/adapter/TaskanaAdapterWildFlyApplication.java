@@ -24,6 +24,7 @@ import pro.taskana.adapter.taskanaconnector.config.TaskanaSystemConnectorConfigu
       "pro.taskana.adapter.systemconnector.camunda.config",
       "pro.taskana.adapter.taskanaconnector.config"
     })
+@SuppressWarnings("checkstyle:Indentation")
 @Import({
   AdapterConfiguration.class,
   CamundaSystemConnectorConfiguration.class,
