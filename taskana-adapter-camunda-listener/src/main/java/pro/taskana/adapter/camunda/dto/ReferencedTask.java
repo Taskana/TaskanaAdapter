@@ -1,5 +1,7 @@
 package pro.taskana.adapter.camunda.dto;
 
+import java.util.Objects;
+
 /**
  * POJO that represents a task in the external system.
  *
@@ -164,26 +166,24 @@ public class ReferencedTask {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((assignee == null) ? 0 : assignee.hashCode());
-    result = prime * result + ((classificationKey == null) ? 0 : classificationKey.hashCode());
-    result = prime * result + ((created == null) ? 0 : created.hashCode());
-    result = prime * result + ((description == null) ? 0 : description.hashCode());
-    result = prime * result + ((domain == null) ? 0 : domain.hashCode());
-    result = prime * result + ((due == null) ? 0 : due.hashCode());
-    result = prime * result + ((id == null) ? 0 : id.hashCode());
-    result = prime * result + ((name == null) ? 0 : name.hashCode());
-    result = prime * result + ((outboxEventId == null) ? 0 : outboxEventId.hashCode());
-    result = prime * result + ((outboxEventType == null) ? 0 : outboxEventType.hashCode());
-    result = prime * result + ((owner == null) ? 0 : owner.hashCode());
-    result = prime * result + ((priority == null) ? 0 : priority.hashCode());
-    result = prime * result + ((suspended == null) ? 0 : suspended.hashCode());
-    result = prime * result + ((systemUrl == null) ? 0 : systemUrl.hashCode());
-    result = prime * result + ((taskDefinitionKey == null) ? 0 : taskDefinitionKey.hashCode());
-    result = prime * result + ((variables == null) ? 0 : variables.hashCode());
-    result = prime * result + ((workbasketKey == null) ? 0 : workbasketKey.hashCode());
-    return result;
+    return Objects.hash(
+        id,
+        outboxEventId,
+        outboxEventType,
+        name,
+        assignee,
+        created,
+        due,
+        description,
+        owner,
+        priority,
+        suspended,
+        systemUrl,
+        taskDefinitionKey,
+        variables,
+        domain,
+        classificationKey,
+        workbasketKey);
   }
 
   @Override
@@ -191,133 +191,27 @@ public class ReferencedTask {
     if (this == obj) {
       return true;
     }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
+    if (!(obj instanceof ReferencedTask)) {
       return false;
     }
     ReferencedTask other = (ReferencedTask) obj;
-    if (assignee == null) {
-      if (other.assignee != null) {
-        return false;
-      }
-    } else if (!assignee.equals(other.assignee)) {
-      return false;
-    }
-    if (classificationKey == null) {
-      if (other.classificationKey != null) {
-        return false;
-      }
-    } else if (!classificationKey.equals(other.classificationKey)) {
-      return false;
-    }
-    if (created == null) {
-      if (other.created != null) {
-        return false;
-      }
-    } else if (!created.equals(other.created)) {
-      return false;
-    }
-    if (description == null) {
-      if (other.description != null) {
-        return false;
-      }
-    } else if (!description.equals(other.description)) {
-      return false;
-    }
-    if (domain == null) {
-      if (other.domain != null) {
-        return false;
-      }
-    } else if (!domain.equals(other.domain)) {
-      return false;
-    }
-    if (due == null) {
-      if (other.due != null) {
-        return false;
-      }
-    } else if (!due.equals(other.due)) {
-      return false;
-    }
-    if (id == null) {
-      if (other.id != null) {
-        return false;
-      }
-    } else if (!id.equals(other.id)) {
-      return false;
-    }
-    if (name == null) {
-      if (other.name != null) {
-        return false;
-      }
-    } else if (!name.equals(other.name)) {
-      return false;
-    }
-    if (outboxEventId == null) {
-      if (other.outboxEventId != null) {
-        return false;
-      }
-    } else if (!outboxEventId.equals(other.outboxEventId)) {
-      return false;
-    }
-    if (outboxEventType == null) {
-      if (other.outboxEventType != null) {
-        return false;
-      }
-    } else if (!outboxEventType.equals(other.outboxEventType)) {
-      return false;
-    }
-    if (owner == null) {
-      if (other.owner != null) {
-        return false;
-      }
-    } else if (!owner.equals(other.owner)) {
-      return false;
-    }
-    if (priority == null) {
-      if (other.priority != null) {
-        return false;
-      }
-    } else if (!priority.equals(other.priority)) {
-      return false;
-    }
-    if (suspended == null) {
-      if (other.suspended != null) {
-        return false;
-      }
-    } else if (!suspended.equals(other.suspended)) {
-      return false;
-    }
-    if (systemUrl == null) {
-      if (other.systemUrl != null) {
-        return false;
-      }
-    } else if (!systemUrl.equals(other.systemUrl)) {
-      return false;
-    }
-    if (taskDefinitionKey == null) {
-      if (other.taskDefinitionKey != null) {
-        return false;
-      }
-    } else if (!taskDefinitionKey.equals(other.taskDefinitionKey)) {
-      return false;
-    }
-    if (variables == null) {
-      if (other.variables != null) {
-        return false;
-      }
-    } else if (!variables.equals(other.variables)) {
-      return false;
-    }
-    if (workbasketKey == null) {
-      if (other.workbasketKey != null) {
-        return false;
-      }
-    } else if (!workbasketKey.equals(other.workbasketKey)) {
-      return false;
-    }
-    return true;
+    return Objects.equals(id, other.id)
+        && Objects.equals(outboxEventId, other.outboxEventId)
+        && Objects.equals(outboxEventType, other.outboxEventType)
+        && Objects.equals(name, other.name)
+        && Objects.equals(assignee, other.assignee)
+        && Objects.equals(created, other.created)
+        && Objects.equals(due, other.due)
+        && Objects.equals(description, other.description)
+        && Objects.equals(owner, other.owner)
+        && Objects.equals(priority, other.priority)
+        && Objects.equals(suspended, other.suspended)
+        && Objects.equals(systemUrl, other.systemUrl)
+        && Objects.equals(taskDefinitionKey, other.taskDefinitionKey)
+        && Objects.equals(variables, other.variables)
+        && Objects.equals(domain, other.domain)
+        && Objects.equals(classificationKey, other.classificationKey)
+        && Objects.equals(workbasketKey, other.workbasketKey);
   }
 
   @Override
