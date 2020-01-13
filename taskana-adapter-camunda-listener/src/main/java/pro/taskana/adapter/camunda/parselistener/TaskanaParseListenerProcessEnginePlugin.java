@@ -1,9 +1,10 @@
 package pro.taskana.adapter.camunda.parselistener;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import javax.sql.DataSource;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
@@ -43,6 +44,8 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
     }
 
     preParseListeners.add(new TaskanaParseListener());
+
+    LOGGER.debug("TaskanaParseListener registered successfully");
   }
 
   private void initOutbox(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -52,26 +55,42 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
       return;
     }
 
-    String schema = getSchemaFrom(dataSource);
-    schema = (schema == null || schema.isEmpty()) ? schema : DEFAULT_SCHEMA;
+    String outboxSchema = getSchemaFromProperties();
+    outboxSchema = (outboxSchema == null || outboxSchema.isEmpty()) ? DEFAULT_SCHEMA : outboxSchema;
 
-    TaskanaOutboxSchemaCreator schemaCreator = new TaskanaOutboxSchemaCreator(dataSource, schema);
+    TaskanaOutboxSchemaCreator schemaCreator = new TaskanaOutboxSchemaCreator(dataSource,
+        outboxSchema);
     try {
       schemaCreator.run();
     } catch (Exception e) {
       LOGGER.warn("Caught {} while trying to initialize the outbox-table", e);
       // processEngineConfiguration.getProcessEngine().close();
     }
+
+    LOGGER.debug("TaskanaOutbox initialized successfully");
   }
 
-  private String getSchemaFrom(DataSource dataSource) {
+  private String getSchemaFromProperties() {
+    InputStream propertiesStream =
+        TaskanaParseListenerProcessEnginePlugin.class
+            .getClassLoader()
+            .getResourceAsStream("taskana-outbox-schema.properties");
+
+    Properties properties = new Properties();
+    String outboxSchema = null;
+
     try {
-      Connection connection = dataSource.getConnection();
-      String schema = connection.getSchema();
-      connection.close();
-      return schema;
-    } catch (SQLException e) {
-      return null;
+
+      properties.load(propertiesStream);
+      outboxSchema = properties.getProperty("taskana.outbox.schema");
+
+
+    } catch (IOException | NullPointerException e) {
+      LOGGER.warn(
+          "Caught {} while trying to retrieve the outbox-schema from the provided properties file",
+          e);
     }
+
+    return outboxSchema;
   }
 }

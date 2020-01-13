@@ -19,11 +19,10 @@ import javax.sql.DataSource;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spinjar.com.fasterxml.jackson.databind.JsonNode;
-import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
-
 import pro.taskana.adapter.camunda.outbox.rest.controller.CamundaTaskEventsController;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
+import spinjar.com.fasterxml.jackson.databind.JsonNode;
+import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Implementation of the Outbox REST service.
@@ -34,12 +33,14 @@ public class CamundaTaskEventsService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskEventsService.class);
 
+  private static String outboxSchema = getSchemaFromProperties();
+
   private static final String SQL_GET_CREATE_EVENTS =
-      "SELECT * FROM taskana_tables.event_store WHERE type = ?";
+      "SELECT * FROM " + outboxSchema + ".event_store WHERE type = ?";
   private static final String SQL_GET_COMPLETE_AND_DELETE_EVENTS =
-      "SELECT * FROM taskana_tables.event_store WHERE type = ? OR type = ?";
+      "SELECT * FROM " + outboxSchema + ".event_store WHERE type = ? OR type = ?";
   private static final String SQL_WITHOUT_PLACEHOLDERS_DELETE_EVENTS =
-      "DELETE FROM taskana_tables.event_store WHERE id in (%s)";
+      "DELETE FROM " + outboxSchema + ".event_store WHERE id in (%s)";
 
   private DataSource dataSource = null;
 
@@ -246,6 +247,34 @@ public class CamundaTaskEventsService {
     }
 
     return dataSource;
+  }
+
+  private static String getSchemaFromProperties() {
+
+    String defaultSchema = "taskana_tables";
+
+    InputStream propertiesStream =
+        CamundaTaskEventsService.class
+            .getClassLoader()
+            .getResourceAsStream("taskana-outbox-schema.properties");
+
+    Properties properties = new Properties();
+    String outboxSchema = null;
+
+    try {
+
+      properties.load(propertiesStream);
+      outboxSchema = properties.getProperty("taskana.outbox.schema");
+
+    } catch (IOException | NullPointerException e) {
+      LOGGER.warn(
+          "Caught {} while trying to retrieve the outbox-schema "
+              + "from the provided properties file.");
+    }
+
+    outboxSchema = (outboxSchema == null || outboxSchema.isEmpty()) ? defaultSchema : outboxSchema;
+
+    return outboxSchema;
   }
 
   private String formatDate(Date date) {
