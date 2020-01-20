@@ -23,8 +23,5 @@
                         <version>2.10.0</version>
                 </dependency>
         </dependencies>
-        <build>
-                <finalName>taskana-adapter-camunda-listener</finalName>
-        </build>
 
 </project>
