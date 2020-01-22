@@ -15,7 +15,6 @@
         <name>taskana-adapter-test</name>
         <description>Test for the integration of taskana adapter with camunda</description>
 
-
         <dependencies>
                 <!-- Camunda BPM -->
                 <dependency>
@@ -58,6 +57,17 @@
                         <groupId>org.camunda.bpm.springboot</groupId>
                         <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
                         <version>${version.camunda.bpm.spring.boot}</version>
+                </dependency>
+                <dependency>
+                        <groupId>org.camunda.bpm</groupId>
+                        <artifactId>camunda-engine-plugin-spin</artifactId>
+                        <scope>compile</scope>
+                        <version>${version.camunda.spin.engine.plugin}</version>
+                </dependency>
+                <dependency>
+                        <groupId>org.camunda.spin</groupId>
+                        <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+                        <version>${version.camunda.spin.dataformat.json.jackson}</version>
                 </dependency>
 
                 <!-- Adapter modules -->

@@ -14,6 +14,9 @@ public class ProcessVariableTestObjectTwo implements Serializable {
   boolean booleanFieldObjectTwo;
   Date dateFieldObjectTwo;
 
+  public ProcessVariableTestObjectTwo() {
+  }
+
   public ProcessVariableTestObjectTwo(
       String stringFieldObjectTwo,
       int intFieldObjectTwo,
@@ -32,7 +35,7 @@ public class ProcessVariableTestObjectTwo implements Serializable {
   }
 
   public void setstringFieldObjectTwo(String stringFieldObjectTwo) {
-    stringFieldObjectTwo = stringFieldObjectTwo;
+    this.stringFieldObjectTwo = stringFieldObjectTwo;
   }
 
   public int getIntFieldObjectTwo() {
