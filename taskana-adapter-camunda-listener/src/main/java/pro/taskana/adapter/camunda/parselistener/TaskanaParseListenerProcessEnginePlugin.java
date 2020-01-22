@@ -1,10 +1,7 @@
 package pro.taskana.adapter.camunda.parselistener;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import javax.sql.DataSource;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
@@ -13,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pro.taskana.adapter.camunda.schemacreator.TaskanaOutboxSchemaCreator;
+import pro.taskana.adapter.camunda.util.ReadPropertiesHelper;
 
 /**
  * Camunda engine plugin for the taskana parse listener.
@@ -55,7 +53,10 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
       return;
     }
 
-    String outboxSchema = getSchemaFromProperties();
+    String outboxSchema =
+        ReadPropertiesHelper
+            .getSchemaFromProperties("taskana-outbox.properties",
+                "taskana.outbox.schema");
     outboxSchema = (outboxSchema == null || outboxSchema.isEmpty()) ? DEFAULT_SCHEMA : outboxSchema;
 
     TaskanaOutboxSchemaCreator schemaCreator = new TaskanaOutboxSchemaCreator(dataSource,
@@ -70,27 +71,4 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
     LOGGER.debug("TaskanaOutbox initialized successfully");
   }
 
-  private String getSchemaFromProperties() {
-    InputStream propertiesStream =
-        TaskanaParseListenerProcessEnginePlugin.class
-            .getClassLoader()
-            .getResourceAsStream("taskana-outbox-schema.properties");
-
-    Properties properties = new Properties();
-    String outboxSchema = null;
-
-    try {
-
-      properties.load(propertiesStream);
-      outboxSchema = properties.getProperty("taskana.outbox.schema");
-
-
-    } catch (IOException | NullPointerException e) {
-      LOGGER.warn(
-          "Caught {} while trying to retrieve the outbox-schema from the provided properties file",
-          e);
-    }
-
-    return outboxSchema;
-  }
 }

@@ -19,10 +19,11 @@ import javax.sql.DataSource;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pro.taskana.adapter.camunda.outbox.rest.controller.CamundaTaskEventsController;
-import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
 import spinjar.com.fasterxml.jackson.databind.JsonNode;
 import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
+
+import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
+
 
 /**
  * Implementation of the Outbox REST service.
@@ -217,9 +218,9 @@ public class CamundaTaskEventsService {
   private DataSource getDataSourceFromPropertiesFile() {
 
     InputStream datasourceConfig =
-        CamundaTaskEventsController.class
+        CamundaTaskEventsService.class
             .getClassLoader()
-            .getResourceAsStream("datasource.properties");
+            .getResourceAsStream("taskana-outbox.properties");
 
     Properties properties = new Properties();
 
@@ -256,7 +257,7 @@ public class CamundaTaskEventsService {
     InputStream propertiesStream =
         CamundaTaskEventsService.class
             .getClassLoader()
-            .getResourceAsStream("taskana-outbox-schema.properties");
+            .getResourceAsStream("taskana-outbox.properties");
 
     Properties properties = new Properties();
     String outboxSchema = null;

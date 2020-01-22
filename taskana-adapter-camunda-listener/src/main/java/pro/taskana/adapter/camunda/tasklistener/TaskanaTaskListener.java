@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import pro.taskana.adapter.camunda.dto.ReferencedTask;
 import pro.taskana.adapter.camunda.dto.VariableValueDto;
 import pro.taskana.adapter.camunda.mapper.JacksonConfigurator;
+import pro.taskana.adapter.camunda.util.ReadPropertiesHelper;
 
 /**
  * This class is responsible for dealing with events within the lifecycle of a camunda user task.
@@ -36,6 +37,8 @@ import pro.taskana.adapter.camunda.mapper.JacksonConfigurator;
 public class TaskanaTaskListener implements TaskListener {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskListener.class);
+
+  private static final String DEFAULT_SCHEMA = "taskana_tables";
 
   private static final String SQL_INSERT_EVENT =
       "INSERT INTO event_store (TYPE,CREATED,PAYLOAD) VALUES (?,?,?)";
@@ -155,11 +158,20 @@ public class TaskanaTaskListener implements TaskListener {
 
   private void setOutboxSchema(Connection connection) throws SQLException {
 
+    String outboxSchemaName =
+        ReadPropertiesHelper
+            .getSchemaFromProperties("taskana-outbox.properties",
+                "taskana.outbox.schema");
+
+    outboxSchemaName =
+        (outboxSchemaName == null || outboxSchemaName.isEmpty())
+            ? DEFAULT_SCHEMA : outboxSchemaName;
+
     String dbProductName = connection.getMetaData().getDatabaseProductName();
     if ("PostgreSQL".equals(dbProductName)) {
-      connection.setSchema("taskana_tables");
+      connection.setSchema(outboxSchemaName.toLowerCase());
     } else {
-      connection.setSchema("TASKANA_TABLES");
+      connection.setSchema(outboxSchemaName.toUpperCase());
     }
   }
 
