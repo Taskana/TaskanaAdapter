@@ -26,7 +26,7 @@ public class ComplexProcessVariableSetter implements JavaDelegate {
             specialCharactersString, 1, 1.1, false, processVariableTestObjectTwo);
 
     delegateExecution.setVariable("attribute1", processVariableTestObject);
-    delegateExecution.setVariable("attribute2", "attribute2Value");
-    delegateExecution.setVariable("attribute3", "attribute3Value");
+    delegateExecution.setVariable("attribute2", 5);
+    delegateExecution.setVariable("attribute3", true);
   }
 }

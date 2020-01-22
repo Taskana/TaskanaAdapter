@@ -8,7 +8,11 @@ public class VariableValueDto {
   protected String type;
 
   protected Object value;
+
   protected Map<String, Object> valueInfo;
+
+  public VariableValueDto() {
+  }
 
   public VariableValueDto(String type, Object value, Map<String, Object> valueInfo) {
     this.type = type;
