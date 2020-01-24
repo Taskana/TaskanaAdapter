@@ -6,9 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is responsible for retrieving complex process
- * variables containing Objects set by a camunda user
- * task.
+ * This class is responsible for retrieving complex process variables containing Objects set by a
+ * camunda user task.
  */
 public class ComplexProcessVariableRetriever implements JavaDelegate {
 
@@ -19,13 +18,12 @@ public class ComplexProcessVariableRetriever implements JavaDelegate {
   public void execute(DelegateExecution execution) throws Exception {
 
     ProcessVariableTestObject processVariableTestObject =
-        (ProcessVariableTestObject)execution.getVariable("attribute1");
+        (ProcessVariableTestObject) execution.getVariable("attribute1");
 
-     LOGGER.info("Successfully deserialized complex process variable"
-                     + " \"ProcessVariableTestObject\", "
-                     + "retrieving sample value via Getter-method : doubleField value = "
-                     + processVariableTestObject.getDoubleField());
-
-
+    LOGGER.info(
+        "Successfully deserialized complex process variable"
+            + " \"ProcessVariableTestObject\", "
+            + "retrieving sample value via Getter-method : doubleField value = "
+            + processVariableTestObject.getDoubleField());
   }
 }
