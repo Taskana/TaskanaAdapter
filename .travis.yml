@@ -35,4 +35,6 @@ matrix:
         --settings ci/mvnsettings.xml -DskipTests -Dcheckstyle.skip \
         -pl !:taskana-adapter-tasklistener-example,!:taskana-adapter-test
       before_cache: rm -rf $HOME/.m2/repository/pro/taskana
-      after_success: ci/change_version.sh -i -m . && ci/commitPoms.sh
+      # travis_terminate is necessary since after_success is a job phase which can change the build result.
+      # it is not documented, so this is a little hack. see: https://docs.travis-ci.com/user/job-lifecycle/#breaking-the-build
+      after_success: ci/change_version.sh -i -m . && ci/commitPoms.sh || travis_terminate 1
