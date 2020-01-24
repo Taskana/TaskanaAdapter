@@ -31,6 +31,7 @@ import pro.taskana.exceptions.DomainNotFoundException;
 import pro.taskana.exceptions.InvalidArgumentException;
 import pro.taskana.exceptions.InvalidWorkbasketException;
 import pro.taskana.exceptions.NotAuthorizedException;
+import pro.taskana.exceptions.WorkbasketAccessItemAlreadyExistException;
 import pro.taskana.exceptions.WorkbasketAlreadyExistException;
 import pro.taskana.exceptions.WorkbasketNotFoundException;
 import pro.taskana.impl.configuration.DbCleaner;
@@ -88,7 +89,8 @@ public abstract class AbsIntegrationTest {
   public void setUp()
       throws SQLException, DomainNotFoundException, WorkbasketNotFoundException,
           NotAuthorizedException, InvalidWorkbasketException, WorkbasketAlreadyExistException,
-          InvalidArgumentException, ClassificationAlreadyExistException {
+          InvalidArgumentException, ClassificationAlreadyExistException,
+          WorkbasketAccessItemAlreadyExistException {
     // set up database connection staticly and only once.
     if (!isInitialised) {
       // setup Taskana engine and clear Taskana database
@@ -125,7 +127,8 @@ public abstract class AbsIntegrationTest {
   public void initInfrastructure()
       throws SQLException, DomainNotFoundException, WorkbasketNotFoundException,
           NotAuthorizedException, InvalidWorkbasketException, WorkbasketAlreadyExistException,
-          InvalidArgumentException, ClassificationAlreadyExistException {
+          InvalidArgumentException, ClassificationAlreadyExistException,
+          WorkbasketAccessItemAlreadyExistException {
     // create workbaskets and classifications needed by the test cases.
     // since this is no testcase we cannot set a JAAS context. To be able to create workbaskets
     // and classifications anyway we use for this purpose an engine with security disabled ...
@@ -150,7 +153,8 @@ public abstract class AbsIntegrationTest {
 
   public void createWorkbasket(TaskanaEngine engine, String workbasketKey, String domain)
       throws NotAuthorizedException, DomainNotFoundException, InvalidWorkbasketException,
-          WorkbasketAlreadyExistException, WorkbasketNotFoundException, InvalidArgumentException {
+          WorkbasketAlreadyExistException, WorkbasketNotFoundException, InvalidArgumentException,
+          WorkbasketAccessItemAlreadyExistException {
     WorkbasketService workbasketService = engine.getWorkbasketService();
     Workbasket wb;
     try {
@@ -166,7 +170,8 @@ public abstract class AbsIntegrationTest {
   }
 
   private void createWorkbasketAccessList(TaskanaEngine engine, Workbasket wb)
-      throws WorkbasketNotFoundException, InvalidArgumentException, NotAuthorizedException {
+      throws WorkbasketNotFoundException, InvalidArgumentException, NotAuthorizedException,
+          WorkbasketAccessItemAlreadyExistException {
     WorkbasketService workbasketService = engine.getWorkbasketService();
     WorkbasketAccessItem workbasketAccessItem =
         workbasketService.newWorkbasketAccessItem(wb.getId(), wb.getOwner());
