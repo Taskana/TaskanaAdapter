@@ -1,3 +1,4 @@
+os: linux
 dist: xenial
 
 language: java
@@ -17,7 +18,7 @@ stages:
   - name: Release / Deploy
     if: repo = 'Taskana/TaskanaAdapter' AND (tag =~ ^[0-9]+\.[0-9]+\.[0-9]+/[0-9]+\.[0-9]+\.[0-9]+$ OR branch = master) AND type != pull_request
 
-matrix:
+jobs:
   include:
     - stage: Test
       install: skip
