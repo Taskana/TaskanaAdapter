@@ -10,10 +10,10 @@
         </parent>
 
         <modelVersion>4.0.0</modelVersion>
-        <artifactId>taskana-adapter-sample</artifactId>
+        <artifactId>taskana-adapter-camunda-spring-boot-sample</artifactId>
         <packaging>jar</packaging>
 
-        <name>taskana-adapter-sample</name>
+        <name>taskana-adapter-camunda-spring-boot-sample</name>
         <url>http://maven.apache.org</url>
 
 
