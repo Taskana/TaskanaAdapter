@@ -82,29 +82,18 @@
                         <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
                 </license>
         </licenses>
-        <dependencyManagement>
-                <dependencies>
-                        <dependency>
-                                <groupId>org.springframework.boot</groupId>
-                                <artifactId>spring-boot-dependencies</artifactId>
-                                <version>${version.spring.boot}</version>
-                                <type>pom</type>
-                                <scope>import</scope>
-                        </dependency>
-                </dependencies>
-        </dependencyManagement>
 
         <modules>
                 <module>taskana-adapter</module>
                 <module>taskana-adapter-camunda-system-connector</module>
                 <module>taskana-adapter-taskana-connector</module>
-                <module>taskana-adapter-sample</module>
+                <module>taskana-adapter-camunda-spring-boot-sample</module>
                 <module>taskana-adapter-camunda-listener</module>
-                <module>taskana-adapter-tasklistener-example</module>
+                <module>taskana-adapter-camunda-tasklistener-example</module>
                 <module>taskana-adapter-camunda-outbox-rest</module>
-                <module>taskana-adapter-outbox-rest-spring-boot-starter</module>
-                <module>taskana-adapter-wildfly-example</module>
-                <module>taskana-adapter-test</module>
+                <module>taskana-adapter-camunda-outbox-rest-spring-boot-starter</module>
+                <module>taskana-adapter-camunda-wildfly-example</module>
+                <module>taskana-adapter-camunda-spring-boot-test</module>
         </modules>
 
                 <repositories>

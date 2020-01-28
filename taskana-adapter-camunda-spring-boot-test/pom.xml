@@ -10,10 +10,22 @@
         </parent>
 
         <modelVersion>4.0.0</modelVersion>
-        <artifactId>taskana-adapter-test</artifactId>
+        <artifactId>taskana-adapter-camunda-spring-boot-test</artifactId>
         <packaging>jar</packaging>
-        <name>taskana-adapter-test</name>
+        <name>taskana-adapter-camunda-spring-boot-test</name>
         <description>Test for the integration of taskana adapter with camunda</description>
+
+        <dependencyManagement>
+                <dependencies>
+                        <dependency>
+                                <groupId>org.springframework.boot</groupId>
+                                <artifactId>spring-boot-dependencies</artifactId>
+                                <version>${version.spring.boot}</version>
+                                <type>pom</type>
+                                <scope>import</scope>
+                        </dependency>
+                </dependencies>
+        </dependencyManagement>
 
         <dependencies>
                 <!-- Camunda BPM -->
@@ -114,7 +126,7 @@
                 </dependency>
                 <dependency>
                         <groupId>pro.taskana</groupId>
-                        <artifactId>taskana-adapter-outbox-rest-spring-boot-starter</artifactId>
+                        <artifactId>taskana-adapter-camunda-outbox-rest-spring-boot-starter</artifactId>
                         <version>${project.version}</version>
                 </dependency>
                 <dependency>
