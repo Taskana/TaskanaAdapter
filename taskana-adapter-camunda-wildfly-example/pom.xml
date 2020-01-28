@@ -8,13 +8,25 @@
                 <relativePath>../pom.xml</relativePath>
         </parent>
         <modelVersion>4.0.0</modelVersion>
-        <artifactId>taskana-adapter-wildfly-example</artifactId>
-        <name>taskana-adapter-wildfly-example-Webapp</name>
+        <artifactId>taskana-adapter-camunda-wildfly-example</artifactId>
+        <name>taskana-adapter-camunda-wildfly-example-Webapp</name>
         <packaging>war</packaging>
 
         <properties>
                 <failOnMissingWebXml>false</failOnMissingWebXml>
         </properties>
+
+        <dependencyManagement>
+                <dependencies>
+                        <dependency>
+                                <groupId>org.springframework.boot</groupId>
+                                <artifactId>spring-boot-dependencies</artifactId>
+                                <version>${version.spring.boot}</version>
+                                <type>pom</type>
+                                <scope>import</scope>
+                        </dependency>
+                </dependencies>
+        </dependencyManagement>
 
         <dependencies>
                 <dependency>
