@@ -38,17 +38,14 @@ import pro.taskana.adapter.camunda.util.ReadPropertiesHelper;
 public class TaskanaTaskListener implements TaskListener {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskListener.class);
-
   private static final String DEFAULT_SCHEMA = "taskana_tables";
-
   private static final String SQL_INSERT_EVENT =
       "INSERT INTO event_store (TYPE,CREATED,PAYLOAD) VALUES (?,?,?)";
-
   private static TaskanaTaskListener instance = null;
 
   private boolean gotActivated = false;
-
   private ObjectMapper objectMapper = JacksonConfigurator.createAndConfigureObjectMapper();
+  private String outboxSchemaName = null;
 
   public static TaskanaTaskListener getInstance() {
     if (instance == null) {
@@ -160,14 +157,17 @@ public class TaskanaTaskListener implements TaskListener {
 
   private void setOutboxSchema(Connection connection) throws SQLException {
 
-    String outboxSchemaName =
-        ReadPropertiesHelper
-            .getSchemaFromProperties("taskana-outbox.properties",
-                "taskana.outbox.schema");
+    if (outboxSchemaName == null) {
+
+      outboxSchemaName =
+          ReadPropertiesHelper.getSchemaFromProperties(
+              "taskana-outbox.properties", "taskana.outbox.schema");
+    }
 
     outboxSchemaName =
         (outboxSchemaName == null || outboxSchemaName.isEmpty())
-            ? DEFAULT_SCHEMA : outboxSchemaName;
+            ? DEFAULT_SCHEMA
+            : outboxSchemaName;
 
     String dbProductName = connection.getMetaData().getDatabaseProductName();
     if ("PostgreSQL".equals(dbProductName)) {
