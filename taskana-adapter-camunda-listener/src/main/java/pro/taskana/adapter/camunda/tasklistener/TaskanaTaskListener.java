@@ -158,16 +158,14 @@ public class TaskanaTaskListener implements TaskListener {
   private void setOutboxSchema(Connection connection) throws SQLException {
 
     if (outboxSchemaName == null) {
-
-      outboxSchemaName =
-          ReadPropertiesHelper.getSchemaFromProperties(
-              "taskana-outbox.properties", "taskana.outbox.schema");
+      outboxSchemaName = ReadPropertiesHelper.getSchemaFromProperties(
+        "taskana-listener.properties", "taskana.outbox.schema");
     }
 
     outboxSchemaName =
-        (outboxSchemaName == null || outboxSchemaName.isEmpty())
-            ? DEFAULT_SCHEMA
-            : outboxSchemaName;
+      (outboxSchemaName == null || outboxSchemaName.isEmpty())
+        ? DEFAULT_SCHEMA
+        : outboxSchemaName;
 
     String dbProductName = connection.getMetaData().getDatabaseProductName();
     if ("PostgreSQL".equals(dbProductName)) {
