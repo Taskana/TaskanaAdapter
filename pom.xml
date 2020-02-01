@@ -51,7 +51,7 @@
                 <version.javax.servlet.api>3.1.0</version.javax.servlet.api>
                 <version.javax.ws.rs.api>2.1.1</version.javax.ws.rs.api>
                 <version.org.webjars.bootstrap>2.3.2</version.org.webjars.bootstrap>
-                <version.org.jboss.spec>1.0.0.Final</version.org.jboss.spec>
+                <version.org.jboss.spec>3.0.3.Final</version.org.jboss.spec>
                 <version.wildfly>11.0.0.Final</version.wildfly>
                 <version.wildfly.maven.plugin>2.0.2.Final</version.wildfly.maven.plugin>
                 <version.jboss-as-maven-plugin>7.9.Final</version.jboss-as-maven-plugin>
