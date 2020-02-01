@@ -53,7 +53,7 @@
                 <version.org.webjars.bootstrap>2.3.2</version.org.webjars.bootstrap>
                 <version.org.jboss.spec>1.0.0.Final</version.org.jboss.spec>
                 <version.wildfly>11.0.0.Final</version.wildfly>
-                <version.wildfly.maven.plugin>2.0.0.Final</version.wildfly.maven.plugin>
+                <version.wildfly.maven.plugin>2.0.2.Final</version.wildfly.maven.plugin>
                 <version.jboss-as-maven-plugin>7.9.Final</version.jboss-as-maven-plugin>
 
                 <version.junit>4.13</version.junit>
