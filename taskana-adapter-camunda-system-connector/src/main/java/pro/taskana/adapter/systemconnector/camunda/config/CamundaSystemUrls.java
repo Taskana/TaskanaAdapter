@@ -5,7 +5,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import org.springframework.stereotype.Component;
 
-import pro.taskana.impl.util.LoggerUtils;
+import pro.taskana.common.internal.util.LoggerUtils;
+
 
 /**
  * Holds the URlS (Camunda REST Api and outbox REST) of the configured camunda systems.

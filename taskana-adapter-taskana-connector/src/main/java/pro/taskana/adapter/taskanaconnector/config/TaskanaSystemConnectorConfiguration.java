@@ -15,12 +15,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 
-import pro.taskana.ClassificationService;
-import pro.taskana.TaskService;
-import pro.taskana.TaskanaEngine;
-import pro.taskana.WorkbasketService;
+import pro.taskana.TaskanaEngineConfiguration;
+import pro.taskana.classification.api.ClassificationService;
+import pro.taskana.common.api.TaskanaEngine;
 import pro.taskana.configuration.SpringTaskanaEngineConfiguration;
-import pro.taskana.configuration.TaskanaEngineConfiguration;
+import pro.taskana.task.api.TaskService;
+import pro.taskana.workbasket.api.WorkbasketService;
 
 /**
  * Configuration for taskana task system connector.

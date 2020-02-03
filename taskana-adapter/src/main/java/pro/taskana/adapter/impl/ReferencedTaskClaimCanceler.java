@@ -8,12 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import pro.taskana.CallbackState;
 import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
-import pro.taskana.exceptions.SystemException;
+import pro.taskana.common.api.exceptions.SystemException;
+import pro.taskana.task.api.CallbackState;
+
 
 /**
  * Cancels claims of tasks in camunda that have been cancel claimed in TASKANA.

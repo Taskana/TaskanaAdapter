@@ -14,12 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import pro.taskana.CallbackState;
-import pro.taskana.ObjectReference;
-import pro.taskana.Task;
-import pro.taskana.TaskService;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
-import pro.taskana.impl.TaskImpl;
+import pro.taskana.task.api.CallbackState;
+import pro.taskana.task.api.ObjectReference;
+import pro.taskana.task.api.Task;
+import pro.taskana.task.api.TaskService;
+import pro.taskana.task.internal.TaskImpl;
+
 
 /**
  * Maps properties between ReferencedTasks from external systems and corresponding taskana tasks.

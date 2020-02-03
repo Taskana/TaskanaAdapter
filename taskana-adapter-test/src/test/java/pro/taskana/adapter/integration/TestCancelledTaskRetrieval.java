@@ -18,15 +18,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 
-import pro.taskana.TaskState;
-import pro.taskana.TaskSummary;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
-import pro.taskana.exceptions.InvalidOwnerException;
-import pro.taskana.exceptions.InvalidStateException;
-import pro.taskana.exceptions.NotAuthorizedException;
-import pro.taskana.exceptions.TaskNotFoundException;
+import pro.taskana.common.api.exceptions.InvalidOwnerException;
+import pro.taskana.common.api.exceptions.InvalidStateException;
+import pro.taskana.common.api.exceptions.NotAuthorizedException;
 import pro.taskana.security.JaasRunner;
 import pro.taskana.security.WithAccessId;
+import pro.taskana.task.api.TaskState;
+import pro.taskana.task.api.TaskSummary;
+import pro.taskana.task.api.exceptions.TaskNotFoundException;
 
 /**
  * Test class to test the cancellation of camunda tasks upon cancellation of taskana tasks and vice
@@ -50,7 +50,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
   @Test
   public void deletion_of_taskana_task_should_delete_camunda_task_and_process()
       throws TaskNotFoundException, NotAuthorizedException, JSONException, InterruptedException,
-          InvalidOwnerException, InvalidStateException {
+                 InvalidOwnerException, InvalidStateException {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", "");
