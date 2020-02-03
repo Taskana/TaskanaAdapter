@@ -41,7 +41,7 @@
                 <version.spring.boot>2.0.2.RELEASE</version.spring.boot>
 
                 <version.camunda>7.10.0</version.camunda>
-                <version.camunda.bpm.spring.boot>3.2.0</version.camunda.bpm.spring.boot>
+                <version.camunda.bpm.spring.boot>3.4.1</version.camunda.bpm.spring.boot>
                 <version.camunda.bpm.extensions>1.2</version.camunda.bpm.extensions>
                 <version.camunda.spin.engine.plugin>7.10.0</version.camunda.spin.engine.plugin>
                 <version.camunda.spin.dataformat.json.jackson>1.7.3</version.camunda.spin.dataformat.json.jackson>
