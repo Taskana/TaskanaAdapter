@@ -2,10 +2,11 @@ package acceptance.taskrouting;
 
 import java.util.List;
 
-import pro.taskana.Task;
-import pro.taskana.TaskanaEngine;
-import pro.taskana.WorkbasketSummary;
-import pro.taskana.taskrouting.api.TaskRoutingProvider;
+import pro.taskana.common.api.TaskanaEngine;
+import pro.taskana.task.api.Task;
+import pro.taskana.task.api.TaskRoutingProvider;
+import pro.taskana.workbasket.api.WorkbasketSummary;
+
 
 /** This is a sample implementation of TaskRouter. */
 public class TestTaskRouterForDomainA implements TaskRoutingProvider {

@@ -1,6 +1,7 @@
 package pro.taskana.adapter.exceptions;
 
-import pro.taskana.exceptions.TaskanaRuntimeException;
+
+import pro.taskana.common.api.exceptions.TaskanaRuntimeException;
 
 /**
  * This exception is thrown when an attempt is made to create a Taskana task for a referenced task

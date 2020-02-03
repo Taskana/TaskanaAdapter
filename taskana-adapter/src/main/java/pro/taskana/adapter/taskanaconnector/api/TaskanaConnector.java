@@ -2,11 +2,12 @@ package pro.taskana.adapter.taskanaconnector.api;
 
 import java.util.List;
 
-import pro.taskana.CallbackState;
-import pro.taskana.Task;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
+import pro.taskana.task.api.CallbackState;
+import pro.taskana.task.api.Task;
+
 
 /**
  * The interface that must be implemented by a SystemConnector to a taskana system.
