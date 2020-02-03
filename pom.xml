@@ -59,7 +59,7 @@
                 <version.junit>4.13</version.junit>
                 <version.hamcrest.json>0.2</version.hamcrest.json>
 
-                <version.maven.gpg>1.5</version.maven.gpg>
+                <version.maven.gpg>1.6</version.maven.gpg>
                 <version.sonatype>1.6.8</version.sonatype>
 
         </properties>
