@@ -16,25 +16,23 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 
-import pro.taskana.Task;
-import pro.taskana.TaskSummary;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
-import pro.taskana.exceptions.AttachmentPersistenceException;
-import pro.taskana.exceptions.ClassificationNotFoundException;
-import pro.taskana.exceptions.ConcurrencyException;
-import pro.taskana.exceptions.InvalidArgumentException;
-import pro.taskana.exceptions.InvalidOwnerException;
-import pro.taskana.exceptions.InvalidStateException;
-import pro.taskana.exceptions.NotAuthorizedException;
-import pro.taskana.exceptions.TaskNotFoundException;
+import pro.taskana.classification.api.exceptions.ClassificationNotFoundException;
+import pro.taskana.common.api.exceptions.AttachmentPersistenceException;
+import pro.taskana.common.api.exceptions.ConcurrencyException;
+import pro.taskana.common.api.exceptions.InvalidArgumentException;
+import pro.taskana.common.api.exceptions.InvalidOwnerException;
+import pro.taskana.common.api.exceptions.InvalidStateException;
+import pro.taskana.common.api.exceptions.NotAuthorizedException;
 import pro.taskana.security.JaasRunner;
 import pro.taskana.security.WithAccessId;
+import pro.taskana.task.api.Task;
+import pro.taskana.task.api.TaskSummary;
+import pro.taskana.task.api.exceptions.TaskNotFoundException;
 
 /**
  * Test class to test the completion of camunda tasks upon completion of taskana tasks and vice
  * versa.
- *
- *
  */
 @SpringBootTest(
     classes = TaskanaAdapterTestApplication.class,
@@ -111,7 +109,8 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
 
       // verify that assignee is not yet set for camunda task
       boolean assigneeNotYetSet =
-          this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, null);
+          this.camundaProcessengineRequester
+              .isCorrectAssignee(camundaTaskId, null);
       assertTrue(assigneeNotYetSet);
 
       // force complete taskanaTask and wait
@@ -217,7 +216,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
 
     taskanaTask.setCustomAttributes(newProcessVariables);
 
-    //update the task to set the process variables
+    // update the task to set the process variables
     this.taskService.updateTask(taskanaTask);
 
     // complete task with setting process variables in camunda
@@ -238,10 +237,10 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
     assertEquals(taskanaTaskExternalId, newCamundaTaskIds.get(0));
 
-    //retrieve the new created task from the new user task in camunda
+    // retrieve the new created task from the new user task in camunda
     Task taskanaTask2 = this.taskService.getTask(taskanaTasks.get(0).getTaskId());
 
-    //make sure that the process variables were set and transfered successfully over the outbox
+    // make sure that the process variables were set and transfered successfully over the outbox
     assertTrue(taskanaTask.getCustomAttributes().equals(taskanaTask2.getCustomAttributes()));
   }
 
@@ -251,10 +250,9 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
   @Test
   public void
       completion_of_taskana_task_with_updated_process_variables_should_update_camunda_variables()
-      throws InterruptedException, NotAuthorizedException, TaskNotFoundException,
-                 ClassificationNotFoundException, InvalidArgumentException, ConcurrencyException,
-                 AttachmentPersistenceException, InvalidStateException, InvalidOwnerException {
-
+          throws InterruptedException, NotAuthorizedException, TaskNotFoundException,
+              ClassificationNotFoundException, InvalidArgumentException, ConcurrencyException,
+              AttachmentPersistenceException, InvalidStateException, InvalidOwnerException {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -291,14 +289,17 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
             + "\"attribute3\":{\"type\":\"Boolean\",\"value\":true,"
             + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Boolean\"}}}";
 
-    //check that existing process variables are already set
-    assertTrue(taskanaTask.getCustomAttributes()
-                    .get("referenced_task_variables").equals(alreadyExistingProcessVariables));
+    // check that existing process variables are already set
+    assertTrue(
+        taskanaTask
+            .getCustomAttributes()
+            .get("referenced_task_variables")
+            .equals(alreadyExistingProcessVariables));
 
     // create map for updated process variables and set new process variables in it
     Map<String, String> updatedProcessVariables = new HashMap<>();
 
-    //update some values
+    // update some values
     String updatedProcessVariablesJson =
         alreadyExistingProcessVariables
             .replaceAll("\\\\\"doubleField\\\\\":1.1",
@@ -311,7 +312,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
 
     taskanaTask.setCustomAttributes(updatedProcessVariables);
 
-    //update the task to update the process variables
+    // update the task to update the process variables
     this.taskService.updateTask(taskanaTask);
 
     // complete task with setting process variables in camunda
@@ -332,12 +333,12 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
     assertEquals(taskanaTaskExternalId, newCamundaTaskIds.get(0));
 
-    //retrieve the newly created task from the new user task in camunda
+    // retrieve the newly created task from the new user task in camunda
     Task taskanaTask2 = this.taskService.getTask(taskanaTasks.get(0).getTaskId());
 
-    //make sure that the process variables were updated and transfered over the outbox
-    assertTrue(!alreadyExistingProcessVariables.equals(taskanaTask2.getCustomAttributes())
-                   && updatedProcessVariables.equals(taskanaTask2.getCustomAttributes()));
-
+    // make sure that the process variables were updated and transfered over the outbox
+    assertTrue(
+        !alreadyExistingProcessVariables.equals(taskanaTask2.getCustomAttributes())
+            && updatedProcessVariables.equals(taskanaTask2.getCustomAttributes()));
   }
 }

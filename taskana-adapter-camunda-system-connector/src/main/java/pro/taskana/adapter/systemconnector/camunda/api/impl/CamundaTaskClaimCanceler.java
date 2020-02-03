@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemResponse;
 import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemUrls;
-import pro.taskana.exceptions.SystemException;
+import pro.taskana.common.api.exceptions.SystemException;
 
 /**
  * Cancels claims of tasks in camunda through the camunda REST-API that have a canceled claim in

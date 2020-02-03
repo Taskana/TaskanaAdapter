@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemResponse;
 import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemUrls;
-import pro.taskana.exceptions.SystemException;
+import pro.taskana.common.api.exceptions.SystemException;
 
 /**
  * Completes Camunda Tasks via the Camunda REST Api.

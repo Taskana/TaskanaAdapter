@@ -1,8 +1,9 @@
 package pro.taskana.sample.taskrouting;
 
-import pro.taskana.Task;
-import pro.taskana.TaskanaEngine;
-import pro.taskana.taskrouting.api.TaskRoutingProvider;
+
+import pro.taskana.common.api.TaskanaEngine;
+import pro.taskana.task.api.Task;
+import pro.taskana.task.api.TaskRoutingProvider;
 
 /** This is a sample implementation of TaskRouter. */
 public class ExampleTaskRoutingProviderForDomainA implements TaskRoutingProvider {

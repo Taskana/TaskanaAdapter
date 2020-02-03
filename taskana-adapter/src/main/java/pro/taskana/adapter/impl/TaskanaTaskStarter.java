@@ -8,14 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import pro.taskana.Task;
 import pro.taskana.adapter.exceptions.ReferencedTaskDoesNotExistInExternalSystemException;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
-import pro.taskana.exceptions.TaskAlreadyExistException;
+import pro.taskana.task.api.Task;
+import pro.taskana.task.api.exceptions.TaskAlreadyExistException;
+
 
 /**
  * Retrieves tasks in an external system and start corresponding tasks in taskana.
