@@ -56,7 +56,7 @@
                 <version.wildfly.maven.plugin>2.0.0.Final</version.wildfly.maven.plugin>
                 <version.jboss-as-maven-plugin>7.9.Final</version.jboss-as-maven-plugin>
 
-                <version.junit>4.12</version.junit>
+                <version.junit>4.13</version.junit>
                 <version.hamcrest.json>0.2</version.hamcrest.json>
 
                 <version.maven.gpg>1.5</version.maven.gpg>
