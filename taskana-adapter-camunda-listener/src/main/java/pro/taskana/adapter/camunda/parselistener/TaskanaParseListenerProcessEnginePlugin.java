@@ -55,7 +55,7 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
 
     String outboxSchema =
         ReadPropertiesHelper
-            .getSchemaFromProperties("taskana-outbox.properties",
+            .getSchemaFromProperties("taskana-listener.properties",
                 "taskana.outbox.schema");
     outboxSchema = (outboxSchema == null || outboxSchema.isEmpty()) ? DEFAULT_SCHEMA : outboxSchema;
 
