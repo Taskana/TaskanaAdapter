@@ -37,7 +37,7 @@
                 <version.postgres>42.2.9</version.postgres>
 
                 <version.spring>5.0.5.RELEASE</version.spring>
-                <version.spring.core>1.2.0.RELEASE</version.spring.core>
+                <version.spring.core>2.0.0.RELEASE</version.spring.core>
                 <version.spring.boot>2.2.4.RELEASE</version.spring.boot>
 
                 <version.camunda>7.10.0</version.camunda>
