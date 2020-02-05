@@ -12,7 +12,7 @@
         <modelVersion>4.0.0</modelVersion>
         <artifactId>taskana-adapter</artifactId>
         <packaging>jar</packaging>
-        <name>taskana-adapter</name>
+        <name>${project.groupId}:${project.artifactId}</name>
         <description>Taskana Adapter for executing tasks from external systems</description>
 
         <dependencies>

@@ -12,7 +12,7 @@
         <modelVersion>4.0.0</modelVersion>
         <artifactId>taskana-adapter-camunda-spring-boot-test</artifactId>
         <packaging>jar</packaging>
-        <name>taskana-adapter-camunda-spring-boot-test</name>
+        <name>${project.groupId}:${project.artifactId}</name>
         <description>Test for the integration of taskana adapter with camunda</description>
 
         <dependencyManagement>

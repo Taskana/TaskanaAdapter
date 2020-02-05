@@ -9,6 +9,7 @@
         </parent>
         <modelVersion>4.0.0</modelVersion>
         <artifactId>taskana-adapter-camunda-outbox-rest-spring-boot-starter</artifactId>
+        <name>${project.groupId}:${project.artifactId}</name>
 
 
         <dependencies>
