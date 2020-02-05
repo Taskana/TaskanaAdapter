@@ -12,7 +12,7 @@
         <modelVersion>4.0.0</modelVersion>
         <artifactId>taskana-adapter-camunda-outbox-rest</artifactId>
         <packaging>war</packaging>
-        <name>taskana-adapter-camunda-outbox-rest</name>
+        <name>${project.groupId}:${project.artifactId}</name>
         <description>Provides access to Camunda Task Events via REST Api for the Adapter</description>
 
 
