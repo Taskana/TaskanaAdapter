@@ -9,7 +9,7 @@
         </parent>
         <modelVersion>4.0.0</modelVersion>
         <artifactId>taskana-adapter-camunda-wildfly-example</artifactId>
-        <name>taskana-adapter-camunda-wildfly-example-Webapp</name>
+        <name>${project.groupId}:${project.artifactId}</name>
         <packaging>war</packaging>
 
         <properties>
