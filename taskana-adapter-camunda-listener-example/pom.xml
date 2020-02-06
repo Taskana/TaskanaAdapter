@@ -8,7 +8,7 @@
         </parent>
         <modelVersion>4.0.0</modelVersion>
 
-        <artifactId>taskana-adapter-camunda-tasklistener-example</artifactId>
+        <artifactId>taskana-adapter-camunda-listener-example</artifactId>
 
         <packaging>war</packaging>
 
