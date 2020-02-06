@@ -89,7 +89,7 @@
                 <module>taskana-adapter-taskana-connector</module>
                 <module>taskana-adapter-camunda-spring-boot-sample</module>
                 <module>taskana-adapter-camunda-listener</module>
-                <module>taskana-adapter-camunda-tasklistener-example</module>
+                <module>taskana-adapter-camunda-listener-example</module>
                 <module>taskana-adapter-camunda-outbox-rest</module>
                 <module>taskana-adapter-camunda-outbox-rest-spring-boot-starter</module>
                 <module>taskana-adapter-camunda-wildfly-example</module>
