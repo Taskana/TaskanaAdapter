@@ -58,7 +58,7 @@ public class TestTaskClaim extends AbsIntegrationTest {
       assertEquals(1, taskanaTasks.size());
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
       assertEquals(taskanaTaskExternalId, camundaTaskId);
-      String taskanaTaskId = taskanaTasks.get(0).getTaskId();
+      String taskanaTaskId = taskanaTasks.get(0).getId();
 
       // verify that no assignee for camunda task is set yet
       boolean noAssigneeSet =
@@ -107,7 +107,7 @@ public class TestTaskClaim extends AbsIntegrationTest {
       assertEquals(1, taskanaTasks.size());
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
       assertEquals(taskanaTaskExternalId, camundaTaskId);
-      String taskanaTaskId = taskanaTasks.get(0).getTaskId();
+      String taskanaTaskId = taskanaTasks.get(0).getId();
 
       // verify that an assignee for camunda task is already set
       boolean noAssigneeSet =
@@ -156,7 +156,7 @@ public class TestTaskClaim extends AbsIntegrationTest {
       assertEquals(1, taskanaTasks.size());
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
       assertEquals(taskanaTaskExternalId, camundaTaskId);
-      String taskanaTaskId = taskanaTasks.get(0).getTaskId();
+      String taskanaTaskId = taskanaTasks.get(0).getId();
 
       // verify that TaskState of taskana task is 'READY' first
       Task task = this.taskService.getTask(taskanaTaskId);
@@ -212,7 +212,7 @@ public class TestTaskClaim extends AbsIntegrationTest {
       assertEquals(1, taskanaTasks.size());
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
       assertEquals(taskanaTaskExternalId, camundaTaskId);
-      String taskanaTaskId = taskanaTasks.get(0).getTaskId();
+      String taskanaTaskId = taskanaTasks.get(0).getId();
 
       // verify that TaskState of taskana task is 'READY' first
       Task task = this.taskService.getTask(taskanaTaskId);

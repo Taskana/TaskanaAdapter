@@ -14,7 +14,7 @@ import pro.taskana.adapter.systemconnector.spi.SystemConnectorProvider;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.adapter.taskanaconnector.spi.TaskanaConnectorProvider;
 import pro.taskana.adapter.util.Assert;
-import pro.taskana.common.internal.util.LoggerUtils;
+import pro.taskana.common.api.LoggerUtils;
 
 /**
  * Scheduler for receiving referenced tasks, completing Taskana tasks and cleaning adapter tables.
