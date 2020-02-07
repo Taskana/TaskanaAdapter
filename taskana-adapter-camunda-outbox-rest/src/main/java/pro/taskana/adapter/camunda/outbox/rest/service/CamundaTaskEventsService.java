@@ -32,8 +32,21 @@ import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
  */
 public class CamundaTaskEventsService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskEventsService.class);
+  public static final String TASKANA_OUTBOX_PROPERTIES = "taskana-outbox.properties";
+  static final String TASKANA_OUBOX_DEFAULT_SCHEMA = "taskana_tables";
+  static final String TASKANA_ADAPTER_OUTBOX_SCHEMA = "taskana.adapter.outbox.schema";
+  static final String TASKANA_ADAPTER_OUTBOX_DATASOURCE_JNDI =
+      "taskana.adapter.outbox.datasource.jndi";
+  static final String TASKANA_ADAPTER_OUTBOX_DATASOURCE_DRIVER =
+      "taskana.adapter.outbox.datasource.driver";
+  static final String TASKANA_ADAPTER_OUTBOX_DATASOURCE_URL =
+      "taskana.adapter.outbox.datasource.url";
+  static final String TASKANA_ADAPTER_OUTBOX_DATASOURCE_USERNAME =
+      "taskana.adapter.outbox.datasource.username";
+  static final String TASKANA_ADAPTER_OUTBOX_DATASOURCE_PASSWORD =
+      "taskana.adapter.outbox.datasource.password";
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskEventsService.class);
   private static String outboxSchema = getSchemaFromProperties();
 
   private static final String SQL_GET_CREATE_EVENTS =
@@ -42,7 +55,6 @@ public class CamundaTaskEventsService {
       "SELECT * FROM " + outboxSchema + ".event_store WHERE type = ? OR type = ?";
   private static final String SQL_WITHOUT_PLACEHOLDERS_DELETE_EVENTS =
       "DELETE FROM " + outboxSchema + ".event_store WHERE id in (%s)";
-
   private DataSource dataSource = null;
 
   public List<CamundaTaskEvent> getEvents(List<String> requestedEventTypes) {
@@ -77,7 +89,7 @@ public class CamundaTaskEventsService {
       preparedStatement.execute();
 
     } catch (Exception e) {
-      LOGGER.warn("Caught {} while trying to delete events from the outbox table", e);
+      LOGGER.warn("Caught Exception while trying to delete events from the outbox table", e);
     }
   }
 
@@ -97,7 +109,7 @@ public class CamundaTaskEventsService {
       camundaTaskEvents = getCamundaTaskEvents(camundaTaskEventResultSet);
 
     } catch (SQLException | NullPointerException e) {
-      LOGGER.warn("Caught {} while trying to retrieve create events from the outbox", e);
+      LOGGER.warn("Caught Exception while trying to retrieve create events from the outbox", e);
     }
     return camundaTaskEvents;
   }
@@ -147,7 +159,7 @@ public class CamundaTaskEventsService {
 
     } catch (IOException e) {
       LOGGER.warn(
-          "Caught {} while trying to read the passed JSON-Object in the POST-Request"
+          "Caught IOException while trying to read the passed JSON-Object in the POST-Request"
               + " to delete events from the outbox table",
           e);
     }
@@ -169,13 +181,14 @@ public class CamundaTaskEventsService {
 
     try (Connection connection = getConnection();
         PreparedStatement preparedStatement =
-            getPreparedCompleteAndDeleteEventsStatement(connection); ) {
+            getPreparedCompleteAndDeleteEventsStatement(connection);) {
 
       ResultSet completeAndDeleteEventsResultSet = preparedStatement.executeQuery();
       camundaTaskEvents = getCamundaTaskEvents(completeAndDeleteEventsResultSet);
 
     } catch (SQLException | NullPointerException e) {
-      LOGGER.warn("Caught {} while trying to retrieve complete/delete events from the outbox", e);
+      LOGGER.warn("Caught {} while trying to retrieve complete/delete events from the outbox",
+          e.getClass().getName());
     }
 
     return camundaTaskEvents;
@@ -199,7 +212,8 @@ public class CamundaTaskEventsService {
       connection = getDataSource().getConnection();
     } catch (SQLException | NullPointerException e) {
       LOGGER.warn(
-          "Caught {} while trying to retrieve a connection from the provided datasource", e);
+          "Caught {} while trying to retrieve a connection from the provided datasource",
+          e.getClass().getName());
     }
 
     return connection;
@@ -220,14 +234,14 @@ public class CamundaTaskEventsService {
     InputStream datasourceConfig =
         CamundaTaskEventsService.class
             .getClassLoader()
-            .getResourceAsStream("taskana-outbox.properties");
+            .getResourceAsStream(TASKANA_OUTBOX_PROPERTIES);
 
     Properties properties = new Properties();
 
     try {
 
       properties.load(datasourceConfig);
-      String jndiUrl = properties.getProperty("taskana.adapter.outbox.rest.datasource.jndi");
+      String jndiUrl = properties.getProperty(TASKANA_ADAPTER_OUTBOX_DATASOURCE_JNDI);
 
       if (jndiUrl != null) {
         dataSource = (DataSource) new InitialContext().lookup(jndiUrl);
@@ -236,15 +250,16 @@ public class CamundaTaskEventsService {
 
         dataSource =
             createDatasource(
-                properties.getProperty("taskana.adapter.outbox.rest.datasource.driver"),
-                properties.getProperty("taskana.adapter.outbox.rest.datasource.url"),
-                properties.getProperty("taskana.adapter.outbox.rest.datasource.username"),
-                properties.getProperty("taskana.adapter.outbox.rest.datasource.password"));
+                properties.getProperty(TASKANA_ADAPTER_OUTBOX_DATASOURCE_DRIVER),
+                properties.getProperty(TASKANA_ADAPTER_OUTBOX_DATASOURCE_URL),
+                properties.getProperty(TASKANA_ADAPTER_OUTBOX_DATASOURCE_USERNAME),
+                properties.getProperty(TASKANA_ADAPTER_OUTBOX_DATASOURCE_PASSWORD));
       }
 
     } catch (IOException | NamingException | NullPointerException e) {
       LOGGER.warn(
-          "Caught {} while trying to retrieve the datasource from the provided properties file", e);
+          "Caught {} while trying to retrieve the datasource from the provided properties file",
+          e.getClass().getName());
     }
 
     return dataSource;
@@ -257,7 +272,7 @@ public class CamundaTaskEventsService {
     InputStream propertiesStream =
         CamundaTaskEventsService.class
             .getClassLoader()
-            .getResourceAsStream("taskana-outbox.properties");
+            .getResourceAsStream(TASKANA_OUTBOX_PROPERTIES);
 
     Properties properties = new Properties();
     String outboxSchema = null;
@@ -265,12 +280,12 @@ public class CamundaTaskEventsService {
     try {
 
       properties.load(propertiesStream);
-      outboxSchema = properties.getProperty("taskana.outbox.schema");
+      outboxSchema = properties.getProperty(TASKANA_ADAPTER_OUTBOX_SCHEMA);
 
     } catch (IOException | NullPointerException e) {
       LOGGER.warn(
-          "Caught {} while trying to retrieve the outbox-schema "
-              + "from the provided properties file.");
+          "Caught Exception {} while trying to retrieve the outbox-schema "
+              + "from the provided properties file.", e.getClass().getName());
     }
 
     outboxSchema = (outboxSchema == null || outboxSchema.isEmpty()) ? defaultSchema : outboxSchema;
@@ -283,8 +298,8 @@ public class CamundaTaskEventsService {
       return null;
     } else {
       return DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-          .withZone(ZoneId.systemDefault())
-          .format(date.toInstant());
+                 .withZone(ZoneId.systemDefault())
+                 .format(date.toInstant());
     }
   }
 }

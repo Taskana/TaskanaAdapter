@@ -51,14 +51,13 @@ public class TaskanaOutboxSchemaCreator {
    * @throws SQLException will be thrown if there will be some incorrect SQL statements invoked.
    */
   public void run() throws SQLException {
-    Connection connection = dataSource.getConnection();
-    ScriptRunner runner = new ScriptRunner(connection);
-    LOGGER.debug(connection.getMetaData().toString());
-    String databaseProductName = connection.getMetaData().getDatabaseProductName();
-    runner.setStopOnError(true);
-    runner.setLogWriter(logWriter);
-    runner.setErrorLogWriter(errorLogWriter);
-    try {
+    try (Connection connection = dataSource.getConnection()) {
+      ScriptRunner runner = new ScriptRunner(connection);
+      LOGGER.debug(connection.getMetaData().toString());
+      runner.setStopOnError(true);
+      runner.setLogWriter(logWriter);
+      runner.setErrorLogWriter(errorLogWriter);
+      final String databaseProductName = connection.getMetaData().getDatabaseProductName();
       if (!isSchemaPreexisting(connection, databaseProductName)) {
         BufferedReader reader =
             new BufferedReader(
@@ -68,11 +67,10 @@ public class TaskanaOutboxSchemaCreator {
         runner.runScript(getSqlSchemaNameParsed(reader, databaseProductName));
       }
     } finally {
-      runner.closeConnection();
-    }
-    LOGGER.debug(outWriter.toString());
-    if (!errorWriter.toString().trim().isEmpty()) {
-      LOGGER.error(errorWriter.toString());
+      LOGGER.debug(outWriter.toString());
+      if (!errorWriter.toString().trim().isEmpty()) {
+        LOGGER.error(errorWriter.toString());
+      }
     }
   }
 

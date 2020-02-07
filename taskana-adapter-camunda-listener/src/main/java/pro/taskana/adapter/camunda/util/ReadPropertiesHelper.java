@@ -11,28 +11,28 @@ public class ReadPropertiesHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReadPropertiesHelper.class);
 
 
-  public static String getSchemaFromProperties(String propertiesFileName, String propertyName) {
+  public static String getPropertyValueFromFile(String propertiesFileName, String propertyName) {
     InputStream propertiesStream =
         ReadPropertiesHelper.class
             .getClassLoader()
             .getResourceAsStream(propertiesFileName);
 
     Properties properties = new Properties();
-    String outboxSchema = null;
+    String propertyValue = null;
 
     try {
 
       properties.load(propertiesStream);
-      outboxSchema = properties.getProperty(propertyName);
+      propertyValue = properties.getProperty(propertyName);
 
 
     } catch (IOException | NullPointerException e) {
       LOGGER.warn(
-          "Caught {} while trying to retrieve the outbox-schema from the provided properties file",
-          e);
+          "Caught Exception while trying to retrieve the outbox-schema from the provided "
+              + "properties file", e);
     }
 
-    return outboxSchema;
+    return propertyValue;
   }
 
 }
