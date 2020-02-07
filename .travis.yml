@@ -13,6 +13,10 @@ cache:
   directories:
     - $HOME/.m2
 
+branches:
+  except:
+    - /dependabot.*/
+
 stages:
   - name: Test
   - name: Release / Deploy
