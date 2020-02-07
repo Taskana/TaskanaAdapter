@@ -66,7 +66,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       assertEquals(1, taskanaTasks.size());
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
       assertEquals(taskanaTaskExternalId, camundaTaskId);
-      String taskanaTaskId = taskanaTasks.get(0).getTaskId();
+      String taskanaTaskId = taskanaTasks.get(0).getId();
 
       // complete taskana-task and wait
       this.taskService.claim(taskanaTaskId);

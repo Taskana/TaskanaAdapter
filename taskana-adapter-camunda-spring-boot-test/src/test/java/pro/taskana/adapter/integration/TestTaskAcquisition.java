@@ -255,7 +255,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
       assertEquals(taskanaTaskExternalId, camundaTaskId);
 
       // get the actual task instead of summary to access custom attributes
-      Task taskanaTask = this.taskService.getTask(taskanaTaskSummary.getTaskId());
+      Task taskanaTask = this.taskService.getTask(taskanaTaskSummary.getId());
       Map<String, String> taskanaTaskCustomAttributes = taskanaTask.getCustomAttributes();
       String variablesKeyString = "referenced_task_variables";
       String taskanaVariablesString = taskanaTaskCustomAttributes.get(variablesKeyString);
@@ -268,7 +268,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
       Assert.assertThat(assumedVariablesString, SameJSONAs.sameJSONAs(taskanaVariablesString));
 
     } catch (TaskNotFoundException | NotAuthorizedException e) {
-      LOGGER.info("Caught {}, while trying to create a taskana task and verify its variables", e);
+      LOGGER.info("Caught {}, while trying to create a taskana task and verify its variables", e, e);
     }
   }
 }

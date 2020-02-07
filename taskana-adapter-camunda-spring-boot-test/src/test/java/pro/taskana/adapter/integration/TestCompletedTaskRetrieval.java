@@ -64,7 +64,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
       assertEquals(1, taskanaTasks.size());
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
       assertEquals(taskanaTaskExternalId, camundaTaskId);
-      String taskanaTaskId = taskanaTasks.get(0).getTaskId();
+      String taskanaTaskId = taskanaTasks.get(0).getId();
 
       // claim and complete taskanaTask and wait
       this.taskService.claim(taskanaTaskId);
@@ -105,7 +105,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
       assertEquals(1, taskanaTasks.size());
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
       assertEquals(taskanaTaskExternalId, camundaTaskId);
-      String taskanaTaskId = taskanaTasks.get(0).getTaskId();
+      String taskanaTaskId = taskanaTasks.get(0).getId();
 
       // verify that assignee is not yet set for camunda task
       boolean assigneeNotYetSet =
@@ -190,7 +190,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
     assertEquals(taskanaTaskExternalId, camundaTaskIds.get(0));
 
-    Task taskanaTask = this.taskService.getTask(taskanaTasks.get(0).getTaskId());
+    Task taskanaTask = this.taskService.getTask(taskanaTasks.get(0).getId());
 
     // create map for new process variables and set new process variables in it
     Map<String, String> newProcessVariables = new HashMap<>();
@@ -238,7 +238,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     assertEquals(taskanaTaskExternalId, newCamundaTaskIds.get(0));
 
     // retrieve the new created task from the new user task in camunda
-    Task taskanaTask2 = this.taskService.getTask(taskanaTasks.get(0).getTaskId());
+    Task taskanaTask2 = this.taskService.getTask(taskanaTasks.get(0).getId());
 
     // make sure that the process variables were set and transfered successfully over the outbox
     assertTrue(taskanaTask.getCustomAttributes().equals(taskanaTask2.getCustomAttributes()));
@@ -269,7 +269,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
     assertEquals(taskanaTaskExternalId, camundaTaskIds.get(0));
 
-    Task taskanaTask = this.taskService.getTask(taskanaTasks.get(0).getTaskId());
+    Task taskanaTask = this.taskService.getTask(taskanaTasks.get(0).getId());
 
     String alreadyExistingProcessVariables =
         "{\"attribute1\":{\"type\":\"Object\",\"value\":"
@@ -334,7 +334,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     assertEquals(taskanaTaskExternalId, newCamundaTaskIds.get(0));
 
     // retrieve the newly created task from the new user task in camunda
-    Task taskanaTask2 = this.taskService.getTask(taskanaTasks.get(0).getTaskId());
+    Task taskanaTask2 = this.taskService.getTask(taskanaTasks.get(0).getId());
 
     // make sure that the process variables were updated and transfered over the outbox
     assertTrue(

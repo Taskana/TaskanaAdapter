@@ -15,11 +15,11 @@ import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.classification.api.exceptions.ClassificationNotFoundException;
+import pro.taskana.common.api.LoggerUtils;
 import pro.taskana.common.api.exceptions.InvalidArgumentException;
 import pro.taskana.common.api.exceptions.InvalidOwnerException;
 import pro.taskana.common.api.exceptions.InvalidStateException;
 import pro.taskana.common.api.exceptions.NotAuthorizedException;
-import pro.taskana.common.internal.util.LoggerUtils;
 import pro.taskana.task.api.CallbackState;
 import pro.taskana.task.api.Task;
 import pro.taskana.task.api.TaskService;
@@ -28,7 +28,6 @@ import pro.taskana.task.api.TaskSummary;
 import pro.taskana.task.api.exceptions.TaskAlreadyExistException;
 import pro.taskana.task.api.exceptions.TaskNotFoundException;
 import pro.taskana.workbasket.api.exceptions.WorkbasketNotFoundException;
-
 
 /**
  * Implements TaskanaConnector.
@@ -63,9 +62,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
           LoggerUtils.listToString(completedTasks));
     }
 
-    List<ReferencedTask> result = retrieveTaskanaTasksAndConvertToReferencedTasks(completedTasks);
-
-    return result;
+    return retrieveTaskanaTasksAndConvertToReferencedTasks(completedTasks);
   }
 
   @Override
@@ -84,9 +81,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
           LoggerUtils.listToString(claimedTasks));
     }
 
-    List<ReferencedTask> result = retrieveTaskanaTasksAndConvertToReferencedTasks(claimedTasks);
-
-    return result;
+    return retrieveTaskanaTasksAndConvertToReferencedTasks(claimedTasks);
   }
 
   @Override
@@ -106,9 +101,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
           LoggerUtils.listToString(claimedTasks));
     }
 
-    List<ReferencedTask> result = retrieveTaskanaTasksAndConvertToReferencedTasks(claimedTasks);
-
-    return result;
+    return retrieveTaskanaTasksAndConvertToReferencedTasks(claimedTasks);
   }
 
   @Override
@@ -155,7 +148,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     try {
       taskSummary = taskService.createTaskQuery().externalIdIn(referencedTask.getId()).single();
       if (taskSummary != null) {
-        taskId = taskSummary.getTaskId();
+        taskId = taskSummary.getId();
         taskService.forceCompleteTask(taskId);
         // take care that the adapter doesn't attempt to finish the corresponding camunda task
         List<String> externalIds = Stream.of(referencedTask.getId()).collect(Collectors.toList());
@@ -180,7 +173,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
 
     for (TaskSummary taskSummary : requestedTasks) {
       try {
-        Task taskanaTask = taskService.getTask(taskSummary.getTaskId());
+        Task taskanaTask = taskService.getTask(taskSummary.getId());
         Map<String, String> callbackInfo = taskanaTask.getCallbackInfo();
         if (callbackInfo != null
             && callbackInfo.get(REFERENCED_TASK_ID) != null
@@ -188,7 +181,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
           result.add(taskInformationMapper.convertToReferencedTask(taskanaTask));
         }
       } catch (TaskNotFoundException | NotAuthorizedException e) {
-        LOGGER.error("Caught {} when trying to retrieve requested taskana tasks.", e);
+        LOGGER.error("Caught {} when trying to retrieve requested taskana tasks.", e, e);
       }
     }
 
