@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ClassUtils;
 
+import pro.taskana.adapter.camunda.TaskanaConfigurationProperties;
 import pro.taskana.adapter.camunda.dto.ReferencedTask;
 import pro.taskana.adapter.camunda.dto.VariableValueDto;
 import pro.taskana.adapter.camunda.mapper.JacksonConfigurator;
@@ -35,7 +36,7 @@ import pro.taskana.adapter.camunda.util.ReadPropertiesHelper;
 /**
  * This class is responsible for dealing with events within the lifecycle of a camunda user task.
  */
-public class TaskanaTaskListener implements TaskListener {
+public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationProperties {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskListener.class);
   private static final String DEFAULT_SCHEMA = "taskana_tables";
@@ -58,7 +59,7 @@ public class TaskanaTaskListener implements TaskListener {
   public void notify(DelegateTask delegateTask) {
 
     try (Connection connection =
-        Context.getProcessEngineConfiguration().getDataSource().getConnection()) {
+             Context.getProcessEngineConfiguration().getDataSource().getConnection()) {
 
       if (!gotActivated) {
         gotActivated = true;
@@ -82,7 +83,7 @@ public class TaskanaTaskListener implements TaskListener {
       }
 
     } catch (Exception e) {
-      LOGGER.warn("Caught {} while trying to process a delegate task", e);
+      LOGGER.warn("Caught Exception while trying to process a delegate task", e);
     }
   }
 
@@ -104,9 +105,12 @@ public class TaskanaTaskListener implements TaskListener {
 
     } catch (JsonProcessingException e) {
 
-      LOGGER.warn("Caught {} while trying to convert ReferencedTask to JSON-String");
+      LOGGER.warn(
+          "Caught JsonProcessingException while trying to convert ReferencedTask to JSON-String");
     } catch (Exception e) {
-      LOGGER.warn("Caught {} while trying to insert a \"create\" event into the outbox table", e);
+      LOGGER
+          .warn("Caught Exception while trying to insert a \"create\" event into the outbox table",
+              e);
 
     } finally {
       if (camundaSchema != null) {
@@ -119,7 +123,7 @@ public class TaskanaTaskListener implements TaskListener {
       DelegateTask delegateTask, Connection connection) throws SQLException {
 
     if (delegateTask.getEventName().equals("complete")
-        && taskWasCompletedByTaskanaAdapter(delegateTask)) {
+            && taskWasCompletedByTaskanaAdapter(delegateTask)) {
       return;
     }
 
@@ -158,14 +162,14 @@ public class TaskanaTaskListener implements TaskListener {
   private void setOutboxSchema(Connection connection) throws SQLException {
 
     if (outboxSchemaName == null) {
-      outboxSchemaName = ReadPropertiesHelper.getSchemaFromProperties(
-        "taskana-listener.properties", "taskana.outbox.schema");
+      outboxSchemaName = ReadPropertiesHelper.getPropertyValueFromFile(
+          TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_SCHEMA);
     }
 
     outboxSchemaName =
-      (outboxSchemaName == null || outboxSchemaName.isEmpty())
-        ? DEFAULT_SCHEMA
-        : outboxSchemaName;
+        (outboxSchemaName == null || outboxSchemaName.isEmpty())
+            ? DEFAULT_SCHEMA
+            : outboxSchemaName;
 
     String dbProductName = connection.getMetaData().getDatabaseProductName();
     if ("PostgreSQL".equals(dbProductName)) {
@@ -179,7 +183,7 @@ public class TaskanaTaskListener implements TaskListener {
       Connection connection, DelegateTask delegateTask, String payloadJson) {
 
     try (PreparedStatement preparedStatement =
-        connection.prepareStatement(SQL_INSERT_EVENT, Statement.RETURN_GENERATED_KEYS)) {
+             connection.prepareStatement(SQL_INSERT_EVENT, Statement.RETURN_GENERATED_KEYS)) {
 
       Timestamp eventCreationTimestamp = Timestamp.from(Instant.now());
 
@@ -191,7 +195,7 @@ public class TaskanaTaskListener implements TaskListener {
 
     } catch (Exception e) {
 
-      LOGGER.warn("Caught {} while trying to prepare and execute statement", e);
+      LOGGER.warn("Caught Exception while trying to prepare and execute statement", e);
     }
   }
 
@@ -291,7 +295,7 @@ public class TaskanaTaskListener implements TaskListener {
     valueInfo.put("objectTypeName", processVariable.getClass());
 
     if (ClassUtils.isPrimitiveOrWrapper(processVariable.getClass())
-        && !processVariable.getClass().getTypeName().equals("String")) {
+            && !processVariable.getClass().getTypeName().equals("String")) {
 
       type = processVariable.getClass().getSimpleName();
 
@@ -401,8 +405,8 @@ public class TaskanaTaskListener implements TaskListener {
       return null;
     } else {
       return DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-          .withZone(ZoneId.systemDefault())
-          .format(date.toInstant());
+                 .withZone(ZoneId.systemDefault())
+                 .format(date.toInstant());
     }
   }
 }
