@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_11cs1io" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.3.5">
   <bpmn:process id="simple_user_task_process_with_assignee_set" isExecutable="true">
+    <bpmn:extensionElements>
+      <camunda:properties>
+        <camunda:property name="taskana.domain" value="DOMAIN_A" />
+      </camunda:properties>
+    </bpmn:extensionElements>
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>SequenceFlow_1e3wk38</bpmn:outgoing>
     </bpmn:startEvent>
@@ -10,6 +15,11 @@
     <bpmn:sequenceFlow id="SequenceFlow_1e3wk38" sourceRef="StartEvent_1" targetRef="Task_1vz5lmh" />
     <bpmn:sequenceFlow id="SequenceFlow_1cnwzol" sourceRef="Task_1vz5lmh" targetRef="EndEvent_10kl9cy" />
     <bpmn:userTask id="Task_1vz5lmh" camunda:assignee="InitialAssignee">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="taskana.classification-key" value="L1050" />
+        </camunda:properties>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_1e3wk38</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1cnwzol</bpmn:outgoing>
     </bpmn:userTask>

@@ -38,18 +38,38 @@
       <bpmn:outgoing>SequenceFlow_0otjbz9</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:userTask id="Task_12ti5ye">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="taskana.classification-key" value="L1050" />
+        </camunda:properties>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0otjbz9</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1d4ky98</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:userTask id="Task_02sxo7m">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="taskana.classification-key" value="L1050" />
+        </camunda:properties>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_1d4ky98</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0tbfqxg</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:userTask id="Task_0irse92">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="taskana.classification-key" value="L1050" />
+        </camunda:properties>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0tbfqxg</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_00sn1cy</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:userTask id="Task_13ytrnp">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="taskana.classification-key" value="L1050" />
+        </camunda:properties>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_00sn1cy</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1eapp1p</bpmn:outgoing>
     </bpmn:userTask>

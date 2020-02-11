@@ -32,17 +32,6 @@ public class TaskInformationMapper {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskInformationMapper.class);
 
-  @Autowired private TaskService taskService;
-
-  @Value("${taskana.adapter.mapping.default.domain:DOMAIN_A}")
-  private String defaultDomain;
-
-  @Value("${taskana.adapter.mapping.default.classification.key:DEFAULT_CLASSIFICATION}")
-  private String defaultClassificationKey;
-
-  @Value("${taskana.adapter.mapping.default.classification.type:TASK}")
-  private String defaultClassificationType;
-
   @Value("${taskana.adapter.mapping.default.objectreference.company:DEFAULT_COMPANY}")
   private String defaultCompany;
 
@@ -59,19 +48,16 @@ public class TaskInformationMapper {
   @Value("${taskana.adapter.mapping.default.objectreference.value:DEFAULT_VALUE}")
   private String defaultValue;
 
+  @Autowired
+  private TaskService taskService;
+
+
   public Task convertToTaskanaTask(ReferencedTask referencedTask) {
 
     LOGGER.debug("entry to TaskInformationMapper.convertToTaskanaTask {}", this.toString());
 
     String domain = referencedTask.getDomain();
-    if (!isValidString(domain)) {
-      domain = defaultDomain;
-    }
-
     String classificationKey = referencedTask.getClassificationKey();
-    if (!isValidString(classificationKey)) {
-      classificationKey = defaultClassificationKey;
-    }
 
     String workbasketKey = referencedTask.getWorkbasketKey();
     TaskImpl taskanaTask = (TaskImpl) taskService.newTask(workbasketKey, domain);
@@ -122,10 +108,6 @@ public class TaskInformationMapper {
     return referencedTask;
   }
 
-  boolean isValidString(String string) {
-    return !(string == null || string.isEmpty() || "null".equals(string));
-  }
-
   private void setTimestampsInTaskanaTask(TaskImpl taskanaTask, ReferencedTask camundaTask) {
     Instant created = convertStringToInstant(camundaTask.getCreated(), Instant.now());
     taskanaTask.setCreated(created);
@@ -169,24 +151,18 @@ public class TaskInformationMapper {
 
   @Override
   public String toString() {
-    return "TaskInformationMapper [taskService="
-        + taskService
-        + ", defaultDomain="
-        + defaultDomain
-        + ", defaultClassificationKey="
-        + defaultClassificationKey
-        + ", defaultClassificationType="
-        + defaultClassificationType
-        + ", defaultCompany="
-        + defaultCompany
-        + ", defaultSystem="
-        + defaultSystem
-        + ", defaultSystemInstance="
-        + defaultSystemInstance
-        + ", defaultType="
-        + defaultType
-        + ", defaultValue="
-        + defaultValue
-        + "]";
+    return "TaskInformationMapper [defaultCompany="
+               + defaultCompany
+               + ", defaultSystem="
+               + defaultSystem
+               + ", defaultSystemInstance="
+               + defaultSystemInstance
+               + ", defaultType="
+               + defaultType
+               + ", defaultValue="
+               + defaultValue
+               + ", taskService="
+               + taskService
+               + "]";
   }
 }
