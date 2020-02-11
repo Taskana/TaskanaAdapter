@@ -2,10 +2,12 @@ package pro.taskana.adapter.camunda.parselistener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.MissingResourceException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -77,15 +79,29 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
     outboxSchema = (outboxSchema == null || outboxSchema.isEmpty()) ? TASKANA_OUTBOX_DEFAULT_SCHEMA
                        : outboxSchema;
 
-    TaskanaOutboxSchemaCreator schemaCreator = new TaskanaOutboxSchemaCreator(dataSource,
-        outboxSchema);
-    try {
-      schemaCreator.run();
-    } catch (Exception e) {
-      LOGGER.warn("Caught {} while trying to initialize the outbox-table", e.getClass().getName());
-    } finally {
-      if (processEngineMustBeClosed) {
-        processEngineConfiguration.getProcessEngine().close();
+    String createSchemaProperty = ReadPropertiesHelper
+                                      .getPropertyValueFromFile(TASKANA_OUTBOX_PROPERTIES,
+                                          TASKANA_ADAPTER_CREATE_SCHEMA);
+    boolean createSchema = true;
+    if (createSchemaProperty != null && "false".equals(createSchemaProperty.toLowerCase())) {
+      createSchema = false;
+    }
+    if (createSchema) {
+      TaskanaOutboxSchemaCreator schemaCreator = new TaskanaOutboxSchemaCreator(dataSource,
+          outboxSchema);
+      try {
+        schemaCreator.run();
+      } catch (Exception e) {
+        LOGGER.error("Caught exception while trying to initialize the outbox-table", e);
+        throw new MissingResourceException("could not initialize the outbox tables.",
+            "TaskanaOutboxSchemaCreator", "TaskanaOutboxSchema");
+      } finally {
+        if (processEngineMustBeClosed) {
+          ProcessEngine processEngine = processEngineConfiguration.getProcessEngine();
+          if (processEngine != null) {
+            processEngine.close();
+          }
+        }
       }
     }
 
@@ -95,12 +111,16 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
   private DataSource getDataSourceFromPropertiesFile() {
     DataSource dataSource = null;
     try {
-      String jndiUrl = ReadPropertiesHelper.getPropertyValueFromFile(
+      String jndiLookup = ReadPropertiesHelper.getPropertyValueFromFile(
           TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_DATASOURCE_JNDI);
 
-      if (jndiUrl != null) {
-        dataSource = (DataSource) new InitialContext().lookup(jndiUrl);
-
+      if (jndiLookup != null) {
+        dataSource = (DataSource) new InitialContext().lookup(jndiLookup);
+        if (dataSource != null) {
+          LOGGER.info("retrieved Datasource from jndi lookup {}", jndiLookup);
+        } else {
+          LOGGER.info("jndi lookup {} didn't return a Datasource.", jndiLookup);
+        }
       } else {
         String driver = ReadPropertiesHelper.getPropertyValueFromFile(
             TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_DATASOURCE_DRIVER);
@@ -113,6 +133,8 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
 
         dataSource =
             createDatasource(driver, jdbcUrl, userName, password);
+
+        LOGGER.info("created Datasource from properties {}, ...", jdbcUrl);
       }
 
     } catch (NamingException | NullPointerException e) {

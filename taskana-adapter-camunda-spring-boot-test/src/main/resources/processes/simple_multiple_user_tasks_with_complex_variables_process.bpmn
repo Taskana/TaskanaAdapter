@@ -4,6 +4,7 @@
     <bpmn:extensionElements>
       <camunda:properties>
         <camunda:property name="taskana-attributes" value="attribute1,attribute2,attribute3" />
+        <camunda:property name="taskana.domain" value="DOMAIN_A" />
       </camunda:properties>
     </bpmn:extensionElements>
     <bpmn:startEvent id="StartEvent_0c8j229">
@@ -16,6 +17,11 @@
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_1xzgwg5" sourceRef="Task_0k9mjh4" targetRef="ExclusiveGateway_048iz44" />
     <bpmn:userTask id="Task_050k6m5">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="taskana.classification-key" value="L1050" />
+        </camunda:properties>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0lphfa8</bpmn:incoming>
     </bpmn:userTask>
     <bpmn:parallelGateway id="ExclusiveGateway_048iz44">
@@ -28,10 +34,20 @@
     <bpmn:sequenceFlow id="SequenceFlow_1tsr64z" sourceRef="ExclusiveGateway_048iz44" targetRef="Task_09j3ywl" />
     <bpmn:sequenceFlow id="SequenceFlow_0hcu5to" sourceRef="ExclusiveGateway_048iz44" targetRef="Task_0x3r8a2" />
     <bpmn:userTask id="Task_09j3ywl">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="taskana.classification-key" value="L1050" />
+        </camunda:properties>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_1tsr64z</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_04ppm3w</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:userTask id="Task_0x3r8a2">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="taskana.classification-key" value="L1050" />
+        </camunda:properties>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0hcu5to</bpmn:incoming>
     </bpmn:userTask>
     <bpmn:sequenceFlow id="SequenceFlow_04ppm3w" sourceRef="Task_09j3ywl" targetRef="Task_08mt113" />

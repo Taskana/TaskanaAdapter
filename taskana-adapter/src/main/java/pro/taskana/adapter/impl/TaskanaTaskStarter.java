@@ -28,7 +28,8 @@ public class TaskanaTaskStarter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskStarter.class);
 
-  @Autowired AdapterManager adapterManager;
+  @Autowired
+  AdapterManager adapterManager;
 
   @Scheduled(
       fixedRateString =
@@ -47,7 +48,8 @@ public class TaskanaTaskStarter {
       try {
         retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks();
       } catch (Exception ex) {
-        LOGGER.error("Caught {} while trying to create Taskana tasks from referenced tasks", ex);
+        LOGGER.error("Caught exception while trying to create Taskana tasks from referenced tasks",
+            ex);
       }
     }
   }
@@ -102,15 +104,13 @@ public class TaskanaTaskStarter {
           newCreatedTasksInTaskana.add(referencedTask);
         } else {
           LOGGER.warn(
-              "caught Exception {} when attempting to start TaskanaTask for referencedTask {}",
-              e,
-              referencedTask);
+              "caught Exception when attempting to start TaskanaTask for referencedTask {}",
+              referencedTask, e);
         }
       } catch (Exception e) {
         LOGGER.warn(
-            "caught Exception {} when attempting to start TaskanaTask for referencedTask {}",
-            e,
-            referencedTask);
+            "caught Exception when attempting to start TaskanaTask for referencedTask {}",
+            referencedTask, e);
       }
     }
     return newCreatedTasksInTaskana;

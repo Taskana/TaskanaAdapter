@@ -2,6 +2,7 @@ package pro.taskana.adapter.camunda;
 
 public interface TaskanaConfigurationProperties {
 
+  static final String TASKANA_ADAPTER_CREATE_SCHEMA = "taskana.adapter.create_outbox_schema";
   static final String TASKANA_OUTBOX_DEFAULT_SCHEMA = "taskana_tables";
   public static final String TASKANA_OUTBOX_PROPERTIES = "taskana-outbox.properties";
 
