@@ -3,8 +3,8 @@ package acceptance.taskrouting;
 import java.util.List;
 
 import pro.taskana.common.api.TaskanaEngine;
+import pro.taskana.spi.routing.api.TaskRoutingProvider;
 import pro.taskana.task.api.Task;
-import pro.taskana.task.api.TaskRoutingProvider;
 import pro.taskana.workbasket.api.WorkbasketSummary;
 
 
