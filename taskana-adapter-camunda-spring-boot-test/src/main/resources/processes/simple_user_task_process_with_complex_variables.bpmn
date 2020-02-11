@@ -4,6 +4,7 @@
     <bpmn:extensionElements>
       <camunda:properties>
         <camunda:property name="taskana-attributes" value=" attribute1, attribute2,   attribute3" />
+        <camunda:property name="taskana.domain" value="DOMAIN_A" />
       </camunda:properties>
     </bpmn:extensionElements>
     <bpmn:startEvent id="StartEvent_1">
@@ -28,6 +29,11 @@
       <bpmn:incoming>SequenceFlow_0oqq965</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:userTask id="Task_1c6psqu" name="UserTask2">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="taskana.classification-key" value="L1050" />
+        </camunda:properties>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_17f586o</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0oqq965</bpmn:outgoing>
     </bpmn:userTask>
