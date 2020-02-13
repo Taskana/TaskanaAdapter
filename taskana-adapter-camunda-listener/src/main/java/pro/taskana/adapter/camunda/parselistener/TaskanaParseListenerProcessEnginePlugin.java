@@ -118,6 +118,7 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
             "TaskanaOutboxSchema");
       }
     }
+
   }
 
   private DataSource getDataSourceFromPropertiesFile() {
@@ -147,9 +148,7 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
         String password =
             ReadPropertiesHelper.getPropertyValueFromFile(
                 TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_DATASOURCE_PASSWORD);
-
         dataSource = createDatasource(driver, jdbcUrl, userName, password);
-
         LOGGER.info("created Datasource from properties {}, ...", jdbcUrl);
       }
 
