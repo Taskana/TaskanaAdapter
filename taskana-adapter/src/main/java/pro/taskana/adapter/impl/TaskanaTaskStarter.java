@@ -17,7 +17,6 @@ import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.task.api.Task;
 import pro.taskana.task.api.exceptions.TaskAlreadyExistException;
 
-
 /**
  * Retrieves tasks in an external system and start corresponding tasks in taskana.
  *
@@ -28,8 +27,7 @@ public class TaskanaTaskStarter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskStarter.class);
 
-  @Autowired
-  AdapterManager adapterManager;
+  @Autowired AdapterManager adapterManager;
 
   @Scheduled(
       fixedRateString =
@@ -48,8 +46,8 @@ public class TaskanaTaskStarter {
       try {
         retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks();
       } catch (Exception ex) {
-        LOGGER.error("Caught exception while trying to create Taskana tasks from referenced tasks",
-            ex);
+        LOGGER.error(
+            "Caught exception while trying to create Taskana tasks from referenced tasks", ex);
       }
     }
   }
@@ -105,12 +103,14 @@ public class TaskanaTaskStarter {
         } else {
           LOGGER.warn(
               "caught Exception when attempting to start TaskanaTask for referencedTask {}",
-              referencedTask, e);
+              referencedTask,
+              e);
         }
       } catch (Exception e) {
         LOGGER.warn(
             "caught Exception when attempting to start TaskanaTask for referencedTask {}",
-            referencedTask, e);
+            referencedTask,
+            e);
       }
     }
     return newCreatedTasksInTaskana;
