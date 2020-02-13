@@ -50,7 +50,7 @@ public class WorkbasketKeySetter implements JavaDelegate {
 
     } catch (Exception e) {
       LOGGER.warn(
-          "Caught {} while trying to retrieve the taskana.domain property from a process model", e);
+          "Caught while trying to retrieve the taskana.domain property from a process model", e);
     }
 
     return domainName;
