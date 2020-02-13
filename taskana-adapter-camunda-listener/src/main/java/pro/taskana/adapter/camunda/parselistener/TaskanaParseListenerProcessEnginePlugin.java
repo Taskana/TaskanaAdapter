@@ -29,7 +29,6 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
   private static final Logger LOGGER =
       LoggerFactory.getLogger(TaskanaParseListenerProcessEnginePlugin.class);
 
-
   @Override
   public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
 
@@ -58,61 +57,75 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
   }
 
   private void initOutbox(ProcessEngineConfigurationImpl processEngineConfiguration) {
-
     boolean processEngineMustBeClosed = false;
     DataSource dataSource = processEngineConfiguration.getDataSource();
     if (dataSource == null) {
-      LOGGER.warn("ProcessEngineConfiguration returns null DataSource. "
-                      + "Retrieving DataSource from properties.");
+      LOGGER.warn(
+          "ProcessEngineConfiguration returns null DataSource. "
+              + "Retrieving DataSource from properties.");
       dataSource = getDataSourceFromPropertiesFile();
       if (dataSource == null) {
-        LOGGER.warn("getDataSourceFromPropertiesFile returns null. "
-                        + "Outbox tables must be initialized manually.");
-        return;
+        LOGGER.warn(
+            "getDataSourceFromPropertiesFile returns null. "
+                + "Outbox tables must be initialized manually.");
+        throw new MissingResourceException(
+            "could not retrieve dataSource to initialize the outbox tables.",
+            "TaskanaOutboxSchemaCreator",
+            "TaskanaOutboxSchema");
       }
     } else {
       processEngineMustBeClosed = true;
     }
+    try {
+      createSchema(dataSource);
+    } finally {
+      if (processEngineMustBeClosed) {
+        ProcessEngine processEngine = processEngineConfiguration.getProcessEngine();
+        if (processEngine != null) {
+          processEngine.close();
+        }
+      }
+    }
+    LOGGER.info("TaskanaOutbox initialized successfully");
+  }
 
-    String outboxSchema = ReadPropertiesHelper.getPropertyValueFromFile(TASKANA_OUTBOX_PROPERTIES,
-        TASKANA_ADAPTER_OUTBOX_SCHEMA);
-    outboxSchema = (outboxSchema == null || outboxSchema.isEmpty()) ? TASKANA_OUTBOX_DEFAULT_SCHEMA
-                       : outboxSchema;
+  private void createSchema(DataSource dataSource) {
+    String outboxSchema =
+        ReadPropertiesHelper.getPropertyValueFromFile(
+            TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_SCHEMA);
+    outboxSchema =
+        (outboxSchema == null || outboxSchema.isEmpty())
+            ? TASKANA_OUTBOX_DEFAULT_SCHEMA
+            : outboxSchema;
 
-    String createSchemaProperty = ReadPropertiesHelper
-                                      .getPropertyValueFromFile(TASKANA_OUTBOX_PROPERTIES,
-                                          TASKANA_ADAPTER_CREATE_SCHEMA);
+    String createSchemaProperty =
+        ReadPropertiesHelper.getPropertyValueFromFile(
+            TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_CREATE_OUTBOX_SCHEMA);
     boolean createSchema = true;
     if (createSchemaProperty != null && "false".equals(createSchemaProperty.toLowerCase())) {
       createSchema = false;
     }
     if (createSchema) {
-      TaskanaOutboxSchemaCreator schemaCreator = new TaskanaOutboxSchemaCreator(dataSource,
-          outboxSchema);
+      TaskanaOutboxSchemaCreator schemaCreator =
+          new TaskanaOutboxSchemaCreator(dataSource, outboxSchema);
       try {
         schemaCreator.run();
       } catch (Exception e) {
         LOGGER.error("Caught exception while trying to initialize the outbox-table", e);
-        throw new MissingResourceException("could not initialize the outbox tables.",
-            "TaskanaOutboxSchemaCreator", "TaskanaOutboxSchema");
-      } finally {
-        if (processEngineMustBeClosed) {
-          ProcessEngine processEngine = processEngineConfiguration.getProcessEngine();
-          if (processEngine != null) {
-            processEngine.close();
-          }
-        }
+        throw new MissingResourceException(
+            "could not initialize the outbox tables.",
+            "TaskanaOutboxSchemaCreator",
+            "TaskanaOutboxSchema");
       }
     }
-
-    LOGGER.info("TaskanaOutbox initialized successfully");
   }
 
   private DataSource getDataSourceFromPropertiesFile() {
     DataSource dataSource = null;
     try {
-      String jndiLookup = ReadPropertiesHelper.getPropertyValueFromFile(
-          TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_DATASOURCE_JNDI);
+      String jndiLookup =
+          ReadPropertiesHelper.getPropertyValueFromFile(
+              TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_DATASOURCE_JNDI);
 
       if (jndiLookup != null) {
         dataSource = (DataSource) new InitialContext().lookup(jndiLookup);
@@ -122,17 +135,20 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
           LOGGER.info("jndi lookup {} didn't return a Datasource.", jndiLookup);
         }
       } else {
-        String driver = ReadPropertiesHelper.getPropertyValueFromFile(
-            TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_DATASOURCE_DRIVER);
-        String jdbcUrl = ReadPropertiesHelper.getPropertyValueFromFile(
-            TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_DATASOURCE_URL);
-        String userName = ReadPropertiesHelper.getPropertyValueFromFile(
-            TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_DATASOURCE_USERNAME);
-        String password = ReadPropertiesHelper.getPropertyValueFromFile(
-            TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_DATASOURCE_PASSWORD);
+        String driver =
+            ReadPropertiesHelper.getPropertyValueFromFile(
+                TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_DATASOURCE_DRIVER);
+        String jdbcUrl =
+            ReadPropertiesHelper.getPropertyValueFromFile(
+                TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_DATASOURCE_URL);
+        String userName =
+            ReadPropertiesHelper.getPropertyValueFromFile(
+                TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_DATASOURCE_USERNAME);
+        String password =
+            ReadPropertiesHelper.getPropertyValueFromFile(
+                TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_DATASOURCE_PASSWORD);
 
-        dataSource =
-            createDatasource(driver, jdbcUrl, userName, password);
+        dataSource = createDatasource(driver, jdbcUrl, userName, password);
 
         LOGGER.info("created Datasource from properties {}, ...", jdbcUrl);
       }

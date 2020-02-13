@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import spinjar.com.fasterxml.jackson.databind.JsonNode;
 import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
 
+import pro.taskana.adapter.camunda.TaskanaConfigurationProperties;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
 
 
@@ -30,31 +31,17 @@ import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
  *
  * @author jhe
  */
-public class CamundaTaskEventsService {
-
-  public static final String TASKANA_OUTBOX_PROPERTIES = "taskana-outbox.properties";
-  static final String TASKANA_OUBOX_DEFAULT_SCHEMA = "taskana_tables";
-  static final String TASKANA_ADAPTER_OUTBOX_SCHEMA = "taskana.adapter.outbox.schema";
-  static final String TASKANA_ADAPTER_OUTBOX_DATASOURCE_JNDI =
-      "taskana.adapter.outbox.datasource.jndi";
-  static final String TASKANA_ADAPTER_OUTBOX_DATASOURCE_DRIVER =
-      "taskana.adapter.outbox.datasource.driver";
-  static final String TASKANA_ADAPTER_OUTBOX_DATASOURCE_URL =
-      "taskana.adapter.outbox.datasource.url";
-  static final String TASKANA_ADAPTER_OUTBOX_DATASOURCE_USERNAME =
-      "taskana.adapter.outbox.datasource.username";
-  static final String TASKANA_ADAPTER_OUTBOX_DATASOURCE_PASSWORD =
-      "taskana.adapter.outbox.datasource.password";
+public class CamundaTaskEventsService implements TaskanaConfigurationProperties {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskEventsService.class);
-  private static String outboxSchema = getSchemaFromProperties();
-
+  private static final String outboxSchema = getSchemaFromProperties();
   private static final String SQL_GET_CREATE_EVENTS =
       "SELECT * FROM " + outboxSchema + ".event_store WHERE type = ?";
   private static final String SQL_GET_COMPLETE_AND_DELETE_EVENTS =
       "SELECT * FROM " + outboxSchema + ".event_store WHERE type = ? OR type = ?";
   private static final String SQL_WITHOUT_PLACEHOLDERS_DELETE_EVENTS =
       "DELETE FROM " + outboxSchema + ".event_store WHERE id in (%s)";
+
   private DataSource dataSource = null;
 
   public List<CamundaTaskEvent> getEvents(List<String> requestedEventTypes) {
