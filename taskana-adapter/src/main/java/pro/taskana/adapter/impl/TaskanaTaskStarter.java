@@ -14,8 +14,8 @@ import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
+import pro.taskana.task.api.Task;
 import pro.taskana.task.api.exceptions.TaskAlreadyExistException;
-import pro.taskana.task.api.models.Task;
 
 /**
  * Retrieves tasks in an external system and start corresponding tasks in taskana.
