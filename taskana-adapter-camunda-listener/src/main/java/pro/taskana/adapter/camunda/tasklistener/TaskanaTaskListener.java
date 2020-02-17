@@ -59,7 +59,7 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
   public void notify(DelegateTask delegateTask) {
 
     try (Connection connection =
-             Context.getProcessEngineConfiguration().getDataSource().getConnection()) {
+        Context.getProcessEngineConfiguration().getDataSource().getConnection()) {
 
       if (!gotActivated) {
         gotActivated = true;
@@ -108,9 +108,8 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
       LOGGER.warn(
           "Caught JsonProcessingException while trying to convert ReferencedTask to JSON-String");
     } catch (Exception e) {
-      LOGGER
-          .warn("Caught Exception while trying to insert a \"create\" event into the outbox table",
-              e);
+      LOGGER.warn(
+          "Caught Exception while trying to insert a \"create\" event into the outbox table", e);
 
     } finally {
       if (camundaSchema != null) {
@@ -123,7 +122,7 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
       DelegateTask delegateTask, Connection connection) throws SQLException {
 
     if (delegateTask.getEventName().equals("complete")
-            && taskWasCompletedByTaskanaAdapter(delegateTask)) {
+        && taskWasCompletedByTaskanaAdapter(delegateTask)) {
       return;
     }
 
@@ -162,8 +161,9 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
   private void setOutboxSchema(Connection connection) throws SQLException {
 
     if (outboxSchemaName == null) {
-      outboxSchemaName = ReadPropertiesHelper.getPropertyValueFromFile(
-          TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_SCHEMA);
+      outboxSchemaName =
+          ReadPropertiesHelper.getPropertyValueFromFile(
+              TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_OUTBOX_SCHEMA);
     }
 
     outboxSchemaName =
@@ -183,7 +183,7 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
       Connection connection, DelegateTask delegateTask, String payloadJson) {
 
     try (PreparedStatement preparedStatement =
-             connection.prepareStatement(SQL_INSERT_EVENT, Statement.RETURN_GENERATED_KEYS)) {
+        connection.prepareStatement(SQL_INSERT_EVENT, Statement.RETURN_GENERATED_KEYS)) {
 
       Timestamp eventCreationTimestamp = Timestamp.from(Instant.now());
 
@@ -295,7 +295,7 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
     valueInfo.put("objectTypeName", processVariable.getClass());
 
     if (ClassUtils.isPrimitiveOrWrapper(processVariable.getClass())
-            && !processVariable.getClass().getTypeName().equals("String")) {
+        && !processVariable.getClass().getTypeName().equals("String")) {
 
       type = processVariable.getClass().getSimpleName();
 
@@ -329,7 +329,12 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
         workbasketKey = (String) workbasketKeyObj;
       }
     } catch (Exception e) {
-      LOGGER.warn("Caught {} while trying to retrieve taskana.workbasket-key", e);
+      LOGGER.warn(
+          "Caught exception while trying to retrieve taskana.workbasket-key "
+              + "for task {} in ProcessDefinition {}",
+          delegateTask.getName(),
+          delegateTask.getProcessDefinitionId(),
+          e);
     }
     return workbasketKey;
   }
@@ -354,9 +359,10 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
 
     } catch (Exception e) {
       LOGGER.warn(
-          "Caught {} while trying to retrieve the "
+          "Caught exception while trying to retrieve the "
               + propertyKey
-              + " property from a process model",
+              + " property from process model {}",
+          model.getDefinitions().getName(),
           e);
     }
 
@@ -394,7 +400,10 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
       }
     } catch (Exception e) {
       LOGGER.warn(
-          "Caught {} while trying to retrieve the " + propertyKey + " property of a user task", e);
+          "Caught exception while trying to retrieve the {} property of user task {}",
+          propertyKey,
+          delegateTask.getName(),
+          e);
     }
 
     return propertyValue;
@@ -405,8 +414,8 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
       return null;
     } else {
       return DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-                 .withZone(ZoneId.systemDefault())
-                 .format(date.toInstant());
+          .withZone(ZoneId.systemDefault())
+          .format(date.toInstant());
     }
   }
 }

@@ -1,10 +1,8 @@
 package pro.taskana.adapter.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.time.Instant;
 import java.util.List;
@@ -50,7 +48,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
   @Test
   public void deletion_of_taskana_task_should_delete_camunda_task_and_process()
       throws TaskNotFoundException, NotAuthorizedException, JSONException, InterruptedException,
-                 InvalidOwnerException, InvalidStateException {
+          InvalidOwnerException, InvalidStateException {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", "");
@@ -63,9 +61,9 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       // retrieve and check taskanaTaskId
       List<TaskSummary> taskanaTasks =
           this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-      assertEquals(taskanaTaskExternalId, camundaTaskId);
+      assertThat(camundaTaskId).isEqualTo(taskanaTaskExternalId);
       String taskanaTaskId = taskanaTasks.get(0).getId();
 
       // complete taskana-task and wait
@@ -75,22 +73,24 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
         this.taskService.deleteTask(taskanaTaskId);
         fail("expected an InvalidStateExcpetion but no Exception was thrown");
       } catch (InvalidStateException e) {
-        assertTrue(
-            e.getMessage().endsWith("cannot be deleted because its callback is not yet processed"));
+        assertThat(
+                e.getMessage()
+                    .endsWith("cannot be deleted because its callback is not yet processed"))
+            .isTrue();
       }
       Thread.sleep((long) (this.adapterCancelPollingInterval * 1.2));
 
       // assert camunda task was deleted
       boolean taskRetrievalSuccessful =
           this.camundaProcessengineRequester.getTaskFromTaskId(camundaTaskId);
-      assertFalse(taskRetrievalSuccessful);
+      assertThat(taskRetrievalSuccessful).isFalse();
 
       // attempt to delete process instance, should fail because process instance should already be
       // deleted in
       // response
       boolean processInstanceDeletionSuccessful =
-          this.camundaProcessengineRequester.deleteProcessInstanceWithId(processInstanceId);
-      assertFalse(processInstanceDeletionSuccessful);
+          this.camundaProcessengineRequester.deleteProcessInstanceWithId(processInstanceId, false);
+      assertThat(processInstanceDeletionSuccessful).isFalse();
     }
   }
 
@@ -112,30 +112,69 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       // retrieve and check taskanaTaskId
       List<TaskSummary> taskanaTasks =
           this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-      assertEquals(taskanaTaskExternalId, camundaTaskId);
+      assertThat(camundaTaskId).isEqualTo(taskanaTaskExternalId);
 
       // delete camunda process instance and wait
       boolean camundaProcessCancellationSucessful =
-          this.camundaProcessengineRequester.deleteProcessInstanceWithId(processInstanceId);
-      assertTrue(camundaProcessCancellationSucessful);
+          this.camundaProcessengineRequester.deleteProcessInstanceWithId(processInstanceId, false);
+      assertThat(camundaProcessCancellationSucessful).isTrue();
 
       // assert deletion was successful by attempting to delete again
       boolean camundaProcessCancellationSucessful2 =
-          this.camundaProcessengineRequester.deleteProcessInstanceWithId(processInstanceId);
-      assertFalse(camundaProcessCancellationSucessful2);
+          this.camundaProcessengineRequester.deleteProcessInstanceWithId(processInstanceId, false);
+      assertThat(camundaProcessCancellationSucessful2).isFalse();
       Thread.sleep((long) (this.adapterCancelPollingInterval * 1.2));
 
       // assert taskana task was completed but still exists
       taskanaTasks = this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       Instant taskanaTaskCompletion = taskanaTasks.get(0).getCompleted();
       Instant taskanaTaskCreation = taskanaTasks.get(0).getCreated();
       TaskState taskanaTaskState = taskanaTasks.get(0).getState();
-      assertTrue(TaskState.COMPLETED.equals(taskanaTaskState));
-      assertFalse(taskanaTaskCompletion == null);
-      assertEquals(1, taskanaTaskCompletion.compareTo(taskanaTaskCreation));
+      assertThat(TaskState.COMPLETED.equals(taskanaTaskState)).isTrue();
+      assertThat(taskanaTaskCompletion == null).isFalse();
+      assertThat(taskanaTaskCompletion.compareTo(taskanaTaskCreation)).isEqualTo(1);
+    }
+  }
+
+  @WithAccessId(
+      userName = "teamlead_1",
+      groupNames = {"admin"})
+  @Test
+  public void deletion_of_taskana_task_with_deleted_camunda_task_should_be_handled_gracefully()
+      throws JSONException, InterruptedException, TaskNotFoundException, NotAuthorizedException,
+          InvalidStateException, InvalidOwnerException {
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_process", "");
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    // delete camunda process without notifying the listeners
+    boolean camundaProcessCancellationSucessful =
+        this.camundaProcessengineRequester.deleteProcessInstanceWithId(processInstanceId, true);
+    assertThat(camundaProcessCancellationSucessful).isTrue();
+
+    for (String camundaTaskId : camundaTaskIds) {
+      // retrieve and check taskanaTaskId
+      List<TaskSummary> taskanaTasks =
+          this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
+      assertThat(taskanaTasks).hasSize(1);
+      String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
+      assertThat(camundaTaskId).isEqualTo(taskanaTaskExternalId);
+      taskService.forceCompleteTask(taskanaTasks.get(0).getId());
+
+      Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+      // now it should be possible to delete the taskana task.
+      taskService.deleteTask(taskanaTasks.get(0).getId());
+
+      assertThatThrownBy(() -> taskService.getTask(taskanaTasks.get(0).getId()))
+          .isInstanceOf(TaskNotFoundException.class);
     }
   }
 
@@ -157,9 +196,9 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       // retrieve and check taskanaTaskId
       List<TaskSummary> taskanaTasks =
           this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-      assertEquals(taskanaTaskExternalId, camundaTaskId);
+      assertThat(camundaTaskId).isEqualTo(taskanaTaskExternalId);
 
       // wait for the camunda task to be interrupted by the timer event (1 second), then the camunda
       // job poll.
@@ -167,20 +206,20 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       Thread.sleep(1000 + (long) (this.jobExecutor.getMaxWait() * 1.2));
       boolean taskRetrievalSuccessful =
           this.camundaProcessengineRequester.getTaskFromTaskId(camundaTaskId);
-      assertFalse(taskRetrievalSuccessful);
+      assertThat(taskRetrievalSuccessful).isFalse();
 
       // wait for the adapter to register the interruption
       Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
 
       // assert taskana task was completed but still exists
       taskanaTasks = this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       Instant taskanaTaskCompletion = taskanaTasks.get(0).getCompleted();
       Instant taskanaTaskCreation = taskanaTasks.get(0).getCreated();
       TaskState taskanaTaskState = taskanaTasks.get(0).getState();
-      assertNotNull(taskanaTaskCompletion);
-      assertEquals(1, taskanaTaskCompletion.compareTo(taskanaTaskCreation));
-      assertEquals(TaskState.COMPLETED, taskanaTaskState);
+      assertThat(taskanaTaskCompletion).isNotNull();
+      assertThat(taskanaTaskCompletion.compareTo(taskanaTaskCreation)).isEqualTo(1);
+      assertThat(taskanaTaskState).isEqualTo(TaskState.COMPLETED);
     }
   }
 }

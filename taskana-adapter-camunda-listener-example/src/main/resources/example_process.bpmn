@@ -22,7 +22,7 @@
     <bpmn:userTask id="Task_02zcf5t" name="listenertask1 test" camunda:assignee="demo">
       <bpmn:extensionElements>
         <camunda:properties>
-          <camunda:property name="taskana.classification" value="L1050" />
+          <camunda:property name="taskana.classification-key" value="L1050" />
         </camunda:properties>
         <camunda:taskListener class="pro.taskana.adapter.camunda.tasklistener.TaskanaTaskListener" event="create" />
       </bpmn:extensionElements>

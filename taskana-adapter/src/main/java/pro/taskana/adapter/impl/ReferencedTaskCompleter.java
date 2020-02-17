@@ -15,7 +15,6 @@ import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.common.api.exceptions.SystemException;
 import pro.taskana.task.api.CallbackState;
 
-
 /**
  * Completes ReferencedTasks in the external system after completion of corresponding taskana tasks.
  *
@@ -43,7 +42,7 @@ public class ReferencedTaskCompleter {
       try {
         retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTask();
       } catch (Exception ex) {
-        LOGGER.debug("Caught {} while trying to complete referenced tasks", ex);
+        LOGGER.debug("Caught exception while trying to complete referenced tasks", ex);
       }
     }
   }
@@ -85,7 +84,8 @@ public class ReferencedTaskCompleter {
             "couldnt find a connector for systemUrl " + referencedTask.getSystemUrl());
       }
     } catch (Exception ex) {
-      LOGGER.error("Caught {} when attempting to complete referenced task {}", ex, referencedTask);
+      LOGGER.error(
+          "Caught exception when attempting to complete referenced task {}", referencedTask, ex);
     }
     LOGGER.trace(
         "Exit from ReferencedTaskCompleter.completeReferencedTask, Success = {} ", success);

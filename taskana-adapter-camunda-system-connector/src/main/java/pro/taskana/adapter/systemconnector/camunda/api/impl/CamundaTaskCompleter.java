@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -34,14 +35,47 @@ public class CamundaTaskCompleter {
       CamundaSystemUrls.SystemUrlInfo camundaSystemUrlInfo, ReferencedTask referencedTask) {
 
     StringBuilder requestUrlBuilder = new StringBuilder();
+    try {
+      setAssigneeToOwnerOfReferencedTask(camundaSystemUrlInfo, referencedTask, requestUrlBuilder);
+      setCompletionByTaskanaAdapterAsLocalVariable(
+          camundaSystemUrlInfo, referencedTask, requestUrlBuilder);
+      SystemResponse systemResponse =
+          performCompletion(camundaSystemUrlInfo, referencedTask, requestUrlBuilder);
+      return systemResponse;
+    } catch (HttpStatusCodeException e) {
+      if (isTaskAlreadyDeleted(camundaSystemUrlInfo, referencedTask, requestUrlBuilder)) {
+        return new SystemResponse(HttpStatus.OK, null);
+      } else {
+        LOGGER.warn("Caught Exception when trying to complete camunda task", e);
+        throw e;
+      }
+    }
+  }
 
-    setAssigneeToOwnerOfReferencedTask(camundaSystemUrlInfo, referencedTask, requestUrlBuilder);
-    setCompletionByTaskanaAdapterAsLocalVariable(
-        camundaSystemUrlInfo, referencedTask, requestUrlBuilder);
-    SystemResponse systemResponse =
-        performCompletion(camundaSystemUrlInfo, referencedTask, requestUrlBuilder);
+  private boolean isTaskAlreadyDeleted(
+      CamundaSystemUrls.SystemUrlInfo camundaSystemUrlInfo,
+      ReferencedTask camundaTask,
+      StringBuilder requestUrlBuilder) {
+    requestUrlBuilder.setLength(0);
+    String requestUrl =
+        requestUrlBuilder
+            .append(camundaSystemUrlInfo.getSystemRestUrl())
+            .append(CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS)
+            .append(camundaTask.getId())
+            .toString();
 
-    return systemResponse;
+    HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
+    try {
+      ResponseEntity<String> response =
+          restTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, String.class);
+    } catch (HttpStatusCodeException ex) {
+      boolean isAlreadyDeleted = HttpStatus.NOT_FOUND.equals(ex.getStatusCode());
+      if (isAlreadyDeleted) {
+        LOGGER.debug("Task {} is already deleted. Returning silently", camundaTask.getId());
+      }
+      return isAlreadyDeleted;
+    }
+    return false;
   }
 
   private void setAssigneeToOwnerOfReferencedTask(
@@ -59,22 +93,13 @@ public class CamundaTaskCompleter {
         CamundaSystemConnectorImpl.BODY_SET_ASSIGNEE + "\"" + referencedTask.getAssignee() + "\"}";
 
     HttpEntity<String> requestEntity = prepareEntityFromBody(requestBody);
-
-    try {
-      ResponseEntity<String> responseEntity =
-          this.restTemplate.exchange(
-              requestUrlBuilder.toString(), HttpMethod.POST, requestEntity, String.class);
-      LOGGER.debug(
-          "Set assignee for camunda task {}. Status code = {}",
-          referencedTask.getId(),
-          responseEntity.getStatusCode());
-
-    } catch (HttpStatusCodeException e) {
-      LOGGER.info(
-          "tried to set assignee for camunda task {} and caught Status code {}",
-          referencedTask.getId(),
-          e.getStatusCode());
-    }
+    ResponseEntity<String> responseEntity =
+        this.restTemplate.exchange(
+            requestUrlBuilder.toString(), HttpMethod.POST, requestEntity, String.class);
+    LOGGER.debug(
+        "Set assignee for camunda task {}. Status code = {}",
+        referencedTask.getId(),
+        responseEntity.getStatusCode());
   }
 
   private void setCompletionByTaskanaAdapterAsLocalVariable(
@@ -95,22 +120,13 @@ public class CamundaTaskCompleter {
     HttpEntity<String> requestEntity =
         prepareEntityFromBody("{\"value\" : true, \"type\": \"Boolean\"}");
 
-    try {
-      ResponseEntity<String> responseEntity =
-          this.restTemplate.exchange(
-              requestUrlBuilder.toString(), HttpMethod.PUT, requestEntity, String.class);
-      LOGGER.debug(
-          "Set local Variable \"completedByTaskanaAdapter\" for camunda task {}. Status code = {}",
-          referencedTask.getId(),
-          responseEntity.getStatusCode());
-
-    } catch (HttpStatusCodeException e) {
-      LOGGER.info(
-          "tried to set local Variable \"completedByTaskanaAdapter\" for "
-              + " camunda task {} and caught Status code {}",
-          referencedTask.getId(),
-          e.getStatusCode());
-    }
+    ResponseEntity<String> responseEntity =
+        this.restTemplate.exchange(
+            requestUrlBuilder.toString(), HttpMethod.PUT, requestEntity, String.class);
+    LOGGER.debug(
+        "Set local Variable \"completedByTaskanaAdapter\" for camunda task {}. Status code = {}",
+        referencedTask.getId(),
+        responseEntity.getStatusCode());
   }
 
   private SystemResponse performCompletion(
@@ -143,7 +159,6 @@ public class CamundaTaskCompleter {
       return new SystemResponse(responseEntity.getStatusCode(), null);
 
     } catch (HttpStatusCodeException e) {
-
       LOGGER.info(
           "tried to complete camunda task {} and caught Status code {}",
           camundaTask.getId(),
