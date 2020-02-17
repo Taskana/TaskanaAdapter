@@ -221,12 +221,17 @@ public class CamundaProcessengineRequester {
    * Deletes the camunda-process-instance with the given Id. Returns true if successful.
    *
    * @param processInstanceId the id of the process-instance to be delete.
+   * @param skipCustomListeners a flag that specifies whether camunda listeners are to be skipped.
    * @return true if deletion was successful. False on failure.
    * @throws JSONException in case of JSON problems
    */
-  public boolean deleteProcessInstanceWithId(String processInstanceId) throws JSONException {
+  public boolean deleteProcessInstanceWithId(String processInstanceId, boolean skipCustomListeners)
+      throws JSONException {
     String url =
         BASIC_ENGINE_PATH + this.processEngineKey + PROCESS_INSTANCE_PATH + "/" + processInstanceId;
+    if (skipCustomListeners) {
+      url += "?skipCustomListeners=true";
+    }
     HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
     ResponseEntity<String> answer =
         this.restTemplate.exchange(url, HttpMethod.DELETE, requestEntity, String.class);
