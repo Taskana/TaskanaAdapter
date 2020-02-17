@@ -1,7 +1,7 @@
 # TaskanaAdapter
 
-[![Build Status](https://travis-ci.org/Taskana/TaskanaAdapter.svg?branch=master)](https://travis-ci.org/Taskana/taskana)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/pro.taskana/taskana-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/pro.taskana/taskana-adapter)
+[![Build Status](https://travis-ci.org/Taskana/TaskanaAdapter.svg?branch=master)](https://travis-ci.org/Taskana/taskanaadapter)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/pro.taskana/taskana-adapter/badge.svg)](https://maven-badges.herokuapp.com/maven-central/pro.taskana/taskana-adapter)
 [![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 Adapter to sync tasks between TASKANA and an external workflow system, e.g. Camunda BPM. 
