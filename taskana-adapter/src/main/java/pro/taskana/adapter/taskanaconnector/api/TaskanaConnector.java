@@ -6,7 +6,7 @@ import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.task.api.CallbackState;
-import pro.taskana.task.api.Task;
+import pro.taskana.task.api.models.Task;
 
 
 /**
