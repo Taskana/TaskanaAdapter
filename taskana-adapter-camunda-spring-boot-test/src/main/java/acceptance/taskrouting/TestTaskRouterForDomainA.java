@@ -4,8 +4,8 @@ import java.util.List;
 
 import pro.taskana.common.api.TaskanaEngine;
 import pro.taskana.spi.routing.api.TaskRoutingProvider;
-import pro.taskana.task.api.Task;
-import pro.taskana.workbasket.api.WorkbasketSummary;
+import pro.taskana.task.api.models.Task;
+import pro.taskana.workbasket.api.models.WorkbasketSummary;
 
 
 /** This is a sample implementation of TaskRouter. */
