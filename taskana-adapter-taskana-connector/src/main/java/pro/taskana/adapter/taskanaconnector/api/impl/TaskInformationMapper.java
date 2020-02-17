@@ -16,10 +16,10 @@ import org.springframework.stereotype.Component;
 
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.task.api.CallbackState;
-import pro.taskana.task.api.ObjectReference;
-import pro.taskana.task.api.Task;
 import pro.taskana.task.api.TaskService;
-import pro.taskana.task.internal.TaskImpl;
+import pro.taskana.task.api.models.ObjectReference;
+import pro.taskana.task.api.models.Task;
+import pro.taskana.task.internal.models.TaskImpl;
 
 
 /**

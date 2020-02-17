@@ -18,17 +18,17 @@ import org.springframework.test.context.ContextConfiguration;
 
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
 import pro.taskana.classification.api.exceptions.ClassificationNotFoundException;
-import pro.taskana.common.api.exceptions.AttachmentPersistenceException;
 import pro.taskana.common.api.exceptions.ConcurrencyException;
 import pro.taskana.common.api.exceptions.InvalidArgumentException;
-import pro.taskana.common.api.exceptions.InvalidOwnerException;
-import pro.taskana.common.api.exceptions.InvalidStateException;
 import pro.taskana.common.api.exceptions.NotAuthorizedException;
 import pro.taskana.security.JaasRunner;
 import pro.taskana.security.WithAccessId;
-import pro.taskana.task.api.Task;
-import pro.taskana.task.api.TaskSummary;
+import pro.taskana.task.api.exceptions.AttachmentPersistenceException;
+import pro.taskana.task.api.exceptions.InvalidOwnerException;
+import pro.taskana.task.api.exceptions.InvalidStateException;
 import pro.taskana.task.api.exceptions.TaskNotFoundException;
+import pro.taskana.task.api.models.Task;
+import pro.taskana.task.api.models.TaskSummary;
 
 /**
  * Test class to test the completion of camunda tasks upon completion of taskana tasks and vice
@@ -48,7 +48,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
   @Test
   public void completion_of_taskana_task_should_complete_camunda_task()
       throws TaskNotFoundException, NotAuthorizedException, JSONException, InterruptedException,
-          InvalidOwnerException, InvalidStateException {
+                 InvalidOwnerException, InvalidStateException {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", "");
