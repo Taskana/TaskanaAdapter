@@ -1,8 +1,21 @@
 # TaskanaAdapter
 
-Adapter to sync tasks between TASKANA and an external workflow system, e.g. Camunda BPM
+[![Build Status](https://travis-ci.org/Taskana/TaskanaAdapter.svg?branch=master)](https://travis-ci.org/Taskana/taskana)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/pro.taskana/taskana-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/pro.taskana/taskana-adapter)
+[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+
+Adapter to sync tasks between TASKANA and an external workflow system, e.g. Camunda BPM. 
+
 ## Components
-The Taskana Adapter repository consists of the taskana adapter plus sample connectors to camunda and taskana.
+The Taskana Adapter repository consists of the taskana adapter, sample connectors to camunda and taskana as well as
+an outbox REST-service and it's SpringBoot-Starter and listeners for camunda. In addition to that there are various example and test modules
+
+The sample implementation of the camunda-system-connector uses the outbox-pattern.
+The general concept of this pattern can be found here: 
+<a href="https://microservices.io/patterns/data/transactional-outbox.html"> Transactional-Outbox-Pattern</a>. 
+How the Camunda BPM Connector uses this pattern can be found here: <a href="https://taskana.atlassian.net/wiki/spaces/TAS/pages/881164289/Camunda+BPM+Connector"> Camunda BPM Connector</a>
+
+
 
     +------------------------------------------+--------------------------------------------------------------+
     | Component                                | Description                                                  |
@@ -12,9 +25,6 @@ The Taskana Adapter repository consists of the taskana adapter plus sample conne
     |                                          | - TaskanaConnector (connects to taskana)                     |
     |                                          | These connectors are plugged in at runtime via SPI mechanisms|
     +------------------------------------------+--------------------------------------------------------------+
-    | taskana-adapter-sample                   | contains Application main class and properties               |
-    |                                          | for taskana-adapter                                          |
-    +------------------------------------------+--------------------------------------------------------------+
     | taskana-adapter-camunda-system-connector | Sample implementation of SystemConnector SPI.                |
     |                                          | Connects to a camunda systems via camunda's REST API         |
     +------------------------------------------+--------------------------------------------------------------+
@@ -22,6 +32,35 @@ The Taskana Adapter repository consists of the taskana adapter plus sample conne
     |                                          | to one taskana system via taskana's java api which           |
     |                                          | accesses the database directly.                              |
     +------------------------------------------+--------------------------------------------------------------+
+    | taskana-adapter-camunda-listener         | Contains a TaskListener, ParseListener,                      |
+    |                                          | ParseListenerProcessEnginePlugin and OutboxSchemaCreator as  |
+    |                                          | client-side components of camunda-system-connector           |
+    |                                          |                                   |
+    +------------------------------------------+--------------------------------------------------------------+
+    | taskana-adapter-camunda-outbox-rest      | An outbox REST-Service which allows the adapter to           | 
+    |                                          | query events from the outbox tables, implemented using JAX-RS|
+    |                                          | The concept of the outbox-pattern can be found under the     |
+    |                                          | "Notes for sample implementation of camunda-system-connector"|  
+    |                                          | section                                                      |  
+    +------------------------------------------+--------------------------------------------------------------+
+    | taskana-adapter-camunda-outbox-rest-     | SpringBoot-Starter in case the REST-Service is used within a |
+    | spring-boot-starter                      | SpringBoot-Application                                       |
+    |                                          |                                                              | 
+    +------------------------------------------+--------------------------------------------------------------+
+    | taskana-adapter-camunda-spring-boot      | SpringBoot-Application containg the adapter with the sample  |
+    |  -sample                                 | camunda-system-connector implementation                      |
+    +------------------------------------------+--------------------------------------------------------------+
+    | taskana-adapter-camunda-spring-boot-test | SpringBoot-Application containing camunda, the adapter and   | 
+    |                                          |   the outbox REST-Service to test a complete scenario        |
+    +------------------------------------------+--------------------------------------------------------------+
+    | taskana-adapter-camunda-wildfly-example  | Example that can be deployed on Wildfly and contains         |
+    |                                          |  the adapter with the sample camunda-system-connector        |
+    |                                          |  implementation                                              |
+    +------------------------------------------+--------------------------------------------------------------+
+    | taskana-adapter-camunda-listener-example | Example Process-Application that can be deployed to camunda  |
+    +------------------------------------------+--------------------------------------------------------------+
+
+    
 
 ## The Adapter defines two SPIs
 - **SystemConnector SPI**  connects the adapter to an external system like e.g. camunda.
@@ -34,71 +73,44 @@ Please note, that the term ‘referenced task’ is used in this document to ref
 
 The adapter performs periodically the following tasks
 
-*       retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks
-        *       retrieve newly created referenced tasks via SystemConnector.retrieveReferencedTasksStartedAfter
-        *       get the task’s variables via SystemConnector.retrieveVariables
-        *       map referenced task to taskana task via TaskanaConnector.convertToTaskanaTask
-        *       create an associated taskana task via TaskanaConnector.createTaskanaTask
-        *       remember the tasks created in the adapter’s database
+*         retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks
+          *       retrieve newly created referenced tasks via SystemConnector.retrieveNewStartedReferencedTasks
+          *       get the task’s variables via SystemConnector.retrieveVariables
+          *       map referenced task to TASKANA task via TaskanaConnector.convertToTaskanaTask
+          *       create an associated TASKANA task via TaskanaConnector.createTaskanaTask
+          *	    clean the corresponding create-event in the outbox via SystemConnector.taskanaTasksHaveBeenCreatedForNewReferencedTasks
 
 *       retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks
-        *       retrieve finished referenced tasks via SystemConnector.retrieveFinishedTasks.
-        *       terminate corresponding taskana tasks via TaskanaConnector.terminateTaskanaTask()
+          *       retrieve finished referenced tasks via SystemConnector.retrieveFinishedTasks
+          *       terminate corresponding TASKANA tasks via TaskanaConnector.terminateTaskanaTask
+          * 	    clean the corresponding complete/delete-event in the outbox via SystemConnector.taskanaTasksHaveBeenCompletedForTerminatedReferencedTasks
 
 *       retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTasks
-        *       retrieve finished Taskana tasks via TaskanaConnector.retrieveCompletedTaskanaTasks.
-        *       complete the corresponding referenced tasks in the external system via SystemConnector.completeReferencedTask.
+          *       retrieve finished TASKANA tasks via TaskanaConnector.retrieveCompletedTaskanaTasksAsReferencedTasks
+          *       complete the corresponding referenced tasks in the external system via SystemConnector.completeReferencedTask
+          *       change the CallbackState of the corresponding task in TASKANA to completed via TaskanaConnector.changeReferencedTaskCallbackState
 
-*       cleanup Adapter’s database tables
-        *       delete aged entries from the adapter’s database tables
+*       retrieveClaimedTaskanaTasksAndClaimCorrespondingReferencedTasks
+          *       retrieve claimed TASKANA tasks via TaskanaConnector.retrieveCompletedTaskanaTasksAsReferencedTasks
+          *       claim the corresponding referenced tasks in the external system via SystemConnector.claimReferencedTask
+          *       change the CallbackState of the corresponding task in TASKANA to claimed via TaskanaConnector.changeReferencedTaskCallbackState
+          
+*       retrieveCancelledClaimTaskanaTasksAndCancelClaimCorrespondingReferencedTasks
+          *       retrieve cancel claimed TASKANA tasks via TaskanaConnector.retrieveCancelledClaimTaskanaTasksAsReferencedTasks
+          *       cancel the claim of the corresponding referenced tasks in the external system via SystemConnector.cancelClaimReferencedTask
+          *       change the CallbackState of the corresponding task in TASKANA to processing required via TaskanaConnector.changeReferencedTaskCallbackState         
 
 ## Notes
 
-1.  Duplicate tasks \
-    Method retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks periodically queries the external system, to retrieve tasks that were created in a specific interval. \
-    To determine this interval, transactional behavior must be taken into account. Due to transactions, a task that was created at a specific instant may become visible only when
-    the transaction is committed.\
-    In the extreme case this is the maximum transaction lifetime. As a consequence, the specified interval is not between the last query time and now,
-    but between (the last query time – maximum transaction lifetime) and now.\
-    Using default values to illustrate: Queries are performed every 10 seconds. The default maximum transaction lifetime is 120 seconds. This is, the adapter has to retrieve all tasks
-    that were created in the last 130 seconds. \
-    In the result, the query returns many tasks that have already been processed by the adapter. To cope with this problem, the adapter uses the TASKS table of its database to keep track
-    of the tasks that are already handled.\
-    Tasks that are not found in this table are added to the table and a corresponding taskana task is started. Tasks that are found in the table are
-    ignored, they are duplicates.
-2.  Variables \
-    When the adapter finds a referenced task for which a taskana task must be started, it retrieves the variables of the referenced task's process.
+
+1.  Variables \
+    When the adapter finds a referenced task for which a taskana task must be started, it checks the variables of the referenced task's process. If they are not already present due to retrieval from the outbox it will attempt to retrieve them from the referenced task's process.
     These variables are stored in the **custom attributes** of the corresponding taskana task in a HashMap with key **referenced_task_variables** and value of type String that contains the Json representation of the variables.
-3.  Workbaskets \
-    Task / workbasket mapping has been kept to a minimum. If the adapter creates a taskana task, it puts it into the workbasket of the referenced task’s assignee. If this workbasket doesn't exist, it is created (together with some workbasket_access_items). If the task has no assignee, it is put into a default workbasket with name DEFAULT_WORKBASKET.
-
+2.  Workbaskets \
+    The Adapter does not perform routing of tasks to workbaskets but instead relies on a SPI. A detailed description can be found here:
+    <a href="https://taskana.atlassian.net/wiki/spaces/TAS/pages/995524621/TaskRouting+Service+Provider+Interface">TaskRouting Service Provider Interface</a>
+    
+        
 ## Properties
-*       Adapter properties
-        * taskana.adapter.datasource.url                                - jdbc URL of adapater's database
-        * taskana.adapter.datasource.driverClassName                    - fully qualified name of driver class
-        * taskana.adapter.datasource.username                           - user name to connect to adapter's db
-        * taskana.adapter.datasource.password                           - password to connect to adapter's db
-        * taskana.adapter.datasource.jndi-name                          - the jndi name of the configured adapter datasource for the wildfly sample
 
-        * taskana.adapter.schemaName                                    - schema name for adapters tables
-
-        * taskana.adapter.total.transaction.lifetime.in.seconds         - total transaction lifetime in seconds. Default: 120
-        * taskana.adapter.scheduler.run.interval.for.cleanup.tasks.cron - cron expression that controls when cleanup tasks are run. Default: 0 0/10 * * * *
-        * taskana.adapter.scheduler.task.age.for.cleanup.in.hours       - determines the number of hours, tasks must be finished before they are removed from the adapter's tables. Default: 10
-
-        * taskana.adapter.scheduler.run.interval.for.start.taskana.tasks.in.milliseconds                - controls how often the external system is checked to create taskana tasks. Default 10000 ms
-        * taskana.adapter.scheduler.run.interval.for.complete.referenced.tasks.in.milliseconds          - controls how often taskana is queried to find finished tasks that must be completed in
-                                                                                                          the external system. Default: 10000 ms
-        * taskana.adapter.scheduler.run.interval.for.check.cancelled.referenced.tasks.in.milliseconds   - controls how often the external system ich checked to find cancelled task that
-                                                                                                          have a corresponding taskana task running. This taskana task must be terminated. Default 10000 ms
-
-*        Camunda System connector properties
-        * taskana-system-connector-camundaSystemURLs - Rest endpoint of camunda. e.g. http://localhost:8080/engine-rest
-
-*        Taskana-connector properties
-        * taskana.datasource.url                   - jdbc url of taskana's database
-        * taskana.datasource.driverClassName       - fully qualified name of driver class
-        * taskana.datasource.username              - user name to connect to taskana db
-        * taskana.datasource.password              - password to connect to taskana db
-        * taskana.datasource.jndi-name             - the jndi name of the configured taskana datasource for the wildfly sample
-        * taskana.schemaName=TASKANA               - schema name of taskana's tables
+A detailed overview of the adapter properties can be found here: <a href="https://taskana.atlassian.net/wiki/spaces/TAS/pages/996966415/Adapter+Properties"> Adapter Properties</a>
