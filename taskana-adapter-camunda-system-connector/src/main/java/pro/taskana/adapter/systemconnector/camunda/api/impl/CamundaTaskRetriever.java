@@ -58,7 +58,7 @@ public class CamundaTaskRetriever {
 
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug(
-          "exit from retrieveTerminatedCamundaTasks. Retrieved Tasks: {}", referencedTasks);
+          "exit from retrieveFinishedCamundaTasks. Retrieved Tasks: {}", referencedTasks);
     }
     return referencedTasks;
   }
