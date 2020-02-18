@@ -145,7 +145,7 @@ public class RetrieveCamundaTaskAccTest {
         .andRespond(withSuccess(expectedReplyBody, MediaType.APPLICATION_JSON));
 
     List<ReferencedTask> actualResult =
-        taskRetriever.retrieveTerminatedCamundaTasks(camundaSystemUrl);
+        taskRetriever.retrieveFinishedCamundaTasks(camundaSystemUrl);
 
     assertNotNull(actualResult);
     assertEquals(expectedTask, actualResult.get(0));

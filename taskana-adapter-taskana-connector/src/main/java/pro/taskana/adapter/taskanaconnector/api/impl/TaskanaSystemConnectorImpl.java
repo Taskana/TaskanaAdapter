@@ -29,11 +29,7 @@ import pro.taskana.task.api.models.Task;
 import pro.taskana.task.api.models.TaskSummary;
 import pro.taskana.workbasket.api.exceptions.WorkbasketNotFoundException;
 
-/**
- * Implements TaskanaConnector.
- *
- * @author bbr
- */
+/** Implements TaskanaConnector. */
 @Component
 public class TaskanaSystemConnectorImpl implements TaskanaConnector {
 
@@ -105,7 +101,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
   }
 
   @Override
-  public void changeReferencedTaskCallbackState(
+  public void changeTaskCallbackState(
       List<ReferencedTask> referencedTasks, CallbackState callbackState) {
 
     List<String> externalIds =

@@ -5,11 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Specify user id for JUnit JaasRunner.
- *
- * @author bbr
- */
+/** Specify user id for JUnit JaasRunner. */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface WithAccessId {

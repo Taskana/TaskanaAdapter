@@ -21,11 +21,8 @@ import pro.taskana.task.api.models.ObjectReference;
 import pro.taskana.task.api.models.Task;
 import pro.taskana.task.internal.models.TaskImpl;
 
-
 /**
- * Maps properties between ReferencedTasks from external systems and corresponding taskana tasks.
- *
- * @author bbr
+ * Maps properties between ReferencedTasks from external systems and corresponding TASKANA tasks.
  */
 @Component
 public class TaskInformationMapper {
@@ -48,9 +45,7 @@ public class TaskInformationMapper {
   @Value("${taskana.adapter.mapping.default.objectreference.value:DEFAULT_VALUE}")
   private String defaultValue;
 
-  @Autowired
-  private TaskService taskService;
-
+  @Autowired private TaskService taskService;
 
   public Task convertToTaskanaTask(ReferencedTask referencedTask) {
 
@@ -152,17 +147,17 @@ public class TaskInformationMapper {
   @Override
   public String toString() {
     return "TaskInformationMapper [defaultCompany="
-               + defaultCompany
-               + ", defaultSystem="
-               + defaultSystem
-               + ", defaultSystemInstance="
-               + defaultSystemInstance
-               + ", defaultType="
-               + defaultType
-               + ", defaultValue="
-               + defaultValue
-               + ", taskService="
-               + taskService
-               + "]";
+        + defaultCompany
+        + ", defaultSystem="
+        + defaultSystem
+        + ", defaultSystemInstance="
+        + defaultSystemInstance
+        + ", defaultType="
+        + defaultType
+        + ", defaultValue="
+        + defaultValue
+        + ", taskService="
+        + taskService
+        + "]";
   }
 }

@@ -68,6 +68,9 @@
         <developers>
                 <developer>
                         <name>Holger Hagen</name>
+                        <email>holger.hagen@novatec-gmbh.de</email>
+                        <organization>Novatec Consulting GmbH</organization>
+                        <organizationUrl>https://www.novatec-gmbh.de</organizationUrl>
                 </developer>
         </developers>
 

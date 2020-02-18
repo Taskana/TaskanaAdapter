@@ -48,14 +48,14 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
   @Test
   public void completion_of_taskana_task_should_complete_camunda_task()
       throws TaskNotFoundException, NotAuthorizedException, JSONException, InterruptedException,
-                 InvalidOwnerException, InvalidStateException {
+          InvalidOwnerException, InvalidStateException {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", "");
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
 
     for (String camundaTaskId : camundaTaskIds) {
       // retrieve and check taskanaTaskId
@@ -95,7 +95,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
 
     for (String camundaTaskId : camundaTaskIds) {
 
@@ -109,8 +109,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
 
       // verify that assignee is not yet set for camunda task
       boolean assigneeNotYetSet =
-          this.camundaProcessengineRequester
-              .isCorrectAssignee(camundaTaskId, null);
+          this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, null);
       assertTrue(assigneeNotYetSet);
 
       // force complete taskanaTask and wait
@@ -224,7 +223,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     // next user task in camunda
     this.taskService.forceCompleteTask(taskanaTask.getId());
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
 
     List<String> newCamundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
@@ -302,8 +301,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     // update some values
     String updatedProcessVariablesJson =
         alreadyExistingProcessVariables
-            .replaceAll("\\\\\"doubleField\\\\\":1.1",
-                "\\\\\"doubleField\\\\\":5.55")
+            .replaceAll("\\\\\"doubleField\\\\\":1.1", "\\\\\"doubleField\\\\\":5.55")
             .replaceAll(
                 "\\\\\"dateFieldObjectTwo\\\\\":\\\\\"1970-01-01 13:12:11\\\\\"",
                 "\\\\\"dateFieldObjectTwo\\\\\":null");
@@ -320,7 +318,7 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     // next user task in camunda
     this.taskService.forceCompleteTask(taskanaTask.getId());
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
 
     List<String> newCamundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);

@@ -5,11 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import pro.taskana.adapter.exceptions.AssertionViolationException;
 
-/**
- * utility class that allows to assert specific conditions.
- *
- * @author bbr
- */
+/** utility class that allows to assert specific conditions. */
 public final class Assert {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Assert.class);

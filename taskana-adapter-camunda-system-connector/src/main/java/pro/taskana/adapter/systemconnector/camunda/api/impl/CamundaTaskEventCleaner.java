@@ -15,9 +15,7 @@ import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 
 /**
  * Clears events in the Camunda outbox after the corresponding action has been carried out by
- * taskana.
- *
- * @author bbr
+ * TASKANA.
  */
 @Component
 public class CamundaTaskEventCleaner {

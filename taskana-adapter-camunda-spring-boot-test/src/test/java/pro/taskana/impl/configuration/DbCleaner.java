@@ -11,10 +11,7 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Helper class to clean up databases. Can be used to clean Camunda, Taskana or
- * Taskana-Adapter-Databases.
- */
+/** Helper class to clean up databases. Can be used to clean Camunda or TASKANA database */
 public class DbCleaner {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DbCleaner.class);
@@ -82,11 +79,7 @@ public class DbCleaner {
     }
   }
 
-  /**
-   * encapsulates the type of the application database.
-   *
-   * @author bbr
-   */
+  /** encapsulates the type of the application database. */
   public enum ApplicationDatabaseType {
     TASKANA,
     TASKANA_ADAPTER,

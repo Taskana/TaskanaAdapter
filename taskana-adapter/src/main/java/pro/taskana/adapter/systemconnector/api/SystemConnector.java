@@ -2,56 +2,51 @@ package pro.taskana.adapter.systemconnector.api;
 
 import java.util.List;
 
-/**
- * This is the interface, a System Connector has to implement.
- *
- * @author bbr
- */
+/** This is the interface, a System Connector has to implement. */
 public interface SystemConnector {
 
   /**
-   * Retrieve referenced tasks that were started since the last polling interval.
+   * Retrieve ReferencedTasks that were started within the last polling interval.
    *
-   * @return a list of referenced tasks that were created and have not yet an associated taskana
-   *     task.
+   * @return a list of created ReferencedTasks that don't have an associated TASKANA task yet.
    */
   List<ReferencedTask> retrieveNewStartedReferencedTasks();
 
   /**
-   * With this call the Adapter notifies the SystemConnector that a list of Taskana Tasks has been
-   * created. Depending on the Implementation of the System Connector, it may ignore this call.
+   * With this call the Adapter notifies the SystemConnector that a list of TASKANA tasks has been
+   * created. Depending on the Implementation of the SystemConnector, it may ignore this call.
    *
-   * @param referencedTasks List of ReferencedTasks for which Taskana Tasks have been created.
+   * @param referencedTasks List of ReferencedTasks for which TASKANA tasks have been created.
    */
   void taskanaTasksHaveBeenCreatedForNewReferencedTasks(List<ReferencedTask> referencedTasks);
 
   /**
-   * Retrieve referenced tasks that were finished.
+   * Retrieve ReferencedTasks that were finished.
    *
-   * @return a list of referenced tasks that were finished after the finishedAfter instant.
+   * @return a list of ReferencedTasks that were finished
    */
-  List<ReferencedTask> retrieveTerminatedTasks();
+  List<ReferencedTask> retrieveFinishedReferencedTasks();
 
   /**
-   * With this call the Adapter notifies the SystemConnector that a list of Taskana Tasks has been
-   * terminated. The rationale for this action is that referenced tasks in the external system were
-   * terminated. Depending on the Implementation of the System Connector, it may ignore this call.
+   * With this call the Adapter notifies the SystemConnector that a list of TASKANA tasks has been
+   * terminated. The rationale for this action is that ReferencedTasks in the external system were
+   * finished. Depending on the Implementation of the SystemConnector, it may ignore this call.
    *
-   * @param referencedTasks List of ReferencedTasks for which Taskana Tasks have been terminated.
+   * @param referencedTasks List of ReferencedTasks for which TASKANA Tasks have been terminated.
    */
-  void taskanaTasksHaveBeenCompletedForTerminatedReferencedTasks(
+  void taskanaTasksHaveBeenTerminatedForFinishedReferencedTasks(
       List<ReferencedTask> referencedTasks);
 
   /**
-   * Get the variables of the process the referenced task belongs to.
+   * Get the variables of the ReferencedTask.
    *
-   * @param taskId the Id of the referenced task.
-   * @return the variables of the referenced task's process.
+   * @param taskId the Id of the ReferencedTask.
+   * @return the variables of the ReferencedTask.
    */
-  String retrieveVariables(String taskId);
+  String retrieveReferencedTaskVariables(String taskId);
 
   /**
-   * Instruct the external system to complete a human task.
+   * Instruct the external system to complete a task.
    *
    * @param task the task to be completed.
    * @return the response from the external system.
@@ -59,7 +54,7 @@ public interface SystemConnector {
   SystemResponse completeReferencedTask(ReferencedTask task);
 
   /**
-   * Instruct the external system to claim a human task.
+   * Instruct the external system to claim a task.
    *
    * @param task the task to be claimed.
    * @return the response from the external system.
@@ -67,7 +62,7 @@ public interface SystemConnector {
   SystemResponse claimReferencedTask(ReferencedTask task);
 
   /**
-   * Instruct the external system to claim a human task.
+   * Instruct the external system to claim a task.
    *
    * @param task the task to cancel the claim on.
    * @return the response from the external system.

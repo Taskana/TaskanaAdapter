@@ -13,11 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import pro.taskana.adapter.camunda.tasklistener.TaskanaTaskListener;
 
-/**
- * The taskana parse listener.
- *
- * @author jhe
- */
+/** This class is responsible for adding the TaskanaTaskListener to all user tasks */
 public class TaskanaParseListener extends AbstractBpmnParseListener {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskListener.class);

@@ -1,10 +1,6 @@
 package pro.taskana.adapter.camunda.outbox.rest;
 
-/**
- * POJO that represents an event in the camunda outbox table.
- *
- * @author jhe.
- */
+/** POJO that represents an event in the camunda outbox table. */
 public class CamundaTaskEvent {
 
   int id;

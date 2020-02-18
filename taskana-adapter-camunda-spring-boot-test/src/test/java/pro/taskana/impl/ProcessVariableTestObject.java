@@ -13,8 +13,7 @@ public class ProcessVariableTestObject implements Serializable {
   boolean booleanField;
   ProcessVariableTestObjectTwo processVariableTestObjectTwoField;
 
-  public ProcessVariableTestObject() {
-  }
+  public ProcessVariableTestObject() {}
 
   public ProcessVariableTestObject(
       String stringField,

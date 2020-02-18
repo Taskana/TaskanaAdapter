@@ -22,11 +22,7 @@ import pro.taskana.common.api.TaskanaEngine;
 import pro.taskana.task.api.TaskService;
 import pro.taskana.workbasket.api.WorkbasketService;
 
-/**
- * Configuration for taskana task system connector.
- *
- * @author bbr
- */
+/** Configuration for TASKANA task system connector. */
 @Configuration
 @DependsOn(value = {"adapterSpringContextProvider"})
 public class TaskanaSystemConnectorConfiguration {

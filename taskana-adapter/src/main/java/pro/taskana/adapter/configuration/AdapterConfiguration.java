@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import pro.taskana.adapter.impl.ReferencedTaskClaimCanceler;
+import pro.taskana.adapter.impl.ReferencedTaskClaimer;
 import pro.taskana.adapter.impl.ReferencedTaskCompleter;
 import pro.taskana.adapter.impl.TaskanaTaskStarter;
 import pro.taskana.adapter.impl.TaskanaTaskTerminator;
@@ -32,6 +34,18 @@ public class AdapterConfiguration {
   @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
   public ReferencedTaskCompleter referencedTaskCompleter() {
     return new ReferencedTaskCompleter();
+  }
+
+  @Bean
+  @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
+  public ReferencedTaskClaimer referencedTaskClaimer() {
+    return new ReferencedTaskClaimer();
+  }
+
+  @Bean
+  @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
+  public ReferencedTaskClaimCanceler referencedTaskClaimCanceler() {
+    return new ReferencedTaskClaimCanceler();
   }
 
   @Bean

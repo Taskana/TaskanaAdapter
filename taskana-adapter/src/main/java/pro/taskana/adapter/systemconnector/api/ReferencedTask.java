@@ -2,11 +2,7 @@ package pro.taskana.adapter.systemconnector.api;
 
 import java.util.Objects;
 
-/**
- * POJO that represents a task in the external system.
- *
- * @author kkl
- */
+/** POJO that represents a task in the external system. */
 public class ReferencedTask {
 
   private String id;
