@@ -29,8 +29,6 @@ import pro.taskana.task.api.models.TaskSummary;
 /**
  * Test class to test the cancellation of camunda tasks upon cancellation of taskana tasks and vice
  * versa.
- *
- * @author Ben Fuernrohr
  */
 @SpringBootTest(
     classes = TaskanaAdapterTestApplication.class,
@@ -209,7 +207,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       assertThat(taskRetrievalSuccessful).isFalse();
 
       // wait for the adapter to register the interruption
-      Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
+      Thread.sleep((long) (this.adapterCancelledClaimPollingInterval * 1.2));
 
       // assert taskana task was completed but still exists
       taskanaTasks = this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();

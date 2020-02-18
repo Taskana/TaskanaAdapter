@@ -9,11 +9,7 @@ import pro.taskana.adapter.camunda.outbox.rest.config.OutboxRestServiceConfig;
 import pro.taskana.adapter.camunda.outbox.rest.controller.CamundaTaskEventsController;
 import pro.taskana.adapter.camunda.parselistener.TaskanaParseListenerProcessEnginePlugin;
 
-/**
- * Configuration for the outbox REST service.
- *
- * @author jhe
- */
+/** Configuration for the outbox REST service. */
 @Configuration
 @ConditionalOnClass(CamundaTaskEventsController.class)
 public class OutboxRestServiceAutoConfiguration {

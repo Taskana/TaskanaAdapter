@@ -31,8 +31,7 @@ public class ExampleTaskRoutingProviderForAdapterTest implements TaskRoutingProv
   }
 
   private String determineRandomWorkbasket() {
-    List<WorkbasketSummary> wbs =
-        theEngine.getWorkbasketService().createWorkbasketQuery().list();
+    List<WorkbasketSummary> wbs = theEngine.getWorkbasketService().createWorkbasketQuery().list();
     if (wbs != null && !(wbs.isEmpty())) {
       // select a random workbasket
       Random random = new Random();
@@ -43,6 +42,4 @@ public class ExampleTaskRoutingProviderForAdapterTest implements TaskRoutingProv
       return null;
     }
   }
-
-
 }

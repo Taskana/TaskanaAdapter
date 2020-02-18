@@ -40,7 +40,7 @@ public class TestTaskClaim extends AbsIntegrationTest {
   @Test
   public void claim_of_taskana_task_should_claim_unclaimed_camunda_task()
       throws TaskNotFoundException, NotAuthorizedException, JSONException, InterruptedException,
-                 InvalidOwnerException, InvalidStateException {
+          InvalidOwnerException, InvalidStateException {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(

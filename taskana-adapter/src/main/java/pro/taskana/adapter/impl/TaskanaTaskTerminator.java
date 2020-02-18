@@ -14,11 +14,7 @@ import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 
-/**
- * terminates taskana tasks if the associated task in the external system was finished.
- *
- * @author bbr
- */
+/** Terminates TASKANA tasks if the associated task in the external system was finished. */
 @Component
 public class TaskanaTaskTerminator {
 
@@ -50,7 +46,7 @@ public class TaskanaTaskTerminator {
       try {
 
         for (SystemConnector systemConnector : (adapterManager.getSystemConnectors().values())) {
-          retrieveTerminatedReferencedTasksAndTerminateCorrespondingTaskanaTasks(systemConnector);
+          retrieveFinishededReferencedTasksAndTerminateCorrespondingTaskanaTasks(systemConnector);
         }
       } catch (Exception e) {
         LOGGER.warn("caught exception {} ", e);
@@ -58,7 +54,7 @@ public class TaskanaTaskTerminator {
     }
   }
 
-  public void retrieveTerminatedReferencedTasksAndTerminateCorrespondingTaskanaTasks(
+  public void retrieveFinishededReferencedTasksAndTerminateCorrespondingTaskanaTasks(
       SystemConnector systemConnector) {
     LOGGER.trace(
         "TaskanaTaskTerminator."
@@ -67,7 +63,8 @@ public class TaskanaTaskTerminator {
     List<ReferencedTask> tasksSuccessfullyTerminatedInTaskana = new ArrayList<>();
 
     try {
-      List<ReferencedTask> taskanaTasksToTerminate = systemConnector.retrieveTerminatedTasks();
+      List<ReferencedTask> taskanaTasksToTerminate =
+          systemConnector.retrieveFinishedReferencedTasks();
 
       for (ReferencedTask referencedTask : taskanaTasksToTerminate) {
         try {
@@ -80,7 +77,7 @@ public class TaskanaTaskTerminator {
               ex);
         }
       }
-      systemConnector.taskanaTasksHaveBeenCompletedForTerminatedReferencedTasks(
+      systemConnector.taskanaTasksHaveBeenTerminatedForFinishedReferencedTasks(
           taskanaTasksToTerminate);
 
     } finally {

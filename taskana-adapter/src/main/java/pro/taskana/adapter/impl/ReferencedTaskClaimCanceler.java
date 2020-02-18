@@ -15,11 +15,8 @@ import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.common.api.exceptions.SystemException;
 import pro.taskana.task.api.CallbackState;
 
-
 /**
- * Cancels claims of tasks in camunda that have been cancel claimed in TASKANA.
- *
- * @author jhe
+ * Cancels claims of ReferencedTasks in external system that have been cancel claimed in TASKANA.
  */
 @Component
 public class ReferencedTaskClaimCanceler {
@@ -30,7 +27,8 @@ public class ReferencedTaskClaimCanceler {
 
   @Scheduled(
       fixedRateString =
-          "${taskana.adapter.scheduler.run.interval.for.claimed.referenced.tasks.in.milliseconds}")
+          "${taskana.adapter.scheduler.run.interval.for."
+              + "cancelled.claim.referenced.tasks.in.milliseconds}")
   public void retrieveCancelledClaimTaskanaTasksAndCancelClaimCorrespondingReferencedTasks() {
 
     synchronized (ReferencedTaskClaimCanceler.class) {
@@ -43,7 +41,7 @@ public class ReferencedTaskClaimCanceler {
       try {
         retrieveCancelledClaimTaskanaTasksAndCancelClaimCorrespondingReferencedTask();
       } catch (Exception ex) {
-        LOGGER.debug("Caught {} while trying to claim referenced tasks", ex);
+        LOGGER.debug("Caught {} while trying to cancel claim referenced tasks", ex);
       }
     }
   }
@@ -53,13 +51,13 @@ public class ReferencedTaskClaimCanceler {
     try {
       TaskanaConnector taskanaSystemConnector = adapterManager.getTaskanaConnector();
 
-      List<ReferencedTask> tasksUnclaimedByTaskana =
+      List<ReferencedTask> tasksCancelClaimedByTaskana =
           taskanaSystemConnector.retrieveCancelledClaimTaskanaTasksAsReferencedTasks();
-      List<ReferencedTask> tasksUnclaimedInExternalSystem =
-          cancelClaimReferencedTasksInExternalSystem(tasksUnclaimedByTaskana);
+      List<ReferencedTask> tasksCancelClaimedInExternalSystem =
+          cancelClaimReferencedTasksInExternalSystem(tasksCancelClaimedByTaskana);
 
-      taskanaSystemConnector.changeReferencedTaskCallbackState(
-          tasksUnclaimedInExternalSystem, CallbackState.CALLBACK_PROCESSING_REQUIRED);
+      taskanaSystemConnector.changeTaskCallbackState(
+          tasksCancelClaimedInExternalSystem, CallbackState.CALLBACK_PROCESSING_REQUIRED);
     } finally {
       LOGGER.trace(
           "ReferencedTaskClaimer."
@@ -71,13 +69,13 @@ public class ReferencedTaskClaimCanceler {
   private List<ReferencedTask> cancelClaimReferencedTasksInExternalSystem(
       List<ReferencedTask> tasksUnclaimedByTaskana) {
 
-    List<ReferencedTask> tasksUnclaimedInExternalSystem = new ArrayList<>();
-    for (ReferencedTask referencedTask : tasksUnclaimedByTaskana) {
-      if (cancelClaimReferencedTask(referencedTask)) {
-        tasksUnclaimedInExternalSystem.add(referencedTask);
+    List<ReferencedTask> tasksCancelClaimedInExternalSystem = new ArrayList<>();
+    for (ReferencedTask referencedTaskToCancelClaim : tasksUnclaimedByTaskana) {
+      if (cancelClaimReferencedTask(referencedTaskToCancelClaim)) {
+        tasksCancelClaimedInExternalSystem.add(referencedTaskToCancelClaim);
       }
     }
-    return tasksUnclaimedInExternalSystem;
+    return tasksCancelClaimedInExternalSystem;
   }
 
   private boolean cancelClaimReferencedTask(ReferencedTask referencedTask) {

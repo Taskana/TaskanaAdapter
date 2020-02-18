@@ -4,11 +4,7 @@ import java.util.List;
 
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 
-/**
- * The interface for the SystemConnector provider.
- *
- * @author bbr
- */
+/** The interface for the SystemConnector provider. */
 public interface SystemConnectorProvider {
 
   /**

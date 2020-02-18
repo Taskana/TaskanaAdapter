@@ -8,18 +8,14 @@ import pro.taskana.adapter.systemconnector.api.SystemConnector;
 import pro.taskana.adapter.systemconnector.api.SystemResponse;
 import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemUrls;
 
-/**
- * Sample Implementation of SystemConnector.
- *
- * @author bbr
- */
+/** Sample Implementation of SystemConnector. */
 public class CamundaSystemConnectorImpl implements SystemConnector {
 
   static final String URL_GET_CAMUNDA_TASKS = "/task/";
   static final String URL_OUTBOX_REST_PATH = "/taskana-outbox/rest-api";
 
   static final String URL_GET_CAMUNDA_CREATE_EVENTS = "/events?type=create";
-  static final String URL_GET_CAMUNDA_COMPLETE_EVENTS = "/events?type=complete&type=delete";
+  static final String URL_GET_CAMUNDA_FINISHED_EVENTS = "/events?type=complete&type=delete";
   static final String URL_DELETE_CAMUNDA_EVENTS = "/events/delete";
 
   static final String BODY_SET_CAMUNDA_VARIABLES = "{\"variables\":";
@@ -65,19 +61,19 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
   }
 
   @Override
-  public List<ReferencedTask> retrieveTerminatedTasks() {
-    return taskRetriever.retrieveTerminatedCamundaTasks(camundaSystemUrl.getSystemTaskEventUrl());
+  public List<ReferencedTask> retrieveFinishedReferencedTasks() {
+    return taskRetriever.retrieveFinishedCamundaTasks(camundaSystemUrl.getSystemTaskEventUrl());
   }
 
   @Override
-  public void taskanaTasksHaveBeenCompletedForTerminatedReferencedTasks(
+  public void taskanaTasksHaveBeenTerminatedForFinishedReferencedTasks(
       List<ReferencedTask> referencedTasks) {
     taskEventCleaner.cleanEventsForReferencedTasks(
         referencedTasks, camundaSystemUrl.getSystemTaskEventUrl());
   }
 
   @Override
-  public String retrieveVariables(String taskId) {
+  public String retrieveReferencedTaskVariables(String taskId) {
     return null;
   }
 

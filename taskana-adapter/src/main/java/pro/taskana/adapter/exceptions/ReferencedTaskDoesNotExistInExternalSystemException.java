@@ -1,13 +1,10 @@
 package pro.taskana.adapter.exceptions;
 
-
 import pro.taskana.common.api.exceptions.TaskanaRuntimeException;
 
 /**
  * This exception is thrown when an attempt is made to create a Taskana task for a referenced task
  * that does not exist.
- *
- * @author bbr
  */
 public class ReferencedTaskDoesNotExistInExternalSystemException extends TaskanaRuntimeException {
 

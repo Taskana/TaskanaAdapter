@@ -10,11 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import pro.taskana.adapter.configuration.AdapterConfiguration;
 import pro.taskana.adapter.test.configuration.CamundaConfiguration;
 
-/**
- * Application to test the integration of Camunda BPM with REST API with the Taskana Adapter.
- *
- * @author Ben Fuernrohr
- */
+/** Application to test the integration of Camunda BPM with REST API with the TASKANA Adapter. */
 @EnableScheduling
 @ComponentScan(basePackages = {"pro.taskana.adapter", "pro.taskana.adapter.test"})
 @Import({AdapterConfiguration.class, CamundaConfiguration.class})

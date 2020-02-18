@@ -18,8 +18,6 @@ import pro.taskana.common.api.LoggerUtils;
 
 /**
  * Scheduler for receiving referenced tasks, completing Taskana tasks and cleaning adapter tables.
- *
- * @author bbr
  */
 @Component
 public class AdapterManager {

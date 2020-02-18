@@ -14,7 +14,6 @@ import org.junit.runners.model.Statement;
 import pro.taskana.common.internal.security.GroupPrincipal;
 import pro.taskana.common.internal.security.UserPrincipal;
 
-
 /** Runner for integration tests that enables JAAS subject. */
 public class JaasRunner extends BlockJUnit4ClassRunner {
 

@@ -15,12 +15,7 @@ import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.common.api.exceptions.SystemException;
 import pro.taskana.task.api.CallbackState;
 
-
-/**
- * Periodically polls claimed TASKANA tasks and claims them in camunda.
- *
- * @author jhe
- */
+/** Claims ReferencedTasks in external system that have been claimed in TASKANA. */
 @Component
 public class ReferencedTaskClaimer {
 
@@ -61,7 +56,7 @@ public class ReferencedTaskClaimer {
       List<ReferencedTask> tasksClaimedInExternalSystem =
           claimReferencedTasksInExternalSystem(tasksClaimedByTaskana);
 
-      taskanaSystemConnector.changeReferencedTaskCallbackState(
+      taskanaSystemConnector.changeTaskCallbackState(
           tasksClaimedInExternalSystem, CallbackState.CLAIMED);
     } finally {
       LOGGER.trace(

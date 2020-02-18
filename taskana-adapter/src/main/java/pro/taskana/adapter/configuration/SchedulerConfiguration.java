@@ -8,8 +8,6 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 /**
  * Configures the scheduler. Per default all @scheduled methods share a single thread. To provide a
  * unique thread per @scheduled method, we configure here 10 threads for the @scheduled methods.
- *
- * @author bbr
  */
 @Configuration
 public class SchedulerConfiguration implements SchedulingConfigurer {

@@ -17,11 +17,7 @@ import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.task.api.exceptions.TaskAlreadyExistException;
 import pro.taskana.task.api.models.Task;
 
-/**
- * Retrieves tasks in an external system and start corresponding tasks in taskana.
- *
- * @author bbr
- */
+/** Retrieves tasks in an external system and starts corresponding tasks in TASKANA. */
 @Component
 public class TaskanaTaskStarter {
 
@@ -119,7 +115,7 @@ public class TaskanaTaskStarter {
   private void addVariablesToReferencedTask(
       ReferencedTask referencedTask, SystemConnector connector) {
     if (referencedTask.getVariables() == null) {
-      String variables = connector.retrieveVariables(referencedTask.getId());
+      String variables = connector.retrieveReferencedTaskVariables(referencedTask.getId());
       referencedTask.setVariables(variables);
     }
   }
