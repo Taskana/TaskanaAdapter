@@ -2,11 +2,7 @@ package pro.taskana.adapter.systemconnector.api;
 
 import org.springframework.http.HttpStatus;
 
-/**
- * encapsulate a response from the external system.
- *
- * @author bbr
- */
+/** encapsulate a response from the external system. */
 public class SystemResponse {
   private HttpStatus statusCode;
   private Throwable throwable;

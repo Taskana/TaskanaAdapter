@@ -13,11 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-/**
- * Class to assist with building requests against the Camunda REST API.
- *
- * @author Ben Fuernrohr
- */
+/** Class to assist with building requests against the Camunda REST API. */
 public class CamundaProcessengineRequester {
 
   private static final String BASIC_ENGINE_PATH = "/rest/engine/";

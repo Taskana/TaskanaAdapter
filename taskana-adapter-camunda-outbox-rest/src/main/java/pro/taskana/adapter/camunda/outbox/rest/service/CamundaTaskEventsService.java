@@ -25,12 +25,7 @@ import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
 import pro.taskana.adapter.camunda.TaskanaConfigurationProperties;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
 
-
-/**
- * Implementation of the Outbox REST service.
- *
- * @author jhe
- */
+/** Implementation of the Outbox REST service. */
 public class CamundaTaskEventsService implements TaskanaConfigurationProperties {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskEventsService.class);
@@ -168,13 +163,14 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
 
     try (Connection connection = getConnection();
         PreparedStatement preparedStatement =
-            getPreparedCompleteAndDeleteEventsStatement(connection);) {
+            getPreparedCompleteAndDeleteEventsStatement(connection); ) {
 
       ResultSet completeAndDeleteEventsResultSet = preparedStatement.executeQuery();
       camundaTaskEvents = getCamundaTaskEvents(completeAndDeleteEventsResultSet);
 
     } catch (SQLException | NullPointerException e) {
-      LOGGER.warn("Caught {} while trying to retrieve complete/delete events from the outbox",
+      LOGGER.warn(
+          "Caught {} while trying to retrieve complete/delete events from the outbox",
           e.getClass().getName());
     }
 
@@ -272,7 +268,8 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
     } catch (IOException | NullPointerException e) {
       LOGGER.warn(
           "Caught Exception {} while trying to retrieve the outbox-schema "
-              + "from the provided properties file.", e.getClass().getName());
+              + "from the provided properties file.",
+          e.getClass().getName());
     }
 
     outboxSchema = (outboxSchema == null || outboxSchema.isEmpty()) ? defaultSchema : outboxSchema;
@@ -285,8 +282,8 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
       return null;
     } else {
       return DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-                 .withZone(ZoneId.systemDefault())
-                 .format(date.toInstant());
+          .withZone(ZoneId.systemDefault())
+          .format(date.toInstant());
     }
   }
 }

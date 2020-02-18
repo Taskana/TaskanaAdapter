@@ -19,8 +19,6 @@ import pro.taskana.common.api.exceptions.SystemException;
 /**
  * Cancels claims of tasks in camunda through the camunda REST-API that have a canceled claim in
  * TASKANA.
- *
- * @author jhe
  */
 @Component
 public class CamundaTaskClaimCanceler {

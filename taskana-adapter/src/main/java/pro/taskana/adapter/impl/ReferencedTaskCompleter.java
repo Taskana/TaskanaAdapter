@@ -16,9 +16,7 @@ import pro.taskana.common.api.exceptions.SystemException;
 import pro.taskana.task.api.CallbackState;
 
 /**
- * Completes ReferencedTasks in the external system after completion of corresponding taskana tasks.
- *
- * @author bbr
+ * Completes ReferencedTasks in the external system after completion of corresponding TASKANA tasks.
  */
 @Component
 public class ReferencedTaskCompleter {
@@ -59,7 +57,7 @@ public class ReferencedTaskCompleter {
       List<ReferencedTask> tasksCompletedInExternalSystem =
           completeReferencedTasksInExternalSystem(tasksCompletedByTaskana);
 
-      taskanaSystemConnector.changeReferencedTaskCallbackState(
+      taskanaSystemConnector.changeTaskCallbackState(
           tasksCompletedInExternalSystem, CallbackState.CALLBACK_PROCESSING_COMPLETED);
     } finally {
       LOGGER.trace(

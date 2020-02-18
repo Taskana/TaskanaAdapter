@@ -1,7 +1,6 @@
 package pro.taskana.adapter;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
@@ -9,13 +8,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import pro.taskana.adapter.configuration.AdapterConfiguration;
 
-/**
- * Application that provides an adapter between taskana and one or more external systems.
- *
- * @author kkl
- */
+/** Application that provides an adapter between TASKANA and one or more external systems. */
 @SpringBootApplication
-@EnableAutoConfiguration
 @EnableScheduling
 @ComponentScan(basePackages = "pro.taskana.adapter")
 @Import({AdapterConfiguration.class})

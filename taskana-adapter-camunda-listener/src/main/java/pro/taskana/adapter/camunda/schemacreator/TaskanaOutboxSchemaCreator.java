@@ -13,11 +13,7 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Creates the outbox schema in the Camunda database.
- *
- * @author jhe
- */
+/** Creates the outbox schema in the Camunda database. */
 public class TaskanaOutboxSchemaCreator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaOutboxSchemaCreator.class);

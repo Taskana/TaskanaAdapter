@@ -36,11 +36,7 @@ import pro.taskana.workbasket.api.exceptions.WorkbasketNotFoundException;
 import pro.taskana.workbasket.api.models.Workbasket;
 import pro.taskana.workbasket.api.models.WorkbasketAccessItem;
 
-/**
- * Parent class for integrationtests for the taskana adapter.
- *
- * @author Ben Fuernrohr
- */
+/** Parent class for integrationtests for the TASKANA-Adapter. */
 public abstract class AbsIntegrationTest {
 
   // use rules instead of running with SpringRunner to allow for running with JaasRunner
@@ -60,11 +56,17 @@ public abstract class AbsIntegrationTest {
   @Value("${taskana.adapter.scheduler.run.interval.for.complete.referenced.tasks.in.milliseconds}")
   protected long adapterCompletionPollingInterval;
 
-  @Value("1000")
+  @Value(
+      "${taskana.adapter.scheduler.run.interval.for.check.finished.referenced."
+          + "tasks.in.milliseconds}")
+  protected long adapterCancelledClaimPollingInterval;
+
+  @Value(
+      "${taskana.adapter.scheduler.run.interval.for.claimed.referenced." + "tasks.in.milliseconds}")
   protected long adapterClaimPollingInterval;
 
   @Value(
-      "${taskana.adapter.scheduler.run.interval.for.check.cancelled.referenced."
+      "${taskana.adapter.scheduler.run.interval.for.cancelled.claim.referenced."
           + "tasks.in.milliseconds}")
   protected long adapterCancelPollingInterval;
 
@@ -96,8 +98,7 @@ public abstract class AbsIntegrationTest {
       // setup Taskana engine and clear Taskana database
       TaskanaEngineConfiguration taskanaEngineConfiguration =
           new TaskanaEngineConfiguration(
-              this.taskanaDataSource,
-              false, ((HikariDataSource) taskanaDataSource).getSchema());
+              this.taskanaDataSource, false, ((HikariDataSource) taskanaDataSource).getSchema());
 
       taskanaEngine = taskanaEngineConfiguration.buildTaskanaEngine();
       taskanaEngine.setConnectionManagementMode(ConnectionManagementMode.AUTOCOMMIT);

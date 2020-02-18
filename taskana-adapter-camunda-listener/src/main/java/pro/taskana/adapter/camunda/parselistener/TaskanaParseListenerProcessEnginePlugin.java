@@ -19,9 +19,8 @@ import pro.taskana.adapter.camunda.schemacreator.TaskanaOutboxSchemaCreator;
 import pro.taskana.adapter.camunda.util.ReadPropertiesHelper;
 
 /**
- * Camunda engine plugin for the taskana parse listener.
- *
- * @author jhe
+ * Camunda engine plugin for the responsible for adding the TaskanaParseListener to the
+ * ProcessEngineConfguration, as well as initializing the outbox tables.
  */
 public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEnginePlugin
     implements TaskanaConfigurationProperties {
@@ -118,7 +117,6 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
             "TaskanaOutboxSchema");
       }
     }
-
   }
 
   private DataSource getDataSourceFromPropertiesFile() {

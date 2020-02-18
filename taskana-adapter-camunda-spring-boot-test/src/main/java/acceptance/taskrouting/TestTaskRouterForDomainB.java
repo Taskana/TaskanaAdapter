@@ -7,7 +7,6 @@ import pro.taskana.spi.routing.api.TaskRoutingProvider;
 import pro.taskana.task.api.models.Task;
 import pro.taskana.workbasket.api.models.WorkbasketSummary;
 
-
 /** This is a sample implementation of TaskRouter. */
 public class TestTaskRouterForDomainB implements TaskRoutingProvider {
 

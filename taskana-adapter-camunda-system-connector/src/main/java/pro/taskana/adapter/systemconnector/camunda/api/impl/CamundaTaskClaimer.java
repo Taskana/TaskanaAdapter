@@ -16,11 +16,7 @@ import pro.taskana.adapter.systemconnector.api.SystemResponse;
 import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemUrls;
 import pro.taskana.common.api.exceptions.SystemException;
 
-/**
- * Claims tasks in camunda through the camunda REST-API that have been claimed in TASKANA.
- *
- * @author jhe
- */
+/** Claims tasks in camunda through the camunda REST-API that have been claimed in TASKANA. */
 @Component
 public class CamundaTaskClaimer {
 

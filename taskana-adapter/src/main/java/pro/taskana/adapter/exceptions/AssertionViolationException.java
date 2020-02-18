@@ -1,10 +1,6 @@
 package pro.taskana.adapter.exceptions;
 
-/**
- * This exception is thrown when an assertion is violated.
- *
- * @author bbr
- */
+/** This exception is thrown when an assertion is violated. */
 public class AssertionViolationException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;

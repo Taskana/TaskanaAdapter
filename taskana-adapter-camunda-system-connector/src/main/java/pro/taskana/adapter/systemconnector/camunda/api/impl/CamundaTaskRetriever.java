@@ -19,11 +19,7 @@ import pro.taskana.adapter.camunda.outbox.rest.CamundaTaskEvent;
 import pro.taskana.adapter.camunda.outbox.rest.CamundaTaskEventListResource;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 
-/**
- * Retrieves tasks from camunda that have been new started or terminated by camunda.
- *
- * @author bbr
- */
+/** Retrieves new tasks from camunda that have been started or finished by camunda. */
 @Component
 public class CamundaTaskRetriever {
 
@@ -50,12 +46,12 @@ public class CamundaTaskRetriever {
     return referencedTasks;
   }
 
-  public List<ReferencedTask> retrieveTerminatedCamundaTasks(String camundaSystemUrl) {
+  public List<ReferencedTask> retrieveFinishedCamundaTasks(String camundaSystemUrl) {
     LOGGER.debug("entry to retrieveFinishedCamundaTasks. CamundSystemURL = {} ", camundaSystemUrl);
 
     List<CamundaTaskEvent> camundaTaskEvents =
         getCamundaTaskEvents(
-            camundaSystemUrl, CamundaSystemConnectorImpl.URL_GET_CAMUNDA_COMPLETE_EVENTS);
+            camundaSystemUrl, CamundaSystemConnectorImpl.URL_GET_CAMUNDA_FINISHED_EVENTS);
 
     List<ReferencedTask> referencedTasks =
         getReferencedTasksFromCamundaTaskEvents(camundaTaskEvents);

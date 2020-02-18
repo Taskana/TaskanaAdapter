@@ -7,14 +7,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.web.client.RestTemplate;
 
+import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskClaimCanceler;
+import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskClaimer;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskCompleter;
+import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskEventCleaner;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskRetriever;
 
-/**
- * Configures the camunda system connector.
- *
- * @author bbr
- */
+/** Configures the camunda system connector. */
 @Configuration
 @DependsOn(value = {"adapterSpringContextProvider"})
 public class CamundaSystemConnectorConfiguration {
@@ -38,5 +37,20 @@ public class CamundaSystemConnectorConfiguration {
   @Bean
   CamundaTaskCompleter camundaTaskCompleter() {
     return new CamundaTaskCompleter();
+  }
+
+  @Bean
+  CamundaTaskClaimer camundaTaskClaimer() {
+    return new CamundaTaskClaimer();
+  }
+
+  @Bean
+  CamundaTaskClaimCanceler camundaTaskClaimCanceler() {
+    return new CamundaTaskClaimCanceler();
+  }
+
+  @Bean
+  CamundaTaskEventCleaner camundaTaskEventCleaner() {
+    return new CamundaTaskEventCleaner();
   }
 }
