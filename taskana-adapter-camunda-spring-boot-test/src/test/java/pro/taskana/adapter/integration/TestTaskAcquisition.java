@@ -268,7 +268,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
 
     } catch (TaskNotFoundException | NotAuthorizedException e) {
       LOGGER.info(
-          "Caught {}, while trying to create a taskana task and verify its variables", e, e);
+          "Caught Exception while trying to create a taskana task and verify its variables", e);
     }
   }
 }
