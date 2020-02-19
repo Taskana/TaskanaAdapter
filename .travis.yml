@@ -7,7 +7,8 @@ jdk:
   - openjdk8
 
 git:
-  depth: 3
+  # depth false is needed by ci/commitPoms.sh
+  depth: false 
 
 cache:
   directories:
