@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.3.5">
-  <bpmn:process id="taskListenerTest" name="TASKANATaskListenerUpdated" isExecutable="true">
+  <bpmn:process id="example_process" name="example_process" isExecutable="true">
     <bpmn:extensionElements>
       <camunda:properties>
         <camunda:property name="taskana.domain" value="DOMAIN_A" />
@@ -24,7 +24,6 @@
         <camunda:properties>
           <camunda:property name="taskana.classification-key" value="L1050" />
         </camunda:properties>
-        <camunda:taskListener class="pro.taskana.adapter.camunda.tasklistener.TaskanaTaskListener" event="create" />
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow1</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_04gptpk</bpmn:outgoing>
@@ -35,8 +34,8 @@
         <camunda:properties>
           <camunda:property name="prop1" value="prop1" />
           <camunda:property name="prop2" value="prop2" />
+          <camunda:property name="taskana.classification-key" value="L1050" />
         </camunda:properties>
-        <camunda:taskListener class="pro.taskana.adapter.camunda.tasklistener.TaskanaTaskListener" event="create" />
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_04gptpk</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0b2pc40</bpmn:outgoing>
