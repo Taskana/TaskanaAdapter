@@ -1,5 +1,7 @@
 package pro.taskana.adapter.camunda.tasklistener;
 
+import static pro.taskana.adapter.camunda.util.PrimitiveWrapperChecker.isPrimitiveWrapper;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Connection;
@@ -25,7 +27,6 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperties;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ClassUtils;
 
 import pro.taskana.adapter.camunda.TaskanaConfigurationProperties;
 import pro.taskana.adapter.camunda.dto.ReferencedTask;
@@ -73,8 +74,6 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
           insertCreateEventIntoOutbox(delegateTask, connection);
           break;
         case "complete":
-          insertCompleteOrDeleteEventIntoOutbox(delegateTask, connection);
-          break;
         case "delete":
           insertCompleteOrDeleteEventIntoOutbox(delegateTask, connection);
           break;
@@ -152,10 +151,7 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
 
   private boolean taskWasCompletedByTaskanaAdapter(DelegateTask delegateTask) {
 
-    if (delegateTask.getVariableNamesLocal().contains("completedByTaskanaAdapter")) {
-      return true;
-    }
-    return false;
+    return delegateTask.getVariableNamesLocal().contains("completedByTaskanaAdapter");
   }
 
   private void setOutboxSchema(Connection connection) throws SQLException {
@@ -279,7 +275,8 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
 
       } catch (Exception ex) {
         LOGGER.warn(
-            "Caught {} while trying to create JSON-String out of process variable object", ex);
+            "Caught exception while trying to create JSON-String out of process variable object",
+            ex);
       }
     }
   }
@@ -294,8 +291,9 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
     Map<String, Object> valueInfo = new HashMap<>();
     valueInfo.put("objectTypeName", processVariable.getClass());
 
-    if (ClassUtils.isPrimitiveOrWrapper(processVariable.getClass())
-        && !processVariable.getClass().getTypeName().equals("String")) {
+    if (processVariable.getClass().isPrimitive()
+        || isPrimitiveWrapper((processVariable.getClass()))
+            && !processVariable.getClass().getTypeName().equals("String")) {
 
       type = processVariable.getClass().getSimpleName();
 
@@ -316,16 +314,14 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
   }
 
   private List<String> splitProcessVariableNamesString(String processVariableNamesConcatenated) {
-    List<String> processVariableNames =
-        Arrays.asList(processVariableNamesConcatenated.trim().split("\\s*,\\s*"));
-    return processVariableNames;
+    return Arrays.asList(processVariableNamesConcatenated.trim().split("\\s*,\\s*"));
   }
 
   private String getWorkbasketKey(DelegateTask delegateTask) {
     String workbasketKey = null;
     try {
       Object workbasketKeyObj = delegateTask.getVariable("taskana.workbasket-key");
-      if (workbasketKeyObj != null && workbasketKeyObj instanceof String) {
+      if (workbasketKeyObj instanceof String) {
         workbasketKey = (String) workbasketKeyObj;
       }
     } catch (Exception e) {
