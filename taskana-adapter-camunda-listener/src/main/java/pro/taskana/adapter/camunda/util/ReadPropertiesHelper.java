@@ -24,8 +24,11 @@ public class ReadPropertiesHelper {
 
     } catch (IOException | NullPointerException e) {
       LOGGER.warn(
-          "Caught Exception while trying to retrieve the outbox-schema from the provided "
-              + "properties file",
+          "Caught Exception while trying to retrieve the "
+              + propertyName
+              + " property from the provided "
+              + "properties file "
+              + propertiesFileName,
           e);
     }
 
