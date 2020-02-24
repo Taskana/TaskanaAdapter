@@ -8,8 +8,11 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
 import javax.sql.DataSource;
+import org.apache.ibatis.jdbc.RuntimeSqlException;
 import org.apache.ibatis.jdbc.ScriptRunner;
+import org.apache.ibatis.jdbc.SqlRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,11 +25,6 @@ public class TaskanaOutboxSchemaCreator {
   private static final String DB_SCHEMA_DB2 = SQL + "/taskana-outbox-schema-db2.sql";
   private static final String DB_SCHEMA_POSTGRES = SQL + "/taskana-outbox-schema-postgres.sql";
   private static final String DB_SCHEMA_ORACLE = SQL + "/taskana-outbox-schema-oracle.sql";
-  private static final String DB_SCHEMA_DETECTION = SQL + "/taskana-outbox-schema-detection.sql";
-  private static final String DB_SCHEMA_DETECTION_POSTGRES =
-      SQL + "/taskana-outbox-schema-detection-postgres.sql";
-  private static final String DB_SCHEMA_DETECTION_ORACLE =
-      SQL + "/taskana-outbox-schema-detection-oracle.sql";
 
   private DataSource dataSource;
   private String schemaName;
@@ -41,12 +39,8 @@ public class TaskanaOutboxSchemaCreator {
     this.schemaName = schemaName;
   }
 
-  /**
-   * Run all db scripts.
-   *
-   * @throws SQLException will be thrown if there will be some incorrect SQL statements invoked.
-   */
-  public void run() throws SQLException {
+  /** Run all db scripts. */
+  public boolean createSchema() {
     try (Connection connection = dataSource.getConnection()) {
       ScriptRunner runner = new ScriptRunner(connection);
       LOGGER.debug(connection.getMetaData().toString());
@@ -54,62 +48,100 @@ public class TaskanaOutboxSchemaCreator {
       runner.setLogWriter(logWriter);
       runner.setErrorLogWriter(errorLogWriter);
       final String databaseProductName = connection.getMetaData().getDatabaseProductName();
-      if (!isSchemaPreexisting(connection, databaseProductName)) {
-        BufferedReader reader =
-            new BufferedReader(
-                new InputStreamReader(
-                    this.getClass()
-                        .getResourceAsStream(selectDbScriptFileName(databaseProductName))));
-        runner.runScript(getSqlSchemaNameParsed(reader, databaseProductName));
-      }
+      BufferedReader reader =
+          new BufferedReader(
+              new InputStreamReader(
+                  this.getClass()
+                      .getResourceAsStream(selectDbScriptFileName(databaseProductName))));
+      runner.runScript(getSqlSchemaNameParsed(reader, databaseProductName));
+
+    } catch (Exception ex) {
+      return false;
     } finally {
       LOGGER.debug(outWriter.toString());
       if (!errorWriter.toString().trim().isEmpty()) {
         LOGGER.error(errorWriter.toString());
       }
     }
-  }
-
-  private ScriptRunner getScriptRunnerInstance(Connection connection) {
-    ScriptRunner runner = new ScriptRunner(connection);
-    runner.setStopOnError(true);
-    runner.setLogWriter(logWriter);
-    runner.setErrorLogWriter(errorLogWriter);
-    return runner;
-  }
-
-  private boolean isSchemaPreexisting(Connection connection, String databaseProductName) {
-    ScriptRunner runner = getScriptRunnerInstance(connection);
-    StringWriter errorWriter = new StringWriter();
-    runner.setErrorLogWriter(new PrintWriter(errorWriter));
-    try {
-
-      BufferedReader reader =
-          new BufferedReader(
-              new InputStreamReader(
-                  this.getClass()
-                      .getResourceAsStream(selectDbSchemaDetectionScript(databaseProductName))));
-
-      runner.runScript(getSqlSchemaNameParsed(reader, databaseProductName));
-    } catch (Exception e) {
-      LOGGER.debug("Schema does not exist.");
-      e.printStackTrace(System.out);
-      if (!errorWriter.toString().trim().isEmpty()) {
-        LOGGER.debug(errorWriter.toString());
-      }
-      return false;
-    }
-    LOGGER.debug("Schema does exist.");
+    LOGGER.info("TaskanaOutbox schema created successfully");
     return true;
   }
 
-  private static String selectDbSchemaDetectionScript(String dbProductName) {
-    if ("PostgreSQL".equals(dbProductName)) {
-      return DB_SCHEMA_DETECTION_POSTGRES;
-    } else if (dbProductName != null && dbProductName.toLowerCase().startsWith("oracle")) {
-      return DB_SCHEMA_DETECTION_ORACLE;
-    } else {
-      return DB_SCHEMA_DETECTION;
+  public boolean isSchemaPreexisting() {
+
+    try {
+
+      Map<String, Object> queryResult = querySchema();
+
+      if (queryResult == null || queryResult.isEmpty()) {
+        LOGGER.error("TaskanaOutbox does not exist");
+        return false;
+      } else {
+        LOGGER.debug("TaskanaOutbox does exist.");
+        return true;
+      }
+
+    } catch (RuntimeSqlException | SQLException e) {
+      LOGGER.error("TaskanaOutbox schema doesn't exist");
+      return false;
+    }
+  }
+
+  public boolean isValidSchemaVersion(String expectedOutboxSchemaVersion) {
+
+    try {
+
+      Map<String, Object> queryResult = querySchema();
+
+      if (queryResult == null || queryResult.isEmpty()) {
+        LOGGER.error(
+            "Schema version not valid. The VERSION property in table OUTBOX_SCHEMA_VERSION "
+                + "has not the expected value {}",
+            expectedOutboxSchemaVersion);
+        return false;
+
+      } else if (queryResult.get("VERSION").equals(expectedOutboxSchemaVersion)) {
+        LOGGER.debug("Schema version is valid.");
+        return true;
+      }
+
+    } catch (RuntimeSqlException | SQLException e) {
+      LOGGER.error(
+          "Schema version not valid. The VERSION property in table OUTBOX_SCHEMA_VERSION "
+              + "has not the expected value {}",
+          expectedOutboxSchemaVersion);
+      return false;
+    }
+
+    return false;
+  }
+
+  private Map<String, Object> querySchema() throws SQLException {
+
+    SqlRunner runner;
+
+    try (Connection connection = dataSource.getConnection()) {
+
+      final String originalSchema = connection.getSchema();
+
+      connection.setSchema(this.schemaName);
+      runner = new SqlRunner(connection);
+
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(connection.getMetaData().toString());
+      }
+
+      String query =
+          "select VERSION from OUTBOX_SCHEMA_VERSION where "
+              + "VERSION = (select max(VERSION) from OUTBOX_SCHEMA_VERSION) ";
+
+      try {
+        Map<String, Object> queryResult = runner.selectOne(query);
+        connection.setSchema(originalSchema);
+        return queryResult;
+      } finally {
+        connection.setSchema(originalSchema);
+      }
     }
   }
 
@@ -127,15 +159,16 @@ public class TaskanaOutboxSchemaCreator {
 
   private StringReader getSqlSchemaNameParsed(BufferedReader reader, String dbProductName) {
     boolean isPostGres = "PostgreSQL".equals(dbProductName);
-    StringBuffer content = new StringBuffer();
+    StringBuilder content = new StringBuilder();
     String effectiveSchemaName = isPostGres ? schemaName.toLowerCase() : schemaName.toUpperCase();
     try {
       String line = "";
       while (line != null) {
         line = reader.readLine();
         if (line != null) {
-          content.append(
-              line.replaceAll("%schemaName%", effectiveSchemaName) + System.lineSeparator());
+          content
+              .append(line.replace("%schemaName%", effectiveSchemaName))
+              .append(System.lineSeparator());
         }
       }
     } catch (IOException e) {
