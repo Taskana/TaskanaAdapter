@@ -6,9 +6,14 @@ language: java
 jdk:
   - openjdk8
 
+addons:
+  sonarcloud:
+    organization: $SONAR_ORGANIZATION
+
 git:
-  # depth false is needed by ci/commitPoms.sh
-  depth: false 
+  #depth false needed by sonarcloud for deep comparison
+  #depth false is needed by ci/commitPoms.sh
+  depth: false
 
 cache:
   directories:
@@ -27,7 +32,8 @@ jobs:
   include:
     - stage: Test
       install: skip
-      script: ci/test.sh H2
+      # include SONAR_PROJECT_KEY as a second parameter if this is not a pull request
+      script: ci/test.sh H2 "$([ "false" = "$TRAVIS_PULL_REQUEST" ] && echo "$SONAR_PROJECT_KEY")"
       before_cache: rm -rf $HOME/.m2/repository/pro/taskana
 
     - stage: Release / Deploy
