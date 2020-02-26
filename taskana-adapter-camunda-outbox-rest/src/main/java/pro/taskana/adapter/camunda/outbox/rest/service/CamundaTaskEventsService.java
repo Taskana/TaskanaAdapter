@@ -29,13 +29,13 @@ import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
 public class CamundaTaskEventsService implements TaskanaConfigurationProperties {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskEventsService.class);
-  private static final String outboxSchema = getSchemaFromProperties();
+  private static final String OUTBOX_SCHEMA = getSchemaFromProperties();
   private static final String SQL_GET_CREATE_EVENTS =
-      "SELECT * FROM " + outboxSchema + ".event_store WHERE type = ?";
+      "SELECT * FROM " + OUTBOX_SCHEMA + ".event_store WHERE type = ?";
   private static final String SQL_GET_COMPLETE_AND_DELETE_EVENTS =
-      "SELECT * FROM " + outboxSchema + ".event_store WHERE type = ? OR type = ?";
+      "SELECT * FROM " + OUTBOX_SCHEMA + ".event_store WHERE type = ? OR type = ?";
   private static final String SQL_WITHOUT_PLACEHOLDERS_DELETE_EVENTS =
-      "DELETE FROM " + outboxSchema + ".event_store WHERE id in (%s)";
+      "DELETE FROM " + OUTBOX_SCHEMA + ".event_store WHERE id in (%s)";
 
   private DataSource dataSource = null;
 
