@@ -1,7 +1,9 @@
 package pro.taskana.sample.taskrouting;
 
+import java.security.SecureRandom;
 import java.util.List;
-import java.util.Random;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 import pro.taskana.common.api.TaskanaEngine;
@@ -10,6 +12,9 @@ import pro.taskana.task.api.models.Task;
 import pro.taskana.workbasket.api.models.WorkbasketSummary;
 
 public class ExampleTaskRoutingProviderForAdapterTest implements TaskRoutingProvider {
+
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(ExampleTaskRoutingProviderForAdapterTest.class);
 
   TaskanaEngine theEngine;
 
@@ -23,7 +28,7 @@ public class ExampleTaskRoutingProviderForAdapterTest implements TaskRoutingProv
 
   @Override
   public String determineWorkbasketId(Task task) {
-    if (routeRandomly != null && "true".equals(routeRandomly.toLowerCase())) {
+    if (routeRandomly != null && "true".equalsIgnoreCase(routeRandomly)) {
       return determineRandomWorkbasket();
     } else {
       return "WBI:100000000000000000000000000000000001";
@@ -34,9 +39,11 @@ public class ExampleTaskRoutingProviderForAdapterTest implements TaskRoutingProv
     List<WorkbasketSummary> wbs = theEngine.getWorkbasketService().createWorkbasketQuery().list();
     if (wbs != null && !(wbs.isEmpty())) {
       // select a random workbasket
-      Random random = new Random();
+      SecureRandom random = new SecureRandom();
       int n = random.nextInt(wbs.size());
-      System.out.println("ExampleTaskRoutingProvider Routs to " + wbs.get(n));
+      if (LOGGER.isInfoEnabled()) {
+        LOGGER.info(String.format("ExampleTaskRoutingProvider Routs to %s", wbs.get(n)));
+      }
       return wbs.get(n).getId();
     } else {
       return null;

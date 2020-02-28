@@ -154,7 +154,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     } catch (TaskNotFoundException e1) {
       LOGGER.debug("Nothing to do in terminateTaskanaTask. Task {} is already gone", taskId);
     } catch (InvalidOwnerException | InvalidStateException | NotAuthorizedException e2) {
-      if (taskSummary != null && TaskState.COMPLETED.equals(taskSummary.getState())) {
+      if (TaskState.COMPLETED.equals(taskSummary.getState())) {
         LOGGER.debug("Nothing to do in terminateTaskanaTask. Task {} is already completed", taskId);
       } else {
         throw new TaskTerminationFailedException("Task termination failed for task " + taskId, e2);

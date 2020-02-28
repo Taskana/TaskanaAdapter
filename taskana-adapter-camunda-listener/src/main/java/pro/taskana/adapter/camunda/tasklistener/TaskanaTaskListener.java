@@ -64,9 +64,12 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
 
       if (!gotActivated) {
         gotActivated = true;
-        LOGGER.info(
-            "TaskanaTaskListener activated successfully, connected to "
-                + connection.getMetaData().getURL());
+        if (LOGGER.isInfoEnabled()) {
+          LOGGER.info(
+              String.format(
+                  "TaskanaTaskListener activated successfully, connected to %s",
+                  connection.getMetaData().getURL()));
+        }
       }
 
       switch (delegateTask.getEventName()) {

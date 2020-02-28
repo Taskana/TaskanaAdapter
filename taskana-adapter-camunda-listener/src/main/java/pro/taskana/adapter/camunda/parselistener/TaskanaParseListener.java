@@ -16,7 +16,7 @@ import pro.taskana.adapter.camunda.tasklistener.TaskanaTaskListener;
 /** This class is responsible for adding the TaskanaTaskListener to all user tasks. */
 public class TaskanaParseListener extends AbstractBpmnParseListener {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaParseListener.class);
 
   private boolean gotActivated = false;
 

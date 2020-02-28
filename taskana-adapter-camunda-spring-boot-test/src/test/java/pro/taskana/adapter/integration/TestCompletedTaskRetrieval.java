@@ -239,6 +239,9 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     // retrieve the new created task from the new user task in camunda
     Task taskanaTask2 = this.taskService.getTask(taskanaTasks.get(0).getId());
 
+    //make sure the task actually got completed
+    assertFalse(taskanaTask.getId().equals(taskanaTask2.getId()));
+
     // make sure that the process variables were set and transfered successfully over the outbox
     assertTrue(taskanaTask.getCustomAttributes().equals(taskanaTask2.getCustomAttributes()));
   }
@@ -333,6 +336,9 @@ public class TestCompletedTaskRetrieval extends AbsIntegrationTest {
 
     // retrieve the newly created task from the new user task in camunda
     Task taskanaTask2 = this.taskService.getTask(taskanaTasks.get(0).getId());
+
+    //make sure the task actually got completed
+    assertFalse(taskanaTask.getId().equals(taskanaTask2.getId()));
 
     // make sure that the process variables were updated and transfered over the outbox
     assertTrue(
