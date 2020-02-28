@@ -61,10 +61,13 @@ public class TaskanaTaskStarter {
 
         systemConnector.taskanaTasksHaveBeenCreatedForNewReferencedTasks(newCreatedTasksInTaskana);
       } finally {
-        LOGGER.trace(
-            "\"TaskanaTaskStarter.retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks "
-                + "Leaving handling of new tasks for System Connector "
-                + systemConnector.getSystemUrl());
+        if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace(
+              String.format(
+                  "TaskanaTaskStarter.retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks "
+                      + "Leaving handling of new tasks for System Connector %s",
+                  systemConnector.getSystemUrl()));
+        }
       }
     }
   }

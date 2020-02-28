@@ -91,10 +91,12 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
       if (!schemaCreator.createSchema()) {
 
         LOGGER.warn(
-            "An error occured while trying to automatically create the TaskanaOutbox schema and table. "
+            "An error occured while trying to automatically create the "
+                + "TaskanaOutbox schema and table. "
                 + "Aborting the boot of camunda.");
         throw new SystemException(
-            "An error occured while trying to automatically create the TaskanaOutbox schema and table. "
+            "An error occured while trying to automatically create the"
+                + " TaskanaOutbox schema and table. "
                 + "Aborting the boot of camunda.");
       }
     }
@@ -119,7 +121,7 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
         ReadPropertiesHelper.getPropertyValueFromFile(
             TASKANA_OUTBOX_PROPERTIES, TASKANA_ADAPTER_CREATE_OUTBOX_SCHEMA);
 
-    if (createSchemaProperty != null && "false".equals(createSchemaProperty.toLowerCase())) {
+    if (createSchemaProperty != null && "false".equalsIgnoreCase(createSchemaProperty)) {
       createSchema = false;
     }
 

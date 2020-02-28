@@ -67,12 +67,12 @@ public class TestTaskClaim extends AbsIntegrationTest {
 
       // verify that TaskState of taskana task is 'READY' first
       Task task = this.taskService.getTask(taskanaTaskId);
-      assertEquals(task.getState(), TaskState.READY);
+      assertEquals(TaskState.READY, task.getState());
 
       // claim task in taskana and verify updated TaskState to be 'CLAIMED'
       this.taskService.claim(taskanaTaskId);
       Task updatedTask = this.taskService.getTask(taskanaTaskId);
-      assertEquals(updatedTask.getState(), TaskState.CLAIMED);
+      assertEquals(TaskState.CLAIMED, updatedTask.getState());
 
       Thread.sleep((long) (this.adapterClaimPollingInterval * 1.2));
 
@@ -116,12 +116,12 @@ public class TestTaskClaim extends AbsIntegrationTest {
 
       // verify that TaskState of taskana task is 'READY' first
       Task task = this.taskService.getTask(taskanaTaskId);
-      assertEquals(task.getState(), TaskState.READY);
+      assertEquals(TaskState.READY, task.getState());
 
       // claim task in taskana and verify updated TaskState to be 'CLAIMED'
       this.taskService.claim(taskanaTaskId);
       Task updatedTask = this.taskService.getTask(taskanaTaskId);
-      assertEquals(updatedTask.getState(), TaskState.CLAIMED);
+      assertEquals(TaskState.CLAIMED, updatedTask.getState());
 
       Thread.sleep((long) (this.adapterClaimPollingInterval * 1.2));
 
@@ -160,12 +160,12 @@ public class TestTaskClaim extends AbsIntegrationTest {
 
       // verify that TaskState of taskana task is 'READY' first
       Task task = this.taskService.getTask(taskanaTaskId);
-      assertEquals(task.getState(), TaskState.READY);
+      assertEquals(TaskState.READY, task.getState());
 
       // claim task in taskana and verify updated TaskState to be 'CLAIMED'
       this.taskService.claim(taskanaTaskId);
       Task updatedTask = this.taskService.getTask(taskanaTaskId);
-      assertEquals(updatedTask.getState(), TaskState.CLAIMED);
+      assertEquals(TaskState.CLAIMED, updatedTask.getState());
 
       Thread.sleep((long) (this.adapterClaimPollingInterval * 1.2));
 
@@ -177,7 +177,7 @@ public class TestTaskClaim extends AbsIntegrationTest {
       // cancel claim taskana task and verify updated TaskState to be 'READY'
       this.taskService.cancelClaim(taskanaTaskId);
       Task taskWithCancelledClaim = this.taskService.getTask(taskanaTaskId);
-      assertEquals(taskWithCancelledClaim.getState(), TaskState.READY);
+      assertEquals(TaskState.READY, taskWithCancelledClaim.getState());
 
       Thread.sleep((long) (this.adapterClaimPollingInterval * 1.2));
 
@@ -216,12 +216,12 @@ public class TestTaskClaim extends AbsIntegrationTest {
 
       // verify that TaskState of taskana task is 'READY' first
       Task task = this.taskService.getTask(taskanaTaskId);
-      assertEquals(task.getState(), TaskState.READY);
+      assertEquals(TaskState.READY, task.getState());
 
       // claim task in taskana and verify updated TaskState to be 'CLAIMED'
       this.taskService.claim(taskanaTaskId);
       Task updatedTask = this.taskService.getTask(taskanaTaskId);
-      assertEquals(updatedTask.getState(), TaskState.CLAIMED);
+      assertEquals(TaskState.CLAIMED, updatedTask.getState());
 
       Thread.sleep((long) (this.adapterClaimPollingInterval * 1.2));
 
@@ -233,7 +233,7 @@ public class TestTaskClaim extends AbsIntegrationTest {
       // cancel claim taskana task and verify updated TaskState to be 'READY'
       this.taskService.cancelClaim(taskanaTaskId);
       Task taskWithCancelledClaim = this.taskService.getTask(taskanaTaskId);
-      assertEquals(taskWithCancelledClaim.getState(), TaskState.READY);
+      assertEquals(TaskState.READY, taskWithCancelledClaim.getState());
 
       Thread.sleep((long) (this.adapterClaimPollingInterval * 1.2));
 
@@ -245,7 +245,7 @@ public class TestTaskClaim extends AbsIntegrationTest {
       // claim task in taskana and verify updated TaskState to be 'CLAIMED' again
       this.taskService.claim(taskanaTaskId);
       Task updatedTaskAfterAnotherClaim = this.taskService.getTask(taskanaTaskId);
-      assertEquals(updatedTaskAfterAnotherClaim.getState(), TaskState.CLAIMED);
+      assertEquals(TaskState.CLAIMED, updatedTaskAfterAnotherClaim.getState());
 
       Thread.sleep((long) (this.adapterClaimPollingInterval * 1.2));
 

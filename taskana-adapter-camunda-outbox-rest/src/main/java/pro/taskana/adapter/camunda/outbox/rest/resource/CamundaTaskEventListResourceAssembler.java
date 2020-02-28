@@ -9,8 +9,7 @@ import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEventList;
 public class CamundaTaskEventListResourceAssembler {
 
   public CamundaTaskEventListResource toResource(CamundaTaskEventList camundaTaskEventList) {
-    CamundaTaskEventListResource resource = new CamundaTaskEventListResource(camundaTaskEventList);
-    return resource;
+    return new CamundaTaskEventListResource(camundaTaskEventList);
   }
 
   public CamundaTaskEventList toModel(CamundaTaskEventListResource camundaTaskEventListResource) {

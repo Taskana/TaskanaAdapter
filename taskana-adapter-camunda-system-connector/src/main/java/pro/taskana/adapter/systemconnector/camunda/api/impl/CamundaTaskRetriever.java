@@ -57,8 +57,7 @@ public class CamundaTaskRetriever {
         getReferencedTasksFromCamundaTaskEvents(camundaTaskEvents);
 
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(
-          "exit from retrieveFinishedCamundaTasks. Retrieved Tasks: {}", referencedTasks);
+      LOGGER.debug("exit from retrieveFinishedCamundaTasks. Retrieved Tasks: {}", referencedTasks);
     }
     return referencedTasks;
   }
@@ -83,9 +82,7 @@ public class CamundaTaskRetriever {
 
     CamundaTaskEventListResource camundaTaskEventListResource = responseEntity.getBody();
 
-    List<CamundaTaskEvent> camundaTaskEvents = camundaTaskEventListResource.getCamundaTaskEvents();
-
-    return camundaTaskEvents;
+    return camundaTaskEventListResource.getCamundaTaskEvents();
   }
 
   private List<ReferencedTask> getReferencedTasksFromCamundaTaskEvents(

@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import pro.taskana.adapter.impl.TaskanaTaskStarter;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 
 /**
@@ -20,7 +19,7 @@ import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 @Component
 public class CamundaTaskEventCleaner {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskStarter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskEventCleaner.class);
 
   @Autowired private RestTemplate restTemplate;
 
@@ -57,7 +56,7 @@ public class CamundaTaskEventCleaner {
     headers.setContentType(MediaType.APPLICATION_JSON);
 
     HttpEntity<String> request =
-        new HttpEntity<String>(idsOfCamundaTaskEventsToDeleteFromOutbox, headers);
+        new HttpEntity<>(idsOfCamundaTaskEventsToDeleteFromOutbox, headers);
 
     restTemplate.postForObject(requestUrl, request, String.class);
   }
@@ -73,7 +72,6 @@ public class CamundaTaskEventCleaner {
       idsBuf.append(',');
     }
     idsBuf.append("]}");
-    String idsOfCamundaTaskEventsToDeleteFromOutbox = idsBuf.toString().replaceAll(",]", "]");
-    return idsOfCamundaTaskEventsToDeleteFromOutbox;
+    return idsBuf.toString().replace(",]", "]");
   }
 }

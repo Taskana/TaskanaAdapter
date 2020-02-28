@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 public class TaskanaOutboxSchemaCreator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaOutboxSchemaCreator.class);
+  private static final String POSTGRESQL = "PostgreSQL";
+  private static final String H2 = "H2";
   private static final String SQL = "/sql";
   private static final String DB_SCHEMA = SQL + "/taskana-outbox-schema.sql";
   private static final String DB_SCHEMA_DB2 = SQL + "/taskana-outbox-schema-db2.sql";
@@ -43,7 +45,9 @@ public class TaskanaOutboxSchemaCreator {
   public boolean createSchema() {
     try (Connection connection = dataSource.getConnection()) {
       ScriptRunner runner = new ScriptRunner(connection);
-      LOGGER.debug(connection.getMetaData().toString());
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(connection.getMetaData().toString());
+      }
       runner.setStopOnError(true);
       runner.setLogWriter(logWriter);
       runner.setErrorLogWriter(errorLogWriter);
@@ -58,8 +62,10 @@ public class TaskanaOutboxSchemaCreator {
     } catch (Exception ex) {
       return false;
     } finally {
-      LOGGER.debug(outWriter.toString());
-      if (!errorWriter.toString().trim().isEmpty()) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(outWriter.toString());
+      }
+      if (!errorWriter.toString().trim().isEmpty() && LOGGER.isErrorEnabled()) {
         LOGGER.error(errorWriter.toString());
       }
     }
@@ -146,9 +152,9 @@ public class TaskanaOutboxSchemaCreator {
   }
 
   private static String selectDbScriptFileName(String dbProductName) {
-    if ("PostgreSQL".equals(dbProductName)) {
+    if (POSTGRESQL.equals(dbProductName)) {
       return DB_SCHEMA_POSTGRES;
-    } else if ("H2".equals(dbProductName)) {
+    } else if (H2.equals(dbProductName)) {
       return DB_SCHEMA;
     } else if (dbProductName != null && dbProductName.toLowerCase().startsWith("oracle")) {
       return DB_SCHEMA_ORACLE;
@@ -158,7 +164,7 @@ public class TaskanaOutboxSchemaCreator {
   }
 
   private StringReader getSqlSchemaNameParsed(BufferedReader reader, String dbProductName) {
-    boolean isPostGres = "PostgreSQL".equals(dbProductName);
+    boolean isPostGres = POSTGRESQL.equals(dbProductName);
     StringBuilder content = new StringBuilder();
     String effectiveSchemaName = isPostGres ? schemaName.toLowerCase() : schemaName.toUpperCase();
     try {

@@ -59,7 +59,9 @@ public class AdapterManager {
         ServiceLoader.load(SystemConnectorProvider.class);
     for (SystemConnectorProvider provider : loader) {
       List<SystemConnector> connectors = provider.create();
-      LOGGER.info("initialized system connectors {} ", LoggerUtils.listToString(connectors));
+      if (LOGGER.isInfoEnabled()) {
+        LOGGER.info("initialized system connectors {} ", LoggerUtils.listToString(connectors));
+      }
       for (SystemConnector conn : connectors) {
         systemConnectors.put(conn.getSystemUrl(), conn);
       }
@@ -72,7 +74,9 @@ public class AdapterManager {
         ServiceLoader.load(TaskanaConnectorProvider.class);
     for (TaskanaConnectorProvider provider : loader) {
       List<TaskanaConnector> connectors = provider.create();
-      LOGGER.info("initialized taskana connectors {} ", LoggerUtils.listToString(connectors));
+      if (LOGGER.isInfoEnabled()) {
+        LOGGER.info("initialized taskana connectors {} ", LoggerUtils.listToString(connectors));
+      }
       taskanaConnectors.addAll(connectors);
     }
   }

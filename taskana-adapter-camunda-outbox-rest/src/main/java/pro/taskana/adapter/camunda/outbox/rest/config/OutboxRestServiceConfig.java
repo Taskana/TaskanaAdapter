@@ -13,7 +13,7 @@ public class OutboxRestServiceConfig extends Application {
 
   @Override
   public Set<Class<?>> getClasses() {
-    Set<Class<?>> classesToBeScanned = new HashSet<Class<?>>();
+    Set<Class<?>> classesToBeScanned = new HashSet<>();
     classesToBeScanned.add(CamundaTaskEventsController.class);
     return classesToBeScanned;
   }
