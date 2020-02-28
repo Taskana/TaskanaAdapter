@@ -24,11 +24,16 @@ import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
 
 import pro.taskana.adapter.camunda.TaskanaConfigurationProperties;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
+import pro.taskana.common.api.exceptions.SystemException;
 
 /** Implementation of the Outbox REST service. */
 public class CamundaTaskEventsService implements TaskanaConfigurationProperties {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskEventsService.class);
+  private static final String CREATE = "create";
+  private static final String COMPLETE = "complete";
+  private static final String DELETE = "delete";
+
   private static final String OUTBOX_SCHEMA = getSchemaFromProperties();
   private static final String SQL_GET_CREATE_EVENTS =
       "SELECT * FROM " + OUTBOX_SCHEMA + ".event_store WHERE type = ?";
@@ -43,11 +48,11 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
 
     List<CamundaTaskEvent> camundaTaskEvents = new ArrayList<>();
 
-    if (requestedEventTypes.contains("create")) {
+    if (requestedEventTypes.contains(CREATE)) {
 
       camundaTaskEvents = getCreateEvents();
 
-    } else if (requestedEventTypes.contains("delete") && requestedEventTypes.contains("complete")) {
+    } else if (requestedEventTypes.contains(DELETE) && requestedEventTypes.contains(COMPLETE)) {
 
       camundaTaskEvents = getCompleteAndDeleteEvents();
     }
@@ -63,9 +68,10 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
         String.format(
             SQL_WITHOUT_PLACEHOLDERS_DELETE_EVENTS, preparePlaceHolders(idsAsIntegers.size()));
 
-    try (Connection connection = getConnection();
-        PreparedStatement preparedStatement =
-            connection.prepareStatement(deleteEventsSqlWithPlaceholders)) {
+    try (Connection connection = getConnection()) {
+
+      PreparedStatement preparedStatement =
+          connection.prepareStatement(deleteEventsSqlWithPlaceholders);
 
       setPreparedStatementValues(preparedStatement, idsAsIntegers);
       preparedStatement.execute();
@@ -75,7 +81,7 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
     }
   }
 
-  public static DataSource createDatasource(
+  private static DataSource createDatasource(
       String driver, String jdbcUrl, String username, String password) {
     return new PooledDataSource(driver, jdbcUrl, username, password);
   }
@@ -84,11 +90,16 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
 
     List<CamundaTaskEvent> camundaTaskEvents = new ArrayList<>();
 
-    try (Connection connection = getConnection();
-        PreparedStatement preparedStatement = getPreparedCreateEventsStatement(connection)) {
+    try (Connection connection = getConnection()) {
 
-      ResultSet camundaTaskEventResultSet = preparedStatement.executeQuery();
-      camundaTaskEvents = getCamundaTaskEvents(camundaTaskEventResultSet);
+      try (PreparedStatement preparedStatement =
+          connection.prepareStatement(SQL_GET_CREATE_EVENTS)) {
+
+        preparedStatement.setString(1, CREATE);
+
+        ResultSet camundaTaskEventResultSet = preparedStatement.executeQuery();
+        camundaTaskEvents = getCamundaTaskEvents(camundaTaskEventResultSet);
+      }
 
     } catch (SQLException | NullPointerException e) {
       LOGGER.warn("Caught Exception while trying to retrieve create events from the outbox", e);
@@ -148,22 +159,16 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
     return idsAsIntegers;
   }
 
-  private PreparedStatement getPreparedCreateEventsStatement(Connection connection)
-      throws SQLException {
-
-    PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_CREATE_EVENTS);
-    preparedStatement.setString(1, "create");
-
-    return preparedStatement;
-  }
-
   private List<CamundaTaskEvent> getCompleteAndDeleteEvents() {
 
     List<CamundaTaskEvent> camundaTaskEvents = new ArrayList<>();
 
     try (Connection connection = getConnection();
         PreparedStatement preparedStatement =
-            getPreparedCompleteAndDeleteEventsStatement(connection); ) {
+            connection.prepareStatement(SQL_GET_COMPLETE_AND_DELETE_EVENTS)) {
+
+      preparedStatement.setString(1, COMPLETE);
+      preparedStatement.setString(2, DELETE);
 
       ResultSet completeAndDeleteEventsResultSet = preparedStatement.executeQuery();
       camundaTaskEvents = getCamundaTaskEvents(completeAndDeleteEventsResultSet);
@@ -177,17 +182,6 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
     return camundaTaskEvents;
   }
 
-  private PreparedStatement getPreparedCompleteAndDeleteEventsStatement(Connection connection)
-      throws SQLException {
-
-    PreparedStatement preparedStatement =
-        connection.prepareStatement(SQL_GET_COMPLETE_AND_DELETE_EVENTS);
-    preparedStatement.setString(1, "complete");
-    preparedStatement.setString(2, "delete");
-
-    return preparedStatement;
-  }
-
   private Connection getConnection() {
 
     Connection connection = null;
@@ -199,6 +193,11 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
           e.getClass().getName());
     }
 
+    if (connection == null) {
+      LOGGER.warn("Retrieved connection was NULL, Please make sure to provide a valid datasource.");
+      throw new SystemException(
+          "Retrieved connection was NULL. Please make sure to provide a valid datasource.");
+    }
     return connection;
   }
 

@@ -23,7 +23,7 @@ import pro.taskana.common.api.exceptions.SystemException;
 @Component
 public class CamundaTaskClaimCanceler {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskClaimer.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskClaimCanceler.class);
 
   @Autowired private RestTemplate restTemplate;
 

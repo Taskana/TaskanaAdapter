@@ -10,6 +10,10 @@ public class ReadPropertiesHelper {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReadPropertiesHelper.class);
 
+  private ReadPropertiesHelper() {
+    throw new IllegalStateException("Utility class");
+  }
+
   public static String getPropertyValueFromFile(String propertiesFileName, String propertyName) {
     InputStream propertiesStream =
         ReadPropertiesHelper.class.getClassLoader().getResourceAsStream(propertiesFileName);

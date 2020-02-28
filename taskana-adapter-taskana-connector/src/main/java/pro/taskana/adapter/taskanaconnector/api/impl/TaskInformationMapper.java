@@ -49,7 +49,9 @@ public class TaskInformationMapper {
 
   public Task convertToTaskanaTask(ReferencedTask referencedTask) {
 
-    LOGGER.debug("entry to TaskInformationMapper.convertToTaskanaTask {}", this.toString());
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("entry to TaskInformationMapper.convertToTaskanaTask {}", this);
+    }
 
     String domain = referencedTask.getDomain();
     String classificationKey = referencedTask.getClassificationKey();

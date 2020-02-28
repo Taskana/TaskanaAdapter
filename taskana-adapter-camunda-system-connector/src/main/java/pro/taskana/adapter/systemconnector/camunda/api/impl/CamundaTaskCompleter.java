@@ -35,9 +35,9 @@ public class CamundaTaskCompleter {
       setAssigneeToOwnerOfReferencedTask(camundaSystemUrlInfo, referencedTask, requestUrlBuilder);
       setCompletionByTaskanaAdapterAsLocalVariable(
           camundaSystemUrlInfo, referencedTask, requestUrlBuilder);
-      SystemResponse systemResponse =
-          performCompletion(camundaSystemUrlInfo, referencedTask, requestUrlBuilder);
-      return systemResponse;
+
+      return performCompletion(camundaSystemUrlInfo, referencedTask, requestUrlBuilder);
+
     } catch (HttpStatusCodeException e) {
       if (isTaskAlreadyDeleted(camundaSystemUrlInfo, referencedTask, requestUrlBuilder)) {
         return new SystemResponse(HttpStatus.OK, null);
@@ -62,8 +62,7 @@ public class CamundaTaskCompleter {
 
     HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
     try {
-      ResponseEntity<String> response =
-          restTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, String.class);
+      restTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, String.class);
     } catch (HttpStatusCodeException ex) {
       boolean isAlreadyDeleted = HttpStatus.NOT_FOUND.equals(ex.getStatusCode());
       if (isAlreadyDeleted) {

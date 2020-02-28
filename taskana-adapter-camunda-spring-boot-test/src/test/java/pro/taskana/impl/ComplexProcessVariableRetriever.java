@@ -20,10 +20,13 @@ public class ComplexProcessVariableRetriever implements JavaDelegate {
     ProcessVariableTestObject processVariableTestObject =
         (ProcessVariableTestObject) execution.getVariable("attribute1");
 
-    LOGGER.info(
-        "Successfully deserialized complex process variable"
-            + " \"ProcessVariableTestObject\", "
-            + "retrieving sample value via Getter-method : doubleField value = "
-            + processVariableTestObject.getDoubleField());
+    if (LOGGER.isInfoEnabled()) {
+      LOGGER.info(
+          String.format(
+              "Successfully deserialized complex process variable"
+                  + " \"ProcessVariableTestObject\", "
+                  + "retrieving sample value via Getter-method : doubleField value = %3.2f ",
+              processVariableTestObject.getDoubleField()));
+    }
   }
 }

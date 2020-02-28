@@ -1,7 +1,11 @@
 package pro.taskana.adapter.camunda.outbox.rest;
 
+import java.io.Serializable;
+
 /** POJO that represents an event in the camunda outbox table. */
-public class CamundaTaskEvent {
+public class CamundaTaskEvent implements Serializable {
+
+  static final long serialVersionUID = 1L;
 
   int id;
   String type;
