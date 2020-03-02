@@ -80,11 +80,11 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
     TaskanaOutboxSchemaCreator schemaCreator =
         new TaskanaOutboxSchemaCreator(camundaDataSource, outboxSchema);
 
-    boolean schemaIsPreexisting = schemaCreator.isSchemaPreexisting();
+    boolean isSchemaPreexisting = schemaCreator.isSchemaPreexisting();
 
-    boolean createSchema = isAutomatedSchemaCreationEnabled();
+    boolean shouldSchemaBeCreated = isAutomatedSchemaCreationEnabled();
 
-    if (!schemaIsPreexisting && createSchema) {
+    if (!isSchemaPreexisting && shouldSchemaBeCreated) {
 
       LOGGER.debug("Running scripts to create schema and tables for TaskanaOutbox");
 
