@@ -29,7 +29,7 @@ function main() {
   case "$1" in
   H2)
     set -x
-    mvn -q verify  -f $REL/.. -B -T 4C -am -Pcoverage -Dmaven.javadoc.skip -Dcheckstyle.skip
+    mvn install -f $REL/.. -B -T 4C -am -Pcoverage -Dmaven.javadoc.skip -Dcheckstyle.skip
     # disabling sonarqube for PRs because it's not supported yet. See https://jira.sonarsource.com/browse/MMF-1371
     if [ -n "$2" ]; then
      #-Pcoverage to activate jacoco and test coverage reports
