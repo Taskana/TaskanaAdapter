@@ -179,7 +179,8 @@ public class TaskanaOutboxSchemaCreator {
       }
     } catch (IOException e) {
       LOGGER.error(
-          "SchemaName sql parsing failed for schemaName {}. Caught {}", effectiveSchemaName, e);
+          "SchemaName sql parsing failed for schemaName {}. Caught exception",
+          effectiveSchemaName, e);
     }
     return new StringReader(content.toString());
   }
