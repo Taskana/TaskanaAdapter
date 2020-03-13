@@ -65,7 +65,10 @@
                 <version.jacoco>0.8.5</version.jacoco>
                 <!-- used by jacoco to collect coverage -->
                 <argLine></argLine>
-				<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../taskana-adapter-camunda-system-connector/target/site/jacoco-aggregate/jacoco.xml,${project.basedir}/../taskana-adapter-camunda-spring-boot-test/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+                <jacoco.file.path>target/site/jacoco-aggregate/jacoco.xml</jacoco.file.path>
+                <jacoco.file.path.1>${project.basedir}/../taskana-adapter-camunda-system-connector/${jacoco.file.path}</jacoco.file.path.1>
+                <jacoco.file.path.2>${project.basedir}/../taskana-adapter-camunda-spring-boot-test/${jacoco.file.path}</jacoco.file.path.2>
+				<sonar.coverage.jacoco.xmlReportPaths>${jacoco.file.path.1},${jacoco.file.path.2}</sonar.coverage.jacoco.xmlReportPaths>
        </properties>
         <developers>
                 <developer>

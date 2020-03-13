@@ -101,18 +101,18 @@
                         <artifactId>taskana-adapter-taskana-connector</artifactId>
                         <version>${project.version}</version>
                 </dependency>
-                <dependency>
-                        <groupId>pro.taskana</groupId>
-                        <artifactId>taskana-adapter-camunda-listener</artifactId>
-                        <version>${project.version}</version>
-                </dependency>
-
-				<!-- need for test coverage  -->
 				<dependency>
-				  <groupId>pro.taskana</groupId>
-				  <artifactId>taskana-adapter-camunda-outbox-rest</artifactId>
-				  <version>${project.version}</version>
-				  <type>war</type>
+						<groupId>pro.taskana</groupId>
+						<artifactId>taskana-adapter-camunda-listener</artifactId>
+						<version>${project.version}</version>
+				</dependency>
+			
+				<!-- needed for test coverage -->
+				<dependency>
+						<groupId>pro.taskana</groupId>
+						<artifactId>taskana-adapter-camunda-outbox-rest</artifactId>
+						<version>${project.version}</version>
+						<type>war</type>
 				</dependency>
 
                 <!-- Database Drivers -->
