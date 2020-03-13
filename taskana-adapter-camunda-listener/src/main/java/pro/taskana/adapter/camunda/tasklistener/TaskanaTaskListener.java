@@ -141,9 +141,9 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
 
     } catch (Exception e) {
       LOGGER.warn(
-          "Caught {} while trying to insert a "
-              + delegateTask.getEventName()
-              + " event into the outbox table",
+          String.format(
+              "Caught exception while trying to insert a %s event into the outbox table",
+              delegateTask.getEventName()),
           e);
     } finally {
       if (camundaSchema != null) {
@@ -358,10 +358,9 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
 
     } catch (Exception e) {
       LOGGER.warn(
-          "Caught exception while trying to retrieve the "
-              + propertyKey
-              + " property from process model {}",
-          model.getDefinitions().getName(),
+          String.format(
+              "Caught exception while trying to retrieve the %s property from process model %s",
+              propertyKey, model.getDefinitions().getName()),
           e);
     }
 

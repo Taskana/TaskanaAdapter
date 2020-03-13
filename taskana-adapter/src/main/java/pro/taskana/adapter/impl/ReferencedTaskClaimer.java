@@ -38,7 +38,7 @@ public class ReferencedTaskClaimer {
       try {
         retrieveClaimedTaskanaTasksAndClaimCorrespondingReferencedTask();
       } catch (Exception ex) {
-        LOGGER.debug("Caught {} while trying to claim referenced tasks", ex);
+        LOGGER.debug("Caught exception while trying to claim referenced tasks", ex);
       }
     }
   }

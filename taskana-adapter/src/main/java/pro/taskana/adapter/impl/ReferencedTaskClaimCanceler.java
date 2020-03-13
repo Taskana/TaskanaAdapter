@@ -41,7 +41,7 @@ public class ReferencedTaskClaimCanceler {
       try {
         retrieveCancelledClaimTaskanaTasksAndCancelClaimCorrespondingReferencedTask();
       } catch (Exception ex) {
-        LOGGER.debug("Caught {} while trying to cancel claim referenced tasks", ex);
+        LOGGER.debug("Caught exception while trying to cancel claim referenced tasks", ex);
       }
     }
   }
