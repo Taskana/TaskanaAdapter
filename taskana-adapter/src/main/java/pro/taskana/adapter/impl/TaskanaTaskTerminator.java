@@ -49,7 +49,10 @@ public class TaskanaTaskTerminator {
           retrieveFinishededReferencedTasksAndTerminateCorrespondingTaskanaTasks(systemConnector);
         }
       } catch (Exception e) {
-        LOGGER.warn("caught exception {} ", e);
+        LOGGER.warn(
+            "caught exception while trying to retrieve "
+                + "finished referenced tasks and terminate corresponding taskana tasks",
+            e);
       }
     }
   }
@@ -72,7 +75,7 @@ public class TaskanaTaskTerminator {
           tasksSuccessfullyTerminatedInTaskana.add(referencedTask);
         } catch (TaskTerminationFailedException ex) {
           LOGGER.error(
-              "attempted to terminate task with external Id {} and caught {}",
+              "attempted to terminate task with external Id {} and caught exception",
               referencedTask.getId(),
               ex);
         }

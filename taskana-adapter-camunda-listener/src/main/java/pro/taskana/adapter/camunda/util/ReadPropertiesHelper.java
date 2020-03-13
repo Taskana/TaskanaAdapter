@@ -28,11 +28,10 @@ public class ReadPropertiesHelper {
 
     } catch (IOException | NullPointerException e) {
       LOGGER.warn(
-          "Caught Exception while trying to retrieve the "
-              + propertyName
-              + " property from the provided "
-              + "properties file "
-              + propertiesFileName,
+          String.format(
+              "Caught Exception while trying to retrieve the %s  "
+                  + " property from the provided properties file %s ",
+              propertyName, propertiesFileName),
           e);
     }
 

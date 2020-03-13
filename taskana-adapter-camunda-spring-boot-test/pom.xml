@@ -15,9 +15,10 @@
         <name>${project.groupId}:${project.artifactId}</name>
         <description>Test for the integration of taskana adapter with camunda</description>
 
-		<properties>
-			<sonar.exclusions>*/src/**/*</sonar.exclusions>
-		</properties>
+        <properties>
+          <sonar.exclusions>**/src/**/*</sonar.exclusions>
+        </properties>
+
         <dependencyManagement>
                 <dependencies>
                         <dependency>
@@ -106,7 +107,7 @@
 						<artifactId>taskana-adapter-camunda-listener</artifactId>
 						<version>${project.version}</version>
 				</dependency>
-			
+
 				<!-- needed for test coverage -->
 				<dependency>
 						<groupId>pro.taskana</groupId>
