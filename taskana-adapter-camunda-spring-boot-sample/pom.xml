@@ -16,6 +16,9 @@
         <name>${project.groupId}:${project.artifactId}</name>
         <url>http://maven.apache.org</url>
 
+		<properties>
+			<sonar.skip>true</sonar.skip>
+		</properties>
 
         <dependencies>
                 <dependency>

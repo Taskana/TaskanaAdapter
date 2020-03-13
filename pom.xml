@@ -65,8 +65,8 @@
                 <version.jacoco>0.8.5</version.jacoco>
                 <!-- used by jacoco to collect coverage -->
                 <argLine></argLine>
-        </properties>
-
+				<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../taskana-adapter-camunda-system-connector/target/site/jacoco-aggregate/jacoco.xml,${project.basedir}/../taskana-adapter-camunda-spring-boot-test/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+       </properties>
         <developers>
                 <developer>
                         <name>Holger Hagen</name>
@@ -233,7 +233,6 @@
                                                         <execution>
                                                                 <goals>
                                                                         <goal>prepare-agent</goal>
-                                                                        <goal>report</goal>
                                                                 </goals>
                                                         </execution>
                                                 </executions>
