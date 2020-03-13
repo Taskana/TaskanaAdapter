@@ -17,6 +17,7 @@
 
         <properties>
                 <failOnMissingWebXml>false</failOnMissingWebXml>
+                <sonar.skip>true</sonar.skip>
         </properties>
 
         <dependencyManagement>

@@ -15,6 +15,9 @@
         <name>${project.groupId}:${project.artifactId}</name>
         <description>Test for the integration of taskana adapter with camunda</description>
 
+		<properties>
+			<sonar.exclusions>*/src/**/*</sonar.exclusions>
+		</properties>
         <dependencyManagement>
                 <dependencies>
                         <dependency>
@@ -104,6 +107,14 @@
                         <version>${project.version}</version>
                 </dependency>
 
+				<!-- need for test coverage  -->
+				<dependency>
+				  <groupId>pro.taskana</groupId>
+				  <artifactId>taskana-adapter-camunda-outbox-rest</artifactId>
+				  <version>${project.version}</version>
+				  <type>war</type>
+				</dependency>
+
                 <!-- Database Drivers -->
                 <dependency>
                         <groupId>com.ibm.db2.jcc</groupId>
@@ -192,6 +203,28 @@
              </pluginRepository>
         </pluginRepositories>
      -->
-
+	<profiles>
+		<profile>
+			<id>coverage</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${version.jacoco}</version>
+						<executions>
+							<execution>
+								<id>report-aggregate</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>report-aggregate</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
