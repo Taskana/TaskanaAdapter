@@ -25,3 +25,10 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# jenv on mac
+/.java-version
