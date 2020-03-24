@@ -40,6 +40,9 @@ import pro.taskana.adapter.camunda.util.ReadPropertiesHelper;
 public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationProperties {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskListener.class);
+  private static final String TASK_STATE_COMPLETED = "COMPLETED";
+  private static final String TASK_STATE_CANCELLED = "CANCELLED";
+  private static final String TASK_STATE_TERMINATED = "TERMINATED";
   private static final String DEFAULT_SCHEMA = "taskana_tables";
   private static final String SQL_INSERT_EVENT =
       "INSERT INTO event_store (TYPE,CREATED,PAYLOAD) VALUES (?,?,?)";
@@ -131,14 +134,24 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
     String camundaSchema = null;
 
     try {
+      String taskState = TASK_STATE_COMPLETED;
+      if (delegateTask.getEventName().equals("delete")) {
+        if (delegateTask.getExecution().isCanceled()) {
+          taskState = TASK_STATE_CANCELLED;
+        } else {
+          taskState = TASK_STATE_TERMINATED;
+        }
+      }
 
-      String taskIdJson = "{\"id\":\"" + delegateTask.getId() + "\"}";
+      ReferencedTask referencedTask = new ReferencedTask();
 
+      referencedTask.setId(delegateTask.getId());
+      referencedTask.setTaskState(taskState);
+      String referencedTaskJson = objectMapper.writeValueAsString(referencedTask);
       camundaSchema = connection.getSchema();
       setOutboxSchema(connection);
-      prepareAndExecuteStatement(connection, delegateTask, taskIdJson);
+      prepareAndExecuteStatement(connection, delegateTask, referencedTaskJson);
       connection.setSchema(camundaSchema);
-
     } catch (Exception e) {
       LOGGER.warn(
           String.format(
