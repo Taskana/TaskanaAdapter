@@ -20,6 +20,7 @@ public class ReferencedTask {
   private String taskDefinitionKey;
   private String businessProcessId;
   private String variables;
+  private String taskState;
   // extension properties
   private String domain;
   private String classificationKey;
@@ -137,6 +138,14 @@ public class ReferencedTask {
     this.taskDefinitionKey = taskDefinitionKey;
   }
 
+  public String getTaskState() {
+    return taskState;
+  }
+
+  public void setTaskState(String taskState) {
+    this.taskState = taskState;
+  }
+
   public String getVariables() {
     return variables;
   }
@@ -187,6 +196,7 @@ public class ReferencedTask {
         taskDefinitionKey,
         businessProcessId,
         variables,
+        taskState,
         domain,
         classificationKey,
         workbasketKey);
@@ -219,6 +229,7 @@ public class ReferencedTask {
         && Objects.equals(taskDefinitionKey, other.taskDefinitionKey)
         && Objects.equals(businessProcessId, other.businessProcessId)
         && Objects.equals(variables, other.variables)
+        && Objects.equals(taskState, other.taskState)
         && Objects.equals(domain, other.domain)
         && Objects.equals(classificationKey, other.classificationKey)
         && Objects.equals(workbasketKey, other.workbasketKey);
@@ -256,6 +267,8 @@ public class ReferencedTask {
         + businessProcessId
         + ", variables="
         + variables
+        + ", taskState="
+        + taskState
         + ", domain="
         + domain
         + ", classificationKey="
