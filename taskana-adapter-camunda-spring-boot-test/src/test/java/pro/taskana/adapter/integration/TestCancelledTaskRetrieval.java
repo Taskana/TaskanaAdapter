@@ -96,7 +96,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void deletion_of_camunda_process_instance_should_complete_taskana_task()
+  public void deletion_of_camunda_process_instance_should_terminate_taskana_task()
       throws JSONException, InterruptedException {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -131,7 +131,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       Instant taskanaTaskCompletion = taskanaTasks.get(0).getCompleted();
       Instant taskanaTaskCreation = taskanaTasks.get(0).getCreated();
       TaskState taskanaTaskState = taskanaTasks.get(0).getState();
-      assertThat(TaskState.COMPLETED.equals(taskanaTaskState)).isTrue();
+      assertThat(TaskState.TERMINATED.equals(taskanaTaskState)).isTrue();
       assertThat(taskanaTaskCompletion == null).isFalse();
       assertThat(taskanaTaskCompletion.compareTo(taskanaTaskCreation)).isEqualTo(1);
     }
@@ -180,7 +180,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void interruption_of_camunda_task_by_timer_should_complete_taskana_task()
+  public void interruption_of_camunda_task_by_timer_should_cancel_taskana_task()
       throws InterruptedException {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -217,7 +217,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       TaskState taskanaTaskState = taskanaTasks.get(0).getState();
       assertThat(taskanaTaskCompletion).isNotNull();
       assertThat(taskanaTaskCompletion.compareTo(taskanaTaskCreation)).isEqualTo(1);
-      assertThat(taskanaTaskState).isEqualTo(TaskState.COMPLETED);
+      assertThat(taskanaTaskState).isEqualTo(TaskState.CANCELLED);
     }
   }
 }
