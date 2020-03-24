@@ -41,7 +41,9 @@ public class TaskanaOutboxSchemaCreator {
     this.schemaName = schemaName;
   }
 
-  /** Run all db scripts. */
+  /** Run all db scripts.
+  * @return true if successful
+  */
   public boolean createSchema() {
     try (Connection connection = dataSource.getConnection()) {
       ScriptRunner runner = new ScriptRunner(connection);
