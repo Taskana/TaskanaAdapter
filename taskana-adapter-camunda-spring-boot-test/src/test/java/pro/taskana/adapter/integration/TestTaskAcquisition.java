@@ -56,8 +56,11 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
       List<TaskSummary> taskanaTasks =
           this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
       assertEquals(1, taskanaTasks.size());
-      String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
+      TaskSummary taskanaTaskSummary = taskanaTasks.get(0);
+      String taskanaTaskExternalId = taskanaTaskSummary.getExternalId();
       assertEquals(taskanaTaskExternalId, camundaTaskId);
+      String businessProcessId = taskanaTaskSummary.getBusinessProcessId();
+      assertEquals(processInstanceId, businessProcessId);
     }
   }
 

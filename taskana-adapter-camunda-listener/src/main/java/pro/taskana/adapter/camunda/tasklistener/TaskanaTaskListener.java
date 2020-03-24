@@ -211,6 +211,7 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
     referencedTask.setDescription(delegateTask.getDescription());
     referencedTask.setOwner(delegateTask.getOwner());
     referencedTask.setTaskDefinitionKey(delegateTask.getTaskDefinitionKey());
+    referencedTask.setBusinessProcessId(delegateTask.getProcessInstanceId());
     referencedTask.setClassificationKey(
         getUserTaskExtensionProperty(delegateTask, "taskana.classification-key"));
     referencedTask.setDomain(getProcessModelExtensionProperty(delegateTask, "taskana.domain"));

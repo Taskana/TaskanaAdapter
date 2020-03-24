@@ -59,6 +59,8 @@ public class TaskInformationMapper {
     String workbasketKey = referencedTask.getWorkbasketKey();
     TaskImpl taskanaTask = (TaskImpl) taskService.newTask(workbasketKey, domain);
     taskanaTask.setClassificationKey(classificationKey);
+    taskanaTask.setBusinessProcessId(referencedTask.getBusinessProcessId());
+    taskanaTask.setPlanned(Instant.now());
     Map<String, String> callbackInfo = new HashMap<>();
     callbackInfo.put(Task.CALLBACK_STATE, CallbackState.CALLBACK_PROCESSING_REQUIRED.name());
     callbackInfo.put(TaskanaSystemConnectorImpl.REFERENCED_TASK_ID, referencedTask.getId());

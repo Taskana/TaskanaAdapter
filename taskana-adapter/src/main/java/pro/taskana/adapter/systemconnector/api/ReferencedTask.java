@@ -18,11 +18,20 @@ public class ReferencedTask {
   private String suspended;
   private String systemUrl;
   private String taskDefinitionKey;
+  private String businessProcessId;
   private String variables;
   // extension properties
   private String domain;
   private String classificationKey;
   private String workbasketKey;
+
+  public String getBusinessProcessId() {
+    return businessProcessId;
+  }
+
+  public void setBusinessProcessId(String businessProcessId) {
+    this.businessProcessId = businessProcessId;
+  }
 
   public String getId() {
     return id;
@@ -176,6 +185,7 @@ public class ReferencedTask {
         suspended,
         systemUrl,
         taskDefinitionKey,
+        businessProcessId,
         variables,
         domain,
         classificationKey,
@@ -187,7 +197,10 @@ public class ReferencedTask {
     if (this == obj) {
       return true;
     }
-    if (!(obj instanceof ReferencedTask)) {
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
       return false;
     }
     ReferencedTask other = (ReferencedTask) obj;
@@ -204,6 +217,7 @@ public class ReferencedTask {
         && Objects.equals(suspended, other.suspended)
         && Objects.equals(systemUrl, other.systemUrl)
         && Objects.equals(taskDefinitionKey, other.taskDefinitionKey)
+        && Objects.equals(businessProcessId, other.businessProcessId)
         && Objects.equals(variables, other.variables)
         && Objects.equals(domain, other.domain)
         && Objects.equals(classificationKey, other.classificationKey)
@@ -234,10 +248,12 @@ public class ReferencedTask {
         + priority
         + ", suspended="
         + suspended
-        + ", systemURL="
+        + ", systemUrl="
         + systemUrl
         + ", taskDefinitionKey="
         + taskDefinitionKey
+        + ", businessProcessId="
+        + businessProcessId
         + ", variables="
         + variables
         + ", domain="
