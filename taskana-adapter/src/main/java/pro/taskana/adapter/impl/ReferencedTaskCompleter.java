@@ -27,7 +27,8 @@ public class ReferencedTaskCompleter {
 
   @Scheduled(
       fixedRateString =
-          "${taskana.adapter.scheduler.run.interval.for.complete.referenced.tasks.in.milliseconds}")
+          "${taskana.adapter.scheduler.run.interval.for.complete.referenced.tasks."
+              + "in.milliseconds:5000}")
   public void retrieveFinishedTaskanaTasksAndCompleteCorrespondingReferencedTasks() {
 
     synchronized (ReferencedTaskCompleter.class) {

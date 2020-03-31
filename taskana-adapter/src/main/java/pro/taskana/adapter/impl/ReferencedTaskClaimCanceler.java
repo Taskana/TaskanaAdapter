@@ -27,8 +27,8 @@ public class ReferencedTaskClaimCanceler {
 
   @Scheduled(
       fixedRateString =
-          "${taskana.adapter.scheduler.run.interval.for."
-              + "cancelled.claim.referenced.tasks.in.milliseconds}")
+          "${taskana.adapter.scheduler.run.interval.for.cancel.claim.referenced.tasks."
+              + "in.milliseconds:5000}")
   public void retrieveCancelledClaimTaskanaTasksAndCancelClaimCorrespondingReferencedTasks() {
 
     synchronized (ReferencedTaskClaimCanceler.class) {

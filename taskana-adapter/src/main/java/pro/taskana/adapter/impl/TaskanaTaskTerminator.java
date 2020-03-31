@@ -24,8 +24,8 @@ public class TaskanaTaskTerminator {
 
   @Scheduled(
       fixedRateString =
-          "${taskana.adapter.scheduler.run.interval.for.check."
-              + "cancelled.referenced.tasks.in.milliseconds:1000}")
+          "${taskana.adapter.scheduler.run.interval.for.check.finished.referenced.tasks."
+              + "in.milliseconds:5000}")
   public void retrieveFinishedReferencedTasksAndTerminateCorrespondingTaskanaTasks() {
 
     synchronized (AdapterManager.class) {
