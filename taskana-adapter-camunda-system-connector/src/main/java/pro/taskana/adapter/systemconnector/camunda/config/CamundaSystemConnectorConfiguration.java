@@ -12,11 +12,16 @@ import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskClaimer;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskCompleter;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskEventCleaner;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskRetriever;
+import pro.taskana.adapter.systemconnector.camunda.api.impl.HttpHeaderProvider;
 
 /** Configures the camunda system connector. */
 @Configuration
 @DependsOn(value = {"adapterSpringContextProvider"})
 public class CamundaSystemConnectorConfiguration {
+  @Bean
+  HttpHeaderProvider httpHeaderProvider() {
+    return new HttpHeaderProvider();
+  }
 
   @Bean
   public RestTemplate restTemplate(RestTemplateBuilder builder) {
@@ -30,6 +35,7 @@ public class CamundaSystemConnectorConfiguration {
   }
 
   @Bean
+  @DependsOn(value = {"httpHeaderProvider"})
   CamundaTaskRetriever camundaTaskRetriever() {
     return new CamundaTaskRetriever();
   }

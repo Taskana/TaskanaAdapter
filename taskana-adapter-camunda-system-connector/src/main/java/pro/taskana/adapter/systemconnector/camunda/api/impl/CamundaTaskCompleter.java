@@ -4,10 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -24,7 +22,7 @@ public class CamundaTaskCompleter {
 
   private static final String COMPLETED_BY_TASKANA_ADAPTER_LOCAL_VARIABLE =
       "completedByTaskanaAdapter";
-
+  @Autowired HttpHeaderProvider httpHeaderProvider;
   @Autowired private RestTemplate restTemplate;
 
   public SystemResponse completeCamundaTask(
@@ -60,7 +58,8 @@ public class CamundaTaskCompleter {
             .append(camundaTask.getId())
             .toString();
 
-    HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
+    HttpEntity<String> requestEntity =
+        httpHeaderProvider.prepareEntityFromBodyForCamundaRestApi("{}");
     try {
       restTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, String.class);
     } catch (HttpStatusCodeException ex) {
@@ -87,7 +86,8 @@ public class CamundaTaskCompleter {
     String requestBody =
         CamundaSystemConnectorImpl.BODY_SET_ASSIGNEE + "\"" + referencedTask.getAssignee() + "\"}";
 
-    HttpEntity<String> requestEntity = prepareEntityFromBody(requestBody);
+    HttpEntity<String> requestEntity =
+        httpHeaderProvider.prepareEntityFromBodyForCamundaRestApi(requestBody);
     ResponseEntity<String> responseEntity =
         this.restTemplate.exchange(
             requestUrlBuilder.toString(), HttpMethod.POST, requestEntity, String.class);
@@ -113,7 +113,8 @@ public class CamundaTaskCompleter {
         .append(COMPLETED_BY_TASKANA_ADAPTER_LOCAL_VARIABLE);
 
     HttpEntity<String> requestEntity =
-        prepareEntityFromBody("{\"value\" : true, \"type\": \"Boolean\"}");
+        httpHeaderProvider.prepareEntityFromBodyForCamundaRestApi(
+            "{\"value\" : true, \"type\": \"Boolean\"}");
 
     ResponseEntity<String> responseEntity =
         this.restTemplate.exchange(
@@ -141,7 +142,8 @@ public class CamundaTaskCompleter {
     LOGGER.debug(
         "completing camunda task {}  with request body {}", camundaTask.getId(), requestBody);
 
-    HttpEntity<String> entity = prepareEntityFromBody(requestBody);
+    HttpEntity<String> entity =
+        httpHeaderProvider.prepareEntityFromBodyForCamundaRestApi(requestBody);
 
     try {
       ResponseEntity<String> responseEntity =
@@ -178,11 +180,5 @@ public class CamundaTaskCompleter {
     }
 
     return requestBody;
-  }
-
-  private HttpEntity<String> prepareEntityFromBody(String requestBody) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    return new HttpEntity<>(requestBody, headers);
   }
 }

@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,7 +19,7 @@ import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 public class CamundaTaskEventCleaner {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskEventCleaner.class);
-
+  @Autowired HttpHeaderProvider httpHeaderProvider;
   @Autowired private RestTemplate restTemplate;
 
   public void cleanEventsForReferencedTasks(
@@ -52,8 +51,7 @@ public class CamundaTaskEventCleaner {
   private void deleteCamundaTaskEventsFromOutbox(
       String requestUrl, String idsOfCamundaTaskEventsToDeleteFromOutbox) {
 
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpHeaders headers = httpHeaderProvider.getHttpHeadersForOutboxRestApi();
 
     HttpEntity<String> request =
         new HttpEntity<>(idsOfCamundaTaskEventsToDeleteFromOutbox, headers);

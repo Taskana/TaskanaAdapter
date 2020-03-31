@@ -61,13 +61,11 @@ public abstract class AbsIntegrationTest {
           + "tasks.in.milliseconds}")
   protected long adapterCancelledClaimPollingInterval;
 
-  @Value(
-      "${taskana.adapter.scheduler.run.interval.for.claimed.referenced." + "tasks.in.milliseconds}")
+  @Value("${taskana.adapter.scheduler.run.interval.for.claim.referenced.tasks.in.milliseconds}")
   protected long adapterClaimPollingInterval;
 
   @Value(
-      "${taskana.adapter.scheduler.run.interval.for.cancelled.claim.referenced."
-          + "tasks.in.milliseconds}")
+      "${taskana.adapter.scheduler.run.interval.for.cancel.claim.referenced.tasks.in.milliseconds}")
   protected long adapterCancelPollingInterval;
 
   @Value("${adapter.polling.inverval.adjustment.factor}")

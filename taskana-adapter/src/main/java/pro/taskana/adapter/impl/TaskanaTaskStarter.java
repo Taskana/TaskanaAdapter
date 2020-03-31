@@ -27,7 +27,7 @@ public class TaskanaTaskStarter {
 
   @Scheduled(
       fixedRateString =
-          "${taskana.adapter.scheduler.run.interval.for.start.taskana.tasks.in.milliseconds}")
+          "${taskana.adapter.scheduler.run.interval.for.start.taskana.tasks.in.milliseconds:5000}")
   public void retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks() {
     if (!adapterIsInitialized()) {
       return;
