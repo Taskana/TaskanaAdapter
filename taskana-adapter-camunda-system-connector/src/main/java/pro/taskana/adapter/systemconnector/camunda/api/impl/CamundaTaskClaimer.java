@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -21,7 +20,7 @@ import pro.taskana.common.api.exceptions.SystemException;
 public class CamundaTaskClaimer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskClaimer.class);
-
+  @Autowired HttpHeaderProvider httpHeaderProvider;
   @Autowired private RestTemplate restTemplate;
 
   public SystemResponse claimCamundaTask(
@@ -37,8 +36,8 @@ public class CamundaTaskClaimer {
 
     String requestBody =
         CamundaSystemConnectorImpl.BODY_SET_ASSIGNEE + "\"" + referencedTask.getAssignee() + "\"}";
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    HttpHeaders headers = httpHeaderProvider.getHttpHeadersForCamundaRestApi();
     HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
 
     try {

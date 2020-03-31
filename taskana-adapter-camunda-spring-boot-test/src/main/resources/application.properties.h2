@@ -21,8 +21,8 @@ logging.level.pro.taskana=info
 
 taskana.adapter.scheduler.run.interval.for.start.taskana.tasks.in.milliseconds=1000
 taskana.adapter.scheduler.run.interval.for.complete.referenced.tasks.in.milliseconds=1000
-taskana.adapter.scheduler.run.interval.for.claimed.referenced.tasks.in.milliseconds=1000
-taskana.adapter.scheduler.run.interval.for.cancelled.claim.referenced.tasks.in.milliseconds=1000
+taskana.adapter.scheduler.run.interval.for.claim.referenced.tasks.in.milliseconds=1000
+taskana.adapter.scheduler.run.interval.for.cancel.claim.referenced.tasks.in.milliseconds=1000
 taskana.adapter.scheduler.run.interval.for.check.finished.referenced.tasks.in.milliseconds=1000
 
 ####################################################################################
@@ -56,10 +56,6 @@ taskana.datasource.password = sa
 
 taskana.schemaName=TASKANA
 
-taskana.adapter.mapping.default.domain=DOMAIN_A
-taskana.adapter.mapping.default.workbasket.key=DEFAULT_WORKBASKET
-taskana.adapter.mapping.default.classification.key=DEFAULT_CLASSIFICATION
-taskana.adapter.mapping.default.classification.type=TASK
 taskana.adapter.mapping.default.objectreference.company=DEFAULT_COMPANY
 taskana.adapter.mapping.default.objectreference.system=DEFAULT_SYSTEM
 taskana.adapter.mapping.default.objectreference.system.instance=DEFAULT_SYSTEM_INSTANCE

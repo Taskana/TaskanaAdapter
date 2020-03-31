@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -25,8 +24,8 @@ public class CamundaTaskRetriever {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskRetriever.class);
 
+  @Autowired private HttpHeaderProvider httpHeaderProvider;
   @Autowired private ObjectMapper objectMapper;
-
   @Autowired private RestTemplate restTemplate;
 
   public List<ReferencedTask> retrieveNewStartedCamundaTasks(String camundaSystemTaskEventUrl) {
@@ -68,11 +67,9 @@ public class CamundaTaskRetriever {
     String requestUrl =
         camundaSystemTaskEventUrl + CamundaSystemConnectorImpl.URL_OUTBOX_REST_PATH + eventSelector;
 
-    LOGGER.debug("retrieving camunda task event resources with url {}", requestUrl);
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-
+    HttpHeaders headers = httpHeaderProvider.getHttpHeadersForOutboxRestApi();
+    LOGGER.debug(
+        "retrieving camunda task event resources with url {} and headers {}", requestUrl, headers);
     ResponseEntity<CamundaTaskEventListResource> responseEntity =
         restTemplate.exchange(
             requestUrl,

@@ -25,7 +25,8 @@ public class ReferencedTaskClaimer {
 
   @Scheduled(
       fixedRateString =
-          "${taskana.adapter.scheduler.run.interval.for.claimed.referenced.tasks.in.milliseconds}")
+          "${taskana.adapter.scheduler.run.interval.for.claim.referenced.tasks."
+              + "in.milliseconds:5000}")
   public void retrieveClaimedTaskanaTasksAndClaimCorrespondingReferencedTasks() {
 
     synchronized (ReferencedTaskClaimer.class) {

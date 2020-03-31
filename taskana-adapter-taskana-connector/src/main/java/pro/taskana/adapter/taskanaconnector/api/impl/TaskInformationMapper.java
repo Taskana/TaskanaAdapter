@@ -60,7 +60,6 @@ public class TaskInformationMapper {
     TaskImpl taskanaTask = (TaskImpl) taskService.newTask(workbasketKey, domain);
     taskanaTask.setClassificationKey(classificationKey);
     taskanaTask.setBusinessProcessId(referencedTask.getBusinessProcessId());
-    taskanaTask.setPlanned(Instant.now());
     Map<String, String> callbackInfo = new HashMap<>();
     callbackInfo.put(Task.CALLBACK_STATE, CallbackState.CALLBACK_PROCESSING_REQUIRED.name());
     callbackInfo.put(TaskanaSystemConnectorImpl.REFERENCED_TASK_ID, referencedTask.getId());
@@ -108,10 +107,16 @@ public class TaskInformationMapper {
   }
 
   private void setTimestampsInTaskanaTask(TaskImpl taskanaTask, ReferencedTask camundaTask) {
-    Instant created = convertStringToInstant(camundaTask.getCreated(), Instant.now());
+    Instant now = Instant.now();
+    Instant created = convertStringToInstant(camundaTask.getCreated(), now);
     taskanaTask.setCreated(created);
-    Instant due = convertStringToInstant(camundaTask.getDue(), Instant.now());
-    taskanaTask.setDue(due);
+
+    String due = camundaTask.getDue();
+    if (due == null || due.isEmpty() || "null".equals(due)) {
+      taskanaTask.setPlanned(now);
+    } else {
+      taskanaTask.setDue(convertStringToInstant(camundaTask.getDue(), now));
+    }
   }
 
   private Instant convertStringToInstant(String strTimestamp, Instant defaultTimestamp) {

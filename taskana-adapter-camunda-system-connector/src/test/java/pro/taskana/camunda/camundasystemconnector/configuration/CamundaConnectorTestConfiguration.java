@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskCompleter;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskRetriever;
+import pro.taskana.adapter.systemconnector.camunda.api.impl.HttpHeaderProvider;
 
 /**
  * Configuration for test of Camunda System Connector.
@@ -31,6 +32,11 @@ public class CamundaConnectorTestConfiguration {
   @Bean
   ObjectMapper objectMapper() {
     return new ObjectMapper();
+  }
+
+  @Bean
+  HttpHeaderProvider httpHeaderProvider() {
+    return new HttpHeaderProvider();
   }
 
   @Bean
