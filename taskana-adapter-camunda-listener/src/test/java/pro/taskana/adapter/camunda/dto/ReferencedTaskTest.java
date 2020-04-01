@@ -163,14 +163,14 @@ public class ReferencedTaskTest {
   }
 
   @Test
-  void should_checkEgality_when_equalsIsCalled() {
+  void should_checkEquality_when_equalsIsCalled() {
     ReferencedTask refTask2 = theTask;
     refTask2.setWorkbasketKey("nochnkey");
-    assertThat(refTask2.equals(theTask));
+    assertThat(refTask2).isEqualTo(theTask);
     refTask2 = theTask;
-    assertThat(theTask.equals(refTask2));
-    assertThat(!theTask.equals("aString"));
-    assertThat(!theTask.equals(null));
+    assertThat(theTask).isEqualTo(refTask2);
+    assertThat(theTask).isNotEqualTo("aString");
+    assertThat(theTask).isNotEqualTo(null);
     theTask = new ReferencedTask();
     theTask.setAssignee("1");
     theTask.setBusinessProcessId("2");
@@ -201,6 +201,6 @@ public class ReferencedTaskTest {
     refTask2.setOwner("11");
     refTask2.setWorkbasketKey("anotherOne");
 
-    assertThat(!refTask2.equals(theTask));
+    assertThat(refTask2).isNotEqualTo(theTask);
   }
 }
