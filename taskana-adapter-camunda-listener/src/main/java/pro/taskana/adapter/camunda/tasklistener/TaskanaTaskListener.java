@@ -143,14 +143,12 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
         }
       }
 
-      ReferencedTask referencedTask = new ReferencedTask();
+      String payload = String.format("{\"id\":\"%s\",\"taskState\":\"%s\"}",
+          delegateTask.getId(),taskState);
 
-      referencedTask.setId(delegateTask.getId());
-      referencedTask.setTaskState(taskState);
-      String referencedTaskJson = objectMapper.writeValueAsString(referencedTask);
       camundaSchema = connection.getSchema();
       setOutboxSchema(connection);
-      prepareAndExecuteStatement(connection, delegateTask, referencedTaskJson);
+      prepareAndExecuteStatement(connection, delegateTask, payload);
       connection.setSchema(camundaSchema);
     } catch (Exception e) {
       LOGGER.warn(
