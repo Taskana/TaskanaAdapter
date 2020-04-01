@@ -35,10 +35,9 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
 
   static final String REFERENCED_TASK_ID = "referenced_task_id";
   static final String REFERENCED_TASK_VARIABLES = "referenced_task_variables";
+  static final String SYSTEM_URL = "system_url";
   private static final String TASK_STATE_CANCELLED = "CANCELLED";
   private static final String TASK_STATE_TERMINATED = "TERMINATED";
-  static final String SYSTEM_URL = "system_url";
-
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaSystemConnectorImpl.class);
 
   @Autowired private TaskService taskService;
@@ -149,18 +148,15 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
         taskId = taskSummary.getId();
 
         switch (referencedTask.getTaskState()) {
-          case TASK_STATE_TERMINATED : {
+          case TASK_STATE_TERMINATED:
             taskService.terminateTask(taskId);
             break;
-          }
-          case TASK_STATE_CANCELLED: {
+          case TASK_STATE_CANCELLED:
             taskService.cancelTask(taskId);
             break;
-          }
-          default: {
+          default:
             taskService.forceCompleteTask(taskId);
             break;
-          }
         }
         // take care that the adapter doesn't attempt to finish the corresponding camunda task
         List<String> externalIds = Stream.of(referencedTask.getId()).collect(Collectors.toList());

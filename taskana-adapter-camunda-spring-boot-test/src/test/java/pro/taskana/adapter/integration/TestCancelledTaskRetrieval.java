@@ -131,8 +131,8 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       Instant taskanaTaskCompletion = taskanaTasks.get(0).getCompleted();
       Instant taskanaTaskCreation = taskanaTasks.get(0).getCreated();
       TaskState taskanaTaskState = taskanaTasks.get(0).getState();
-      assertThat(TaskState.TERMINATED.equals(taskanaTaskState)).isTrue();
-      assertThat(taskanaTaskCompletion == null).isFalse();
+      assertThat(TaskState.TERMINATED).isEqualTo(taskanaTaskState);
+      assertThat(taskanaTaskCompletion).isNotNull();
       assertThat(taskanaTaskCompletion.compareTo(taskanaTaskCreation)).isEqualTo(1);
     }
   }
