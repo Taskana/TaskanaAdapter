@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -36,11 +37,38 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
 
   private static final String OUTBOX_SCHEMA = getSchemaFromProperties();
   private static final String SQL_GET_CREATE_EVENTS =
-      "SELECT * FROM " + OUTBOX_SCHEMA + ".event_store WHERE type = ?";
+      "SELECT * FROM %s.event_store WHERE type = ? fetch first %d rows only";
   private static final String SQL_GET_COMPLETE_AND_DELETE_EVENTS =
-      "SELECT * FROM " + OUTBOX_SCHEMA + ".event_store WHERE type = ? OR type = ?";
+      "SELECT * FROM %s.event_store WHERE type = ? OR type = ? fetch first %d rows only";
   private static final String SQL_WITHOUT_PLACEHOLDERS_DELETE_EVENTS =
       "DELETE FROM " + OUTBOX_SCHEMA + ".event_store WHERE id in (%s)";
+  private static final int MAX_NUMBER_OF_EVENTS_DEFAULT = 50;
+
+  private static Properties outboxProperties;
+  private static int maxNumberOfEventsReturned = 0;
+
+  static {
+    try {
+      Properties properties = getProperties();
+      if (maxNumberOfEventsReturned == 0) {
+        String maxNumberOfEventsString =
+            properties.getProperty(TASKANA_ADAPTER_OUTBOX_MAX_NUMBER_OF_EVENTS);
+        if (maxNumberOfEventsString != null && !maxNumberOfEventsString.isEmpty()) {
+          maxNumberOfEventsReturned = Integer.parseInt(maxNumberOfEventsString);
+        } else {
+          maxNumberOfEventsReturned = MAX_NUMBER_OF_EVENTS_DEFAULT;
+        }
+      }
+    } catch (IOException | NumberFormatException e) {
+      if (maxNumberOfEventsReturned == 0) {
+        maxNumberOfEventsReturned = MAX_NUMBER_OF_EVENTS_DEFAULT;
+      }
+      LOGGER.warn("attempted to retrieve max number of events to be returned and caught ", e);
+    }
+    LOGGER.info(
+        "Outbox Rest Api will return at max {} events per request",
+        Integer.valueOf(maxNumberOfEventsReturned));
+  }
 
   private DataSource dataSource = null;
 
@@ -56,7 +84,13 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
 
       camundaTaskEvents = getCompleteAndDeleteEvents();
     }
+    if (LOGGER.isDebugEnabled()) {
 
+      LOGGER.debug(
+          "outbox retrieved {} camundaTaskEvents: {}",
+          camundaTaskEvents.size(),
+          camundaTaskEvents.stream().map(Object::toString).collect(Collectors.joining(";\n")));
+    }
     return camundaTaskEvents;
   }
 
@@ -92,8 +126,10 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
 
     try (Connection connection = getConnection()) {
 
-      try (PreparedStatement preparedStatement =
-          connection.prepareStatement(SQL_GET_CREATE_EVENTS)) {
+      String sql =
+          String.format(
+              SQL_GET_CREATE_EVENTS, OUTBOX_SCHEMA, Integer.valueOf(maxNumberOfEventsReturned));
+      try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
         preparedStatement.setString(1, CREATE);
 
@@ -147,7 +183,7 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
       JsonNode idsAsJsonArrayNode = objectMapper.readTree(idsAsJsonArray).get("taskCreationIds");
 
       if (idsAsJsonArrayNode != null) {
-        idsAsJsonArrayNode.forEach(id -> idsAsIntegers.add(id.asInt()));
+        idsAsJsonArrayNode.forEach(id -> idsAsIntegers.add(Integer.valueOf(id.asInt())));
       }
 
     } catch (IOException e) {
@@ -163,9 +199,13 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
 
     List<CamundaTaskEvent> camundaTaskEvents = new ArrayList<>();
 
+    String sql =
+        String.format(
+            SQL_GET_COMPLETE_AND_DELETE_EVENTS,
+            OUTBOX_SCHEMA,
+            Integer.valueOf(maxNumberOfEventsReturned));
     try (Connection connection = getConnection();
-        PreparedStatement preparedStatement =
-            connection.prepareStatement(SQL_GET_COMPLETE_AND_DELETE_EVENTS)) {
+        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
       preparedStatement.setString(1, COMPLETE);
       preparedStatement.setString(2, DELETE);
@@ -212,17 +252,8 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
   }
 
   private DataSource getDataSourceFromPropertiesFile() {
-
-    InputStream datasourceConfig =
-        CamundaTaskEventsService.class
-            .getClassLoader()
-            .getResourceAsStream(TASKANA_OUTBOX_PROPERTIES);
-
-    Properties properties = new Properties();
-
     try {
-
-      properties.load(datasourceConfig);
+      Properties properties = getProperties();
       String jndiUrl = properties.getProperty(TASKANA_ADAPTER_OUTBOX_DATASOURCE_JNDI);
 
       if (jndiUrl != null) {
@@ -245,6 +276,18 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
     }
 
     return dataSource;
+  }
+
+  private static Properties getProperties() throws IOException {
+    if (outboxProperties == null) {
+      InputStream propertiesInputStream =
+          CamundaTaskEventsService.class
+              .getClassLoader()
+              .getResourceAsStream(TASKANA_OUTBOX_PROPERTIES);
+      outboxProperties = new Properties();
+      outboxProperties.load(propertiesInputStream);
+    }
+    return outboxProperties;
   }
 
   private static String getSchemaFromProperties() {
