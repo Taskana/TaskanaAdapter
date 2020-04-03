@@ -10,4 +10,6 @@ public interface TaskanaConfigurationProperties {
   String TASKANA_ADAPTER_OUTBOX_DATASOURCE_URL = "taskana.adapter.outbox.datasource.url";
   String TASKANA_ADAPTER_OUTBOX_DATASOURCE_USERNAME = "taskana.adapter.outbox.datasource.username";
   String TASKANA_ADAPTER_OUTBOX_DATASOURCE_PASSWORD = "taskana.adapter.outbox.datasource.password";
+  String TASKANA_ADAPTER_OUTBOX_MAX_NUMBER_OF_EVENTS =
+      "taskana.adapter.outbox.max.number.of.events";
 }
