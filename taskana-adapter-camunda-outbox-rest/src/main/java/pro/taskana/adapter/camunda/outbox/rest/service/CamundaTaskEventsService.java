@@ -37,11 +37,11 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
 
   private static final String OUTBOX_SCHEMA = getSchemaFromProperties();
   private static final String SQL_GET_CREATE_EVENTS =
-      "SELECT * FROM %s.event_store WHERE type = ? fetch first %d rows only";
+      "select * from %s.event_store where type = ? fetch first %d rows only";
   private static final String SQL_GET_COMPLETE_AND_DELETE_EVENTS =
-      "SELECT * FROM %s.event_store WHERE type = ? OR type = ? fetch first %d rows only";
+      "select * from %s.event_store where type = ? OR type = ? fetch first %d rows only";
   private static final String SQL_WITHOUT_PLACEHOLDERS_DELETE_EVENTS =
-      "DELETE FROM " + OUTBOX_SCHEMA + ".event_store WHERE id in (%s)";
+      "delete from %s.event_store where id in (%s)";
   private static final int MAX_NUMBER_OF_EVENTS_DEFAULT = 50;
 
   private static Properties outboxProperties;
@@ -100,7 +100,9 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
 
     String deleteEventsSqlWithPlaceholders =
         String.format(
-            SQL_WITHOUT_PLACEHOLDERS_DELETE_EVENTS, preparePlaceHolders(idsAsIntegers.size()));
+            SQL_WITHOUT_PLACEHOLDERS_DELETE_EVENTS,
+            OUTBOX_SCHEMA,
+            preparePlaceHolders(idsAsIntegers.size()));
 
     try (Connection connection = getConnection()) {
 
