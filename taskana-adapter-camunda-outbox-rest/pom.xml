@@ -43,24 +43,7 @@
         </dependencyManagement>
 
         <dependencies>
-                <dependency>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-web</artifactId>
-                        <exclusions>
-                                <exclusion>
-                                        <groupId>org.springframework.boot</groupId>
-                                        <artifactId>spring-boot-starter-tomcat</artifactId>
-                                </exclusion>
-                        </exclusions>
-                        <version>${version.spring.boot}</version>
-                </dependency>
 
-
-                <dependency>
-                        <groupId>pro.taskana</groupId>
-                        <artifactId>taskana-adapter</artifactId>
-                        <version>${project.version}</version>
-                </dependency>
                 <dependency>
                         <groupId>org.camunda.spin</groupId>
                         <artifactId>camunda-spin-core</artifactId>

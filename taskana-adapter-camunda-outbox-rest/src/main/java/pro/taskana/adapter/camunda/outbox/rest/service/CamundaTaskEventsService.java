@@ -24,8 +24,8 @@ import spinjar.com.fasterxml.jackson.databind.JsonNode;
 import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
 
 import pro.taskana.adapter.camunda.TaskanaConfigurationProperties;
+import pro.taskana.adapter.camunda.outbox.rest.exceptions.SystemException;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
-import pro.taskana.common.api.exceptions.SystemException;
 
 /** Implementation of the Outbox REST service. */
 public class CamundaTaskEventsService implements TaskanaConfigurationProperties {
