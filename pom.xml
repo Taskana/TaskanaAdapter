@@ -3,7 +3,7 @@
         <modelVersion>4.0.0</modelVersion>
         <groupId>pro.taskana</groupId>
         <artifactId>taskana-adapter-parent</artifactId>
-        <version>0.9.4-SNAPSHOT</version>
+        <version>0.9.5-SNAPSHOT</version>
         <packaging>pom</packaging>
 
         <name>${project.groupId}:${project.artifactId}</name>
@@ -17,7 +17,7 @@
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
                 <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-                <version.taskana>2.1.0</version.taskana>
+                <version.taskana>2.1.1-SNAPSHOT</version.taskana>
 
                 <version.maven.jar>3.2.0</version.maven.jar>
                 <version.maven-war-plugin>3.2.3</version.maven-war-plugin>
