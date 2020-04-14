@@ -8,7 +8,7 @@ import javax.ws.rs.core.Application;
 import pro.taskana.adapter.camunda.outbox.rest.controller.CamundaTaskEventsController;
 
 /** Configures the outbox REST service. */
-@ApplicationPath("")
+@ApplicationPath("taskana-outbox")
 public class OutboxRestServiceConfig extends Application {
 
   @Override
