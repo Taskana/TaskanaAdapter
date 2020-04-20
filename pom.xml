@@ -40,7 +40,7 @@
                 <version.spring.core>2.0.0.RELEASE</version.spring.core>
                 <version.spring.boot>2.2.6.RELEASE</version.spring.boot>
 
-                <version.camunda>7.10.0</version.camunda>
+                <version.camunda>7.12.0</version.camunda>
                 <version.camunda.bpm.spring.boot>3.2.0</version.camunda.bpm.spring.boot>
                 <version.camunda.bpm.extensions>1.2</version.camunda.bpm.extensions>
                 <version.camunda.spin.engine.plugin>7.10.0</version.camunda.spin.engine.plugin>
