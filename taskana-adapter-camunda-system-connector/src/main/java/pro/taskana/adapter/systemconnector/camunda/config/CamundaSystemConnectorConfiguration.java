@@ -19,13 +19,13 @@ import pro.taskana.adapter.systemconnector.camunda.api.impl.HttpHeaderProvider;
 @DependsOn(value = {"adapterSpringContextProvider"})
 public class CamundaSystemConnectorConfiguration {
   @Bean
-  HttpHeaderProvider httpHeaderProvider() {
-    return new HttpHeaderProvider();
+  public RestTemplate restTemplate(RestTemplateBuilder builder) {
+    return builder.build();
   }
 
   @Bean
-  public RestTemplate restTemplate(RestTemplateBuilder builder) {
-    return builder.build();
+  HttpHeaderProvider httpHeaderProvider() {
+    return new HttpHeaderProvider();
   }
 
   @Bean
