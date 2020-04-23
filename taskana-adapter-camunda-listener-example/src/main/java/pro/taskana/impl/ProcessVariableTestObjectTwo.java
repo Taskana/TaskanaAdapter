@@ -14,8 +14,7 @@ public class ProcessVariableTestObjectTwo implements Serializable {
   boolean booleanFieldObjectTwo;
   Date dateFieldObjectTwo;
 
-  public ProcessVariableTestObjectTwo() {
-  }
+  public ProcessVariableTestObjectTwo() {}
 
   public ProcessVariableTestObjectTwo(
       String stringFieldObjectTwo,

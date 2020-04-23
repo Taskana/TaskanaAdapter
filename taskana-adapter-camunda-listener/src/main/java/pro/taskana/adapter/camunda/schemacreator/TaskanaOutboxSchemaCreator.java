@@ -41,9 +41,11 @@ public class TaskanaOutboxSchemaCreator {
     this.schemaName = schemaName;
   }
 
-  /** Run all db scripts.
-  * @return true if successful
-  */
+  /**
+   * Run all db scripts.
+   *
+   * @return true if successful
+   */
   public boolean createSchema() {
     try (Connection connection = dataSource.getConnection()) {
       ScriptRunner runner = new ScriptRunner(connection);
@@ -182,7 +184,8 @@ public class TaskanaOutboxSchemaCreator {
     } catch (IOException e) {
       LOGGER.error(
           "SchemaName sql parsing failed for schemaName {}. Caught exception",
-          effectiveSchemaName, e);
+          effectiveSchemaName,
+          e);
     }
     return new StringReader(content.toString());
   }

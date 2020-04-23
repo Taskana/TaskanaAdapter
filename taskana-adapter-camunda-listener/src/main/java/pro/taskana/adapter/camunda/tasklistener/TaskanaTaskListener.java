@@ -143,8 +143,8 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
         }
       }
 
-      String payload = String.format("{\"id\":\"%s\",\"taskState\":\"%s\"}",
-          delegateTask.getId(),taskState);
+      String payload =
+          String.format("{\"id\":\"%s\",\"taskState\":\"%s\"}", delegateTask.getId(), taskState);
 
       camundaSchema = connection.getSchema();
       setOutboxSchema(connection);
