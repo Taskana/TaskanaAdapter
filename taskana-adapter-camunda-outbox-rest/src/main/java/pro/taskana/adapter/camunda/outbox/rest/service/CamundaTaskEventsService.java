@@ -24,10 +24,11 @@ import spinjar.com.fasterxml.jackson.databind.JsonNode;
 import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
 
 import pro.taskana.adapter.camunda.TaskanaConfigurationProperties;
-import pro.taskana.adapter.camunda.outbox.rest.exceptions.SystemException;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
 
-/** Implementation of the Outbox REST service. */
+/**
+ * Implementation of the Outbox REST service.
+ */
 public class CamundaTaskEventsService implements TaskanaConfigurationProperties {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskEventsService.class);
@@ -237,7 +238,7 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
 
     if (connection == null) {
       LOGGER.warn("Retrieved connection was NULL, Please make sure to provide a valid datasource.");
-      throw new SystemException(
+      throw new RuntimeException(
           "Retrieved connection was NULL. Please make sure to provide a valid datasource.");
     }
     return connection;
@@ -326,8 +327,8 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
       return null;
     } else {
       return DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-          .withZone(ZoneId.systemDefault())
-          .format(date.toInstant());
+                 .withZone(ZoneId.systemDefault())
+                 .format(date.toInstant());
     }
   }
 }
