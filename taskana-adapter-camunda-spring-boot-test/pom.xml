@@ -39,6 +39,12 @@
                         <version>${version.camunda.bpm.spring.boot}</version>
                 </dependency>
                 <dependency>
+                        <groupId>org.camunda.bpm.springboot</groupId>
+                        <artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
+                        <version>${version.camunda.bpm.spring.boot.test}</version>
+                        <scope>test</scope>
+                </dependency>
+                <dependency>
                         <groupId>com.h2database</groupId>
                         <artifactId>h2</artifactId>
                         <version>${version.h2database}</version>
@@ -72,7 +78,7 @@
                 <dependency>
                         <groupId>org.camunda.bpm.springboot</groupId>
                         <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
-                        <version>${version.camunda.bpm.spring.boot}</version>
+                        <version>${version.camunda.bpm.spring.boot.webapps}</version>
                 </dependency>
                 <dependency>
                         <groupId>org.camunda.bpm</groupId>
