@@ -8,7 +8,6 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -47,8 +46,6 @@ public abstract class AbsIntegrationTest {
   private static boolean isInitialised = false;
 
   @Rule public final SpringMethodRule springMethodRule = new SpringMethodRule();
-
-  @Rule public final ExpectedException exception = ExpectedException.none();
 
   @Value("${taskana.adapter.scheduler.run.interval.for.start.taskana.tasks.in.milliseconds}")
   protected long adapterTaskPollingInterval;
