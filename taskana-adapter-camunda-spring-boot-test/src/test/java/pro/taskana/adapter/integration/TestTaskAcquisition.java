@@ -1,12 +1,12 @@
 package pro.taskana.adapter.integration;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.json.JSONException;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -267,7 +267,7 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
       // comparison of the strings doesn't work.
       // rather use SameJSONAs.sameJSONAs from hamcrest-json to compare Json strings independent of
       // child order
-      Assert.assertThat(assumedVariablesString, SameJSONAs.sameJSONAs(taskanaVariablesString));
+      assertThat(assumedVariablesString, SameJSONAs.sameJSONAs(taskanaVariablesString));
 
     } catch (TaskNotFoundException | NotAuthorizedException e) {
       LOGGER.info(
