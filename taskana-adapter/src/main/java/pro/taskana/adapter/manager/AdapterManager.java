@@ -14,7 +14,6 @@ import pro.taskana.adapter.systemconnector.spi.SystemConnectorProvider;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.adapter.taskanaconnector.spi.TaskanaConnectorProvider;
 import pro.taskana.adapter.util.Assert;
-import pro.taskana.common.api.LoggerUtils;
 
 /**
  * Scheduler for receiving referenced tasks, completing Taskana tasks and cleaning adapter tables.
@@ -60,7 +59,7 @@ public class AdapterManager {
     for (SystemConnectorProvider provider : loader) {
       List<SystemConnector> connectors = provider.create();
       if (LOGGER.isInfoEnabled()) {
-        LOGGER.info("initialized system connectors {} ", LoggerUtils.listToString(connectors));
+        LOGGER.info("initialized system connectors {} ", connectors);
       }
       for (SystemConnector conn : connectors) {
         systemConnectors.put(conn.getSystemUrl(), conn);
@@ -75,7 +74,7 @@ public class AdapterManager {
     for (TaskanaConnectorProvider provider : loader) {
       List<TaskanaConnector> connectors = provider.create();
       if (LOGGER.isInfoEnabled()) {
-        LOGGER.info("initialized taskana connectors {} ", LoggerUtils.listToString(connectors));
+        LOGGER.info("initialized taskana connectors {} ", connectors);
       }
       taskanaConnectors.addAll(connectors);
     }
