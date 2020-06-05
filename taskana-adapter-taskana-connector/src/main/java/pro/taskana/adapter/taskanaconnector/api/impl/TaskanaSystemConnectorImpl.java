@@ -15,7 +15,6 @@ import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.classification.api.exceptions.ClassificationNotFoundException;
-import pro.taskana.common.api.LoggerUtils;
 import pro.taskana.common.api.exceptions.InvalidArgumentException;
 import pro.taskana.common.api.exceptions.NotAuthorizedException;
 import pro.taskana.task.api.CallbackState;
@@ -56,7 +55,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug(
           "the following taskana tasks were completed {} and must process their callback.",
-          LoggerUtils.listToString(completedTasks));
+          completedTasks);
     }
 
     return retrieveTaskanaTasksAndConvertToReferencedTasks(completedTasks);
@@ -75,7 +74,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug(
           "the following taskana tasks were claimed {} and must process their callback.",
-          LoggerUtils.listToString(claimedTasks));
+          claimedTasks);
     }
 
     return retrieveTaskanaTasksAndConvertToReferencedTasks(claimedTasks);
@@ -95,7 +94,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
       LOGGER.debug(
           "the claims of the following taskana tasks were cancelled {} and "
               + " must process their callback.",
-          LoggerUtils.listToString(claimedTasks));
+          claimedTasks);
     }
 
     return retrieveTaskanaTasksAndConvertToReferencedTasks(claimedTasks);

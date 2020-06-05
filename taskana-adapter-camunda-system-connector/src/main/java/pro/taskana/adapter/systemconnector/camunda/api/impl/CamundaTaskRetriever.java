@@ -17,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
 import pro.taskana.adapter.camunda.outbox.rest.CamundaTaskEvent;
 import pro.taskana.adapter.camunda.outbox.rest.CamundaTaskEventListResource;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
-import pro.taskana.common.api.LoggerUtils;
 
 /** Retrieves new tasks from camunda that have been started or finished by camunda. */
 @Component
@@ -82,7 +81,7 @@ public class CamundaTaskRetriever {
 
     List<CamundaTaskEvent> retrievedEvents = camundaTaskEventListResource.getCamundaTaskEvents();
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("retrieved camunda task events {}", LoggerUtils.listToString(retrievedEvents));
+      LOGGER.debug("retrieved camunda task events {}", retrievedEvents);
     }
 
     return retrievedEvents;
@@ -115,7 +114,7 @@ public class CamundaTaskRetriever {
       }
     }
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("retrieved reference tasks {}", LoggerUtils.listToString(referencedTasks));
+      LOGGER.debug("retrieved reference tasks {}", referencedTasks);
     }
     return referencedTasks;
   }
