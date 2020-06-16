@@ -1,3 +1,15 @@
 pullRequestOpened: |
-  Did you update the [documentation](https://taskana.atlassian.net/wiki/spaces/TAS/overview)?
-  If you updated the documentation please react to this comment with a 👍 and comment which page you updated, if the documentation did not need an update react with a 👎.
+  ### For the submitter:
+  - [ ] In case it's necessary, update the [documentation](https://taskana.atlassian.net/wiki/spaces/TAS/overview)
+  - [ ] Include link of [SonarCloud branch analysis](https://taskana.atlassian.net/wiki/spaces/TAS/pages/1019969636/SonarCloud+Integration)
+  - [ ] Add description of changes in the [current release notes](https://taskana.atlassian.net/wiki/spaces/TAS/pages/1270808638/Current+Release+Notes+Adapter) if necessary
+  - [ ] Put ticket in review
+
+  ### For the reviewer:
+  - [ ] Check commit message format → ADPT-XXX: Your commit message.
+  - [ ] Check the submitter's answer to the updated documentation
+  - [ ] Check the SonarCloud analysis link for new issues
+  - [ ] Check the update of the [current release notes](https://taskana.atlassian.net/wiki/spaces/TAS/pages/1270808638/Current+Release+Notes+Adapter)
+  - [ ] Check that the PR fulfills the ticket
+  - [ ] Check for edge cases and unwanted side effects
+  - [ ] Check for readability
