@@ -1,6 +1,7 @@
 package pro.taskana.impl;
 
 import java.io.Serializable;
+import java.util.List;
 
 /** Test entity for a complex process variable. */
 public class ProcessVariableTestObject implements Serializable {
@@ -11,7 +12,7 @@ public class ProcessVariableTestObject implements Serializable {
   int intField;
   double doubleField;
   boolean booleanField;
-  ProcessVariableTestObjectTwo processVariableTestObjectTwoField;
+  List<ProcessVariableTestObjectTwo> processVariableTestObjectTwoField;
 
   public ProcessVariableTestObject() {}
 
@@ -20,7 +21,7 @@ public class ProcessVariableTestObject implements Serializable {
       int intField,
       double doubleField,
       boolean booleanField,
-      ProcessVariableTestObjectTwo processVariableTestObjectTwoField) {
+      List<ProcessVariableTestObjectTwo> processVariableTestObjectTwoField) {
     this.stringField = stringField;
     this.intField = intField;
     this.doubleField = doubleField;
@@ -60,12 +61,28 @@ public class ProcessVariableTestObject implements Serializable {
     this.booleanField = booleanField;
   }
 
-  public ProcessVariableTestObjectTwo getProcessVariableTestObjectTwoField() {
+  public List<ProcessVariableTestObjectTwo> getProcessVariableTestObjectTwoField() {
     return processVariableTestObjectTwoField;
   }
 
   public void setProcessVariableTestObjectTwoField(
-      ProcessVariableTestObjectTwo processVariableTestObjectTwoField) {
+      List<ProcessVariableTestObjectTwo> processVariableTestObjectTwoField) {
     this.processVariableTestObjectTwoField = processVariableTestObjectTwoField;
+  }
+
+  @Override
+  public String toString() {
+    return "ProcessVariableTestObject [stringField="
+        + stringField
+        + ", intField="
+        + intField
+        + ", doubleField="
+        + doubleField
+        + ", booleanField="
+        + booleanField
+        + ", processVariableTestObjectTwoField="
+        + "\n"
+        + processVariableTestObjectTwoField.toString()
+        + "]";
   }
 }

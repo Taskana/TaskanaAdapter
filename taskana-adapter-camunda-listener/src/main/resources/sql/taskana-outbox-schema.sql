@@ -6,7 +6,7 @@ CREATE TABLE %schemaName%.event_store
     ID INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
     type VARCHAR(32) NOT NULL,
     created timestamp,
-    payload VARCHAR(32704),
+    payload CLOB,
     CONSTRAINT event_store_pkey PRIMARY KEY (id)
 );
 
