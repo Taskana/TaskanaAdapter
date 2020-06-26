@@ -2,6 +2,7 @@ package pro.taskana.adapter.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -141,6 +142,39 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       groupNames = {"admin"})
   @Test
   void
+      task_with_big_complex_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
+          throws JSONException, InterruptedException, NotAuthorizedException,
+              TaskNotFoundException {
+
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_with_big_complex_variables_process", "");
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    List<TaskSummary> taskanaTasks =
+        this.taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(0)).list();
+    assertEquals(1, taskanaTasks.size());
+
+    TaskSummary taskanaTaskSummary = taskanaTasks.get(0);
+    String taskanaTaskExternalId = taskanaTaskSummary.getExternalId();
+    assertEquals(taskanaTaskExternalId, camundaTaskIds.get(0));
+
+    Task taskanaTask = this.taskService.getTask(taskanaTaskSummary.getId());
+    Map<String, String> taskanaTaskCustomAttributes = taskanaTask.getCustomAttributes();
+    String variablesKeyString = "referenced_task_variables";
+    String taskanaVariablesString = taskanaTaskCustomAttributes.get(variablesKeyString);
+
+    assertTrue(taskanaVariablesString.length() > 1500000);
+  }
+
+  @WithAccessId(
+      userName = "teamlead_1",
+      groupNames = {"admin"})
+  @Test
+  public void
       task_with_complex_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
           throws Exception {
 
@@ -158,11 +192,11 @@ class TestTaskAcquisition extends AbsIntegrationTest {
             + "{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab"
             + " \\\\\\\\Backslash \\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\","
             + "\\\"intField\\\":1,\\\"doubleField\\\":1.1,\\\"booleanField\\\":false,"
-            + "\\\"processVariableTestObjectTwoField\\\":"
+            + "\\\"processVariableTestObjectTwoField\\\":["
             + "{\\\"stringFieldObjectTwo\\\":\\\"stringValueObjectTwo\\\","
             + "\\\"intFieldObjectTwo\\\":2,\\\"doubleFieldObjectTwo\\\":2.2,"
             + "\\\"booleanFieldObjectTwo\\\":true,"
-            + "\\\"dateFieldObjectTwo\\\":\\\"1970-01-01 13:12:11\\\"}}\","
+            + "\\\"dateFieldObjectTwo\\\":\\\"1970-01-01 13:12:11\\\"}]}\","
             + "\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\","
             + "\"serializationDataFormat\":\"application/json\"}}";
 
@@ -228,11 +262,11 @@ class TestTaskAcquisition extends AbsIntegrationTest {
             + "{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab"
             + " \\\\\\\\Backslash \\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\","
             + "\\\"intField\\\":1,\\\"doubleField\\\":1.1,\\\"booleanField\\\":false,"
-            + "\\\"processVariableTestObjectTwoField\\\":"
+            + "\\\"processVariableTestObjectTwoField\\\":["
             + "{\\\"stringFieldObjectTwo\\\":\\\"stringValueObjectTwo\\\","
             + "\\\"intFieldObjectTwo\\\":2,\\\"doubleFieldObjectTwo\\\":2.2,"
             + "\\\"booleanFieldObjectTwo\\\":true,"
-            + "\\\"dateFieldObjectTwo\\\":\\\"1970-01-01 13:12:11\\\"}}\","
+            + "\\\"dateFieldObjectTwo\\\":\\\"1970-01-01 13:12:11\\\"}]}\","
             + "\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\","
             + "\"serializationDataFormat\":\"application/json\"}}";
 
