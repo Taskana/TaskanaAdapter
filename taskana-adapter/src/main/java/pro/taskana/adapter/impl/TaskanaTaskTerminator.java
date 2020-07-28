@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,9 @@ import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 public class TaskanaTaskTerminator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskTerminator.class);
+
+  @Value("${taskana.adapter.run-as.user}")
+  protected String runAsUser;
 
   @Autowired AdapterManager adapterManager;
 
@@ -46,7 +50,13 @@ public class TaskanaTaskTerminator {
       try {
 
         for (SystemConnector systemConnector : (adapterManager.getSystemConnectors().values())) {
-          retrieveFinishededReferencedTasksAndTerminateCorrespondingTaskanaTasks(systemConnector);
+          UserContext.runAsUser(
+              runAsUser,
+              () -> {
+                retrieveFinishededReferencedTasksAndTerminateCorrespondingTaskanaTasks(
+                    systemConnector);
+                return null;
+              });
         }
       } catch (Exception e) {
         LOGGER.warn(

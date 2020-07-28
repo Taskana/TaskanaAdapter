@@ -39,13 +39,6 @@
                         <version>${version.spring.boot}</version>
                 </dependency>
                 <dependency>
-                        <groupId>junit</groupId>
-                        <artifactId>junit</artifactId>
-                        <version>${version.junit}</version>
-                        <scope>test</scope>
-                </dependency>
-
-                <dependency>
                         <groupId>com.h2database</groupId>
                         <artifactId>h2</artifactId>
                         <version>${version.h2database}</version>

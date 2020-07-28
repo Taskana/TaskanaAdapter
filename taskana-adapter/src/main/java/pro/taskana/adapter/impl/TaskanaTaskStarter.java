@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,9 @@ public class TaskanaTaskStarter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskStarter.class);
 
+  @Value("${taskana.adapter.run-as.user}")
+  protected String runAsUser;
+
   @Autowired AdapterManager adapterManager;
 
   @Scheduled(
@@ -40,7 +44,12 @@ public class TaskanaTaskStarter {
       LOGGER.debug(
           "-retrieveNewReferencedTasksAndCreateCorrespondingTaskanaTasks started---------------");
       try {
-        retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks();
+        UserContext.runAsUser(
+            runAsUser,
+            () -> {
+              retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks();
+              return null;
+            });
       } catch (Exception ex) {
         LOGGER.error(
             "Caught exception while trying to create Taskana tasks from referenced tasks", ex);

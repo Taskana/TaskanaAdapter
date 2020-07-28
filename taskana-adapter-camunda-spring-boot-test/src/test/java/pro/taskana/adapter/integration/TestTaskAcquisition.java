@@ -6,9 +6,8 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.json.JSONException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -19,7 +18,7 @@ import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
 import pro.taskana.common.api.exceptions.NotAuthorizedException;
-import pro.taskana.security.JaasRunner;
+import pro.taskana.security.JaasExtension;
 import pro.taskana.security.WithAccessId;
 import pro.taskana.task.api.exceptions.TaskNotFoundException;
 import pro.taskana.task.api.models.Task;
@@ -30,10 +29,10 @@ import pro.taskana.task.api.models.TaskSummary;
     classes = TaskanaAdapterTestApplication.class,
     webEnvironment = WebEnvironment.DEFINED_PORT)
 @AutoConfigureWebTestClient
-@RunWith(JaasRunner.class)
+@ExtendWith(JaasExtension.class)
 @ContextConfiguration
 @SuppressWarnings("checkstyle:LineLength")
-public class TestTaskAcquisition extends AbsIntegrationTest {
+class TestTaskAcquisition extends AbsIntegrationTest {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TestTaskAcquisition.class);
 
@@ -41,8 +40,8 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void user_task_process_instance_started_in_camunda_via_rest_should_result_in_taskanaTask()
-      throws JSONException, InterruptedException {
+  void user_task_process_instance_started_in_camunda_via_rest_should_result_in_taskanaTask()
+      throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -68,9 +67,9 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void
+  void
       multiple_user_task_process_instances_started_in_camunda_via_rest_should_result_in_multiple_taskanaTasks()
-          throws JSONException, InterruptedException {
+          throws Exception {
 
     int numberOfProcesses = 10;
     List<List<String>> camundaTaskIdsList = new ArrayList<List<String>>();
@@ -98,9 +97,9 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void
+  void
       task_with_primitive_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
-          throws JSONException, InterruptedException {
+          throws Exception {
 
     String variables =
         "\"variables\": {\"amount\": {\"value\":555, "
@@ -130,9 +129,9 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void
+  void
       task_with_complex_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
-          throws JSONException, InterruptedException {
+          throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -169,9 +168,9 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void
+  void
       task_with_complex_variables_from_parent_execution_should_result_in_taskanaTasks_with_those_variables_in_custom_attributes()
-          throws JSONException, InterruptedException {
+          throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -220,11 +219,11 @@ public class TestTaskAcquisition extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
+      userName = "admin",
       groupNames = {"admin"})
   @Test
-  public void process_instance_with_multiple_executions_should_result_in_multiple_taskanaTasks()
-      throws JSONException, InterruptedException {
+  void process_instance_with_multiple_executions_should_result_in_multiple_taskanaTasks()
+      throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(

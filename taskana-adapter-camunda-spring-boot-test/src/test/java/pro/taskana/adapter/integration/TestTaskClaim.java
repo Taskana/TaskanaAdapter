@@ -5,21 +5,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
-import org.json.JSONException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
-import pro.taskana.common.api.exceptions.NotAuthorizedException;
-import pro.taskana.security.JaasRunner;
+import pro.taskana.security.JaasExtension;
 import pro.taskana.security.WithAccessId;
 import pro.taskana.task.api.TaskState;
-import pro.taskana.task.api.exceptions.InvalidOwnerException;
-import pro.taskana.task.api.exceptions.InvalidStateException;
-import pro.taskana.task.api.exceptions.TaskNotFoundException;
 import pro.taskana.task.api.models.Task;
 import pro.taskana.task.api.models.TaskSummary;
 
@@ -30,17 +25,15 @@ import pro.taskana.task.api.models.TaskSummary;
     classes = TaskanaAdapterTestApplication.class,
     webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @AutoConfigureWebTestClient
-@RunWith(JaasRunner.class)
+@ExtendWith(JaasExtension.class)
 @ContextConfiguration
-public class TestTaskClaim extends AbsIntegrationTest {
+class TestTaskClaim extends AbsIntegrationTest {
 
   @WithAccessId(
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void claim_of_taskana_task_should_claim_unclaimed_camunda_task()
-      throws TaskNotFoundException, NotAuthorizedException, JSONException, InterruptedException,
-          InvalidOwnerException, InvalidStateException {
+  void claim_of_taskana_task_should_claim_unclaimed_camunda_task() throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -87,9 +80,7 @@ public class TestTaskClaim extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void claim_of_taskana_task_should_claim_already_claimed_camunda_task()
-      throws TaskNotFoundException, NotAuthorizedException, JSONException, InterruptedException,
-          InvalidOwnerException, InvalidStateException {
+  void claim_of_taskana_task_should_claim_already_claimed_camunda_task() throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -136,9 +127,7 @@ public class TestTaskClaim extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void cancel_claim_of_taskana_task_should_cancel_claim_of_camunda_task()
-      throws TaskNotFoundException, NotAuthorizedException, JSONException, InterruptedException,
-          InvalidOwnerException, InvalidStateException {
+  void cancel_claim_of_taskana_task_should_cancel_claim_of_camunda_task() throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -192,9 +181,8 @@ public class TestTaskClaim extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void claim_of_taskana_task_after_cancel_claim_should_claim_task_in_camunda_again()
-      throws TaskNotFoundException, NotAuthorizedException, JSONException, InterruptedException,
-          InvalidOwnerException, InvalidStateException {
+  void claim_of_taskana_task_after_cancel_claim_should_claim_task_in_camunda_again()
+      throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
