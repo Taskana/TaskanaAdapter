@@ -69,6 +69,6 @@ public class TaskanaSystemConnectorConfiguration {
   @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
   public SpringTaskanaEngineConfiguration taskanaEngineConfiguration(
       @Qualifier("taskanaDataSource") DataSource taskanaDataSource) throws SQLException {
-    return new SpringTaskanaEngineConfiguration(taskanaDataSource, true, false, taskanaSchemaName);
+    return new SpringTaskanaEngineConfiguration(taskanaDataSource, true, true, taskanaSchemaName);
   }
 }

@@ -7,9 +7,8 @@ import static org.assertj.core.api.Assertions.fail;
 import java.time.Instant;
 import java.util.List;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.json.JSONException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,11 +16,9 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
-import pro.taskana.common.api.exceptions.NotAuthorizedException;
-import pro.taskana.security.JaasRunner;
+import pro.taskana.security.JaasExtension;
 import pro.taskana.security.WithAccessId;
 import pro.taskana.task.api.TaskState;
-import pro.taskana.task.api.exceptions.InvalidOwnerException;
 import pro.taskana.task.api.exceptions.InvalidStateException;
 import pro.taskana.task.api.exceptions.TaskNotFoundException;
 import pro.taskana.task.api.models.TaskSummary;
@@ -34,9 +31,9 @@ import pro.taskana.task.api.models.TaskSummary;
     classes = TaskanaAdapterTestApplication.class,
     webEnvironment = WebEnvironment.DEFINED_PORT)
 @AutoConfigureWebTestClient
-@RunWith(JaasRunner.class)
+@ExtendWith(JaasExtension.class)
 @ContextConfiguration
-public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
+class TestCancelledTaskRetrieval extends AbsIntegrationTest {
 
   @Autowired private JobExecutor jobExecutor;
 
@@ -44,9 +41,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void deletion_of_taskana_task_should_delete_camunda_task_and_process()
-      throws TaskNotFoundException, NotAuthorizedException, JSONException, InterruptedException,
-          InvalidOwnerException, InvalidStateException {
+  void deletion_of_taskana_task_should_delete_camunda_task_and_process() throws Exception {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", "");
@@ -71,10 +66,8 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
         this.taskService.deleteTask(taskanaTaskId);
         fail("expected an InvalidStateExcpetion but no Exception was thrown");
       } catch (InvalidStateException e) {
-        assertThat(
-                e.getMessage()
-                    .endsWith("cannot be deleted because its callback is not yet processed"))
-            .isTrue();
+        assertThat(e.getMessage())
+            .endsWith("cannot be deleted because its callback is not yet processed");
       }
       Thread.sleep((long) (this.adapterCancelPollingInterval * 1.2));
 
@@ -96,8 +89,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void deletion_of_camunda_process_instance_should_terminate_taskana_task()
-      throws JSONException, InterruptedException {
+  void deletion_of_camunda_process_instance_should_terminate_taskana_task() throws Exception {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", "");
@@ -131,7 +123,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       Instant taskanaTaskCompletion = taskanaTasks.get(0).getCompleted();
       Instant taskanaTaskCreation = taskanaTasks.get(0).getCreated();
       TaskState taskanaTaskState = taskanaTasks.get(0).getState();
-      assertThat(TaskState.TERMINATED).isEqualTo(taskanaTaskState);
+      assertThat(taskanaTaskState).isEqualTo(TaskState.TERMINATED);
       assertThat(taskanaTaskCompletion).isNotNull();
       assertThat(taskanaTaskCompletion.compareTo(taskanaTaskCreation)).isEqualTo(1);
     }
@@ -141,9 +133,8 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void deletion_of_taskana_task_with_deleted_camunda_task_should_be_handled_gracefully()
-      throws JSONException, InterruptedException, TaskNotFoundException, NotAuthorizedException,
-          InvalidStateException, InvalidOwnerException {
+  void deletion_of_taskana_task_with_deleted_camunda_task_should_be_handled_gracefully()
+      throws Exception {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", "");
@@ -180,8 +171,7 @@ public class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
-  public void interruption_of_camunda_task_by_timer_should_cancel_taskana_task()
-      throws InterruptedException {
+  void interruption_of_camunda_task_by_timer_should_cancel_taskana_task() throws Exception {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_timed_user_task_process", "");

@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,9 @@ import pro.taskana.task.api.CallbackState;
 public class ReferencedTaskClaimer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReferencedTaskClaimer.class);
+
+  @Value("${taskana.adapter.run-as.user}")
+  protected String runAsUser;
 
   @Autowired AdapterManager adapterManager;
 
@@ -37,7 +41,12 @@ public class ReferencedTaskClaimer {
       LOGGER.debug(
           "--retrieveClaimedTaskanaTasksAndClaimCorrespondingReferencedTasks started-----------");
       try {
-        retrieveClaimedTaskanaTasksAndClaimCorrespondingReferencedTask();
+        UserContext.runAsUser(
+            runAsUser,
+            () -> {
+              retrieveClaimedTaskanaTasksAndClaimCorrespondingReferencedTask();
+              return null;
+            });
       } catch (Exception ex) {
         LOGGER.debug("Caught exception while trying to claim referenced tasks", ex);
       }

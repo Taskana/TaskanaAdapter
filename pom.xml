@@ -60,7 +60,6 @@
 
                 <version.assertj>3.16.1</version.assertj>
                 <version.junit.jupiter>5.6.2</version.junit.jupiter>
-                <version.junit>4.13</version.junit>
                 <version.hamcrest.json>0.2</version.hamcrest.json>
 
                 <version.maven.gpg>1.6</version.maven.gpg>

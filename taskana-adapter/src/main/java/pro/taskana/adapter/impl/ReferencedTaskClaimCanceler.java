@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,9 @@ public class ReferencedTaskClaimCanceler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReferencedTaskClaimCanceler.class);
 
+  @Value("${taskana.adapter.run-as.user}")
+  protected String runAsUser;
+
   @Autowired AdapterManager adapterManager;
 
   @Scheduled(
@@ -39,7 +43,12 @@ public class ReferencedTaskClaimCanceler {
       LOGGER.debug(
           "----retrieveCancelledClaimTaskanaTasksAndCancelCorrespondingReferencedTasks started--");
       try {
-        retrieveCancelledClaimTaskanaTasksAndCancelClaimCorrespondingReferencedTask();
+        UserContext.runAsUser(
+            runAsUser,
+            () -> {
+              retrieveCancelledClaimTaskanaTasksAndCancelClaimCorrespondingReferencedTask();
+              return null;
+            });
       } catch (Exception ex) {
         LOGGER.debug("Caught exception while trying to cancel claim referenced tasks", ex);
       }

@@ -1,18 +1,14 @@
 package pro.taskana.adapter.integration;
 
 import com.zaxxer.hikari.HikariDataSource;
-import java.sql.SQLException;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 
 import pro.taskana.TaskanaEngineConfiguration;
 import pro.taskana.classification.api.ClassificationService;
@@ -25,6 +21,8 @@ import pro.taskana.common.api.exceptions.DomainNotFoundException;
 import pro.taskana.common.api.exceptions.InvalidArgumentException;
 import pro.taskana.common.api.exceptions.NotAuthorizedException;
 import pro.taskana.impl.configuration.DbCleaner;
+import pro.taskana.security.JaasExtension;
+import pro.taskana.security.WithAccessId;
 import pro.taskana.task.api.TaskService;
 import pro.taskana.workbasket.api.WorkbasketService;
 import pro.taskana.workbasket.api.WorkbasketType;
@@ -36,16 +34,12 @@ import pro.taskana.workbasket.api.models.Workbasket;
 import pro.taskana.workbasket.api.models.WorkbasketAccessItem;
 
 /** Parent class for integrationtests for the TASKANA-Adapter. */
+@ExtendWith(JaasExtension.class)
 public abstract class AbsIntegrationTest {
-
-  // use rules instead of running with SpringRunner to allow for running with JaasRunner
-  @ClassRule public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
 
   protected static TaskanaEngine taskanaEngine;
 
   private static boolean isInitialised = false;
-
-  @Rule public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
   @Value("${taskana.adapter.scheduler.run.interval.for.start.taskana.tasks.in.milliseconds}")
   protected long adapterTaskPollingInterval;
@@ -82,12 +76,9 @@ public abstract class AbsIntegrationTest {
   @Resource(name = "camundaBpmDataSource")
   private DataSource camundaBpmDataSource;
 
-  @Before
-  public void setUp()
-      throws SQLException, DomainNotFoundException, WorkbasketNotFoundException,
-          NotAuthorizedException, InvalidWorkbasketException, WorkbasketAlreadyExistException,
-          InvalidArgumentException, ClassificationAlreadyExistException,
-          WorkbasketAccessItemAlreadyExistException {
+  @BeforeEach
+  @WithAccessId(userName = "admin")
+  public void setUp() throws Exception {
     // set up database connection staticly and only once.
     if (!isInitialised) {
       // setup Taskana engine and clear Taskana database
@@ -121,11 +112,7 @@ public abstract class AbsIntegrationTest {
     initInfrastructure();
   }
 
-  public void initInfrastructure()
-      throws SQLException, DomainNotFoundException, WorkbasketNotFoundException,
-          NotAuthorizedException, InvalidWorkbasketException, WorkbasketAlreadyExistException,
-          InvalidArgumentException, ClassificationAlreadyExistException,
-          WorkbasketAccessItemAlreadyExistException {
+  public void initInfrastructure() throws Exception {
     // create workbaskets and classifications needed by the test cases.
     // since this is no testcase we cannot set a JAAS context. To be able to create workbaskets
     // and classifications anyway we use for this purpose an engine with security disabled ...
@@ -133,7 +120,7 @@ public abstract class AbsIntegrationTest {
         new TaskanaEngineConfiguration(
             this.taskanaDataSource,
             false,
-            false,
+            true,
             ((HikariDataSource) taskanaDataSource).getSchema());
 
     TaskanaEngine taskanaEngineUnsecure = taskanaEngineConfiguration.buildTaskanaEngine();
