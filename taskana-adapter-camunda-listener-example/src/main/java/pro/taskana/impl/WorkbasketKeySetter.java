@@ -18,7 +18,7 @@ public class WorkbasketKeySetter implements JavaDelegate {
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkbasketKeySetter.class);
 
   @Override
-  public void execute(DelegateExecution execution) throws Exception {
+  public void execute(DelegateExecution execution) {
     String currentDomainName = getDomainName(execution);
     if ("DOMAIN_A".equals(currentDomainName)) {
       LOGGER.info("Domain = DOMAIN_A --> Setting workbasket key to GPK_KSC ... ");

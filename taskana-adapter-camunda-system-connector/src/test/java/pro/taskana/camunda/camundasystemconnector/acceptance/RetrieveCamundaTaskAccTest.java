@@ -8,7 +8,6 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.text.ParseException;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +49,7 @@ public class RetrieveCamundaTaskAccTest {
   }
 
   @Test
-  public void testGetActiveCamundaTasks() throws ParseException {
+  public void testGetActiveCamundaTasks() {
 
     String timeStamp = "2019-01-14T15:22:30.811+0000";
 
@@ -114,7 +113,7 @@ public class RetrieveCamundaTaskAccTest {
   }
 
   @Test
-  public void testGetFinishedCamundaTasks() throws ParseException {
+  public void testGetFinishedCamundaTasks() {
 
     ReferencedTask expectedTask = new ReferencedTask();
     expectedTask.setId("2275fb87-1065-11ea-a7a0-02004c4f4f50");

@@ -95,7 +95,7 @@ public class TaskInformationMapper {
       referencedTask.setId(taskanaTask.getExternalId());
     }
 
-    Map<String, String> customAttributes = taskanaTask.getCustomAttributes();
+    Map<String, String> customAttributes = taskanaTask.getCustomAttributeMap();
     if (customAttributes != null) {
       referencedTask.setVariables(
           customAttributes.get(TaskanaSystemConnectorImpl.REFERENCED_TASK_VARIABLES));

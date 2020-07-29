@@ -15,7 +15,7 @@ public class ComplexProcessVariableRetriever implements JavaDelegate {
       LoggerFactory.getLogger(ComplexProcessVariableRetriever.class);
 
   @Override
-  public void execute(DelegateExecution execution) throws Exception {
+  public void execute(DelegateExecution execution) {
 
     ProcessVariableTestObject processVariableTestObject =
         (ProcessVariableTestObject) execution.getVariable("attribute1");

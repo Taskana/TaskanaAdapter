@@ -257,7 +257,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
 
       // get the actual task instead of summary to access custom attributes
       Task taskanaTask = this.taskService.getTask(taskanaTaskSummary.getId());
-      Map<String, String> taskanaTaskCustomAttributes = taskanaTask.getCustomAttributes();
+      Map<String, String> taskanaTaskCustomAttributes = taskanaTask.getCustomAttributeMap();
       String variablesKeyString = "referenced_task_variables";
       String taskanaVariablesString = taskanaTaskCustomAttributes.get(variablesKeyString);
 
