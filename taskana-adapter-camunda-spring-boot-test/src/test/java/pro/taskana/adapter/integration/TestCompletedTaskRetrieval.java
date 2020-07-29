@@ -197,7 +197,7 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
 
     newProcessVariables.put("referenced_task_variables", newProcessVariablesJson);
 
-    taskanaTask.setCustomAttributes(newProcessVariables);
+    taskanaTask.setCustomAttributeMap(newProcessVariables);
 
     // update the task to set the process variables
     this.taskService.updateTask(taskanaTask);
@@ -227,7 +227,7 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     assertFalse(taskanaTask.getId().equals(taskanaTask2.getId()));
 
     // make sure that the process variables were set and transfered successfully over the outbox
-    assertTrue(taskanaTask.getCustomAttributes().equals(taskanaTask2.getCustomAttributes()));
+    assertTrue(taskanaTask.getCustomAttributeMap().equals(taskanaTask2.getCustomAttributeMap()));
   }
 
   @WithAccessId(
@@ -275,7 +275,7 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     // check that existing process variables are already set
     assertTrue(
         taskanaTask
-            .getCustomAttributes()
+            .getCustomAttributeMap()
             .get("referenced_task_variables")
             .equals(alreadyExistingProcessVariables));
 
@@ -292,7 +292,7 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
 
     updatedProcessVariables.put("referenced_task_variables", updatedProcessVariablesJson);
 
-    taskanaTask.setCustomAttributes(updatedProcessVariables);
+    taskanaTask.setCustomAttributeMap(updatedProcessVariables);
 
     // update the task to update the process variables
     this.taskService.updateTask(taskanaTask);
@@ -323,7 +323,7 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
 
     // make sure that the process variables were updated and transfered over the outbox
     assertTrue(
-        !alreadyExistingProcessVariables.equals(taskanaTask2.getCustomAttributes())
-            && updatedProcessVariables.equals(taskanaTask2.getCustomAttributes()));
+        !alreadyExistingProcessVariables.equals(taskanaTask2.getCustomAttributeMap())
+            && updatedProcessVariables.equals(taskanaTask2.getCustomAttributeMap()));
   }
 }

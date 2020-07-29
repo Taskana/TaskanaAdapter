@@ -24,6 +24,7 @@ import pro.taskana.impl.configuration.DbCleaner;
 import pro.taskana.security.JaasExtension;
 import pro.taskana.security.WithAccessId;
 import pro.taskana.task.api.TaskService;
+import pro.taskana.workbasket.api.WorkbasketPermission;
 import pro.taskana.workbasket.api.WorkbasketService;
 import pro.taskana.workbasket.api.WorkbasketType;
 import pro.taskana.workbasket.api.exceptions.InvalidWorkbasketException;
@@ -160,11 +161,11 @@ public abstract class AbsIntegrationTest {
     WorkbasketAccessItem workbasketAccessItem =
         workbasketService.newWorkbasketAccessItem(wb.getId(), wb.getOwner());
     workbasketAccessItem.setAccessName(wb.getOwner());
-    workbasketAccessItem.setPermAppend(true);
-    workbasketAccessItem.setPermTransfer(true);
-    workbasketAccessItem.setPermRead(true);
-    workbasketAccessItem.setPermOpen(true);
-    workbasketAccessItem.setPermDistribute(true);
+    workbasketAccessItem.setPermission(WorkbasketPermission.APPEND, true);
+    workbasketAccessItem.setPermission(WorkbasketPermission.TRANSFER, true);
+    workbasketAccessItem.setPermission(WorkbasketPermission.READ, true);
+    workbasketAccessItem.setPermission(WorkbasketPermission.OPEN, true);
+    workbasketAccessItem.setPermission(WorkbasketPermission.DISTRIBUTE, true);
     workbasketService.createWorkbasketAccessItem(workbasketAccessItem);
   }
 
