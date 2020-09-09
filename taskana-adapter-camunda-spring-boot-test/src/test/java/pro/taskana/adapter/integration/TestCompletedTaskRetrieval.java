@@ -6,21 +6,28 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
+import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaUtilRequester;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
 import pro.taskana.security.JaasExtension;
 import pro.taskana.security.WithAccessId;
+import pro.taskana.task.api.TaskState;
 import pro.taskana.task.api.models.Task;
 import pro.taskana.task.api.models.TaskSummary;
 
@@ -340,8 +347,64 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     assertThat(
         updatedExistingComplexProcessVariable,
         SameJSONAs.sameJSONAs(taskanaTask2.getCustomAttributeMap().get("camunda:attribute1")));
-    assertThat(
-        updatedExistingPrimitiveProcessVariable,
-        SameJSONAs.sameJSONAs(taskanaTask2.getCustomAttributeMap().get("camunda:attribute3")));
+  }
+
+  @WithAccessId(
+      userName = "teamlead_1",
+      groupNames = {"admin"})
+  @Test
+  void should_preventLoopFromScheduledMethod_When_TryingToCompleteNotAnymoreExistingCamundaTask()
+      throws Exception {
+
+    Logger camundaUtilRequesterLogger =
+        (Logger) LoggerFactory.getLogger(CamundaUtilRequester.class);
+
+    camundaUtilRequesterLogger.setLevel(Level.DEBUG);
+    ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+    listAppender.start();
+    camundaUtilRequesterLogger.addAppender(listAppender);
+
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_process", "");
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    for (String camundaTaskId : camundaTaskIds) {
+
+      // retrieve and check taskanaTaskId
+      List<TaskSummary> taskanaTasks =
+          this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
+      assertThat(taskanaTasks).hasSize(1);
+      String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
+      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
+
+      // delete camunda process without notifying the listeners
+      boolean camundaProcessCancellationSucessful =
+          this.camundaProcessengineRequester.deleteProcessInstanceWithId(processInstanceId, true);
+      assertThat(camundaProcessCancellationSucessful).isTrue();
+
+      // complete task in taskana and verify updated TaskState to be 'COMPLETED'
+      String taskanaTaskId = taskanaTasks.get(0).getId();
+      this.taskService.forceCompleteTask(taskanaTaskId);
+      TaskState updatedTaskState = this.taskService.getTask(taskanaTaskId).getState();
+      assertThat(updatedTaskState).isEqualTo(TaskState.COMPLETED);
+
+      // wait for the adapter to try to complete the not anymore existing camunda task
+      Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+      List<ILoggingEvent> logsList = listAppender.list;
+
+      // verify that the CamundaUtilRequester log contains 1 entry for
+      // the failed try to complete the not existing camunda task
+      assertThat(logsList).hasSize(1);
+
+      String camundaUtilRequesterLogMessage = logsList.get(0).getFormattedMessage();
+
+      assertThat(camundaUtilRequesterLogMessage)
+          .isEqualTo("Camunda Task " + camundaTaskId + " is not existing. Returning silently");
+    }
   }
 }

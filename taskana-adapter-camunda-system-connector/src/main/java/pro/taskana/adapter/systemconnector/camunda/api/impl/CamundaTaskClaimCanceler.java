@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -13,7 +14,6 @@ import org.springframework.web.client.RestTemplate;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemResponse;
 import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemUrls;
-import pro.taskana.common.api.exceptions.SystemException;
 
 /**
  * Cancels claims of tasks in camunda through the camunda REST-API that have a canceled claim in
@@ -52,17 +52,13 @@ public class CamundaTaskClaimCanceler {
       return new SystemResponse(responseEntity.getStatusCode(), null);
 
     } catch (HttpStatusCodeException e) {
-
-      LOGGER.info(
-          "tried to cancel claim camunda task {} and caught Status code {}",
-          referencedTask.getId(),
-          e.getStatusCode());
-      throw new SystemException(
-          "caught HttpStatusCodeException "
-              + e.getStatusCode()
-              + " on the attempt to cancel claim Camunda Task "
-              + referencedTask.getId(),
-          e.getMostSpecificCause());
+      if (CamundaUtilRequester.isTaskNotExisting(
+          httpHeaderProvider, restTemplate, camundaSystemUrlInfo, referencedTask.getId())) {
+        return new SystemResponse(HttpStatus.OK, null);
+      } else {
+        LOGGER.warn("Caught Exception when trying to complete camunda task", e);
+        throw e;
+      }
     }
   }
 }
