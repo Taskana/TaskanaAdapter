@@ -12,11 +12,11 @@ import pro.taskana.task.api.models.Task;
 public interface TaskanaConnector {
 
   /**
-   * retrieve completed TASKANA tasks.
+   * retrieve finished TASKANA tasks.
    *
-   * @return a list of completed TASKANA tasks
+   * @return a list of finished TASKANA tasks
    */
-  List<ReferencedTask> retrieveCompletedTaskanaTasksAsReferencedTasks();
+  List<ReferencedTask> retrieveFinishedTaskanaTasksAsReferencedTasks();
 
   /**
    * retrieve claimed TASKANA tasks.

@@ -63,7 +63,7 @@ public class ReferencedTaskCompleter {
       TaskanaConnector taskanaSystemConnector = adapterManager.getTaskanaConnector();
 
       List<ReferencedTask> tasksCompletedByTaskana =
-          taskanaSystemConnector.retrieveCompletedTaskanaTasksAsReferencedTasks();
+          taskanaSystemConnector.retrieveFinishedTaskanaTasksAsReferencedTasks();
       List<ReferencedTask> tasksCompletedInExternalSystem =
           completeReferencedTasksInExternalSystem(tasksCompletedByTaskana);
 

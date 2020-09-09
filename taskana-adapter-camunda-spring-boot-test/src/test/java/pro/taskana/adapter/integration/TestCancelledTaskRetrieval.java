@@ -210,4 +210,36 @@ class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       assertThat(taskanaTaskState).isEqualTo(TaskState.CANCELLED);
     }
   }
+
+  @WithAccessId(
+      userName = "teamlead_1",
+      groupNames = {"admin"})
+  @Test
+  void should_CompleteCamundaTask_When_CancellingTaskanaTask() throws Exception {
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_process", "");
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    for (String camundaTaskId : camundaTaskIds) {
+      // retrieve and check taskanaTaskId
+      List<TaskSummary> taskanaTasks =
+          this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
+      assertThat(taskanaTasks).hasSize(1);
+      String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
+      assertThat(camundaTaskId).isEqualTo(taskanaTaskExternalId);
+
+      taskService.cancelTask(taskanaTasks.get(0).getId());
+
+      Thread.sleep(1000 + (long) (this.jobExecutor.getMaxWait() * 1.2));
+
+      //check if camunda task got completed and therefore doesn't exist anymore
+      boolean taskRetrievalSuccessful =
+          this.camundaProcessengineRequester.getTaskFromTaskId(camundaTaskId);
+      assertThat(taskRetrievalSuccessful).isFalse();
+    }
+  }
 }
