@@ -1,16 +1,23 @@
 package pro.taskana.adapter.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
+import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaUtilRequester;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
 import pro.taskana.security.JaasExtension;
 import pro.taskana.security.WithAccessId;
@@ -241,6 +248,135 @@ class TestTaskClaim extends AbsIntegrationTest {
       boolean assigneeSetSuccessfullyAgain =
           this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, "teamlead_1");
       assertTrue(assigneeSetSuccessfullyAgain);
+    }
+  }
+
+  @WithAccessId(
+      userName = "teamlead_1",
+      groupNames = {"admin"})
+  @Test
+  void should_preventLoopFromScheduledMethod_When_TryingToClaimNotAnymoreExistingCamundaTask()
+      throws Exception {
+
+    Logger camundaUtilRequesterLogger =
+        (Logger) LoggerFactory.getLogger(CamundaUtilRequester.class);
+
+    camundaUtilRequesterLogger.setLevel(Level.DEBUG);
+    ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+    listAppender.start();
+    camundaUtilRequesterLogger.addAppender(listAppender);
+
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_process", "");
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    for (String camundaTaskId : camundaTaskIds) {
+
+      // retrieve and check taskanaTaskId
+      List<TaskSummary> taskanaTasks =
+          this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
+      assertThat(taskanaTasks).hasSize(1);
+      String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
+      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
+
+      // delete camunda process without notifying the listeners
+      boolean camundaProcessCancellationSucessful =
+          this.camundaProcessengineRequester.deleteProcessInstanceWithId(processInstanceId, true);
+      assertThat(camundaProcessCancellationSucessful).isTrue();
+
+      // claim task in taskana and verify updated TaskState to be 'CLAIMED'
+      String taskanaTaskId = taskanaTasks.get(0).getId();
+      this.taskService.claim(taskanaTaskId);
+      TaskState updatedTaskState = this.taskService.getTask(taskanaTaskId).getState();
+      assertThat(updatedTaskState).isEqualTo(TaskState.CLAIMED);
+
+      // wait for the adapter to claim the not anymore existing camunda task
+      Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+      List<ILoggingEvent> logsList = listAppender.list;
+
+      // verify that the CamundaUtilRequester log contains 1 entry for
+      // the failed try to claim the not existing camunda task
+      assertThat(logsList).hasSize(1);
+
+      String camundaUtilRequesterLogMessage = logsList.get(0).getFormattedMessage();
+
+      assertThat(camundaUtilRequesterLogMessage)
+          .isEqualTo("Camunda Task " + camundaTaskId + " is not existing. Returning silently");
+    }
+  }
+
+  @WithAccessId(
+      userName = "teamlead_1",
+      groupNames = {"admin"})
+  @Test
+  void should_preventLoopFromScheduledMethod_When_TryingToCancelClaimNotAnymoreExistingCamundaTask()
+      throws Exception {
+
+    Logger camundaUtilRequesterLogger =
+        (Logger) LoggerFactory.getLogger(CamundaUtilRequester.class);
+
+    camundaUtilRequesterLogger.setLevel(Level.DEBUG);
+    ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+    listAppender.start();
+    camundaUtilRequesterLogger.addAppender(listAppender);
+
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_process", "");
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    for (String camundaTaskId : camundaTaskIds) {
+
+      // retrieve and check taskanaTaskId
+      List<TaskSummary> taskanaTasks =
+          this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
+      assertThat(taskanaTasks).hasSize(1);
+      String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
+      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
+
+      // claim task in taskana and verify updated TaskState to be 'CLAIMED'
+      String taskanaTaskId = taskanaTasks.get(0).getId();
+      this.taskService.claim(taskanaTaskId);
+      TaskState updatedTaskState = this.taskService.getTask(taskanaTaskId).getState();
+      assertThat(updatedTaskState).isEqualTo(TaskState.CLAIMED);
+      Thread.sleep((long) (this.adapterClaimPollingInterval * 1.2));
+
+      // verify updated assignee for camunda task
+      boolean assigneeSetSuccessfully =
+          this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, "teamlead_1");
+      assertThat(assigneeSetSuccessfully).isTrue();
+
+      // delete camunda process without notifying the listeners
+      boolean camundaProcessCancellationSucessful =
+          this.camundaProcessengineRequester.deleteProcessInstanceWithId(processInstanceId, true);
+      assertThat(camundaProcessCancellationSucessful).isTrue();
+
+      // cancel claim taskana task and verify updated TaskState to be 'READY'
+      this.taskService.cancelClaim(taskanaTaskId);
+      TaskState taskWithCancelledClaimState = this.taskService.getTask(taskanaTaskId).getState();
+      assertThat(taskWithCancelledClaimState).isEqualTo(TaskState.READY);
+
+      // wait for the adapter to try to cancel claim the not anymore existing camunda task
+      Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+      List<ILoggingEvent> logsList = listAppender.list;
+
+      // verify that the CamundaUtilRequester log contains 1 entry for
+      // the failed try to cancel claim the not existing camunda task
+      assertThat(logsList).hasSize(1);
+
+      String camundaUtilRequesterLogMessage = logsList.get(0).getFormattedMessage();
+
+      assertThat(camundaUtilRequesterLogMessage)
+          .isEqualTo("Camunda Task " + camundaTaskId + " is not existing. Returning silently");
     }
   }
 }

@@ -37,39 +37,14 @@ public class CamundaTaskCompleter {
       return performCompletion(camundaSystemUrlInfo, referencedTask, requestUrlBuilder);
 
     } catch (HttpStatusCodeException e) {
-      if (isTaskAlreadyDeleted(camundaSystemUrlInfo, referencedTask, requestUrlBuilder)) {
+      if (CamundaUtilRequester.isTaskNotExisting(
+          httpHeaderProvider, restTemplate, camundaSystemUrlInfo, referencedTask.getId())) {
         return new SystemResponse(HttpStatus.OK, null);
       } else {
         LOGGER.warn("Caught Exception when trying to complete camunda task", e);
         throw e;
       }
     }
-  }
-
-  private boolean isTaskAlreadyDeleted(
-      CamundaSystemUrls.SystemUrlInfo camundaSystemUrlInfo,
-      ReferencedTask camundaTask,
-      StringBuilder requestUrlBuilder) {
-    requestUrlBuilder.setLength(0);
-    String requestUrl =
-        requestUrlBuilder
-            .append(camundaSystemUrlInfo.getSystemRestUrl())
-            .append(CamundaSystemConnectorImpl.URL_GET_CAMUNDA_TASKS)
-            .append(camundaTask.getId())
-            .toString();
-
-    HttpEntity<String> requestEntity =
-        httpHeaderProvider.prepareEntityFromBodyForCamundaRestApi("{}");
-    try {
-      restTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, String.class);
-    } catch (HttpStatusCodeException ex) {
-      boolean isAlreadyDeleted = HttpStatus.NOT_FOUND.equals(ex.getStatusCode());
-      if (isAlreadyDeleted) {
-        LOGGER.debug("Task {} is already deleted. Returning silently", camundaTask.getId());
-      }
-      return isAlreadyDeleted;
-    }
-    return false;
   }
 
   private void setAssigneeToOwnerOfReferencedTask(
