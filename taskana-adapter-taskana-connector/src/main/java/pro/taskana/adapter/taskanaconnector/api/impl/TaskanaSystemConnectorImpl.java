@@ -43,22 +43,22 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
 
   @Autowired private TaskInformationMapper taskInformationMapper;
 
-  public List<ReferencedTask> retrieveCompletedTaskanaTasksAsReferencedTasks() {
+  public List<ReferencedTask> retrieveFinishedTaskanaTasksAsReferencedTasks() {
 
-    List<TaskSummary> completedTasks =
+    List<TaskSummary> finishedTasks =
         taskService
             .createTaskQuery()
-            .stateIn(TaskState.COMPLETED)
+            .stateIn(TaskState.COMPLETED, TaskState.CANCELLED, TaskState.TERMINATED)
             .callbackStateIn(CallbackState.CALLBACK_PROCESSING_REQUIRED, CallbackState.CLAIMED)
             .list();
 
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug(
           "the following taskana tasks were completed {} and must process their callback.",
-          completedTasks);
+          finishedTasks);
     }
 
-    return retrieveTaskanaTasksAndConvertToReferencedTasks(completedTasks);
+    return retrieveTaskanaTasksAndConvertToReferencedTasks(finishedTasks);
   }
 
   @Override
