@@ -64,7 +64,7 @@
 
                 <version.maven.gpg>1.6</version.maven.gpg>
                 <version.sonatype>1.6.8</version.sonatype>
-                <version.jacoco>0.8.5</version.jacoco>
+                <version.jacoco>0.8.6</version.jacoco>
                 <!-- used by jacoco to collect coverage -->
                 <argLine></argLine>
                 <jacoco.file.path>target/site/jacoco-aggregate/jacoco.xml</jacoco.file.path>
