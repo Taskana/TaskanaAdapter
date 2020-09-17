@@ -17,7 +17,7 @@
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
                 <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-                <version.taskana>4.0.1-SNAPSHOT</version.taskana>
+                <version.taskana>4.1.1-SNAPSHOT</version.taskana>
 
                 <version.maven.jar>3.2.0</version.maven.jar>
                 <version.maven-war-plugin>3.3.1</version.maven-war-plugin>
@@ -38,12 +38,12 @@
 
                 <version.spring>5.0.5.RELEASE</version.spring>
                 <version.spring.core>2.0.0.RELEASE</version.spring.core>
-                <version.spring.boot>2.3.2.RELEASE</version.spring.boot>
+                <version.spring.boot>2.3.4.RELEASE</version.spring.boot>
 
                 <version.camunda>7.11.0</version.camunda>
-                <version.camunda.bpm.spring.boot>3.3.0</version.camunda.bpm.spring.boot>
-                <version.camunda.bpm.spring.boot.webapps>3.2.0</version.camunda.bpm.spring.boot.webapps>
-                <version.camunda.bpm.spring.boot.test>3.2.0</version.camunda.bpm.spring.boot.test>
+                <version.camunda.bpm.spring.boot>3.3.10</version.camunda.bpm.spring.boot>
+                <version.camunda.bpm.spring.boot.webapps>3.3.10</version.camunda.bpm.spring.boot.webapps>
+                <version.camunda.bpm.spring.boot.test>3.3.10</version.camunda.bpm.spring.boot.test>
                 <version.camunda.bpm.extensions>1.2</version.camunda.bpm.extensions>
                 <version.camunda.spin.engine.plugin>7.11.0</version.camunda.spin.engine.plugin>
                 <version.camunda.spin.dataformat.json.jackson>1.9.0</version.camunda.spin.dataformat.json.jackson>
@@ -106,6 +106,7 @@
                 <module>taskana-adapter-camunda-outbox-rest-spring-boot-starter</module>
                 <module>taskana-adapter-camunda-wildfly-example</module>
                 <module>taskana-adapter-camunda-spring-boot-test</module>
+                <module>camunda-outbox-example-boot</module>
         </modules>
 
         <repositories>

@@ -17,7 +17,7 @@ import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventListReso
 import pro.taskana.adapter.camunda.outbox.rest.service.CamundaTaskEventsService;
 
 /** Controller for the Outbox REST service. */
-@Path("/rest-api/events")
+@Path("/events")
 public class CamundaTaskEventsController {
 
   CamundaTaskEventsService camundaTaskEventService = new CamundaTaskEventsService();

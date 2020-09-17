@@ -64,8 +64,7 @@ public class CamundaTaskRetriever {
   private List<CamundaTaskEvent> getCamundaTaskEvents(
       String camundaSystemTaskEventUrl, String eventSelector) {
 
-    String requestUrl =
-        camundaSystemTaskEventUrl + CamundaSystemConnectorImpl.URL_OUTBOX_REST_PATH + eventSelector;
+    String requestUrl = camundaSystemTaskEventUrl + eventSelector;
 
     HttpHeaders headers = httpHeaderProvider.getHttpHeadersForOutboxRestApi();
     LOGGER.debug(

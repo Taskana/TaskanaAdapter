@@ -12,7 +12,6 @@ import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemUrls;
 public class CamundaSystemConnectorImpl implements SystemConnector {
 
   static final String URL_GET_CAMUNDA_TASKS = "/task/";
-  static final String URL_OUTBOX_REST_PATH = "/taskana-outbox/rest-api";
 
   static final String URL_GET_CAMUNDA_CREATE_EVENTS = "/events?type=create";
   static final String URL_GET_CAMUNDA_FINISHED_EVENTS = "/events?type=complete&type=delete";
