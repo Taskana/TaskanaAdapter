@@ -29,9 +29,7 @@ public class CamundaTaskEventCleaner {
         "entry to cleanEventsForReferencedTasks, CamundSystemURL = {}", camundaSystemTaskEventUrl);
 
     String requestUrl =
-        camundaSystemTaskEventUrl
-            + CamundaSystemConnectorImpl.URL_OUTBOX_REST_PATH
-            + CamundaSystemConnectorImpl.URL_DELETE_CAMUNDA_EVENTS;
+        camundaSystemTaskEventUrl + CamundaSystemConnectorImpl.URL_DELETE_CAMUNDA_EVENTS;
 
     if (referencedTasks == null || referencedTasks.isEmpty()) {
       return;
