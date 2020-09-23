@@ -1,9 +1,10 @@
 package pro.taskana.adapter.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -54,12 +55,12 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     for (String camundaTaskId : camundaTaskIds) {
       List<TaskSummary> taskanaTasks =
           this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       TaskSummary taskanaTaskSummary = taskanaTasks.get(0);
       String taskanaTaskExternalId = taskanaTaskSummary.getExternalId();
-      assertEquals(taskanaTaskExternalId, camundaTaskId);
+      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
       String businessProcessId = taskanaTaskSummary.getBusinessProcessId();
-      assertEquals(processInstanceId, businessProcessId);
+      assertThat(processInstanceId).isEqualTo(businessProcessId);
     }
   }
 
@@ -72,7 +73,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
           throws Exception {
 
     int numberOfProcesses = 10;
-    List<List<String>> camundaTaskIdsList = new ArrayList<List<String>>();
+    List<List<String>> camundaTaskIdsList = new ArrayList<>();
     for (int i = 0; i < numberOfProcesses; i++) {
       String processInstanceId =
           this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -86,9 +87,9 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       for (String camundaTaskId : camundaTaskIds) {
         List<TaskSummary> taskanaTasks =
             this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-        assertEquals(1, taskanaTasks.size());
+        assertThat(taskanaTasks).hasSize(1);
         String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-        assertEquals(taskanaTaskExternalId, camundaTaskId);
+        assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
       }
     }
   }
@@ -112,17 +113,27 @@ class TestTaskAcquisition extends AbsIntegrationTest {
 
     Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
-    String assumedVariablesString =
-        "{\"amount\":{\"type\":\"Long\",\"value\":555,\"valueInfo\":"
-            + "{\"objectTypeName\":\"java.lang.Long\"}},"
-            + "\"item\":{\"type\":\"Object\","
+    String expectedPrimitiveVariable1 =
+        "{\"type\":\"Long\",\"value\":555,\"valueInfo\":"
+            + "{\"objectTypeName\":\"java.lang.Long\"}}";
+
+    String expectedPrimitiveVariable2 =
+        "{\"type\":\"Object\","
             + "\"value\":\"\\\"item-xyz\\\"\","
             + "\"valueInfo\":{\"objectTypeName\":\"java.lang.String\","
-            + "\"serializationDataFormat\":\"application/json\"}}}";
+            + "\"serializationDataFormat\":\"application/json\"}}";
 
     camundaTaskIds.forEach(
-        camundaTaskId ->
-            retrieveTaskanaTaskAndVerifyTaskVariables(camundaTaskId, assumedVariablesString));
+        camundaTaskId -> {
+          Map<String, String> customAttributes =
+              retrieveCustomAttributesFromNewTaskanaTask(camundaTaskId);
+          assertThat(
+              expectedPrimitiveVariable1,
+              SameJSONAs.sameJSONAs(customAttributes.get("camunda:amount")));
+          assertThat(
+              expectedPrimitiveVariable2,
+              SameJSONAs.sameJSONAs(customAttributes.get("camunda:item")));
+        });
   }
 
   @WithAccessId(
@@ -141,8 +152,8 @@ class TestTaskAcquisition extends AbsIntegrationTest {
 
     Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
-    String assumedVariablesString =
-        "{\"attribute1\":{\"type\":\"Object\","
+    String expectedComplexProcessVariable =
+        "{\"type\":\"Object\","
             + "\"value\":\""
             + "{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab"
             + " \\\\\\\\Backslash \\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\","
@@ -153,15 +164,31 @@ class TestTaskAcquisition extends AbsIntegrationTest {
             + "\\\"booleanFieldObjectTwo\\\":true,"
             + "\\\"dateFieldObjectTwo\\\":\\\"1970-01-01 13:12:11\\\"}}\","
             + "\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\","
-            + "\"serializationDataFormat\":\"application/json\"}},"
-            + "\"attribute2\":{\"type\":\"Integer\",\"value\":5,"
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Integer\"}},"
-            + "\"attribute3\":{\"type\":\"Boolean\",\"value\":true,"
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Boolean\"}}}";
+            + "\"serializationDataFormat\":\"application/json\"}}";
+
+    String expectedPrimitiveProcessVariable1 =
+        "{\"type\":\"Integer\",\"value\":5,"
+            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Integer\"}}";
+
+    String expectedPrimitiveProcessVariable2 =
+        "{\"type\":\"Boolean\",\"value\":true,"
+            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Boolean\"}}";
 
     camundaTaskIds.forEach(
-        camundaTaskId ->
-            retrieveTaskanaTaskAndVerifyTaskVariables(camundaTaskId, assumedVariablesString));
+        camundaTaskId -> {
+          Map<String, String> customAttributes =
+              retrieveCustomAttributesFromNewTaskanaTask(camundaTaskId);
+
+          assertThat(
+              expectedComplexProcessVariable,
+              SameJSONAs.sameJSONAs(customAttributes.get("camunda:attribute1")));
+          assertThat(
+              expectedPrimitiveProcessVariable1,
+              SameJSONAs.sameJSONAs(customAttributes.get("camunda:attribute2")));
+          assertThat(
+              expectedPrimitiveProcessVariable2,
+              SameJSONAs.sameJSONAs(customAttributes.get("camunda:attribute3")));
+        });
   }
 
   @WithAccessId(
@@ -181,7 +208,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
 
     Thread.sleep(this.adapterTaskPollingInterval);
 
-    assertEquals(3, camundaTaskIds.size());
+    assertThat(camundaTaskIds).hasSize(3);
 
     // complete first 3 parallel tasks, one of which starts another task after completion that will
     // be checked for the process variables
@@ -191,12 +218,12 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
-    assertEquals(1, camundaTaskIds.size());
+    assertThat(camundaTaskIds).hasSize(1);
 
     Thread.sleep(this.adapterTaskPollingInterval);
 
-    String assumedVariablesString =
-        "{\"attribute1\":{\"type\":\"Object\","
+    String expectedComplexProcessVariable =
+        "{\"type\":\"Object\","
             + "\"value\":\""
             + "{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab"
             + " \\\\\\\\Backslash \\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\","
@@ -207,15 +234,30 @@ class TestTaskAcquisition extends AbsIntegrationTest {
             + "\\\"booleanFieldObjectTwo\\\":true,"
             + "\\\"dateFieldObjectTwo\\\":\\\"1970-01-01 13:12:11\\\"}}\","
             + "\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\","
-            + "\"serializationDataFormat\":\"application/json\"}},"
-            + "\"attribute2\":{\"type\":\"Integer\",\"value\":5,"
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Integer\"}},"
-            + "\"attribute3\":{\"type\":\"Boolean\",\"value\":true,"
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Boolean\"}}}";
+            + "\"serializationDataFormat\":\"application/json\"}}";
 
+    String expectedPrimitiveProcessVariable1 =
+        "{\"type\":\"Integer\",\"value\":5,"
+            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Integer\"}}";
+
+    String expectedPrimitiveProcessVariable2 =
+        "{\"type\":\"Boolean\",\"value\":true,"
+            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Boolean\"}}";
     camundaTaskIds.forEach(
-        camundaTaskId ->
-            retrieveTaskanaTaskAndVerifyTaskVariables(camundaTaskId, assumedVariablesString));
+        camundaTaskId -> {
+          Map<String, String> customAttributes =
+              retrieveCustomAttributesFromNewTaskanaTask(camundaTaskId);
+
+          assertThat(
+              expectedComplexProcessVariable,
+              SameJSONAs.sameJSONAs(customAttributes.get("camunda:attribute1")));
+          assertThat(
+              expectedPrimitiveProcessVariable1,
+              SameJSONAs.sameJSONAs(customAttributes.get("camunda:attribute2")));
+          assertThat(
+              expectedPrimitiveProcessVariable2,
+              SameJSONAs.sameJSONAs(customAttributes.get("camunda:attribute3")));
+        });
   }
 
   @WithAccessId(
@@ -230,47 +272,41 @@ class TestTaskAcquisition extends AbsIntegrationTest {
             "simple_multiple_execution_process", "");
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
-    assertEquals(3, camundaTaskIds.size());
+    assertThat(camundaTaskIds).hasSize(3);
 
     Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
     for (String camundaTaskId : camundaTaskIds) {
       List<TaskSummary> taskanaTasks =
           this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-      assertEquals(taskanaTaskExternalId, camundaTaskId);
+      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
     }
   }
 
-  private void retrieveTaskanaTaskAndVerifyTaskVariables(
-      String camundaTaskId, String assumedVariablesString) {
+  private Map<String, String> retrieveCustomAttributesFromNewTaskanaTask(String camundaTaskId) {
 
+    Map<String, String> customAttributes = new HashMap<>();
     try {
 
       List<TaskSummary> taskanaTasks =
           this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       TaskSummary taskanaTaskSummary = taskanaTasks.get(0);
       String taskanaTaskExternalId = taskanaTaskSummary.getExternalId();
-      assertEquals(taskanaTaskExternalId, camundaTaskId);
+      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
 
       // get the actual task instead of summary to access custom attributes
       Task taskanaTask = this.taskService.getTask(taskanaTaskSummary.getId());
-      Map<String, String> taskanaTaskCustomAttributes = taskanaTask.getCustomAttributeMap();
-      String variablesKeyString = "referenced_task_variables";
-      String taskanaVariablesString = taskanaTaskCustomAttributes.get(variablesKeyString);
 
-      // attention: the order of "amount" and "item" returned by camunda is random. Therefore, a
-      // simple
-      // comparison of the strings doesn't work.
-      // rather use SameJSONAs.sameJSONAs from hamcrest-json to compare Json strings independent of
-      // child order
-      assertThat(assumedVariablesString, SameJSONAs.sameJSONAs(taskanaVariablesString));
+      customAttributes = taskanaTask.getCustomAttributeMap();
+      return customAttributes;
 
     } catch (TaskNotFoundException | NotAuthorizedException e) {
       LOGGER.info(
-          "Caught Exception while trying to create a taskana task and verify its variables", e);
+          "Caught Exception while trying to retrieve custom attributes from new taskana task", e);
     }
+    return customAttributes;
   }
 }
