@@ -1,5 +1,7 @@
 package pro.taskana.adapter.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -14,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
 import pro.taskana.security.JaasExtension;
@@ -169,34 +172,35 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     // retrieve and check taskanaTaskId
     List<TaskSummary> taskanaTasks =
         this.taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(0)).list();
-    assertEquals(1, taskanaTasks.size());
+    assertThat(taskanaTasks).hasSize(1);
     String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-    assertEquals(taskanaTaskExternalId, camundaTaskIds.get(0));
-
-    Task taskanaTask = this.taskService.getTask(taskanaTasks.get(0).getId());
+    assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskIds.get(0));
 
     // create map for new process variables and set new process variables in it
     Map<String, String> newProcessVariables = new HashMap<>();
 
-    String newProcessVariablesJson =
-        "{\"attribute1\":{\"type\":\"Object\",\"value\":"
-            + "\"{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab"
-            + " \\\\\\\\Backslash "
-            + "\\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\",\\\"intField\\\":1,"
-            + "\\\"doubleField\\\":1.1,\\\"booleanField\\\":false,"
+    newProcessVariables.put(
+        "camunda:attribute1",
+        "{\"type\":\"Object\","
+            + "\"value\":\"{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab "
+            + "\\\\\\\\Backslash \\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\","
+            + "\\\"intField\\\":1,\\\"doubleField\\\":1.1,\\\"booleanField\\\":false,"
             + "\\\"processVariableTestObjectTwoField\\\":"
             + "{\\\"stringFieldObjectTwo\\\":\\\"stringValueObjectTwo\\\","
             + "\\\"intFieldObjectTwo\\\":2,\\\"doubleFieldObjectTwo\\\":2.2,"
             + "\\\"booleanFieldObjectTwo\\\":true,\\\"dateFieldObjectTwo\\\":null}}\","
             + "\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\","
-            + "\"serializationDataFormat\":\"application/json\"}},"
-            + "\"attribute2\":{\"type\":\"Integer\",\"value\":5,"
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Integer\"}},"
-            + "\"attribute3\":{\"type\":\"Boolean\",\"value\":true,"
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Boolean\"}}}";
+            + "\"serializationDataFormat\":\"application/json\"}}");
+    newProcessVariables.put(
+        "camunda:attribute2",
+        "{\"valueInfo\":{\"objectTypeName\":\"java.lang.Boolean\"},"
+            + "\"type\":\"Boolean\",\"value\":true}");
+    newProcessVariables.put(
+        "attribute3",
+        "{\"valueInfo\":{\"objectTypeName\":\"java.lang.Integer\"},"
+            + "\"type\":\"Integer\",\"value\":5}");
 
-    newProcessVariables.put("referenced_task_variables", newProcessVariablesJson);
-
+    Task taskanaTask = this.taskService.getTask(taskanaTasks.get(0).getId());
     taskanaTask.setCustomAttributeMap(newProcessVariables);
 
     // update the task to set the process variables
@@ -205,7 +209,7 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     // complete task with setting process variables in camunda
     // and wait for adapter to create next task from
     // next user task in camunda
-    this.taskService.forceCompleteTask(taskanaTask.getId());
+    taskanaTask = this.taskService.forceCompleteTask(taskanaTask.getId());
 
     Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
 
@@ -216,18 +220,46 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
 
     // retrieve and check taskanaTaskId
     taskanaTasks = this.taskService.createTaskQuery().externalIdIn(newCamundaTaskIds.get(0)).list();
-    assertEquals(1, taskanaTasks.size());
+    assertThat(taskanaTasks).hasSize(1);
     taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-    assertEquals(taskanaTaskExternalId, newCamundaTaskIds.get(0));
+    assertThat(taskanaTaskExternalId).isEqualTo(newCamundaTaskIds.get(0));
 
     // retrieve the new created task from the new user task in camunda
     Task taskanaTask2 = this.taskService.getTask(taskanaTasks.get(0).getId());
 
     // make sure the task actually got completed
-    assertFalse(taskanaTask.getId().equals(taskanaTask2.getId()));
+    assertThat(taskanaTask.getId()).isNotEqualTo(taskanaTask2.getId());
+
+    // make sure that the prefixed process variables were set and successfully transfered back over
+    // the outbox
+    assertThat(taskanaTask2.getCustomAttributeMap()).hasSize(2);
+    assertThat(
+        taskanaTask.getCustomAttributeMap().get("camunda:attribute1"),
+        SameJSONAs.sameJSONAs(taskanaTask2.getCustomAttributeMap().get("camunda:attribute1")));
+
+    this.taskService.forceCompleteTask(taskanaTask2.getId());
+
+    Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
+
+    newCamundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    // retrieve and check taskanaTaskId
+    taskanaTasks = this.taskService.createTaskQuery().externalIdIn(newCamundaTaskIds.get(0)).list();
+    assertThat(taskanaTasks).hasSize(1);
+    taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
+    assertThat(taskanaTaskExternalId).isEqualTo(newCamundaTaskIds.get(0));
+
+    // retrieve the new created task from the new user task in camunda
+    Task taskanaTask3 = this.taskService.getTask(taskanaTasks.get(0).getId());
+
+    assertThat(taskanaTask2.getId()).isNotEqualTo(taskanaTask3.getId());
 
     // make sure that the process variables were set and transfered successfully over the outbox
-    assertTrue(taskanaTask.getCustomAttributeMap().equals(taskanaTask2.getCustomAttributeMap()));
+    assertThat(taskanaTask2.getCustomAttributeMap())
+        .isEqualTo(taskanaTask3.getCustomAttributeMap());
   }
 
   @WithAccessId(
@@ -248,49 +280,32 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     // retrieve and check taskanaTaskId
     List<TaskSummary> taskanaTasks =
         this.taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(0)).list();
-    assertEquals(1, taskanaTasks.size());
+    assertThat(taskanaTasks).hasSize(1);
     String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-    assertEquals(taskanaTaskExternalId, camundaTaskIds.get(0));
+    assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskIds.get(0));
 
     Task taskanaTask = this.taskService.getTask(taskanaTasks.get(0).getId());
 
-    String alreadyExistingProcessVariables =
-        "{\"attribute1\":{\"type\":\"Object\",\"value\":"
-            + "\"{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab"
-            + " \\\\\\\\Backslash "
-            + "\\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\",\\\"intField\\\":1,"
-            + "\\\"doubleField\\\":1.1,\\\"booleanField\\\":false,"
-            + "\\\"processVariableTestObjectTwoField\\\":"
-            + "{\\\"stringFieldObjectTwo\\\":\\\"stringValueObjectTwo\\\","
-            + "\\\"intFieldObjectTwo\\\":2,\\\"doubleFieldObjectTwo\\\":2.2,"
-            + "\\\"booleanFieldObjectTwo\\\":true,"
-            + "\\\"dateFieldObjectTwo\\\":\\\"1970-01-01 13:12:11\\\"}}\","
-            + "\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\","
-            + "\"serializationDataFormat\":\"application/json\"}},"
-            + "\"attribute2\":{\"type\":\"Integer\",\"value\":5,"
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Integer\"}},"
-            + "\"attribute3\":{\"type\":\"Boolean\",\"value\":true,"
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Boolean\"}}}";
+    String alreadyExistingComplexProcessVariable =
+        taskanaTask.getCustomAttributeMap().get("camunda:attribute1");
 
-    // check that existing process variables are already set
-    assertTrue(
-        taskanaTask
-            .getCustomAttributeMap()
-            .get("referenced_task_variables")
-            .equals(alreadyExistingProcessVariables));
-
-    // create map for updated process variables and set new process variables in it
-    Map<String, String> updatedProcessVariables = new HashMap<>();
-
-    // update some values
-    String updatedProcessVariablesJson =
-        alreadyExistingProcessVariables
+    String updatedExistingComplexProcessVariable =
+        alreadyExistingComplexProcessVariable
             .replaceAll("\\\\\"doubleField\\\\\":1.1", "\\\\\"doubleField\\\\\":5.55")
             .replaceAll(
                 "\\\\\"dateFieldObjectTwo\\\\\":\\\\\"1970-01-01 13:12:11\\\\\"",
                 "\\\\\"dateFieldObjectTwo\\\\\":null");
 
-    updatedProcessVariables.put("referenced_task_variables", updatedProcessVariablesJson);
+    String alreadyExistingPrimitiveProcessVariable =
+        taskanaTask.getCustomAttributeMap().get("camunda:attribute3");
+
+    String updatedExistingPrimitiveProcessVariable =
+        alreadyExistingPrimitiveProcessVariable.replaceAll("\"value\":true", "\"value\":false");
+
+    Map<String, String> updatedProcessVariables = new HashMap<>();
+
+    updatedProcessVariables.put("camunda:attribute1", updatedExistingComplexProcessVariable);
+    updatedProcessVariables.put("camunda:attribute3", updatedExistingPrimitiveProcessVariable);
 
     taskanaTask.setCustomAttributeMap(updatedProcessVariables);
 
@@ -298,7 +313,7 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     this.taskService.updateTask(taskanaTask);
 
     // complete task with setting process variables in camunda
-    // and wait for adapter to create next task from
+    // and wait for adapter to create next askana task from
     // next user task in camunda
     this.taskService.forceCompleteTask(taskanaTask.getId());
 
@@ -311,19 +326,22 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
 
     // retrieve and check taskanaTaskId
     taskanaTasks = this.taskService.createTaskQuery().externalIdIn(newCamundaTaskIds.get(0)).list();
-    assertEquals(1, taskanaTasks.size());
+    assertThat(taskanaTasks).hasSize(1);
     taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-    assertEquals(taskanaTaskExternalId, newCamundaTaskIds.get(0));
+    assertThat(taskanaTaskExternalId).isEqualTo(newCamundaTaskIds.get(0));
 
     // retrieve the newly created task from the new user task in camunda
     Task taskanaTask2 = this.taskService.getTask(taskanaTasks.get(0).getId());
 
     // make sure the task actually got completed
-    assertFalse(taskanaTask.getId().equals(taskanaTask2.getId()));
+    assertThat(taskanaTask.getId()).isNotEqualTo(taskanaTask2.getId());
 
     // make sure that the process variables were updated and transfered over the outbox
-    assertTrue(
-        !alreadyExistingProcessVariables.equals(taskanaTask2.getCustomAttributeMap())
-            && updatedProcessVariables.equals(taskanaTask2.getCustomAttributeMap()));
+    assertThat(
+        updatedExistingComplexProcessVariable,
+        SameJSONAs.sameJSONAs(taskanaTask2.getCustomAttributeMap().get("camunda:attribute1")));
+    assertThat(
+        updatedExistingPrimitiveProcessVariable,
+        SameJSONAs.sameJSONAs(taskanaTask2.getCustomAttributeMap().get("camunda:attribute3")));
   }
 }

@@ -18,7 +18,7 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
   static final String URL_GET_CAMUNDA_FINISHED_EVENTS = "/events?type=complete&type=delete";
   static final String URL_DELETE_CAMUNDA_EVENTS = "/events/delete";
 
-  static final String BODY_SET_CAMUNDA_VARIABLES = "{\"variables\":";
+  static final String BODY_SET_CAMUNDA_VARIABLES = "{\"variables\":{";
   static final String LOCAL_VARIABLE_PATH = "/localVariables";
   static final String EMPTY_REQUEST_BODY = "{}";
 

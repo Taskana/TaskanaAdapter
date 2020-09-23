@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.HashMap;
 import java.util.Map;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import pro.taskana.task.internal.models.TaskImpl;
 public class TaskInformationMapper {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskInformationMapper.class);
+  private static final String CAMUNDA_PROCESS_VARIABLE_PREFIX="camunda:";
 
   @Value("${taskana.adapter.mapping.default.objectreference.company:DEFAULT_COMPANY}")
   private String defaultCompany;
@@ -67,9 +69,8 @@ public class TaskInformationMapper {
     taskanaTask.setCallbackInfo(callbackInfo);
     taskanaTask.setExternalId(referencedTask.getId());
 
-    Map<String, String> customAttributes = new HashMap<>();
-    customAttributes.put(
-        TaskanaSystemConnectorImpl.REFERENCED_TASK_VARIABLES, referencedTask.getVariables());
+    Map<String, String> customAttributes =
+        retrieveCustomAttributesFromProcessVariables(referencedTask.getVariables());
     taskanaTask.setCustomAttributes(customAttributes);
 
     if (referencedTask.getName() != null && !referencedTask.getName().isEmpty()) {
@@ -96,14 +97,55 @@ public class TaskInformationMapper {
     }
 
     Map<String, String> customAttributes = taskanaTask.getCustomAttributeMap();
-    if (customAttributes != null) {
-      referencedTask.setVariables(
-          customAttributes.get(TaskanaSystemConnectorImpl.REFERENCED_TASK_VARIABLES));
+    if (customAttributes != null && !customAttributes.isEmpty()) {
+
+      String processVariables = getProcessVariablesFromCustomAttributes(customAttributes);
+      referencedTask.setVariables(processVariables);
     }
     referencedTask.setName(taskanaTask.getName());
     referencedTask.setDescription(taskanaTask.getDescription());
     referencedTask.setAssignee(taskanaTask.getOwner());
     return referencedTask;
+  }
+
+  private String getProcessVariablesFromCustomAttributes(Map<String, String> customAttributes) {
+
+    StringBuilder builder = new StringBuilder();
+
+    customAttributes.entrySet().stream()
+        .filter(entry -> entry.getKey().startsWith(CAMUNDA_PROCESS_VARIABLE_PREFIX))
+        .forEach(
+            entry ->
+                builder
+                    .append("\"")
+                    .append(entry.getKey().replace(CAMUNDA_PROCESS_VARIABLE_PREFIX, ""))
+                    .append("\":")
+                    .append(entry.getValue())
+                    .append(","));
+
+    if (builder.length() > 0) {
+      return builder.deleteCharAt(builder.length() - 1).toString();
+    }
+
+    return "";
+  }
+
+  private Map<String, String> retrieveCustomAttributesFromProcessVariables(
+      String processVariables) {
+
+    Map<String, String> customAttributes = new HashMap<>();
+
+    JSONObject jsonObject = new JSONObject(processVariables);
+
+    jsonObject
+        .toMap()
+        .entrySet()
+        .forEach(
+            entry ->
+                customAttributes.put(
+                    CAMUNDA_PROCESS_VARIABLE_PREFIX + entry.getKey(), String.valueOf(jsonObject.get(entry.getKey()))));
+
+    return customAttributes;
   }
 
   private void setTimestampsInTaskanaTask(TaskImpl taskanaTask, ReferencedTask camundaTask) {
