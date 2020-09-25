@@ -29,7 +29,7 @@ import pro.taskana.task.internal.models.TaskImpl;
 public class TaskInformationMapper {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskInformationMapper.class);
-  private static final String CAMUNDA_PROCESS_VARIABLE_PREFIX="camunda:";
+  private static final String CAMUNDA_PROCESS_VARIABLE_PREFIX = "camunda:";
 
   @Value("${taskana.adapter.mapping.default.objectreference.company:DEFAULT_COMPANY}")
   private String defaultCompany;
@@ -143,7 +143,8 @@ public class TaskInformationMapper {
         .forEach(
             entry ->
                 customAttributes.put(
-                    CAMUNDA_PROCESS_VARIABLE_PREFIX + entry.getKey(), String.valueOf(jsonObject.get(entry.getKey()))));
+                    CAMUNDA_PROCESS_VARIABLE_PREFIX + entry.getKey(),
+                    String.valueOf(jsonObject.get(entry.getKey()))));
 
     return customAttributes;
   }
