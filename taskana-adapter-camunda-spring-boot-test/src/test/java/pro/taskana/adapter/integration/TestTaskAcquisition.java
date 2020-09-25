@@ -42,6 +42,61 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       userName = "teamlead_1",
       groupNames = {"admin"})
   @Test
+  public void
+      task_with_complex_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
+          throws Exception {
+
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_with_complex_variables_process", "");
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    String expectedComplexProcessVariable =
+        "{\"type\":\"Object\","
+            + "\"value\":\""
+            + "{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab"
+            + " \\\\\\\\Backslash \\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\","
+            + "\\\"intField\\\":1,\\\"doubleField\\\":1.1,\\\"booleanField\\\":false,"
+            + "\\\"processVariableTestObjectTwoField\\\":["
+            + "{\\\"stringFieldObjectTwo\\\":\\\"stringValueObjectTwo\\\","
+            + "\\\"intFieldObjectTwo\\\":2,\\\"doubleFieldObjectTwo\\\":2.2,"
+            + "\\\"booleanFieldObjectTwo\\\":true,"
+            + "\\\"dateFieldObjectTwo\\\":\\\"1970-01-01 13:12:11\\\"}]}\","
+            + "\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\","
+            + "\"serializationDataFormat\":\"application/json\"}}";
+
+    String expectedPrimitiveProcessVariable1 =
+        "{\"type\":\"Integer\",\"value\":5,"
+            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Integer\"}}";
+
+    String expectedPrimitiveProcessVariable2 =
+        "{\"type\":\"Boolean\",\"value\":true,"
+            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Boolean\"}}";
+
+    camundaTaskIds.forEach(
+        camundaTaskId -> {
+          Map<String, String> customAttributes =
+              retrieveCustomAttributesFromNewTaskanaTask(camundaTaskId);
+
+          assertThat(
+              expectedComplexProcessVariable,
+              SameJSONAs.sameJSONAs(customAttributes.get("camunda:attribute1")));
+          assertThat(
+              expectedPrimitiveProcessVariable1,
+              SameJSONAs.sameJSONAs(customAttributes.get("camunda:attribute2")));
+          assertThat(
+              expectedPrimitiveProcessVariable2,
+              SameJSONAs.sameJSONAs(customAttributes.get("camunda:attribute3")));
+        });
+  }
+
+  @WithAccessId(
+      userName = "teamlead_1",
+      groupNames = {"admin"})
+  @Test
   void user_task_process_instance_started_in_camunda_via_rest_should_result_in_taskanaTask()
       throws Exception {
 
@@ -143,8 +198,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
   @Test
   void
       task_with_big_complex_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
-          throws JSONException, InterruptedException, NotAuthorizedException,
-              TaskNotFoundException {
+          throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -156,73 +210,18 @@ class TestTaskAcquisition extends AbsIntegrationTest {
 
     List<TaskSummary> taskanaTasks =
         this.taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(0)).list();
-    assertEquals(1, taskanaTasks.size());
+    assertThat(taskanaTasks).hasSize(1);
 
     TaskSummary taskanaTaskSummary = taskanaTasks.get(0);
     String taskanaTaskExternalId = taskanaTaskSummary.getExternalId();
-    assertEquals(taskanaTaskExternalId, camundaTaskIds.get(0));
+    assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskIds.get(0));
 
     Task taskanaTask = this.taskService.getTask(taskanaTaskSummary.getId());
-    Map<String, String> taskanaTaskCustomAttributes = taskanaTask.getCustomAttributes();
-    String variablesKeyString = "referenced_task_variables";
+    Map<String, String> taskanaTaskCustomAttributes = taskanaTask.getCustomAttributeMap();
+    String variablesKeyString = "camunda:attribute1";
     String taskanaVariablesString = taskanaTaskCustomAttributes.get(variablesKeyString);
 
     assertTrue(taskanaVariablesString.length() > 1500000);
-  }
-
-  @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
-  @Test
-  public void
-      task_with_complex_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
-          throws Exception {
-
-    String processInstanceId =
-        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
-            "simple_user_task_with_complex_variables_process", "");
-    List<String> camundaTaskIds =
-        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
-
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
-
-    String expectedComplexProcessVariable =
-        "{\"type\":\"Object\","
-            + "\"value\":\""
-            + "{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab"
-            + " \\\\\\\\Backslash \\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\","
-            + "\\\"intField\\\":1,\\\"doubleField\\\":1.1,\\\"booleanField\\\":false,"
-            + "\\\"processVariableTestObjectTwoField\\\":["
-            + "{\\\"stringFieldObjectTwo\\\":\\\"stringValueObjectTwo\\\","
-            + "\\\"intFieldObjectTwo\\\":2,\\\"doubleFieldObjectTwo\\\":2.2,"
-            + "\\\"booleanFieldObjectTwo\\\":true,"
-            + "\\\"dateFieldObjectTwo\\\":\\\"1970-01-01 13:12:11\\\"}]}\","
-            + "\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\","
-            + "\"serializationDataFormat\":\"application/json\"}}";
-
-    String expectedPrimitiveProcessVariable1 =
-        "{\"type\":\"Integer\",\"value\":5,"
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Integer\"}}";
-
-    String expectedPrimitiveProcessVariable2 =
-        "{\"type\":\"Boolean\",\"value\":true,"
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Boolean\"}}";
-
-    camundaTaskIds.forEach(
-        camundaTaskId -> {
-          Map<String, String> customAttributes =
-              retrieveCustomAttributesFromNewTaskanaTask(camundaTaskId);
-
-          assertThat(
-              expectedComplexProcessVariable,
-              SameJSONAs.sameJSONAs(customAttributes.get("camunda:attribute1")));
-          assertThat(
-              expectedPrimitiveProcessVariable1,
-              SameJSONAs.sameJSONAs(customAttributes.get("camunda:attribute2")));
-          assertThat(
-              expectedPrimitiveProcessVariable2,
-              SameJSONAs.sameJSONAs(customAttributes.get("camunda:attribute3")));
-        });
   }
 
   @WithAccessId(

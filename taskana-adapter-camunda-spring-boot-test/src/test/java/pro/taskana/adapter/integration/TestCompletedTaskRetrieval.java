@@ -192,8 +192,8 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
             + "\"value\":\"{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab "
             + "\\\\\\\\Backslash \\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\","
             + "\\\"intField\\\":1,\\\"doubleField\\\":1.1,\\\"booleanField\\\":false,"
-            + "\\\"processVariableTestObjectTwoField\\\":["
-            + "{\\\"stringFieldObjectTwo\\\":\\\"stringValueObjectTwo\\\","
+            + "\\\"processVariableTestObjectTwoField\\\":"
+            + "[{\\\"stringFieldObjectTwo\\\":\\\"stringValueObjectTwo\\\","
             + "\\\"intFieldObjectTwo\\\":2,\\\"doubleFieldObjectTwo\\\":2.2,"
             + "\\\"booleanFieldObjectTwo\\\":true,\\\"dateFieldObjectTwo\\\":null}]}\","
             + "\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\","
@@ -295,8 +295,6 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
 
     String alreadyExistingComplexProcessVariable =
         taskanaTask.getCustomAttributeMap().get("camunda:attribute1");
-            + "\\\"processVariableTestObjectTwoField\\\":"
-            + "\\\"dateFieldObjectTwo\\\":\\\"1970-01-01 13:12:11\\\"}}\","
 
     String updatedExistingComplexProcessVariable =
         alreadyExistingComplexProcessVariable
