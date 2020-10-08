@@ -113,12 +113,15 @@ public class TaskanaTaskStarter {
               "caught Exception when attempting to start TaskanaTask for referencedTask {}",
               referencedTask,
               e);
+          systemConnector.taskanaTaskFailedToBeCreatedForNewReferencedTask(referencedTask, e);
         }
       } catch (Exception e) {
         LOGGER.warn(
-            "caught Exception when attempting to start TaskanaTask for referencedTask {}",
+            "caught unexpected Exception when attempting to start TaskanaTask "
+                + "for referencedTask {}",
             referencedTask,
             e);
+        systemConnector.taskanaTaskFailedToBeCreatedForNewReferencedTask(referencedTask, e);
       }
     }
     return newCreatedTasksInTaskana;

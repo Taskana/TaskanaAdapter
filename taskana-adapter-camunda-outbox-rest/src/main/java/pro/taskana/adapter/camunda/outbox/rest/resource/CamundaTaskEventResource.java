@@ -1,11 +1,7 @@
-package pro.taskana.adapter.camunda.outbox.rest;
+package pro.taskana.adapter.camunda.outbox.rest.resource;
 
-import java.io.Serializable;
-
-/** POJO that represents an event in the camunda outbox table. */
-public class CamundaTaskEvent implements Serializable {
-
-  static final long serialVersionUID = 1L;
+/** EntityRessource class for {@link pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent}. */
+public class CamundaTaskEventResource {
 
   int id;
   String type;
@@ -71,22 +67,5 @@ public class CamundaTaskEvent implements Serializable {
     this.error = error;
   }
 
-  @Override
-  public String toString() {
-    return "CamundaTaskEvent [id="
-               + id
-               + ", type="
-               + type
-               + ", created="
-               + created
-               + ", payload="
-               + payload
-               + ", remainingRetries="
-               + remainingRetries
-               + ", blockedUntil="
-               + blockedUntil
-               + ", error="
-               + error
-               + "]";
-  }
+
 }

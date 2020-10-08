@@ -122,7 +122,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
         | TaskAlreadyExistException e) {
       LOGGER.error("Caught Exception {} when creating taskana task {} ", e, taskanaTask);
       throw new TaskCreationFailedException(
-          "Error when creationg a taskana task " + taskanaTask, e);
+          "Error when creating a taskana task " + taskanaTask, e);
     }
   }
 
