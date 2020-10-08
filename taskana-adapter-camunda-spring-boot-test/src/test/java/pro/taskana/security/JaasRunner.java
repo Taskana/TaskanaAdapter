@@ -11,8 +11,9 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
-import pro.taskana.common.internal.security.GroupPrincipal;
-import pro.taskana.common.internal.security.UserPrincipal;
+import pro.taskana.common.api.security.GroupPrincipal;
+import pro.taskana.common.api.security.UserPrincipal;
+
 
 /** Runner for integration tests that enables JAAS subject. */
 public class JaasRunner extends BlockJUnit4ClassRunner {

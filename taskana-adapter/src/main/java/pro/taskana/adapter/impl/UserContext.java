@@ -4,7 +4,8 @@ import java.security.PrivilegedAction;
 import java.util.function.Supplier;
 import javax.security.auth.Subject;
 
-import pro.taskana.common.internal.security.UserPrincipal;
+import pro.taskana.common.api.security.UserPrincipal;
+
 
 public class UserContext {
 

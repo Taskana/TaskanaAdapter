@@ -45,7 +45,8 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
   private static final String TASK_STATE_TERMINATED = "TERMINATED";
   private static final String DEFAULT_SCHEMA = "taskana_tables";
   private static final String SQL_INSERT_EVENT =
-      "INSERT INTO event_store (TYPE,CREATED,PAYLOAD) VALUES (?,?,?)";
+      "INSERT INTO event_store (TYPE,CREATED,PAYLOAD,REMAINING_RETRIES,BLOCKED_UNTIL) "
+          + "VALUES (?,?,?,?,?)";
   private static TaskanaTaskListener instance = null;
 
   private boolean gotActivated = false;
@@ -197,9 +198,17 @@ public class TaskanaTaskListener implements TaskListener, TaskanaConfigurationPr
 
       Timestamp eventCreationTimestamp = Timestamp.from(Instant.now());
 
+      int maxRetries =
+          Integer.parseInt(
+              ReadPropertiesHelper.getPropertyValueFromFile(
+                  TASKANA_OUTBOX_PROPERTIES,
+                  TASKANA_ADAPTER_OUTBOX_MAX_NUMBER_OF_TASK_CREATION_RETRIES));
+
       preparedStatement.setString(1, delegateTask.getEventName());
       preparedStatement.setTimestamp(2, eventCreationTimestamp);
       preparedStatement.setString(3, payloadJson);
+      preparedStatement.setInt(4, maxRetries);
+      preparedStatement.setTimestamp(5, eventCreationTimestamp);
 
       preparedStatement.execute();
 

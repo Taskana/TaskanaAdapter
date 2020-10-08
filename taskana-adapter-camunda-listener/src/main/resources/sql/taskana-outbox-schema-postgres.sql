@@ -15,5 +15,8 @@ CREATE TABLE IF NOT EXISTS %schemaName%.event_store
     type text COLLATE pg_catalog."default",
     created timestamp(4) without time zone,
     payload text COLLATE pg_catalog."default",
+    REMAINING_RETRIES INT NOT NULL,
+    BLOCKED_UNTIL TIMESTAMP NOT NULL,
+    ERROR text COLLATE pg_catalog."default",
     CONSTRAINT event_store_pkey PRIMARY KEY (id)
     );
