@@ -1,0 +1,18 @@
+Tickets between upstream/master and :
+ADPT-88
+ADPT-94
+ADPT-102
+ADPT-103
+ADPT-104
+
+Release notes:
+[ADPT-88](https://taskana.atlassian.net/browse/ADPT-88): cancelled/terminated tasks from TASKANA->Camunda not added yet
+[ADPT-94](https://taskana.atlassian.net/browse/ADPT-94): Support large process variables (>= 1 MB)
+[ADPT-102](https://taskana.atlassian.net/browse/ADPT-102): Prevent loops when trying to claim/complete/cancel claim not existing camunda tasks
+[ADPT-103](https://taskana.atlassian.net/browse/ADPT-103): Configurable context-root for outbox-rest
+[ADPT-104](https://taskana.atlassian.net/browse/ADPT-104): Prcoess variables in the customAttributesMap should have their own key
+
+jira filter:
+ID in ( ADPT-88, ADPT-94, ADPT-102, ADPT-103, ADPT-104 )
+URL:
+https://taskana.atlassian.net/issues/?jql=ID in ( ADPT-88, ADPT-94, ADPT-102, ADPT-103, ADPT-104 )
