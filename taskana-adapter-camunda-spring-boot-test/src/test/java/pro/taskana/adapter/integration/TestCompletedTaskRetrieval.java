@@ -25,8 +25,8 @@ import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaUtilRequester;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
-import pro.taskana.security.JaasExtension;
-import pro.taskana.security.WithAccessId;
+import pro.taskana.common.test.security.JaasExtension;
+import pro.taskana.common.test.security.WithAccessId;
 import pro.taskana.task.api.TaskState;
 import pro.taskana.task.api.models.Task;
 import pro.taskana.task.api.models.TaskSummary;
@@ -44,8 +44,8 @@ import pro.taskana.task.api.models.TaskSummary;
 class TestCompletedTaskRetrieval extends AbsIntegrationTest {
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"admin"})
   @Test
   void completion_of_taskana_task_should_complete_camunda_task() throws Exception {
     String processInstanceId =
@@ -82,8 +82,8 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void forced_completion_of_taskana_task_should_set_assignee_and_complete_camunda_task()
       throws Exception {
@@ -125,8 +125,8 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void completion_of_camunda_task_should_complete_taskana_task() throws Exception {
     String processInstanceId =
@@ -162,8 +162,8 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void completion_of_taskana_task_with_new_process_variables_should_set_these_variables_in_camunda()
       throws Exception {
@@ -270,8 +270,8 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void completion_of_taskana_task_with_updated_process_variables_should_update_camunda_variables()
       throws Exception {
@@ -350,8 +350,8 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void should_preventLoopFromScheduledMethod_When_TryingToCompleteNotAnymoreExistingCamundaTask()
       throws Exception {

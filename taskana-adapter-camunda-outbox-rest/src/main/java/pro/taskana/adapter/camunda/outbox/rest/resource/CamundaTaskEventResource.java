@@ -1,6 +1,8 @@
 package pro.taskana.adapter.camunda.outbox.rest.resource;
 
-/** EntityRessource class for {@link pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent}. */
+/**
+ * EntityRessource class for {@link pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent}.
+ */
 public class CamundaTaskEventResource {
 
   int id;
@@ -10,6 +12,7 @@ public class CamundaTaskEventResource {
   int remainingRetries;
   String blockedUntil;
   String error;
+  String camundaTaskId;
 
   public int getId() {
     return id;
@@ -67,5 +70,11 @@ public class CamundaTaskEventResource {
     this.error = error;
   }
 
+  public String getCamundaTaskId() {
+    return camundaTaskId;
+  }
 
+  public void setCamundaTaskId(String camundaTaskId) {
+    this.camundaTaskId = camundaTaskId;
+  }
 }

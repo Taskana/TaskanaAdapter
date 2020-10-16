@@ -34,8 +34,6 @@ public class CamundaTaskEventErrorHandler {
         "{\"taskEventId\":"
             + referencedTask.getOutboxEventId()
             + ",\"errorLog\":\""
-            + referencedTask.getId()
-            + ":"
             + e.getCause()
             + "\"}";
 
@@ -54,7 +52,10 @@ public class CamundaTaskEventErrorHandler {
     HttpHeaders headers = httpHeaderProvider.getHttpHeadersForOutboxRestApi();
 
     HttpEntity<String> request = new HttpEntity<>(failedTaskEventIdAndErrorLog, headers);
-
-    restTemplate.postForObject(requestUrl, request, String.class);
+    try {
+      restTemplate.postForObject(requestUrl, request, String.class);
+    } catch (Exception e) {
+      LOGGER.error("Caught exception while trying to decrease remaining retries and log error", e);
+    }
   }
 }

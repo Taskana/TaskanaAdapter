@@ -28,7 +28,7 @@ import pro.taskana.adapter.camunda.util.ReadPropertiesHelper;
 public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEnginePlugin
     implements TaskanaConfigurationProperties {
 
-  private static final String OUTBOX_SCHEMA_VERSION = "0.0.1";
+  private static final String OUTBOX_SCHEMA_VERSION = "1.0.0";
   private static final Logger LOGGER =
       LoggerFactory.getLogger(TaskanaParseListenerProcessEnginePlugin.class);
 

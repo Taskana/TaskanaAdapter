@@ -14,6 +14,7 @@ public class CamundaTaskEvent implements Serializable {
   int remainingRetries;
   String blockedUntil;
   String error;
+  String camundaTaskId;
 
   public int getId() {
     return id;
@@ -71,22 +72,32 @@ public class CamundaTaskEvent implements Serializable {
     this.error = error;
   }
 
+  public String getCamundaTaskId() {
+    return camundaTaskId;
+  }
+
+  public void setCamundaTaskId(String camundaTaskId) {
+    this.camundaTaskId = camundaTaskId;
+  }
+
   @Override
   public String toString() {
     return "CamundaTaskEvent [id="
-               + id
-               + ", type="
-               + type
-               + ", created="
-               + created
-               + ", payload="
-               + payload
-               + ", remainingRetries="
-               + remainingRetries
-               + ", blockedUntil="
-               + blockedUntil
-               + ", error="
-               + error
-               + "]";
+        + id
+        + ", type="
+        + type
+        + ", created="
+        + created
+        + ", payload="
+        + payload
+        + ", remainingRetries="
+        + remainingRetries
+        + ", blockedUntil="
+        + blockedUntil
+        + ", error="
+        + error
+        + ", camundaTaskId="
+        + camundaTaskId
+        + "]";
   }
 }

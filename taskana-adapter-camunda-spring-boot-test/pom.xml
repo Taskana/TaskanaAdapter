@@ -114,7 +114,14 @@
 						<version>${project.version}</version>
 				</dependency>
 
-				<!-- needed for test coverage -->
+                <!-- taskana-common-test classes -->
+                <dependency>
+                        <groupId>pro.taskana</groupId>
+                        <artifactId>taskana-common-test</artifactId>
+                        <version>${version.taskana}</version>
+                </dependency>
+
+                <!-- needed for test coverage -->
 				<dependency>
 						<groupId>pro.taskana</groupId>
 						<artifactId>taskana-adapter-camunda-outbox-rest</artifactId>

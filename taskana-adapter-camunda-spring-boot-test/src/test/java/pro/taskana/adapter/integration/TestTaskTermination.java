@@ -13,8 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
-import pro.taskana.security.JaasExtension;
-import pro.taskana.security.WithAccessId;
+import pro.taskana.common.test.security.JaasExtension;
+import pro.taskana.common.test.security.WithAccessId;
 import pro.taskana.task.api.models.TaskSummary;
 
 /** Test class to test the completion of camunda tasks upon termination of taskana tasks. */
@@ -29,8 +29,8 @@ public class TestTaskTermination extends AbsIntegrationTest {
   @Autowired private JobExecutor jobExecutor;
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void should_CompleteCamundaTask_When_TerminatingTaskanaTask() throws Exception {
 

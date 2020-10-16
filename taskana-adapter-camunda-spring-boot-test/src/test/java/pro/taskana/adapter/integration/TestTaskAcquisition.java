@@ -20,8 +20,8 @@ import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
 import pro.taskana.common.api.exceptions.NotAuthorizedException;
-import pro.taskana.security.JaasExtension;
-import pro.taskana.security.WithAccessId;
+import pro.taskana.common.test.security.JaasExtension;
+import pro.taskana.common.test.security.WithAccessId;
 import pro.taskana.task.api.exceptions.TaskNotFoundException;
 import pro.taskana.task.api.models.Task;
 import pro.taskana.task.api.models.TaskSummary;
@@ -39,8 +39,8 @@ class TestTaskAcquisition extends AbsIntegrationTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(TestTaskAcquisition.class);
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   public void
       task_with_complex_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
@@ -94,8 +94,8 @@ class TestTaskAcquisition extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void user_task_process_instance_started_in_camunda_via_rest_should_result_in_taskanaTask()
       throws Exception {
@@ -121,8 +121,8 @@ class TestTaskAcquisition extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void
       multiple_user_task_process_instances_started_in_camunda_via_rest_should_result_in_multiple_taskanaTasks()
@@ -151,8 +151,8 @@ class TestTaskAcquisition extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void
       task_with_primitive_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
@@ -193,8 +193,8 @@ class TestTaskAcquisition extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void
       task_with_big_complex_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
@@ -225,8 +225,8 @@ class TestTaskAcquisition extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void
       task_with_complex_variables_from_parent_execution_should_result_in_taskanaTasks_with_those_variables_in_custom_attributes()
@@ -294,8 +294,8 @@ class TestTaskAcquisition extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "admin",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void process_instance_with_multiple_executions_should_result_in_multiple_taskanaTasks()
       throws Exception {

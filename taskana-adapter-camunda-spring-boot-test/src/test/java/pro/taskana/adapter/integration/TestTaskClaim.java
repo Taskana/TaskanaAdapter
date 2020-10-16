@@ -19,8 +19,8 @@ import org.springframework.test.context.ContextConfiguration;
 
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaUtilRequester;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
-import pro.taskana.security.JaasExtension;
-import pro.taskana.security.WithAccessId;
+import pro.taskana.common.test.security.JaasExtension;
+import pro.taskana.common.test.security.WithAccessId;
 import pro.taskana.task.api.TaskState;
 import pro.taskana.task.api.models.Task;
 import pro.taskana.task.api.models.TaskSummary;
@@ -37,8 +37,8 @@ import pro.taskana.task.api.models.TaskSummary;
 class TestTaskClaim extends AbsIntegrationTest {
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void claim_of_taskana_task_should_claim_unclaimed_camunda_task() throws Exception {
 
@@ -84,8 +84,8 @@ class TestTaskClaim extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void claim_of_taskana_task_should_claim_already_claimed_camunda_task() throws Exception {
 
@@ -131,8 +131,8 @@ class TestTaskClaim extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void cancel_claim_of_taskana_task_should_cancel_claim_of_camunda_task() throws Exception {
 
@@ -185,8 +185,8 @@ class TestTaskClaim extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void claim_of_taskana_task_after_cancel_claim_should_claim_task_in_camunda_again()
       throws Exception {
@@ -252,8 +252,8 @@ class TestTaskClaim extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void should_preventLoopFromScheduledMethod_When_TryingToClaimNotAnymoreExistingCamundaTask()
       throws Exception {
@@ -311,8 +311,8 @@ class TestTaskClaim extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void should_preventLoopFromScheduledMethod_When_TryingToCancelClaimNotAnymoreExistingCamundaTask()
       throws Exception {

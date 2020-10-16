@@ -1,5 +1,7 @@
 package pro.taskana.adapter.camunda.outbox.rest.service;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -15,12 +17,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import javax.ws.rs.core.MultivaluedMap;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +31,8 @@ import spinjar.com.fasterxml.jackson.databind.JsonNode;
 import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
 
 import pro.taskana.adapter.camunda.TaskanaConfigurationProperties;
+import pro.taskana.adapter.camunda.outbox.rest.exception.CamundaTaskEventNotFoundException;
+import pro.taskana.adapter.camunda.outbox.rest.exception.InvalidArgumentException;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
 import pro.taskana.adapter.camunda.util.ReadPropertiesHelper;
 
@@ -38,6 +43,10 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
   private static final String CREATE = "create";
   private static final String COMPLETE = "complete";
   private static final String DELETE = "delete";
+  private static final String RETRIES = "retries";
+  private static final String TYPE = "type";
+
+  private static final List<String> ALLOWED_PARAMS = Stream.of(TYPE, RETRIES).collect(toList());
 
   private static final String OUTBOX_SCHEMA = getSchemaFromProperties();
   private static final String SQL_GET_CREATE_EVENTS =
@@ -48,7 +57,7 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
   private static final String SQL_GET_COMPLETE_AND_DELETE_EVENTS =
       "select * from %s.event_store where type = ? OR type = ? fetch first %d rows only";
   private static final String SQL_GET_EVENTS_FILTERED_BY_RETRIES =
-      "select * from %s.event_store where remaining_retries<= ?";
+      "select * from %s.event_store where remaining_retries = ?";
   private static final String SQL_GET_EVENTS_COUNT =
       "select count(id) from %s.event_store where remaining_retries = ?";
   private static final String SQL_WITHOUT_PLACEHOLDERS_DELETE_EVENTS =
@@ -66,7 +75,7 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
       "delete from %s.event_store where remaining_retries <= 0 ";
   private static final int MAX_NUMBER_OF_EVENTS_DEFAULT = 50;
 
-  private static ObjectMapper objectMapper = new ObjectMapper();
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   private static Properties outboxProperties;
   private static int maxNumberOfEventsReturned = 0;
@@ -90,23 +99,33 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
       LOGGER.warn("attempted to retrieve max number of events to be returned and caught ", e);
     }
     LOGGER.info(
-        "Outbox Rest Api will return at max {} events per request",
-        Integer.valueOf(maxNumberOfEventsReturned));
+        "Outbox Rest Api will return at max {} events per request", maxNumberOfEventsReturned);
   }
 
   private DataSource dataSource = null;
 
-  public List<CamundaTaskEvent> getEvents(List<String> requestedEventTypes) {
+  public List<CamundaTaskEvent> getEvents(MultivaluedMap<String, String> filterParams)
+      throws InvalidArgumentException {
 
-    List<CamundaTaskEvent> camundaTaskEvents = new ArrayList<>();
+    verifyNoInvalidParameters(filterParams);
 
-    if (requestedEventTypes.contains(CREATE)) {
+    List<CamundaTaskEvent> camundaTaskEvents;
+
+    if (filterParams.containsKey(TYPE) && filterParams.get(TYPE).contains(CREATE)) {
 
       camundaTaskEvents = getCreateEvents();
 
-    } else if (requestedEventTypes.contains(DELETE) && requestedEventTypes.contains(COMPLETE)) {
+    } else if (filterParams.containsKey(TYPE)
+        && filterParams.get(TYPE).contains(DELETE)
+        && filterParams.get(TYPE).contains(COMPLETE)) {
 
       camundaTaskEvents = getCompleteAndDeleteEvents();
+
+    } else if (filterParams.containsKey(RETRIES) && filterParams.get(RETRIES) != null) {
+
+      int remainingRetries = getRetries(filterParams.get(RETRIES));
+
+      camundaTaskEvents = getEventsFilteredByRetries(remainingRetries);
     } else {
       camundaTaskEvents = getAllEvents();
     }
@@ -150,9 +169,9 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
     try (Connection connection = getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-      JsonNode id = objectMapper.readTree(eventIdAndErrorLog).get("taskEventId");
+      JsonNode id = OBJECT_MAPPER.readTree(eventIdAndErrorLog).get("taskEventId");
 
-      JsonNode errorLog = objectMapper.readTree(eventIdAndErrorLog).get("errorLog");
+      JsonNode errorLog = OBJECT_MAPPER.readTree(eventIdAndErrorLog).get("errorLog");
 
       Instant blockedUntil = getBlockedUntil();
 
@@ -215,18 +234,19 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
     return eventsCount;
   }
 
-  public CamundaTaskEvent setRemainingRetries(int id, Map<String, Integer> newRemainingRetries) {
+  public CamundaTaskEvent setRemainingRetries(int id, int retriesToSet)
+      throws CamundaTaskEventNotFoundException {
 
     CamundaTaskEvent event = getEvent(id);
 
-    event.setRemainingRetries(newRemainingRetries.get("remainingRetries"));
+    event.setRemainingRetries(retriesToSet);
 
     String setRemainingRetriesSql = String.format(SQL_SET_REMAINING_RETRIES, OUTBOX_SCHEMA);
 
     try (Connection connection = getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(setRemainingRetriesSql)) {
 
-      preparedStatement.setInt(1, newRemainingRetries.get("remainingRetries"));
+      preparedStatement.setInt(1, retriesToSet);
       preparedStatement.setInt(2, id);
       preparedStatement.execute();
 
@@ -239,13 +259,12 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
   }
 
   public List<CamundaTaskEvent> setRemainingRetriesForMultipleEvents(
-      int retries, Map<String, Integer> newRemainingRetries) {
+      int retries, int retriesToSet) {
 
     List<CamundaTaskEvent> camundaTaskEventsFilteredByRetries = getEventsFilteredByRetries(retries);
 
     camundaTaskEventsFilteredByRetries.forEach(
-        camundaTaskEvent ->
-            camundaTaskEvent.setRemainingRetries(newRemainingRetries.get("remainingRetries")));
+        camundaTaskEvent -> camundaTaskEvent.setRemainingRetries(retriesToSet));
 
     String setRemainingRetriesForAllFilteredByRetriesSql =
         String.format(SQL_SET_REMAINING_RETRIES_FOR_MULTIPLE_EVENTS, OUTBOX_SCHEMA);
@@ -254,7 +273,7 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
         PreparedStatement preparedStatement =
             connection.prepareStatement(setRemainingRetriesForAllFilteredByRetriesSql)) {
 
-      preparedStatement.setInt(1, newRemainingRetries.get("remainingRetries"));
+      preparedStatement.setInt(1, retriesToSet);
       preparedStatement.setInt(2, retries);
       preparedStatement.execute();
 
@@ -299,7 +318,7 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
     }
   }
 
-  public CamundaTaskEvent getEvent(int id) {
+  public CamundaTaskEvent getEvent(int id) throws CamundaTaskEventNotFoundException {
 
     String sql = String.format(SQL_GET_EVENT, OUTBOX_SCHEMA);
 
@@ -325,11 +344,11 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
         return camundaTaskEvent;
       }
 
-    } catch (SQLException throwables) {
-      throwables.printStackTrace();
+    } catch (SQLException e) {
+      LOGGER.error("Caughr exception while trying to retrieve camunda task event", e);
     }
 
-    throw new RuntimeException("camunda task event not found");
+    throw new CamundaTaskEventNotFoundException("camunda task event not found");
   }
 
   public List<CamundaTaskEvent> getAllEvents() {
@@ -348,6 +367,29 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
       LOGGER.warn("Caught Exception while trying to retrieve all events from the outbox", e);
     }
     return camundaTaskEvents;
+  }
+
+  private int getRetries(List<String> retries) throws InvalidArgumentException {
+
+    try {
+      return Integer.parseInt(retries.get(0));
+
+    } catch (NumberFormatException e) {
+      throw new InvalidArgumentException("retries param must be of type Integer!");
+    }
+  }
+
+  private void verifyNoInvalidParameters(MultivaluedMap<String, String> filterParams)
+      throws InvalidArgumentException {
+
+    List<String> invalidParams =
+        filterParams.keySet().stream()
+            .filter(key -> !ALLOWED_PARAMS.contains(key))
+            .collect(Collectors.toList());
+
+    if (!invalidParams.isEmpty()) {
+      throw new InvalidArgumentException("Provided invalid request params: " + invalidParams);
+    }
   }
 
   private Instant getBlockedUntil() {
@@ -372,9 +414,7 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
 
     try (Connection connection = getConnection()) {
 
-      String sql =
-          String.format(
-              SQL_GET_CREATE_EVENTS, OUTBOX_SCHEMA, Integer.valueOf(maxNumberOfEventsReturned));
+      String sql = String.format(SQL_GET_CREATE_EVENTS, OUTBOX_SCHEMA, maxNumberOfEventsReturned);
       try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
         preparedStatement.setString(1, CREATE);
@@ -417,6 +457,7 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
       camundaTaskEvent.setRemainingRetries(createEventsResultSet.getInt(5));
       camundaTaskEvent.setBlockedUntil(createEventsResultSet.getString(6));
       camundaTaskEvent.setError(createEventsResultSet.getString(7));
+      camundaTaskEvent.setCamundaTaskId(createEventsResultSet.getString(8));
 
       camundaTaskEvents.add(camundaTaskEvent);
     }
@@ -433,7 +474,7 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
       JsonNode idsAsJsonArrayNode = objectMapper.readTree(idsAsJsonArray).get("taskCreationIds");
 
       if (idsAsJsonArrayNode != null) {
-        idsAsJsonArrayNode.forEach(id -> idsAsIntegers.add(Integer.valueOf(id.asInt())));
+        idsAsJsonArrayNode.forEach(id -> idsAsIntegers.add(id.asInt()));
       }
 
     } catch (IOException e) {
@@ -450,10 +491,7 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
     List<CamundaTaskEvent> camundaTaskEvents = new ArrayList<>();
 
     String sql =
-        String.format(
-            SQL_GET_COMPLETE_AND_DELETE_EVENTS,
-            OUTBOX_SCHEMA,
-            Integer.valueOf(maxNumberOfEventsReturned));
+        String.format(SQL_GET_COMPLETE_AND_DELETE_EVENTS, OUTBOX_SCHEMA, maxNumberOfEventsReturned);
     try (Connection connection = getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
@@ -464,7 +502,8 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
       camundaTaskEvents = getCamundaTaskEvents(completeAndDeleteEventsResultSet);
 
     } catch (SQLException | NullPointerException e) {
-      LOGGER.warn("Caught {} while trying to retrieve complete/delete events from the outbox", e);
+      LOGGER.warn(
+          "Caught exception while trying to retrieve complete/delete events from the outbox", e);
     }
 
     return camundaTaskEvents;

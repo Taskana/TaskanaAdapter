@@ -10,9 +10,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
+import pro.taskana.adapter.camunda.outbox.rest.exception.CamundaTaskEventNotFoundException;
+import pro.taskana.adapter.camunda.outbox.rest.exception.InvalidArgumentException;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEventList;
 import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventListResource;
@@ -33,40 +38,13 @@ public class CamundaTaskEventsController {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getEvents(
-      @QueryParam("type") final List<String> requestedEventTypes,
-      @QueryParam("retries") final String retries) {
+  public Response getEvents(@Context UriInfo uriInfo) throws InvalidArgumentException {
 
     CamundaTaskEventList camundaTaskEventList = new CamundaTaskEventList();
 
-    if (!requestedEventTypes.isEmpty()) {
+    MultivaluedMap<String, String> filterParams = uriInfo.getQueryParameters();
 
-      List<CamundaTaskEvent> camundaTaskEvents =
-          camundaTaskEventService.getEvents(requestedEventTypes);
-
-      camundaTaskEventList.setCamundaTaskEvents(camundaTaskEvents);
-
-      CamundaTaskEventListResource camundaTaskEventListResource =
-          camundaTaskEventListResourceAssembler.toResource(camundaTaskEventList);
-
-      return Response.status(200).entity(camundaTaskEventListResource).build();
-    }
-
-    if (retries != null) {
-
-      int remainingRetries = Integer.valueOf(retries);
-      List<CamundaTaskEvent> failedCamundaTaskEvents =
-          camundaTaskEventService.getEventsFilteredByRetries(remainingRetries);
-
-      camundaTaskEventList.setCamundaTaskEvents(failedCamundaTaskEvents);
-
-      CamundaTaskEventListResource failedCamundaTaskEventListResource =
-          camundaTaskEventListResourceAssembler.toResource(camundaTaskEventList);
-
-      return Response.status(200).entity(failedCamundaTaskEventListResource).build();
-    }
-
-    List<CamundaTaskEvent> camundaTaskEvents = camundaTaskEventService.getAllEvents();
+    List<CamundaTaskEvent> camundaTaskEvents = camundaTaskEventService.getEvents(filterParams);
 
     camundaTaskEventList.setCamundaTaskEvents(camundaTaskEvents);
 
@@ -79,7 +57,8 @@ public class CamundaTaskEventsController {
   @Path(Mapping.URL_EVENT)
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getEvent(@PathParam("eventId") final int eventId) {
+  public Response getEvent(@PathParam("eventId") final int eventId)
+      throws CamundaTaskEventNotFoundException {
 
     CamundaTaskEvent camundaTaskEvent = camundaTaskEventService.getEvent(eventId);
 
@@ -102,9 +81,11 @@ public class CamundaTaskEventsController {
   @Path(Mapping.URL_DECREASE_REMAINING_RETRIES)
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response decreaseRemainingRetriesAndLogError(String eventIdsOfTasksFailedToStart) {
+  public Response decreaseRemainingRetriesAndLogError(
+      String eventIdOfTaskFailedToStartAndErrorLog) {
 
-    camundaTaskEventService.decreaseRemainingRetriesAndLogError(eventIdsOfTasksFailedToStart);
+    camundaTaskEventService.decreaseRemainingRetriesAndLogError(
+        eventIdOfTaskFailedToStartAndErrorLog);
 
     return Response.status(204).build();
   }
@@ -114,10 +95,18 @@ public class CamundaTaskEventsController {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response setRemainingRetries(
-      @PathParam("eventId") int eventId, Map<String, Integer> newRemainingRetries) {
+      @PathParam("eventId") int eventId, Map<String, Integer> newRemainingRetries)
+      throws InvalidArgumentException, CamundaTaskEventNotFoundException {
+
+    if (newRemainingRetries == null || !newRemainingRetries.containsKey("remainingRetries")) {
+      throw new InvalidArgumentException(
+          "Please provide a valid json body in the format {\"remainingRetries\":3}");
+    }
+
+    int retriesToSet = newRemainingRetries.get("remainingRetries");
 
     CamundaTaskEvent camundaTaskEvent =
-        camundaTaskEventService.setRemainingRetries(eventId, newRemainingRetries);
+        camundaTaskEventService.setRemainingRetries(eventId, retriesToSet);
 
     CamundaTaskEventResource camundaTaskEventResource =
         camundaTaskEventResourceAssembler.toResource(camundaTaskEvent);
@@ -129,17 +118,25 @@ public class CamundaTaskEventsController {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response setRemainingRetriesForMultipleEvents(
-      @QueryParam("retries") final String retries, Map<String, Integer> newRemainingRetries) {
+      @QueryParam("retries") final String retries, Map<String, Integer> newRemainingRetries)
+      throws InvalidArgumentException {
 
     if (retries == null || retries.isEmpty()) {
-      String invalidQueryParam = "Please provide a valid \"retries\" query parameter";
-      return Response.status(400).entity(invalidQueryParam).build();
+      throw new InvalidArgumentException("Please provide a valid \"retries\" query parameter");
     }
 
-    int remainingRetries = Integer.valueOf(retries);
+    if (newRemainingRetries == null || !newRemainingRetries.containsKey("remainingRetries")) {
+      throw new InvalidArgumentException(
+          "Please provide a valid json body in the format {\"remainingRetries\":3}");
+    }
+
+    int retriesToSet = newRemainingRetries.get("remainingRetries");
+
+    int remainingRetries = Integer.parseInt(retries);
+
     List<CamundaTaskEvent> camundaTaskEvents =
         camundaTaskEventService.setRemainingRetriesForMultipleEvents(
-            remainingRetries, newRemainingRetries);
+            remainingRetries, retriesToSet);
 
     CamundaTaskEventList camundaTaskEventList = new CamundaTaskEventList();
     camundaTaskEventList.setCamundaTaskEvents(camundaTaskEvents);

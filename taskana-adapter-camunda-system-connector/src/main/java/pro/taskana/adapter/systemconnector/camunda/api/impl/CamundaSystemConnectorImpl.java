@@ -15,7 +15,7 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
 
   static final String URL_GET_CAMUNDA_CREATE_EVENTS = "/events?type=create";
   static final String URL_GET_CAMUNDA_FINISHED_EVENTS = "/events?type=complete&type=delete";
-  static final String URL_DELETE_CAMUNDA_EVENTS = "/events/delete";
+  static final String URL_DELETE_CAMUNDA_EVENTS = "/events/delete-successful-events";
   static final String URL_CAMUNDA_EVENT_DECREASE_REMAINING_RETRIES =
       "/events/%d/decrease-remaining-retries";
 
