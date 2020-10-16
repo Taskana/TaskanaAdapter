@@ -19,6 +19,7 @@ public class CamundaTaskEventResourceAssembler {
     camundaTaskEventResource.setRemainingRetries(camundaTaskEvent.getRemainingRetries());
     camundaTaskEventResource.setBlockedUntil(camundaTaskEvent.getBlockedUntil());
     camundaTaskEventResource.setError(camundaTaskEvent.getError());
+    camundaTaskEventResource.setCamundaTaskId(camundaTaskEvent.getCamundaTaskId());
 
     return camundaTaskEventResource;
   }
@@ -34,6 +35,7 @@ public class CamundaTaskEventResourceAssembler {
     camundaTaskEvent.setRemainingRetries(camundaTaskEventResource.getRemainingRetries());
     camundaTaskEvent.setBlockedUntil(camundaTaskEventResource.getBlockedUntil());
     camundaTaskEvent.setError(camundaTaskEventResource.getError());
+    camundaTaskEvent.setCamundaTaskId(camundaTaskEventResource.getCamundaTaskId());
 
     return camundaTaskEvent;
   }

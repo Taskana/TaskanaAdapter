@@ -20,9 +20,9 @@ import pro.taskana.common.api.TaskanaEngine.ConnectionManagementMode;
 import pro.taskana.common.api.exceptions.DomainNotFoundException;
 import pro.taskana.common.api.exceptions.InvalidArgumentException;
 import pro.taskana.common.api.exceptions.NotAuthorizedException;
+import pro.taskana.common.test.security.JaasExtension;
+import pro.taskana.common.test.security.WithAccessId;
 import pro.taskana.impl.configuration.DbCleaner;
-import pro.taskana.security.JaasExtension;
-import pro.taskana.security.WithAccessId;
 import pro.taskana.task.api.TaskService;
 import pro.taskana.workbasket.api.WorkbasketPermission;
 import pro.taskana.workbasket.api.WorkbasketService;
@@ -36,6 +36,7 @@ import pro.taskana.workbasket.api.models.WorkbasketAccessItem;
 
 /** Parent class for integrationtests for the TASKANA-Adapter. */
 @ExtendWith(JaasExtension.class)
+@SuppressWarnings("checkstyle:LineLength")
 public abstract class AbsIntegrationTest {
 
   protected static TaskanaEngine taskanaEngine;
@@ -83,7 +84,7 @@ public abstract class AbsIntegrationTest {
   private DataSource taskanaDataSource;
 
   @BeforeEach
-  @WithAccessId(userName = "admin")
+  @WithAccessId(user = "admin")
   public void setUp() throws Exception {
     // set up database connection staticly and only once.
     if (!isInitialised) {

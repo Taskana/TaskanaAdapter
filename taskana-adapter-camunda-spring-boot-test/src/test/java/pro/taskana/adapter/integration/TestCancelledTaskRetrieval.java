@@ -16,8 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
-import pro.taskana.security.JaasExtension;
-import pro.taskana.security.WithAccessId;
+import pro.taskana.common.test.security.JaasExtension;
+import pro.taskana.common.test.security.WithAccessId;
 import pro.taskana.task.api.TaskState;
 import pro.taskana.task.api.exceptions.InvalidStateException;
 import pro.taskana.task.api.exceptions.TaskNotFoundException;
@@ -38,8 +38,8 @@ class TestCancelledTaskRetrieval extends AbsIntegrationTest {
   @Autowired private JobExecutor jobExecutor;
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"admin"})
   @Test
   void deletion_of_taskana_task_should_delete_camunda_task_and_process() throws Exception {
     String processInstanceId =
@@ -86,8 +86,8 @@ class TestCancelledTaskRetrieval extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void deletion_of_camunda_process_instance_should_terminate_taskana_task() throws Exception {
     String processInstanceId =
@@ -130,8 +130,8 @@ class TestCancelledTaskRetrieval extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"admin"})
   @Test
   void deletion_of_taskana_task_with_deleted_camunda_task_should_be_handled_gracefully()
       throws Exception {
@@ -168,8 +168,8 @@ class TestCancelledTaskRetrieval extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void interruption_of_camunda_task_by_timer_should_cancel_taskana_task() throws Exception {
     String processInstanceId =
@@ -212,8 +212,8 @@ class TestCancelledTaskRetrieval extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void should_CompleteCamundaTask_When_CancellingTaskanaTask() throws Exception {
     String processInstanceId =
@@ -236,7 +236,7 @@ class TestCancelledTaskRetrieval extends AbsIntegrationTest {
 
       Thread.sleep(1000 + (long) (this.jobExecutor.getMaxWait() * 1.2));
 
-      //check if camunda task got completed and therefore doesn't exist anymore
+      // check if camunda task got completed and therefore doesn't exist anymore
       boolean taskRetrievalSuccessful =
           this.camundaProcessengineRequester.getTaskFromTaskId(camundaTaskId);
       assertThat(taskRetrievalSuccessful).isFalse();

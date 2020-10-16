@@ -6,6 +6,8 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import pro.taskana.adapter.camunda.outbox.rest.controller.CamundaTaskEventsController;
+import pro.taskana.adapter.camunda.outbox.rest.exception.CamundaTaskEventNotFoundExceptionMapper;
+import pro.taskana.adapter.camunda.outbox.rest.exception.InvalidArgumentExceptionMapper;
 
 /** Configures the outbox REST service. */
 @ApplicationPath("/outbox-rest")
@@ -15,6 +17,8 @@ public class OutboxRestServiceConfig extends Application {
   public Set<Class<?>> getClasses() {
     Set<Class<?>> classesToBeScanned = new HashSet<>();
     classesToBeScanned.add(CamundaTaskEventsController.class);
+    classesToBeScanned.add(InvalidArgumentExceptionMapper.class);
+    classesToBeScanned.add(CamundaTaskEventNotFoundExceptionMapper.class);
     return classesToBeScanned;
   }
 }

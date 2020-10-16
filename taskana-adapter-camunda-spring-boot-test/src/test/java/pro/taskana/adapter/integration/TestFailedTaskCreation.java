@@ -13,10 +13,10 @@ import org.springframework.test.context.ContextConfiguration;
 
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
+import pro.taskana.common.test.security.JaasExtension;
+import pro.taskana.common.test.security.WithAccessId;
 import pro.taskana.impl.configuration.DbCleaner;
 import pro.taskana.impl.configuration.DbCleaner.ApplicationDatabaseType;
-import pro.taskana.security.JaasExtension;
-import pro.taskana.security.WithAccessId;
 
 /** Test class to test failed task creation scenarios from camunda to TASKANA. */
 @SpringBootTest(
@@ -26,18 +26,18 @@ import pro.taskana.security.WithAccessId;
 @ExtendWith(JaasExtension.class)
 @ContextConfiguration
 @SuppressWarnings("checkstyle:LineLength")
-public class TestFailedTaskCreation extends AbsIntegrationTest {
+class TestFailedTaskCreation extends AbsIntegrationTest {
 
   @AfterEach
-  @WithAccessId(userName = "admin")
-  public void resetOutbox() {
+  @WithAccessId(user = "taskadmin")
+  void resetOutbox() {
     DbCleaner cleaner = new DbCleaner();
     cleaner.clearDb(camundaBpmDataSource, ApplicationDatabaseType.OUTBOX);
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void should_CountDownRetriesAndAddToFailedEvents_When_TaskCreationFailedInTaskana()
       throws Exception {
@@ -57,7 +57,7 @@ public class TestFailedTaskCreation extends AbsIntegrationTest {
 
     List<CamundaTaskEvent> failedEvents = taskanaOutboxRequester.getFailedEvents();
 
-    assertThat(failedEvents).hasSize(0);
+    assertThat(failedEvents).isEmpty();
 
     // adapter makes retries
     Thread.sleep(this.adapterRetryAndBlockingInterval);
@@ -68,8 +68,8 @@ public class TestFailedTaskCreation extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void should_LogError_When_TaskCreationFailedInTaskana() throws Exception {
 
@@ -87,7 +87,7 @@ public class TestFailedTaskCreation extends AbsIntegrationTest {
     List<CamundaTaskEvent> failedEvents = taskanaOutboxRequester.getFailedEvents();
 
     // retries still above 0
-    assertThat(failedEvents).hasSize(0);
+    assertThat(failedEvents).isEmpty();
 
     // adapter makes retries
     Thread.sleep(this.adapterRetryAndBlockingInterval);
@@ -98,19 +98,19 @@ public class TestFailedTaskCreation extends AbsIntegrationTest {
     assertThat(failedEvents).hasSize(3);
 
     assertThat(failedEvents)
-        .extracting(CamundaTaskEvent::getError)
-        .extracting(error -> error.split(":")[0])
+        .extracting(CamundaTaskEvent::getCamundaTaskId)
         .containsExactlyInAnyOrderElementsOf(camundaTaskIds);
 
     assertThat(failedEvents)
         .extracting(CamundaTaskEvent::getError)
-        .extracting(error -> error.split(":")[1])
-        .contains("pro.taskana.workbasket.api.exceptions.WorkbasketNotFoundException");
+        .containsOnly(
+            "pro.taskana.workbasket.api.exceptions.WorkbasketNotFoundException: "
+                + "Workbasket with key invalidWorkbasketKey and domain null was not found.");
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void should_DeleteFailedEvent_When_CallingDeleteEndpoint() throws Exception {
 
@@ -140,8 +140,8 @@ public class TestFailedTaskCreation extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void should_DeleteAllFailedEvents_When_CallingDeleteAllFailedEndpoint() throws Exception {
 
@@ -168,12 +168,12 @@ public class TestFailedTaskCreation extends AbsIntegrationTest {
 
     failedEvents = taskanaOutboxRequester.getFailedEvents();
 
-    assertThat(failedEvents).hasSize(0);
+    assertThat(failedEvents).isEmpty();
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void should_SetRetryForFailedEvent_When_CallingSetRetriesEndpoint() throws Exception {
 
@@ -206,8 +206,8 @@ public class TestFailedTaskCreation extends AbsIntegrationTest {
   }
 
   @WithAccessId(
-      userName = "teamlead_1",
-      groupNames = {"admin"})
+      user = "teamlead_1",
+      groups = {"taskadmin"})
   @Test
   void should_SetRetryForAllFailedEvents_When_CallingSetRetriesForAllFailedEndpoint()
       throws Exception {
@@ -236,6 +236,6 @@ public class TestFailedTaskCreation extends AbsIntegrationTest {
 
     failedEvents = taskanaOutboxRequester.getFailedEvents();
 
-    assertThat(failedEvents).hasSize(0);
+    assertThat(failedEvents).isEmpty();
   }
 }

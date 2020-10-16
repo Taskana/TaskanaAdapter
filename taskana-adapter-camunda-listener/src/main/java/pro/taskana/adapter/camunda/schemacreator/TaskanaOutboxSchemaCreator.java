@@ -23,10 +23,11 @@ public class TaskanaOutboxSchemaCreator {
   private static final String POSTGRESQL = "PostgreSQL";
   private static final String H2 = "H2";
   private static final String SQL = "/sql";
-  private static final String DB_SCHEMA = SQL + "/taskana-outbox-schema.sql";
-  private static final String DB_SCHEMA_DB2 = SQL + "/taskana-outbox-schema-db2.sql";
-  private static final String DB_SCHEMA_POSTGRES = SQL + "/taskana-outbox-schema-postgres.sql";
-  private static final String DB_SCHEMA_ORACLE = SQL + "/taskana-outbox-schema-oracle.sql";
+  private static final String DB_SCHEMA = SQL + "/h2/taskana-outbox-schema.sql";
+  private static final String DB_SCHEMA_DB2 = SQL + "/db2/taskana-outbox-schema-db2.sql";
+  private static final String DB_SCHEMA_POSTGRES =
+      SQL + "/postgres/taskana-outbox-schema-postgres.sql";
+  private static final String DB_SCHEMA_ORACLE = SQL + "/oracle/taskana-outbox-schema-oracle.sql";
 
   private DataSource dataSource;
   private String schemaName;

@@ -40,7 +40,7 @@ public class TaskanaOutboxRequester {
 
   public boolean deleteAllFailedEvents() throws JSONException {
 
-    String url = BASIC_OUTBOX_PATH + "/deleteFailedEvents";
+    String url = BASIC_OUTBOX_PATH + "/delete-failed-events";
 
     HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
     ResponseEntity<String> answer =
