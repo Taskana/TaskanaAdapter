@@ -5,7 +5,7 @@
         <parent>
                 <artifactId>taskana-adapter-parent</artifactId>
                 <groupId>pro.taskana</groupId>
-                <version>0.9.9-SNAPSHOT</version>
+                <version>1.0.1-SNAPSHOT</version>
                 <relativePath>../pom.xml</relativePath>
         </parent>
 
