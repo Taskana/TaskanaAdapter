@@ -3,7 +3,6 @@ package pro.taskana.adapter.camunda.outbox.rest.service;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.naming.InitialContext;
@@ -30,14 +28,13 @@ import org.slf4j.LoggerFactory;
 import spinjar.com.fasterxml.jackson.databind.JsonNode;
 import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
 
-import pro.taskana.adapter.camunda.TaskanaConfigurationProperties;
+import pro.taskana.adapter.camunda.OutboxRestConfigurationProperties;
 import pro.taskana.adapter.camunda.outbox.rest.exception.CamundaTaskEventNotFoundException;
 import pro.taskana.adapter.camunda.outbox.rest.exception.InvalidArgumentException;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
-import pro.taskana.adapter.camunda.util.ReadPropertiesHelper;
 
 /** Implementation of the Outbox REST service. */
-public class CamundaTaskEventsService implements TaskanaConfigurationProperties {
+public class CamundaTaskEventsService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskEventsService.class);
   private static final String CREATE = "create";
@@ -48,7 +45,7 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
 
   private static final List<String> ALLOWED_PARAMS = Stream.of(TYPE, RETRIES).collect(toList());
 
-  private static final String OUTBOX_SCHEMA = getSchemaFromProperties();
+  private static final String OUTBOX_SCHEMA = OutboxRestConfigurationProperties.getOutboxSchema();
   private static final String SQL_GET_CREATE_EVENTS =
       "select * from %s.event_store where type = ? "
           + "and remaining_retries>0 and blocked_until < ? fetch first %d rows only";
@@ -73,30 +70,15 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
       "delete from %s.event_store where id = ? and remaining_retries <=0";
   private static final String SQL_DELETE_ALL_FAILED_EVENTS =
       "delete from %s.event_store where remaining_retries <= 0 ";
-  private static final int MAX_NUMBER_OF_EVENTS_DEFAULT = 50;
 
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-  private static Properties outboxProperties;
   private static int maxNumberOfEventsReturned = 0;
 
   static {
-    try {
-      Properties properties = getProperties();
-      if (maxNumberOfEventsReturned == 0) {
-        String maxNumberOfEventsString =
-            properties.getProperty(TASKANA_ADAPTER_OUTBOX_MAX_NUMBER_OF_EVENTS);
-        if (maxNumberOfEventsString != null && !maxNumberOfEventsString.isEmpty()) {
-          maxNumberOfEventsReturned = Integer.parseInt(maxNumberOfEventsString);
-        } else {
-          maxNumberOfEventsReturned = MAX_NUMBER_OF_EVENTS_DEFAULT;
-        }
-      }
-    } catch (IOException | NumberFormatException e) {
-      if (maxNumberOfEventsReturned == 0) {
-        maxNumberOfEventsReturned = MAX_NUMBER_OF_EVENTS_DEFAULT;
-      }
-      LOGGER.warn("attempted to retrieve max number of events to be returned and caught ", e);
+    if (maxNumberOfEventsReturned == 0) {
+      maxNumberOfEventsReturned =
+          OutboxRestConfigurationProperties.getOutboxMaxNumberOfEvents();
     }
     LOGGER.info(
         "Outbox Rest Api will return at max {} events per request", maxNumberOfEventsReturned);
@@ -174,7 +156,6 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
       JsonNode errorLog = OBJECT_MAPPER.readTree(eventIdAndErrorLog).get("errorLog");
 
       Instant blockedUntil = getBlockedUntil();
-
       preparedStatement.setTimestamp(1, Timestamp.from(blockedUntil));
       preparedStatement.setString(2, errorLog.asText());
       preparedStatement.setInt(3, id.asInt());
@@ -395,10 +376,7 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
   private Instant getBlockedUntil() {
 
     Duration blockedDuration =
-        Duration.parse(
-            ReadPropertiesHelper.getPropertyValueFromFile(
-                TASKANA_OUTBOX_PROPERTIES,
-                TASKANA_ADAPTER_OUTBOX_DURATION_BETWEEN_TASK_CREATION_RETRIES));
+        OutboxRestConfigurationProperties.getDurationBetweenTaskCreationRetries();
 
     return Instant.now().plus(blockedDuration);
   }
@@ -540,9 +518,8 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
 
   private DataSource getDataSourceFromPropertiesFile() {
     try {
-      Properties properties = getProperties();
-      String jndiUrl = properties.getProperty(TASKANA_ADAPTER_OUTBOX_DATASOURCE_JNDI);
 
+      String jndiUrl = OutboxRestConfigurationProperties.getOutboxDatasourceJndi();
       if (jndiUrl != null) {
         dataSource = (DataSource) new InitialContext().lookup(jndiUrl);
 
@@ -550,60 +527,19 @@ public class CamundaTaskEventsService implements TaskanaConfigurationProperties 
 
         dataSource =
             createDatasource(
-                properties.getProperty(TASKANA_ADAPTER_OUTBOX_DATASOURCE_DRIVER),
-                properties.getProperty(TASKANA_ADAPTER_OUTBOX_DATASOURCE_URL),
-                properties.getProperty(TASKANA_ADAPTER_OUTBOX_DATASOURCE_USERNAME),
-                properties.getProperty(TASKANA_ADAPTER_OUTBOX_DATASOURCE_PASSWORD));
+                OutboxRestConfigurationProperties.getOutboxDatasourceDriver(),
+                OutboxRestConfigurationProperties.getOutboxDatasourceUrl(),
+                OutboxRestConfigurationProperties.getOutboxDatasourceUsername(),
+                OutboxRestConfigurationProperties.getOutboxDatasourcePassword());
       }
 
-    } catch (IOException | NamingException | NullPointerException e) {
+    } catch (NamingException | NullPointerException e) {
       LOGGER.warn(
           "Caught {} while trying to retrieve the datasource from the provided properties file",
           e.getClass().getName());
     }
 
     return dataSource;
-  }
-
-  private static Properties getProperties() throws IOException {
-    if (outboxProperties == null) {
-      InputStream propertiesInputStream =
-          CamundaTaskEventsService.class
-              .getClassLoader()
-              .getResourceAsStream(TASKANA_OUTBOX_PROPERTIES);
-      outboxProperties = new Properties();
-      outboxProperties.load(propertiesInputStream);
-    }
-    return outboxProperties;
-  }
-
-  private static String getSchemaFromProperties() {
-
-    String defaultSchema = "taskana_tables";
-
-    InputStream propertiesStream =
-        CamundaTaskEventsService.class
-            .getClassLoader()
-            .getResourceAsStream(TASKANA_OUTBOX_PROPERTIES);
-
-    Properties properties = new Properties();
-    String outboxSchema = null;
-
-    try {
-
-      properties.load(propertiesStream);
-      outboxSchema = properties.getProperty(TASKANA_ADAPTER_OUTBOX_SCHEMA);
-
-    } catch (IOException | NullPointerException e) {
-      LOGGER.warn(
-          "Caught Exception {} while trying to retrieve the outbox-schema "
-              + "from the provided properties file.",
-          e.getClass().getName());
-    }
-
-    outboxSchema = (outboxSchema == null || outboxSchema.isEmpty()) ? defaultSchema : outboxSchema;
-
-    return outboxSchema;
   }
 
   private String formatDate(Date date) {
