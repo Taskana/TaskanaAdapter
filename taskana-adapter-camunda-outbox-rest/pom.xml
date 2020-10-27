@@ -65,6 +65,11 @@
                         <artifactId>mybatis</artifactId>
                         <version>${version.mybatis}</version>
                 </dependency>
+                <dependency>
+                        <groupId>pro.taskana</groupId>
+                        <artifactId>taskana-common</artifactId>
+                        <version>${version.taskana}</version>
+                </dependency>
         </dependencies>
 
 

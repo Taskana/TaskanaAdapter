@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import spinjar.com.fasterxml.jackson.databind.JsonNode;
 import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
 
-import pro.taskana.adapter.camunda.OutboxRestConfigurationProperties;
+import pro.taskana.adapter.camunda.OutboxRestConfiguration;
 import pro.taskana.adapter.camunda.outbox.rest.exception.CamundaTaskEventNotFoundException;
 import pro.taskana.adapter.camunda.outbox.rest.exception.InvalidArgumentException;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
@@ -45,7 +45,7 @@ public class CamundaTaskEventsService {
 
   private static final List<String> ALLOWED_PARAMS = Stream.of(TYPE, RETRIES).collect(toList());
 
-  private static final String OUTBOX_SCHEMA = OutboxRestConfigurationProperties.getOutboxSchema();
+  private static final String OUTBOX_SCHEMA = OutboxRestConfiguration.getOutboxSchema();
   private static final String SQL_GET_CREATE_EVENTS =
       "select * from %s.event_store where type = ? "
           + "and remaining_retries>0 and blocked_until < ? fetch first %d rows only";
@@ -78,7 +78,7 @@ public class CamundaTaskEventsService {
   static {
     if (maxNumberOfEventsReturned == 0) {
       maxNumberOfEventsReturned =
-          OutboxRestConfigurationProperties.getOutboxMaxNumberOfEvents();
+          OutboxRestConfiguration.getOutboxMaxNumberOfEvents();
     }
     LOGGER.info(
         "Outbox Rest Api will return at max {} events per request", maxNumberOfEventsReturned);
@@ -376,7 +376,7 @@ public class CamundaTaskEventsService {
   private Instant getBlockedUntil() {
 
     Duration blockedDuration =
-        OutboxRestConfigurationProperties.getDurationBetweenTaskCreationRetries();
+        OutboxRestConfiguration.getDurationBetweenTaskCreationRetries();
 
     return Instant.now().plus(blockedDuration);
   }
@@ -519,7 +519,7 @@ public class CamundaTaskEventsService {
   private DataSource getDataSourceFromPropertiesFile() {
     try {
 
-      String jndiUrl = OutboxRestConfigurationProperties.getOutboxDatasourceJndi();
+      String jndiUrl = OutboxRestConfiguration.getOutboxDatasourceJndi();
       if (jndiUrl != null) {
         dataSource = (DataSource) new InitialContext().lookup(jndiUrl);
 
@@ -527,10 +527,10 @@ public class CamundaTaskEventsService {
 
         dataSource =
             createDatasource(
-                OutboxRestConfigurationProperties.getOutboxDatasourceDriver(),
-                OutboxRestConfigurationProperties.getOutboxDatasourceUrl(),
-                OutboxRestConfigurationProperties.getOutboxDatasourceUsername(),
-                OutboxRestConfigurationProperties.getOutboxDatasourcePassword());
+                OutboxRestConfiguration.getOutboxDatasourceDriver(),
+                OutboxRestConfiguration.getOutboxDatasourceUrl(),
+                OutboxRestConfiguration.getOutboxDatasourceUsername(),
+                OutboxRestConfiguration.getOutboxDatasourcePassword());
       }
 
     } catch (NamingException | NullPointerException e) {

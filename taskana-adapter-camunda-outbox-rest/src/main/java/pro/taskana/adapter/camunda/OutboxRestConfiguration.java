@@ -2,21 +2,17 @@ package pro.taskana.adapter.camunda;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pro.taskana.adapter.camunda.exceptions.SystemException;
+import pro.taskana.common.api.exceptions.SystemException;
 
-public class CamundaListenerConfigurationProperties {
-
-  private static final String TASKANA_ADAPTER_CREATE_OUTBOX_SCHEMA =
-      "taskana.adapter.create_outbox_schema";
+public class OutboxRestConfiguration {
 
   private static final String TASKANA_OUTBOX_PROPERTIES = "taskana-outbox.properties";
-
   private static final String TASKANA_ADAPTER_OUTBOX_SCHEMA = "taskana.adapter.outbox.schema";
-
   private static final String TASKANA_ADAPTER_OUTBOX_DATASOURCE_JNDI =
       "taskana.adapter.outbox.datasource.jndi";
   private static final String TASKANA_ADAPTER_OUTBOX_DATASOURCE_DRIVER =
@@ -27,21 +23,22 @@ public class CamundaListenerConfigurationProperties {
       "taskana.adapter.outbox.datasource.username";
   private static final String TASKANA_ADAPTER_OUTBOX_DATASOURCE_PASSWORD =
       "taskana.adapter.outbox.datasource.password";
-
-  private static final String TASKANA_ADAPTER_OUTBOX_INITIAL_NUMBER_OF_TASK_CREATION_RETRIES =
-      "taskana.adapter.outbox.initial.number.of.task.creation.retries";
-
+  private static final String TASKANA_ADAPTER_OUTBOX_MAX_NUMBER_OF_EVENTS =
+      "taskana.adapter.outbox.max.number.of.events";
+  private static final String TASKANA_ADAPTER_OUTBOX_DURATION_BETWEEN_TASK_CREATION_RETRIES =
+      "taskana.adapter.outbox.duration.between.task.creation.retries";
   private static final String OUTBOX_SYSTEM_PROPERTY = "taskana.outbox.properties";
-  private static final String OUTBOX_SCHEMA_DEFAULT = "taskana_tables";
-  private static final boolean CREATE_OUTBOX_SCHEMA_DEFAULT = true;
-  private static final int INITIAL_NUMBER_OF_TASK_CREATION_RETRIES_DEFAULT = 5;
 
-  private static final Logger LOGGER =
-      LoggerFactory.getLogger(CamundaListenerConfigurationProperties.class);
+  private static final String OUTBOX_SCHEMA_DEFAULT = "taskana_tables";
+  private static final int MAX_NUMBER_OF_EVENTS_DEFAULT = 50;
+  private static final Duration DURATION_BETWEEN_TASK_CREATION_RETRIES_DEFAULT =
+      Duration.ofHours(1);
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(OutboxRestConfiguration.class);
 
   private final Properties outboxProperties = new Properties();
 
-  private CamundaListenerConfigurationProperties() {
+  private OutboxRestConfiguration() {
 
     String outboxPropertiesFile = System.getProperty(OUTBOX_SYSTEM_PROPERTY);
 
@@ -51,14 +48,14 @@ public class CamundaListenerConfigurationProperties {
 
         outboxProperties.load(propertiesStream);
 
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug(
-              String.format("Outbox properties were loaded from file %s.", outboxPropertiesFile));
-        }
+        LOGGER.info(
+            String.format("Outbox properties were loaded from file %s.", outboxPropertiesFile));
+
       } catch (Exception e) {
         LOGGER.warn(
             String.format(
-                "Caught Exception while trying to load properties from provided properties file %s. "
+                "Caught Exception while trying to load properties from "
+                    + "provided properties file %s. "
                     + "Trying to read properties from classpath",
                 outboxPropertiesFile),
             e);
@@ -70,23 +67,8 @@ public class CamundaListenerConfigurationProperties {
     }
   }
 
-  public static CamundaListenerConfigurationProperties getInstance() {
-    return CamundaListenerConfigurationProperties.LazyHolder.INSTANCE;
-  }
-
-  public static boolean getCreateOutboxSchema() {
-
-    String createOutboxSchemaProperty =
-        getInstance().outboxProperties.getProperty(TASKANA_ADAPTER_CREATE_OUTBOX_SCHEMA);
-
-    if (createOutboxSchemaProperty == null || createOutboxSchemaProperty.isEmpty()) {
-      LOGGER.info(
-          "Couldn't retrieve boolean property to create schema or not, setting to default ");
-      return CREATE_OUTBOX_SCHEMA_DEFAULT;
-    } else if ("false".equalsIgnoreCase(createOutboxSchemaProperty)) {
-      return false;
-    }
-    return true;
+  public static OutboxRestConfiguration getInstance() {
+    return OutboxRestConfiguration.LazyHolder.INSTANCE;
   }
 
   public static String getOutboxSchema() {
@@ -122,39 +104,58 @@ public class CamundaListenerConfigurationProperties {
     return getInstance().outboxProperties.getProperty(TASKANA_ADAPTER_OUTBOX_DATASOURCE_PASSWORD);
   }
 
-  public static int getInitialNumberOfTaskCreationRetries() {
-    int initialNumberOfTaskCreationRetries = 0;
+  public static int getOutboxMaxNumberOfEvents() {
 
-    String initialNumberOfTaskCreationRetriesProperty =
+    int maxNumberOfEventsReturned;
+
+    String maxNumberOfEventsString =
+        getInstance().outboxProperties.getProperty(TASKANA_ADAPTER_OUTBOX_MAX_NUMBER_OF_EVENTS);
+
+    try {
+      maxNumberOfEventsReturned = Integer.parseInt(maxNumberOfEventsString);
+    } catch (NumberFormatException e) {
+      maxNumberOfEventsReturned = MAX_NUMBER_OF_EVENTS_DEFAULT;
+      LOGGER.warn(
+          String.format(
+              "Attempted to retrieve max number of events to be returned and caught Exception. "
+                  + "Setting default for max number of events to be returned to %d  ",
+              maxNumberOfEventsReturned),
+          e);
+    }
+
+    return maxNumberOfEventsReturned;
+  }
+
+  public static Duration getDurationBetweenTaskCreationRetries() {
+
+    String durationBetweentaskCreationRetriesProperty =
         getInstance()
             .outboxProperties
-            .getProperty(TASKANA_ADAPTER_OUTBOX_INITIAL_NUMBER_OF_TASK_CREATION_RETRIES);
+            .getProperty(TASKANA_ADAPTER_OUTBOX_DURATION_BETWEEN_TASK_CREATION_RETRIES);
 
-    if (initialNumberOfTaskCreationRetriesProperty == null || initialNumberOfTaskCreationRetriesProperty.isEmpty()) {
+    if (durationBetweentaskCreationRetriesProperty == null
+        || durationBetweentaskCreationRetriesProperty.isEmpty()) {
       LOGGER.info(
-          "Couldn't retrieve property entry for initial number of task creation retries, "
+          "Couldn't retrieve property entry for duration between task creation retries, "
               + "setting to default ");
-      initialNumberOfTaskCreationRetries = INITIAL_NUMBER_OF_TASK_CREATION_RETRIES_DEFAULT;
-
+      return DURATION_BETWEEN_TASK_CREATION_RETRIES_DEFAULT;
     } else {
       try {
-        initialNumberOfTaskCreationRetries = Integer.parseInt(initialNumberOfTaskCreationRetriesProperty);
-      } catch (NumberFormatException e) {
-        initialNumberOfTaskCreationRetries = INITIAL_NUMBER_OF_TASK_CREATION_RETRIES_DEFAULT;
+        return Duration.parse(durationBetweentaskCreationRetriesProperty);
+      } catch (Exception e) {
         LOGGER.warn(
             String.format(
-                "Attempted to retrieve initial number of task creation retries and caught "
-                    + "Exception. Setting default for initial number of "
-                    + "task creation retries to %d ",
-                initialNumberOfTaskCreationRetries),
+                "Attempted to retrieve duration between task creation retries and caught Exception."
+                    + "Setting default to %s ",
+                durationBetweentaskCreationRetriesProperty),
             e);
+
+        return DURATION_BETWEEN_TASK_CREATION_RETRIES_DEFAULT;
       }
     }
-    return initialNumberOfTaskCreationRetries;
   }
 
   private void readPropertiesFromClasspath() {
-
     try (InputStream propertiesStream =
         this.getClass().getClassLoader().getResourceAsStream(TASKANA_OUTBOX_PROPERTIES)) {
 
@@ -181,7 +182,6 @@ public class CamundaListenerConfigurationProperties {
   }
 
   private static class LazyHolder {
-    private static final CamundaListenerConfigurationProperties INSTANCE =
-        new CamundaListenerConfigurationProperties();
+    private static final OutboxRestConfiguration INSTANCE = new OutboxRestConfiguration();
   }
 }

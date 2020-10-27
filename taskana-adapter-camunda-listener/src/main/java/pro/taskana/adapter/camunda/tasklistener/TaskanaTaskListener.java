@@ -28,7 +28,7 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pro.taskana.adapter.camunda.CamundaListenerConfigurationProperties;
+import pro.taskana.adapter.camunda.CamundaListenerConfiguration;
 import pro.taskana.adapter.camunda.dto.ReferencedTask;
 import pro.taskana.adapter.camunda.dto.VariableValueDto;
 import pro.taskana.adapter.camunda.mapper.JacksonConfigurator;
@@ -171,7 +171,7 @@ public class TaskanaTaskListener implements TaskListener {
   private void setOutboxSchema(Connection connection) throws SQLException {
 
     if (outboxSchemaName == null) {
-      outboxSchemaName = CamundaListenerConfigurationProperties.getOutboxSchema();
+      outboxSchemaName = CamundaListenerConfiguration.getOutboxSchema();
     }
 
     outboxSchemaName =
@@ -196,7 +196,7 @@ public class TaskanaTaskListener implements TaskListener {
       Timestamp eventCreationTimestamp = Timestamp.from(Instant.now());
 
       int initialRetries =
-          CamundaListenerConfigurationProperties.getInitialNumberOfTaskCreationRetries();
+          CamundaListenerConfiguration.getInitialNumberOfTaskCreationRetries();
 
       preparedStatement.setString(1, delegateTask.getEventName());
       preparedStatement.setTimestamp(2, eventCreationTimestamp);

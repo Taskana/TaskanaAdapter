@@ -15,10 +15,10 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pro.taskana.adapter.camunda.CamundaListenerConfigurationProperties;
-import pro.taskana.adapter.camunda.exceptions.SystemException;
+import pro.taskana.adapter.camunda.CamundaListenerConfiguration;
 import pro.taskana.adapter.camunda.schemacreator.DB;
 import pro.taskana.adapter.camunda.schemacreator.TaskanaOutboxSchemaCreator;
+import pro.taskana.common.api.exceptions.SystemException;
 
 /**
  * Camunda engine plugin responsible for adding the TaskanaParseListener to the
@@ -80,7 +80,7 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
 
     boolean isSchemaPreexisting = schemaCreator.isSchemaPreexisting();
 
-    boolean shouldSchemaBeCreated = CamundaListenerConfigurationProperties.getCreateOutboxSchema();
+    boolean shouldSchemaBeCreated = CamundaListenerConfiguration.getCreateOutboxSchema();
 
     if (!isSchemaPreexisting && shouldSchemaBeCreated) {
 
@@ -113,9 +113,7 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
 
   private String initSchemaName(DataSource dataSource) {
 
-    String outboxSchema = CamundaListenerConfigurationProperties.getOutboxSchema();
-    outboxSchema =
-        (outboxSchema == null || outboxSchema.isEmpty()) ? "taskana_tables" : outboxSchema;
+    String outboxSchema = CamundaListenerConfiguration.getOutboxSchema();
 
     try (Connection connection = dataSource.getConnection()) {
       String databaseProductName = connection.getMetaData().getDatabaseProductName();
@@ -159,7 +157,7 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
   private DataSource getDataSourceFromPropertiesFile() {
     DataSource dataSource = null;
     try {
-      String jndiLookup = CamundaListenerConfigurationProperties.getOutboxDatasourceJndi();
+      String jndiLookup = CamundaListenerConfiguration.getOutboxDatasourceJndi();
 
       if (jndiLookup != null) {
         dataSource = (DataSource) new InitialContext().lookup(jndiLookup);
@@ -169,10 +167,10 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
           LOGGER.info("jndi lookup {} didn't return a Datasource.", jndiLookup);
         }
       } else {
-        String driver = CamundaListenerConfigurationProperties.getOutboxDatasourceDriver();
-        String jdbcUrl = CamundaListenerConfigurationProperties.getOutboxDatasourceUrl();
-        String userName = CamundaListenerConfigurationProperties.getOutboxDatasourceUsername();
-        String password = CamundaListenerConfigurationProperties.getOutboxDatasourcePassword();
+        String driver = CamundaListenerConfiguration.getOutboxDatasourceDriver();
+        String jdbcUrl = CamundaListenerConfiguration.getOutboxDatasourceUrl();
+        String userName = CamundaListenerConfiguration.getOutboxDatasourceUsername();
+        String password = CamundaListenerConfiguration.getOutboxDatasourcePassword();
         dataSource = createDatasource(driver, jdbcUrl, userName, password);
         LOGGER.info("created Datasource from properties {}, ...", jdbcUrl);
       }
