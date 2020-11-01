@@ -48,8 +48,8 @@ public class TaskanaTaskListener implements TaskListener {
           + "BLOCKED_UNTIL,CAMUNDA_TASK_ID) VALUES (?,?,?,?,?,?)";
   private static TaskanaTaskListener instance = null;
 
+  private final ObjectMapper objectMapper = JacksonConfigurator.createAndConfigureObjectMapper();
   private boolean gotActivated = false;
-  private ObjectMapper objectMapper = JacksonConfigurator.createAndConfigureObjectMapper();
   private String outboxSchemaName = null;
 
   public static TaskanaTaskListener getInstance() {
@@ -195,8 +195,7 @@ public class TaskanaTaskListener implements TaskListener {
 
       Timestamp eventCreationTimestamp = Timestamp.from(Instant.now());
 
-      int initialRetries =
-          CamundaListenerConfiguration.getInitialNumberOfTaskCreationRetries();
+      int initialRetries = CamundaListenerConfiguration.getInitialNumberOfTaskCreationRetries();
 
       preparedStatement.setString(1, delegateTask.getEventName());
       preparedStatement.setTimestamp(2, eventCreationTimestamp);

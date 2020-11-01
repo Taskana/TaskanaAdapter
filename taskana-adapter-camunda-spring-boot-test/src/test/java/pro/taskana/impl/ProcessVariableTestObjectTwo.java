@@ -8,11 +8,11 @@ public class ProcessVariableTestObjectTwo implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  String stringFieldObjectTwo;
-  int intFieldObjectTwo;
-  double doubleFieldObjectTwo;
-  boolean booleanFieldObjectTwo;
-  Date dateFieldObjectTwo;
+  private String stringFieldObjectTwo;
+  private int intFieldObjectTwo;
+  private double doubleFieldObjectTwo;
+  private boolean booleanFieldObjectTwo;
+  private Date dateFieldObjectTwo;
 
   public ProcessVariableTestObjectTwo() {}
 
