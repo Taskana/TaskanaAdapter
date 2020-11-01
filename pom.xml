@@ -277,7 +277,7 @@
                                         <showWarnings>true</showWarnings>
                                         <failOnWarning>true</failOnWarning>
                                         <compilerArgs>
-                                                <arg>-Xlint:all</arg>
+                                                <arg>-Xlint:-serial</arg>
                                                 <arg>-proc:none</arg>
                                         </compilerArgs>
                                 </configuration>

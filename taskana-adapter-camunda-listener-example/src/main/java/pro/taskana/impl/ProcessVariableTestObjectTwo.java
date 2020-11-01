@@ -6,8 +6,6 @@ import java.util.Date;
 /** Test entity for a complex process variable. */
 public class ProcessVariableTestObjectTwo implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   private String stringFieldObjectTwo;
   private int intFieldObjectTwo;
   private double doubleFieldObjectTwo;
