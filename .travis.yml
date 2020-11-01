@@ -1,10 +1,10 @@
 os: linux
-dist: xenial
+dist: bionic
 
 language: java
 
 jdk:
-  - openjdk8
+  - openjdk11
 
 addons:
   sonarcloud:
@@ -43,7 +43,7 @@ jobs:
         -in "ci/codesigning.asc.enc" -out "ci/codesigning.asc" -d && gpg --import "ci/codesigning.asc"
       install: ci/change_version.sh -m .
       script: |
-        mvn deploy -T 4C -P `[[ "$TRAVIS_TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+/[0-9]+\.[0-9]+\.[0-9]+$ ]] && echo "release" || echo "snapshot"` \
+        mvn deploy -B -T 2C -P `[[ "$TRAVIS_TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+/[0-9]+\.[0-9]+\.[0-9]+$ ]] && echo "release" || echo "snapshot"` \
         --settings ci/mvnsettings.xml -DskipTests -Dcheckstyle.skip \
         -pl !:taskana-adapter-camunda-listener-example,!:taskana-adapter-camunda-spring-boot-test
       before_cache: rm -rf $HOME/.m2/repository/pro/taskana
