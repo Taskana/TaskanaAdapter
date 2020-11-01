@@ -9,8 +9,6 @@ import java.util.List;
  */
 public class CamundaTaskEventListResource implements Serializable {
 
-  static final long serialVersionUID = 1L;
-
   private List<CamundaTaskEvent> camundaTaskEvents;
 
   public List<CamundaTaskEvent> getCamundaTaskEvents() {

@@ -5,8 +5,6 @@ import java.io.Serializable;
 /** POJO that represents an event in the camunda outbox table. */
 public class CamundaTaskEvent implements Serializable {
 
-  static final long serialVersionUID = 1L;
-
   private int id;
   private String type;
   private String created;

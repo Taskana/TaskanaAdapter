@@ -5,8 +5,6 @@ package pro.taskana.adapter.camunda.exceptions;
  */
 public class UnsupportedDatabaseException extends RuntimeException {
 
-  private static final long serialVersionUID = 1L;
-
   public UnsupportedDatabaseException(String name) {
     super(String.format("Database with name %s not supported", name));
   }

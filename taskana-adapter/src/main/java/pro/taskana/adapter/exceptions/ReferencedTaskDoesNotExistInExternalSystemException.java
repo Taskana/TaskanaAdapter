@@ -8,8 +8,6 @@ import pro.taskana.common.api.exceptions.TaskanaRuntimeException;
  */
 public class ReferencedTaskDoesNotExistInExternalSystemException extends TaskanaRuntimeException {
 
-  private static final long serialVersionUID = 1L;
-
   public ReferencedTaskDoesNotExistInExternalSystemException(String msg) {
     super(msg);
   }

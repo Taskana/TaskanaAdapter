@@ -6,8 +6,6 @@ import java.util.List;
 /** Test entity for a complex process variable. */
 public class ProcessVariableTestObject implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   private String stringField;
   private int intField;
   private double doubleField;

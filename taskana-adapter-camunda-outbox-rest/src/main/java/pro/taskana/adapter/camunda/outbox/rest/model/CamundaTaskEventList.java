@@ -6,8 +6,6 @@ import java.util.List;
 /** POJO that represents a list of events in the camunda outbox table. */
 public class CamundaTaskEventList implements Serializable {
 
-  static final long serialVersionUID = 1L;
-
   private List<CamundaTaskEvent> camundaTaskEvents;
 
   public List<CamundaTaskEvent> getCamundaTaskEvents() {
