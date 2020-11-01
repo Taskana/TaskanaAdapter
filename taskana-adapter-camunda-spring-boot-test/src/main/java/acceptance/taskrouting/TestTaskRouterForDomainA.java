@@ -14,7 +14,7 @@ public class TestTaskRouterForDomainA implements TaskRoutingProvider {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TestTaskRouterForDomainA.class);
 
-  TaskanaEngine theEngine;
+  private TaskanaEngine theEngine;
 
   @Override
   public void initialize(TaskanaEngine taskanaEngine) {

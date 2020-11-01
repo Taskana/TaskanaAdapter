@@ -8,7 +8,7 @@ public class CamundaTaskEventList implements Serializable {
 
   static final long serialVersionUID = 1L;
 
-  List<CamundaTaskEvent> camundaTaskEvents;
+  private List<CamundaTaskEvent> camundaTaskEvents;
 
   public List<CamundaTaskEvent> getCamundaTaskEvents() {
     return camundaTaskEvents;

@@ -5,14 +5,14 @@ package pro.taskana.adapter.camunda.outbox.rest.resource;
  */
 public class CamundaTaskEventResource {
 
-  int id;
-  String type;
-  String created;
-  String payload;
-  int remainingRetries;
-  String blockedUntil;
-  String error;
-  String camundaTaskId;
+  private int id;
+  private String type;
+  private String created;
+  private String payload;
+  private int remainingRetries;
+  private String blockedUntil;
+  private String error;
+  private String camundaTaskId;
 
   public int getId() {
     return id;

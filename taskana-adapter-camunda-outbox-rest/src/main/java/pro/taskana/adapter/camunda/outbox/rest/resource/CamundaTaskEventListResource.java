@@ -11,9 +11,7 @@ import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
  */
 public class CamundaTaskEventListResource implements Serializable {
 
-  static final long serialVersionUID = 1L;
-
-  List<CamundaTaskEvent> camundaTaskEvents;
+  private List<CamundaTaskEvent> camundaTaskEvents;
 
   public CamundaTaskEventListResource() {}
 

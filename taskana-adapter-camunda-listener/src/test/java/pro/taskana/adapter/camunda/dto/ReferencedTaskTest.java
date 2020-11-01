@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 /** Acceptance test for ReferencedTask setters and getters. */
 public class ReferencedTaskTest {
 
-  ReferencedTask theTask;
-  String theValue;
+  private ReferencedTask theTask;
+  private String theValue;
 
   public ReferencedTaskTest() {
     theValue = "blablabla";

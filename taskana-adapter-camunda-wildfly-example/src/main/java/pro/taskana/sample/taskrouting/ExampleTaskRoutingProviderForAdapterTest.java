@@ -16,7 +16,7 @@ public class ExampleTaskRoutingProviderForAdapterTest implements TaskRoutingProv
   private static final Logger LOGGER =
       LoggerFactory.getLogger(ExampleTaskRoutingProviderForAdapterTest.class);
 
-  TaskanaEngine theEngine;
+  private TaskanaEngine theEngine;
 
   @Value("${taskana.sample.taskrouter.random:false}")
   private String routeRandomly;
@@ -28,7 +28,7 @@ public class ExampleTaskRoutingProviderForAdapterTest implements TaskRoutingProv
 
   @Override
   public String determineWorkbasketId(Task task) {
-    if (routeRandomly != null && "true".equalsIgnoreCase(routeRandomly)) {
+    if ("true".equalsIgnoreCase(routeRandomly)) {
       return determineRandomWorkbasket();
     } else {
       return "WBI:100000000000000000000000000000000001";
