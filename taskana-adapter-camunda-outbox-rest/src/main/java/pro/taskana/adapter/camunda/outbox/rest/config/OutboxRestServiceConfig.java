@@ -8,6 +8,8 @@ import javax.ws.rs.core.Application;
 import pro.taskana.adapter.camunda.outbox.rest.controller.CamundaTaskEventsController;
 import pro.taskana.adapter.camunda.outbox.rest.exception.CamundaTaskEventNotFoundExceptionMapper;
 import pro.taskana.adapter.camunda.outbox.rest.exception.InvalidArgumentExceptionMapper;
+import pro.taskana.adapter.camunda.outbox.rest.exception.JsonParseExceptionMapper;
+import pro.taskana.adapter.camunda.outbox.rest.exception.MismatchedInputExceptionMapper;
 
 /** Configures the outbox REST service. */
 @ApplicationPath("/outbox-rest")
@@ -19,6 +21,8 @@ public class OutboxRestServiceConfig extends Application {
     classesToBeScanned.add(CamundaTaskEventsController.class);
     classesToBeScanned.add(InvalidArgumentExceptionMapper.class);
     classesToBeScanned.add(CamundaTaskEventNotFoundExceptionMapper.class);
+    classesToBeScanned.add(JsonParseExceptionMapper.class);
+    classesToBeScanned.add(MismatchedInputExceptionMapper.class);
     return classesToBeScanned;
   }
 }

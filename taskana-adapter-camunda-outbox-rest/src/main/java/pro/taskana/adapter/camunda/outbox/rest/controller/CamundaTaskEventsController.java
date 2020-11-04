@@ -15,6 +15,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import spinjar.com.fasterxml.jackson.core.JsonProcessingException;
+import spinjar.com.fasterxml.jackson.core.type.TypeReference;
+import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
 
 import pro.taskana.adapter.camunda.outbox.rest.exception.CamundaTaskEventNotFoundException;
 import pro.taskana.adapter.camunda.outbox.rest.exception.InvalidArgumentException;
@@ -29,6 +32,8 @@ import pro.taskana.adapter.camunda.outbox.rest.service.CamundaTaskEventsService;
 /** Controller for the Outbox REST service. */
 @Path(Mapping.URL_EVENTS)
 public class CamundaTaskEventsController {
+
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   CamundaTaskEventsService camundaTaskEventService = new CamundaTaskEventsService();
   CamundaTaskEventResourceAssembler camundaTaskEventResourceAssembler =
@@ -94,16 +99,18 @@ public class CamundaTaskEventsController {
   @PATCH
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  public Response setRemainingRetries(
-      @PathParam("eventId") int eventId, Map<String, Integer> newRemainingRetries)
-      throws InvalidArgumentException, CamundaTaskEventNotFoundException {
+  public Response setRemainingRetries(@PathParam("eventId") int eventId, String newRemainingRetries)
+      throws InvalidArgumentException, CamundaTaskEventNotFoundException, JsonProcessingException {
 
-    if (newRemainingRetries == null || !newRemainingRetries.containsKey("remainingRetries")) {
+    Map<String, Integer> patchMap =
+        OBJECT_MAPPER.readValue(newRemainingRetries, new TypeReference<Map<String, Integer>>() {});
+
+    if (patchMap == null || !patchMap.containsKey("remainingRetries")) {
       throw new InvalidArgumentException(
           "Please provide a valid json body in the format {\"remainingRetries\":3}");
     }
 
-    int retriesToSet = newRemainingRetries.get("remainingRetries");
+    int retriesToSet = patchMap.get("remainingRetries");
 
     CamundaTaskEvent camundaTaskEvent =
         camundaTaskEventService.setRemainingRetries(eventId, retriesToSet);
@@ -118,19 +125,22 @@ public class CamundaTaskEventsController {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response setRemainingRetriesForMultipleEvents(
-      @QueryParam("retries") final String retries, Map<String, Integer> newRemainingRetries)
-      throws InvalidArgumentException {
+      @QueryParam("retries") final String retries, String newRemainingRetries)
+      throws InvalidArgumentException, JsonProcessingException {
 
     if (retries == null || retries.isEmpty()) {
       throw new InvalidArgumentException("Please provide a valid \"retries\" query parameter");
     }
 
-    if (newRemainingRetries == null || !newRemainingRetries.containsKey("remainingRetries")) {
+    Map<String, Integer> patchMap =
+        OBJECT_MAPPER.readValue(newRemainingRetries, new TypeReference<Map<String, Integer>>() {});
+
+    if (patchMap == null || !patchMap.containsKey("remainingRetries")) {
       throw new InvalidArgumentException(
           "Please provide a valid json body in the format {\"remainingRetries\":3}");
     }
 
-    int retriesToSet = newRemainingRetries.get("remainingRetries");
+    int retriesToSet = patchMap.get("remainingRetries");
 
     int remainingRetries = Integer.parseInt(retries);
 
