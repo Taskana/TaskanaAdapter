@@ -82,20 +82,24 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
 
     boolean shouldSchemaBeCreated = CamundaListenerConfiguration.getCreateOutboxSchema();
 
-    if (!isSchemaPreexisting && shouldSchemaBeCreated) {
-
-      LOGGER.debug("Running scripts to create schema and tables for TaskanaOutbox");
-
-      if (!schemaCreator.createSchema()) {
-
-        LOGGER.warn(
-            "An error occured while trying to automatically create the "
-                + "TaskanaOutbox schema and table. "
-                + "Aborting the boot of camunda.");
+    if (!isSchemaPreexisting) {
+      if (shouldSchemaBeCreated) {
+        LOGGER.debug("Running scripts to create schema and tables for TaskanaOutbox");
+        if (!schemaCreator.createSchema()) {
+          LOGGER.error(
+                  "An error occured while trying to automatically create the "
+                          + "TaskanaOutbox schema and table. "
+                          + "Aborting the boot of camunda.");
+          throw new SystemException(
+                  "An error occured while trying to automatically create the"
+                          + " TaskanaOutbox schema and table. "
+                          + "Aborting the boot of camunda.");
+        }
+      } else {
+        LOGGER.error(
+                "TaskanaOutbox schema does not exist and shall not be created.");
         throw new SystemException(
-            "An error occured while trying to automatically create the"
-                + " TaskanaOutbox schema and table. "
-                + "Aborting the boot of camunda.");
+                "TaskanaOutbox schema does not exist and shall not be created.");
       }
     }
 
