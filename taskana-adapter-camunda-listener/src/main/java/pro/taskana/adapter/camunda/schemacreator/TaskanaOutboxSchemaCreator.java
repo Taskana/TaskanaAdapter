@@ -16,7 +16,9 @@ import org.apache.ibatis.jdbc.SqlRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Creates the outbox schema in the Camunda database. */
+/**
+ * Creates the outbox schema in the Camunda database.
+ */
 public class TaskanaOutboxSchemaCreator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaOutboxSchemaCreator.class);
@@ -85,7 +87,7 @@ public class TaskanaOutboxSchemaCreator {
       Map<String, Object> queryResult = querySchema();
 
       if (queryResult == null || queryResult.isEmpty()) {
-        LOGGER.error("TaskanaOutbox does not exist");
+        LOGGER.debug("TaskanaOutbox does not exist");
         return false;
       } else {
         LOGGER.debug("TaskanaOutbox does exist.");
@@ -93,7 +95,7 @@ public class TaskanaOutboxSchemaCreator {
       }
 
     } catch (RuntimeSqlException | SQLException e) {
-      LOGGER.error("TaskanaOutbox schema doesn't exist");
+      LOGGER.debug("TaskanaOutbox schema doesn't exist. (Exception: " + e.getMessage() + ")");
       return false;
     }
   }
