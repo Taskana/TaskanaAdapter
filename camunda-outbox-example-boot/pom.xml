@@ -12,18 +12,6 @@
   <artifactId>camunda-outbox-spring-boot-sample</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>2.2.5.RELEASE</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
 
     <!-- database -->
