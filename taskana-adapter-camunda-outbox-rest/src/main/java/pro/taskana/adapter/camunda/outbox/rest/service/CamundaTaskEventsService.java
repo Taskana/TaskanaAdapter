@@ -77,8 +77,7 @@ public class CamundaTaskEventsService {
 
   static {
     if (maxNumberOfEventsReturned == 0) {
-      maxNumberOfEventsReturned =
-          OutboxRestConfiguration.getOutboxMaxNumberOfEvents();
+      maxNumberOfEventsReturned = OutboxRestConfiguration.getOutboxMaxNumberOfEvents();
     }
     LOGGER.info(
         "Outbox Rest Api will return at max {} events per request", maxNumberOfEventsReturned);
@@ -321,6 +320,7 @@ public class CamundaTaskEventsService {
         camundaTaskEvent.setRemainingRetries(completeAndDeleteEventsResultSet.getInt(5));
         camundaTaskEvent.setBlockedUntil(completeAndDeleteEventsResultSet.getString(6));
         camundaTaskEvent.setError(completeAndDeleteEventsResultSet.getString(7));
+        camundaTaskEvent.setCamundaTaskId(completeAndDeleteEventsResultSet.getString(8));
 
         return camundaTaskEvent;
       }
@@ -375,8 +375,7 @@ public class CamundaTaskEventsService {
 
   private Instant getBlockedUntil() {
 
-    Duration blockedDuration =
-        OutboxRestConfiguration.getDurationBetweenTaskCreationRetries();
+    Duration blockedDuration = OutboxRestConfiguration.getDurationBetweenTaskCreationRetries();
 
     return Instant.now().plus(blockedDuration);
   }

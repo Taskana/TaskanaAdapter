@@ -99,11 +99,11 @@ public class CamundaTaskEventsController {
   @PATCH
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  public Response setRemainingRetries(@PathParam("eventId") int eventId, String newRemainingRetries)
+  public Response setRemainingRetries(@PathParam("eventId") int eventId, String body)
       throws InvalidArgumentException, CamundaTaskEventNotFoundException, JsonProcessingException {
 
     Map<String, Integer> patchMap =
-        OBJECT_MAPPER.readValue(newRemainingRetries, new TypeReference<Map<String, Integer>>() {});
+        OBJECT_MAPPER.readValue(body, new TypeReference<Map<String, Integer>>() {});
 
     if (patchMap == null || !patchMap.containsKey("remainingRetries")) {
       throw new InvalidArgumentException(
@@ -125,7 +125,7 @@ public class CamundaTaskEventsController {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response setRemainingRetriesForMultipleEvents(
-      @QueryParam("retries") final String retries, String newRemainingRetries)
+      @QueryParam("retries") final String retries, String body)
       throws InvalidArgumentException, JsonProcessingException {
 
     if (retries == null || retries.isEmpty()) {
@@ -133,7 +133,7 @@ public class CamundaTaskEventsController {
     }
 
     Map<String, Integer> patchMap =
-        OBJECT_MAPPER.readValue(newRemainingRetries, new TypeReference<Map<String, Integer>>() {});
+        OBJECT_MAPPER.readValue(body, new TypeReference<Map<String, Integer>>() {});
 
     if (patchMap == null || !patchMap.containsKey("remainingRetries")) {
       throw new InvalidArgumentException(
