@@ -1,7 +1,7 @@
 target/
 bin/
 .checkstyle
-!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/*jar
 *.orig
 
 ### STS ###
