@@ -45,22 +45,26 @@ function increment_version() {
 # Arguments:
 #   $1: directory of pom
 #   $2: new version
+# Environment variable:
+#   REL: relative path to this file
 function change_version() {
-  mvn -q versions:set -f "$1" -DnewVersion="$2" -DartifactId=* -DgroupId=* versions:commit
+  $REL/../mvnw -q versions:set -f "$1" -DnewVersion="$2" -DartifactId=* -DgroupId=* versions:commit
 }
 
-# chaning version im pom of a specific property
+# changing version im pom of a specific property
 # Arguments:
-#  $1: direcotry of pom
+#  $1: directory of pom
 #  $2: property name
 #  $3: new version
+# Environment variable:
+#   REL: relative path to this file
 function change_version_of_property() {
-  mvn -q versions:set-property -f "$1" -Dproperty="$2" -DnewVersion="$3" versions:commit
+  $REL/../mvnw -q versions:set-property -f "$1" -Dproperty="$2" -DnewVersion="$3" versions:commit
 }
 
 function main() {
   [[ $# -eq 0 || "$1" == '-h' || "$1" == '--help' ]] && helpAndExit 0
-
+  REL=$(dirname "$0")
   while [[ $# -gt 0 ]]; do
     case $1 in
     -i)
@@ -90,10 +94,10 @@ function main() {
 
   if [[ "$TRAVIS_TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     version=$([[ -n "$INCREMENT" ]] && echo $(increment_version "${TRAVIS_TAG%%/*}")-SNAPSHOT || echo "${TRAVIS_TAG%%/*}")
-    propversion=$([[ -n "$INCREMENT" ]] && echo $(increment_version "${TRAVIS_TAG##*/}")-SNAPSHOT || echo "${TRAVIS_TAG##*/}")
+    prop_version=$([[ -n "$INCREMENT" ]] && echo $(increment_version "${TRAVIS_TAG##*/}")-SNAPSHOT || echo "${TRAVIS_TAG##*/}")
     for dir in ${MODULES[@]}; do
       change_version "$dir" "$version"
-      change_version_of_property "$dir" "version.taskana" "$propversion"
+      change_version_of_property "$dir" "version.taskana" "$prop_version"
     done
   else
     echo "skipped version change because this is not a release build"
