@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import pro.taskana.adapter.camunda.CamundaListenerConfiguration;
 import pro.taskana.adapter.camunda.dto.ReferencedTask;
 import pro.taskana.adapter.camunda.dto.VariableValueDto;
+import pro.taskana.adapter.camunda.exceptions.SystemException;
 import pro.taskana.adapter.camunda.mapper.JacksonConfigurator;
 
 /**
@@ -87,12 +88,13 @@ public class TaskanaTaskListener implements TaskListener {
       }
 
     } catch (Exception e) {
-      LOGGER.warn("Caught Exception while trying to process a delegate task", e);
+      LOGGER.error("Unexpected Exception while trying to process a delegate task", e);
+      throw new SystemException("Unexpected Exception while trying to process a delegate task", e);
     }
   }
 
   private void insertCreateEventIntoOutbox(DelegateTask delegateTask, Connection connection)
-      throws SQLException {
+      throws Exception {
 
     String camundaSchema = null;
 
@@ -107,14 +109,6 @@ public class TaskanaTaskListener implements TaskListener {
 
       prepareAndExecuteStatement(connection, delegateTask, referencedTaskJson);
 
-    } catch (JsonProcessingException e) {
-
-      LOGGER.warn(
-          "Caught JsonProcessingException while trying to convert ReferencedTask to JSON-String");
-    } catch (Exception e) {
-      LOGGER.warn(
-          "Caught Exception while trying to insert a \"create\" event into the outbox table", e);
-
     } finally {
       if (camundaSchema != null) {
         connection.setSchema(camundaSchema);
@@ -123,7 +117,7 @@ public class TaskanaTaskListener implements TaskListener {
   }
 
   private void insertCompleteOrDeleteEventIntoOutbox(
-      DelegateTask delegateTask, Connection connection) throws SQLException {
+      DelegateTask delegateTask, Connection connection) throws Exception {
 
     if (delegateTask.getEventName().equals("complete")
         && taskWasCompletedByTaskanaAdapter(delegateTask)) {
@@ -149,12 +143,6 @@ public class TaskanaTaskListener implements TaskListener {
       setOutboxSchema(connection);
       prepareAndExecuteStatement(connection, delegateTask, payload);
       connection.setSchema(camundaSchema);
-    } catch (Exception e) {
-      LOGGER.warn(
-          String.format(
-              "Caught exception while trying to insert a %s event into the outbox table",
-              delegateTask.getEventName()),
-          e);
     } finally {
       if (camundaSchema != null) {
         connection.setSchema(camundaSchema);
@@ -187,7 +175,7 @@ public class TaskanaTaskListener implements TaskListener {
   }
 
   private void prepareAndExecuteStatement(
-      Connection connection, DelegateTask delegateTask, String payloadJson) {
+      Connection connection, DelegateTask delegateTask, String payloadJson) throws Exception {
 
     try (PreparedStatement preparedStatement =
         connection.prepareStatement(SQL_INSERT_EVENT, Statement.RETURN_GENERATED_KEYS)) {
@@ -204,10 +192,6 @@ public class TaskanaTaskListener implements TaskListener {
       preparedStatement.setString(6, delegateTask.getId());
 
       preparedStatement.execute();
-
-    } catch (Exception e) {
-
-      LOGGER.warn("Caught Exception while trying to prepare and execute statement", e);
     }
   }
 
@@ -290,10 +274,16 @@ public class TaskanaTaskListener implements TaskListener {
             .append(variableValueDtoJson)
             .append(",");
 
-      } catch (Exception ex) {
-        LOGGER.warn(
-            "Caught exception while trying to create JSON-String out of process variable object",
-            ex);
+      } catch (JsonProcessingException ex) {
+
+        if (CamundaListenerConfiguration.shouldCatchAndLogExceptionForFaultyProcessVariables()) {
+
+          LOGGER.error("Caught exception while trying to serialize process variables to JSON", ex);
+
+        } else {
+          throw new SystemException(
+              "Exception while trying to serialize process variables to JSON", ex);
+        }
       }
     }
   }
@@ -353,24 +343,15 @@ public class TaskanaTaskListener implements TaskListener {
 
     BpmnModelInstance model = delegateTask.getExecution().getBpmnModelInstance();
 
-    try {
-      List<CamundaProperty> processModelExtensionProperties =
-          model.getModelElementsByType(CamundaProperty.class).stream()
-              .filter(camundaProperty -> camundaProperty.getCamundaName().equals(propertyKey))
-              .collect(Collectors.toList());
+    List<CamundaProperty> processModelExtensionProperties =
+        model.getModelElementsByType(CamundaProperty.class).stream()
+            .filter(camundaProperty -> camundaProperty.getCamundaName().equals(propertyKey))
+            .collect(Collectors.toList());
 
-      if (processModelExtensionProperties.isEmpty()) {
-        return propertyValue;
-      } else {
-        propertyValue = processModelExtensionProperties.get(0).getCamundaValue();
-      }
-
-    } catch (Exception e) {
-      LOGGER.warn(
-          String.format(
-              "Caught exception while trying to retrieve the %s property from process model %s",
-              propertyKey, model.getDefinitions().getName()),
-          e);
+    if (processModelExtensionProperties.isEmpty()) {
+      return propertyValue;
+    } else {
+      propertyValue = processModelExtensionProperties.get(0).getCamundaValue();
     }
 
     return propertyValue;
@@ -380,37 +361,25 @@ public class TaskanaTaskListener implements TaskListener {
 
     String propertyValue = null;
 
-    try {
+    ExtensionElements extensionElements =
+        delegateTask.getExecution().getBpmnModelElementInstance().getExtensionElements();
 
-      ExtensionElements extensionElements =
-          delegateTask.getExecution().getBpmnModelElementInstance().getExtensionElements();
+    if (extensionElements == null) {
+      return propertyValue;
+    } else {
+      CamundaProperties camundaProperties =
+          extensionElements.getElementsQuery().filterByType(CamundaProperties.class).singleResult();
 
-      if (extensionElements == null) {
+      List<CamundaProperty> userTaskExtensionProperties =
+          camundaProperties.getCamundaProperties().stream()
+              .filter(camundaProperty -> camundaProperty.getCamundaName().equals(propertyKey))
+              .collect(Collectors.toList());
+
+      if (userTaskExtensionProperties.isEmpty()) {
         return propertyValue;
       } else {
-        CamundaProperties camundaProperties =
-            extensionElements
-                .getElementsQuery()
-                .filterByType(CamundaProperties.class)
-                .singleResult();
-
-        List<CamundaProperty> userTaskExtensionProperties =
-            camundaProperties.getCamundaProperties().stream()
-                .filter(camundaProperty -> camundaProperty.getCamundaName().equals(propertyKey))
-                .collect(Collectors.toList());
-
-        if (userTaskExtensionProperties.isEmpty()) {
-          return propertyValue;
-        } else {
-          propertyValue = userTaskExtensionProperties.get(0).getCamundaValue();
-        }
+        propertyValue = userTaskExtensionProperties.get(0).getCamundaValue();
       }
-    } catch (Exception e) {
-      LOGGER.warn(
-          "Caught exception while trying to retrieve the {} property of user task {}",
-          propertyKey,
-          delegateTask.getName(),
-          e);
     }
 
     return propertyValue;
