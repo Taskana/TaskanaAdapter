@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import pro.taskana.adapter.camunda.exceptions.SystemException;
 
-
 public class CamundaListenerConfiguration {
 
   private static final String TASKANA_ADAPTER_CREATE_OUTBOX_SCHEMA =
@@ -28,13 +27,12 @@ public class CamundaListenerConfiguration {
   private static final String TASKANA_ADAPTER_OUTBOX_INITIAL_NUMBER_OF_TASK_CREATION_RETRIES =
       "taskana.adapter.outbox.initial.number.of.task.creation.retries";
   private static final String OUTBOX_SYSTEM_PROPERTY = "taskana.outbox.properties";
-
   private static final String OUTBOX_SCHEMA_DEFAULT = "taskana_tables";
+  private static final String EXCEPTION_FOR_FAULTY_PROCESS_VARIABLES =
+      "taskana.listener.process.variables.exception";
   private static final boolean CREATE_OUTBOX_SCHEMA_DEFAULT = true;
   private static final int INITIAL_NUMBER_OF_TASK_CREATION_RETRIES_DEFAULT = 5;
-
   private static final Logger LOGGER = LoggerFactory.getLogger(CamundaListenerConfiguration.class);
-
   private final Properties outboxProperties = new Properties();
 
   private CamundaListenerConfiguration() {
@@ -115,6 +113,11 @@ public class CamundaListenerConfiguration {
 
   public static String getOutboxDatasourcePassword() {
     return getInstance().outboxProperties.getProperty(TASKANA_ADAPTER_OUTBOX_DATASOURCE_PASSWORD);
+  }
+
+  public static boolean shouldCatchAndLogExceptionForFaultyProcessVariables() {
+    return Boolean.parseBoolean(
+        getInstance().outboxProperties.getProperty(EXCEPTION_FOR_FAULTY_PROCESS_VARIABLES));
   }
 
   public static int getInitialNumberOfTaskCreationRetries() {

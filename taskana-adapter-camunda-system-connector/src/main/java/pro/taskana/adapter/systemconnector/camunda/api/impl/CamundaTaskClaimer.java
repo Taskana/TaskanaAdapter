@@ -34,7 +34,8 @@ public class CamundaTaskClaimer {
 
     if (!claimConfigLogged) {
       LOGGER.info(
-          "Synchronizing claim of tasks in TASKANA to Camunda is set to " + claimingEnabled);
+          String.format(
+              "Synchronizing claim of tasks in TASKANA to Camunda is set to %b", claimingEnabled));
       claimConfigLogged = true;
     }
 
