@@ -166,6 +166,12 @@
                         <version>${version.assertj}</version>
                         <scope>test</scope>
                 </dependency>
+                <dependency>
+                        <groupId>org.junit.vintage</groupId>
+                        <artifactId>junit-vintage-engine</artifactId>
+                        <version>${version.junit.jupiter}</version>
+                        <scope>test</scope>
+                </dependency>
         </dependencies>
 
         <build>
