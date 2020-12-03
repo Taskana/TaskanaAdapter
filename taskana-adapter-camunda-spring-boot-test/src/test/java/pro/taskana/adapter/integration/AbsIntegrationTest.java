@@ -187,6 +187,7 @@ public abstract class AbsIntegrationTest {
       classification = myClassificationService.getClassification(classificationKey, domain);
     } catch (ClassificationNotFoundException e) {
       classification = myClassificationService.newClassification(classificationKey, domain, "TASK");
+      classification.setServiceLevel("P1D");
       classification = myClassificationService.createClassification(classification);
     }
     return classification;
