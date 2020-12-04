@@ -1,101 +1,103 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-        <parent>
-                <groupId>pro.taskana</groupId>
-                <artifactId>taskana-adapter-parent</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
-                <relativePath>../pom.xml</relativePath>
-        </parent>
+  <parent>
+    <groupId>pro.taskana</groupId>
+    <artifactId>taskana-adapter-parent</artifactId>
+    <version>1.0.2-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
-        <modelVersion>4.0.0</modelVersion>
-        <artifactId>taskana-adapter-camunda-system-connector</artifactId>
-        <packaging>jar</packaging>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>taskana-adapter-camunda-system-connector</artifactId>
+  <packaging>jar</packaging>
 
-        <name>${project.groupId}:${project.artifactId}</name>
-        <description>System connector between taskana-adapter and Camunda</description>
-
-
-        <dependencies>
-
-                <dependency>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter</artifactId>
-                        <version>${version.spring.boot}</version>
-                </dependency>
-
-                <dependency>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-web</artifactId>
-                        <version>${version.spring.boot}</version>
-                </dependency>
-                <dependency>
-                        <groupId>pro.taskana</groupId>
-                        <artifactId>taskana-adapter</artifactId>
-                        <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-test</artifactId>
-                        <scope>test</scope>
-                        <exclusions>
-                                <exclusion>
-                                        <groupId>com.vaadin.external.google</groupId>
-                                        <artifactId>android-json</artifactId>
-                                </exclusion>
-                        </exclusions>
-                        <version>${version.spring.boot}</version>
-                </dependency>
-
-                <dependency>
-                  <groupId>org.junit.vintage</groupId>
-                  <artifactId>junit-vintage-engine</artifactId>
-                  <version>${version.junit.jupiter}</version>
-                  <scope>test</scope>
-                </dependency>
-
-        </dependencies>
-
-        <build>
-                <plugins>
-                        <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-failsafe-plugin</artifactId>
-                                <version>${version.maven.failsafe.plugin}</version>
-                                <configuration>
-                                        <classpathDependencyExcludes>
-                                                <classpathDependencyExcludes>com.googlecode.json-simple:json-simple</classpathDependencyExcludes>
-                                                <classpathDependencyExcludes>com.vaadin.external.google:android-json</classpathDependencyExcludes>
-                                        </classpathDependencyExcludes>
-                                </configuration>
-                        </plugin>
-                </plugins>
-        </build>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>System connector between taskana-adapter and Camunda</description>
 
 
-		<profiles>
-			<profile>
-				<id>coverage</id>
-				<build>
-					<plugins>
-						<plugin>
-							<groupId>org.jacoco</groupId>
-							<artifactId>jacoco-maven-plugin</artifactId>
-							<version>${version.jacoco}</version>
-							<executions>
-								<execution>
-									<id>report-aggregate</id>
-									<phase>verify</phase>
-									<goals>
-										<goal>report-aggregate</goal>
-									</goals>
-								</execution>
-							</executions>
-						</plugin>
-					</plugins>
-				</build>
-			</profile>
-		</profiles>
+  <dependencies>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+      <version>${version.spring.boot}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <version>${version.spring.boot}</version>
+    </dependency>
+    <dependency>
+      <groupId>pro.taskana</groupId>
+      <artifactId>taskana-adapter</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.vaadin.external.google</groupId>
+          <artifactId>android-json</artifactId>
+        </exclusion>
+      </exclusions>
+      <version>${version.spring.boot}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <version>${version.junit.jupiter}</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${version.maven.failsafe.plugin}</version>
+        <configuration>
+          <classpathDependencyExcludes>
+            <classpathDependencyExcludes>com.googlecode.json-simple:json-simple
+            </classpathDependencyExcludes>
+            <classpathDependencyExcludes>com.vaadin.external.google:android-json
+            </classpathDependencyExcludes>
+          </classpathDependencyExcludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+
+  <profiles>
+    <profile>
+      <id>coverage</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${version.jacoco}</version>
+            <executions>
+              <execution>
+                <id>report-aggregate</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>report-aggregate</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

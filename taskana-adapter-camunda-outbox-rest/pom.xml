@@ -1,76 +1,76 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-        <parent>
-                <artifactId>taskana-adapter-parent</artifactId>
-                <groupId>pro.taskana</groupId>
-                <version>1.0.2-SNAPSHOT</version>
-                <relativePath>../pom.xml</relativePath>
-        </parent>
+  <parent>
+    <artifactId>taskana-adapter-parent</artifactId>
+    <groupId>pro.taskana</groupId>
+    <version>1.0.2-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
-        <modelVersion>4.0.0</modelVersion>
-        <artifactId>taskana-adapter-camunda-outbox-rest</artifactId>
-        <packaging>war</packaging>
-        <name>${project.groupId}:${project.artifactId}</name>
-        <description>Provides access to Camunda Task Events via REST Api for the Adapter</description>
-
-
-        <build>
-                <plugins>
-                        <plugin>
-                                <artifactId>maven-war-plugin</artifactId>
-                                <version>${version.maven-war-plugin}</version>
-                                <configuration>
-                                        <attachClasses>true</attachClasses>
-                                        <failOnMissingWebXml>false</failOnMissingWebXml>
-                                </configuration>
-                        </plugin>
-                </plugins>
-        </build>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>taskana-adapter-camunda-outbox-rest</artifactId>
+  <packaging>war</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>Provides access to Camunda Task Events via REST Api for the Adapter</description>
 
 
-        <dependencyManagement>
-                <dependencies>
-                        <dependency>
-                                <groupId>org.camunda.spin</groupId>
-                                <artifactId>camunda-spin-bom</artifactId>
-                                <scope>import</scope>
-                                <type>pom</type>
-                                <version>${version.camunda.spin}</version>
-                        </dependency>
-                </dependencies>
-        </dependencyManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>${version.maven-war-plugin}</version>
+        <configuration>
+          <attachClasses>true</attachClasses>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
-        <dependencies>
 
-                <dependency>
-                        <groupId>org.camunda.spin</groupId>
-                        <artifactId>camunda-spin-core</artifactId>
-                        <version>${version.camunda.spin}</version>
-                </dependency>
-                <dependency>
-                        <groupId>org.camunda.spin</groupId>
-                        <artifactId>camunda-spin-dataformat-all</artifactId>
-                        <version>${version.camunda.spin}</version>
-                </dependency>
-                <dependency>
-                        <groupId>org.jboss.resteasy</groupId>
-                        <artifactId>jaxrs-api</artifactId>
-                        <version>${version.resteasy.jaxrs}</version>
-                        <scope>provided</scope>
-                </dependency>
-                <dependency>
-                        <groupId>org.mybatis</groupId>
-                        <artifactId>mybatis</artifactId>
-                        <version>${version.mybatis}</version>
-                </dependency>
-                <dependency>
-                        <groupId>pro.taskana</groupId>
-                        <artifactId>taskana-common</artifactId>
-                        <version>${version.taskana}</version>
-                </dependency>
-        </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.camunda.spin</groupId>
+        <artifactId>camunda-spin-bom</artifactId>
+        <scope>import</scope>
+        <type>pom</type>
+        <version>${version.camunda.spin}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-core</artifactId>
+      <version>${version.camunda.spin}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-dataformat-all</artifactId>
+      <version>${version.camunda.spin}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>jaxrs-api</artifactId>
+      <version>${version.resteasy.jaxrs}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis</artifactId>
+      <version>${version.mybatis}</version>
+    </dependency>
+    <dependency>
+      <groupId>pro.taskana</groupId>
+      <artifactId>taskana-common</artifactId>
+      <version>${version.taskana}</version>
+    </dependency>
+  </dependencies>
 
 
 </project>
