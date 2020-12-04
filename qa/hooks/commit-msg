@@ -1,7 +1,7 @@
 #!/bin/bash
 MSG_FILE=$1
 COMMIT_MESSAGE="$(cat $MSG_FILE)"
-REGEX='^((TSK)|(ADPT)-[0-9]+):'
+REGEX='^((ADPT)-[0-9]+):'
 if [[ $COMMIT_MESSAGE =~ $REGEX ]]; then
  TICKET=${BASH_REMATCH[1]}
  RESULT=$(curl -s https://taskana.atlassian.net/rest/api/3/issue/$TICKET)
@@ -10,6 +10,6 @@ if [[ $COMMIT_MESSAGE =~ $REGEX ]]; then
   exit 1
  fi
 else
- echo -e "\033[0;31mERROR:\033[0m Prefix Git commit messages with the ticket number, e.g. TSK-140: xyz..."
+ echo -e "\033[0;31mERROR:\033[0m Prefix Git commit messages with the ticket number, e.g. ADPT-140: xyz..."
  exit 1
 fi
