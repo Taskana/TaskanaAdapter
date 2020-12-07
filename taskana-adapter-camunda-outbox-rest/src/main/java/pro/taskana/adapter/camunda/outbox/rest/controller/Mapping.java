@@ -12,5 +12,4 @@ public final class Mapping {
   public static final String URL_COUNT_FAILED_EVENTS = "/count";
 
   private Mapping() {}
-
 }

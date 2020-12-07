@@ -11,5 +11,4 @@ public class CamundaTaskEventNotFoundException extends Exception implements Seri
   public CamundaTaskEventNotFoundException(String msg, Throwable cause) {
     super(msg, cause);
   }
-
 }

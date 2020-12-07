@@ -16,9 +16,7 @@ import org.apache.ibatis.jdbc.SqlRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Creates the outbox schema in the Camunda database.
- */
+/** Creates the outbox schema in the Camunda database. */
 public class TaskanaOutboxSchemaCreator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaOutboxSchemaCreator.class);

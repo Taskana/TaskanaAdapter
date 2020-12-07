@@ -87,19 +87,17 @@ public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEngi
         LOGGER.debug("Running scripts to create schema and tables for TaskanaOutbox");
         if (!schemaCreator.createSchema()) {
           LOGGER.error(
-                  "An error occured while trying to automatically create the "
-                          + "TaskanaOutbox schema and table. "
-                          + "Aborting the boot of camunda.");
+              "An error occured while trying to automatically create the "
+                  + "TaskanaOutbox schema and table. "
+                  + "Aborting the boot of camunda.");
           throw new SystemException(
-                  "An error occured while trying to automatically create the"
-                          + " TaskanaOutbox schema and table. "
-                          + "Aborting the boot of camunda.");
+              "An error occured while trying to automatically create the"
+                  + " TaskanaOutbox schema and table. "
+                  + "Aborting the boot of camunda.");
         }
       } else {
-        LOGGER.error(
-                "TaskanaOutbox schema does not exist and shall not be created.");
-        throw new SystemException(
-                "TaskanaOutbox schema does not exist and shall not be created.");
+        LOGGER.error("TaskanaOutbox schema does not exist and shall not be created.");
+        throw new SystemException("TaskanaOutbox schema does not exist and shall not be created.");
       }
     }
 

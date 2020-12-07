@@ -9,5 +9,4 @@ public class CamundaSpringBootExample {
   public static void main(String... args) {
     SpringApplication.run(CamundaSpringBootExample.class, args);
   }
-
 }

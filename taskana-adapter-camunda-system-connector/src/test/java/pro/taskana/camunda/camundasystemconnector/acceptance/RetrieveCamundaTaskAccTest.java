@@ -136,9 +136,7 @@ public class RetrieveCamundaTaskAccTest {
 
     String camundaSystemUrl = "http://localhost:8080";
     mockServer
-        .expect(
-            requestTo(
-                camundaSystemUrl + "/events?type=complete&type=delete"))
+        .expect(requestTo(camundaSystemUrl + "/events?type=complete&type=delete"))
         .andExpect(method(HttpMethod.GET))
         .andExpect(content().contentType(org.springframework.http.MediaType.APPLICATION_JSON))
         .andRespond(withSuccess(expectedReplyBody, MediaType.APPLICATION_JSON));
