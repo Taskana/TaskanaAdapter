@@ -6,7 +6,6 @@ import javax.security.auth.Subject;
 
 import pro.taskana.common.api.security.UserPrincipal;
 
-
 public class UserContext {
 
   private UserContext() {

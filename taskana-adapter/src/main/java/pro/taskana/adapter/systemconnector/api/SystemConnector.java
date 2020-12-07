@@ -77,8 +77,8 @@ public interface SystemConnector {
   String getSystemUrl();
 
   /**
-   * With this call the Adapter notifies the SystemConnector that a TASKANA task has failed
-   * to be created. Depending on the implementation of the SystemConnector, it may ignore this call.
+   * With this call the Adapter notifies the SystemConnector that a TASKANA task has failed to be
+   * created. Depending on the implementation of the SystemConnector, it may ignore this call.
    *
    * @param referencedTask The ReferencedTasks for which the TASKANA task failed to be created
    * @param e exception

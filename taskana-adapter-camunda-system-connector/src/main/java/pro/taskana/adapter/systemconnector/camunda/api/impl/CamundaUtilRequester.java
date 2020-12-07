@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemUrls;
 
-/** Util class for camunda requests used in multiple components of CamundaSystemConnectorImpl.*/
+/** Util class for camunda requests used in multiple components of CamundaSystemConnectorImpl. */
 public class CamundaUtilRequester {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CamundaUtilRequester.class);

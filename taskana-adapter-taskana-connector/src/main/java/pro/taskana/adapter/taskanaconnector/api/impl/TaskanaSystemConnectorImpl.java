@@ -121,8 +121,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
         | WorkbasketNotFoundException
         | TaskAlreadyExistException e) {
       LOGGER.error("Caught Exception {} when creating taskana task {} ", e, taskanaTask);
-      throw new TaskCreationFailedException(
-          "Error when creating a taskana task " + taskanaTask, e);
+      throw new TaskCreationFailedException("Error when creating a taskana task " + taskanaTask, e);
     }
   }
 
