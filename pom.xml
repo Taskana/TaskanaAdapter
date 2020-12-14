@@ -32,7 +32,7 @@
     <version.maven.surefire.plugin>3.0.0-M5</version.maven.surefire.plugin>
     <version.checkstyle>8.38</version.checkstyle>
     <version.maven.checkstyle>3.1.1</version.maven.checkstyle>
-    <version.spring.boot.maven.plugin>2.4.0</version.spring.boot.maven.plugin>
+    <version.spring.boot.maven.plugin>2.4.1</version.spring.boot.maven.plugin>
     <version.mybatis>3.5.6</version.mybatis>
     <version.spring.mybatis>2.1.4</version.spring.mybatis>
     <version.h2database>1.4.200</version.h2database>
