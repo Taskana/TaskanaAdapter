@@ -69,14 +69,27 @@ public class CamundaTaskRetriever {
     HttpHeaders headers = httpHeaderProvider.getHttpHeadersForOutboxRestApi();
     LOGGER.debug(
         "retrieving camunda task event resources with url {} and headers {}", requestUrl, headers);
-    ResponseEntity<CamundaTaskEventListResource> responseEntity =
-        restTemplate.exchange(
-            requestUrl,
-            HttpMethod.GET,
-            new HttpEntity<Object>(headers),
-            CamundaTaskEventListResource.class);
 
-    CamundaTaskEventListResource camundaTaskEventListResource = responseEntity.getBody();
+    CamundaTaskEventListResource camundaTaskEventListResource = new CamundaTaskEventListResource();
+    camundaTaskEventListResource.setCamundaTaskEvents(new ArrayList<>());
+
+    try {
+
+      ResponseEntity<CamundaTaskEventListResource> responseEntity =
+          restTemplate.exchange(
+              requestUrl,
+              HttpMethod.GET,
+              new HttpEntity<Object>(headers),
+              CamundaTaskEventListResource.class);
+
+      camundaTaskEventListResource = responseEntity.getBody();
+
+    } catch (Exception e) {
+      LOGGER.error(
+          "Caught exception while trying to retrieve CamundaTaskEvents from system with URL "
+              + camundaSystemTaskEventUrl,
+          e);
+    }
 
     List<CamundaTaskEvent> retrievedEvents = camundaTaskEventListResource.getCamundaTaskEvents();
     if (LOGGER.isDebugEnabled()) {
