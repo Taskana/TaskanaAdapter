@@ -9,7 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>camunda-outbox-spring-boot-sample</artifactId>
+  <artifactId>camunda-outbox-example-boot</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>

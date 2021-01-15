@@ -14,7 +14,6 @@
 
   <properties>
     <failOnMissingWebXml>false</failOnMissingWebXml>
-    <sonar.skip>true</sonar.skip>
   </properties>
 
   <dependencyManagement>
@@ -160,7 +159,7 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>${version.spring.boot.maven.plugin}</version>
+        <version>${version.maven.spring-boot}</version>
       </plugin>
       <plugin>
         <groupId>org.wildfly.plugins</groupId>

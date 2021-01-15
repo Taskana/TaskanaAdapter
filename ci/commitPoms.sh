@@ -2,26 +2,23 @@
 set -e # fail fast
 
 #H Usage:
-#H commitPoms.sh -h | commitPoms.sh --help
+#H %FILE% -h | %FILE% --help
 #H
 #H prints this help and exits
 #H
-#H commitPoms.sh [additional files...]
+#H %FILE% [additional files...]
 #H
 #H   commits and pushes all *.pom files (+ additional files)
 #H
 #H Requirements:
 #H   current commit is a HEAD commit
-#H   GH_TOKEN - github access token
-#H   GH_USER - username for the github access token
 #H   GH_USERNAME - github username / displayname (for git config)
 #H   GH_EMAIL - github email address (for git config)
-#H   TRAVIS_TAG (format v[0-9]+\.[0-9]+\.[0-9]+)
-#H   TRAVIS_REPO_SLUG - repo name (in form: owner_name/repo_name)
+#H   GITHUB_REF (format refs/tags/v[0-9]+\.[0-9]+\.[0-9]+)
 # Arguments:
 #   $1: exit code
 function helpAndExit() {
-  cat "$0" | grep "^#H" | cut -c4-
+  cat "$0" | grep "^#H" | cut -c4- | sed -e "s/%FILE%/$(basename "$0")/g"
   exit "$1"
 }
 
@@ -41,26 +38,26 @@ function increment_version() {
 
 function main() {
   [[ "$1" == '-h' || "$1" == '--help' ]] && helpAndExit 0
-  [[ -z "$GH_USER" || -z "$GH_TOKEN" || -z "$GH_EMAIL" || -z "$GH_USERNAME" || -z "$TRAVIS_REPO_SLUG" ]] && helpAndExit 1
-  if [[ "$TRAVIS_TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  [[ -z "$GH_EMAIL" || -z "$GH_USERNAME" ]] && helpAndExit 1
+  if [[ "$GITHUB_REF" =~ ^refs/tags/([0-9]+\.[0-9]+\.[0-9]+)/([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
     #check if tagged commit is a head commit of any branch
-    commit=$(git ls-remote -q -t origin | grep "$TRAVIS_TAG" | cut -c1-40)
+    commit=$(git ls-remote -q -t origin | grep "$GITHUB_REF" | cut -c1-40)
     branch=$(git ls-remote -q -h origin | grep "$commit" | sed "s/$commit.*refs\/heads\///")
 
     if [[ -z "$commit" || -z "$branch" ]]; then
-      echo "the commit '$commit' of tag '$TRAVIS_TAG' is not a head commit. Can not release" >&2
+      echo "the commit '$commit' of tag '${GITHUB_REF##refs/tags/}' is not a head commit. Can not release" >&2
       exit 1
     fi
 
     if [[ $(echo "$branch" | wc -l) != '1' ]]; then
       echo "can not match commit '$commit' to a unique branch." >&2
-      echo "Please make sure, that the tag '$TRAVIS_TAG' is the head of a unique branch" >&2
+      echo "Please make sure, that the tag '${GITHUB_REF##refs/tags/}' is the head of a unique branch" >&2
       echo "Branches detected: $branch"
       exit 1
     fi
     set -x
-    git config --global user.email $GH_EMAIL
-    git config --global user.name $GH_USERNAME
+    git config --global user.email "$GH_EMAIL"
+    git config --global user.name "$GH_USERNAME"
 
     #commit all poms
     git checkout "$branch"
@@ -68,11 +65,8 @@ function main() {
     for file in "$@"; do
       [[ -n "$file" ]] && git add "$file"
     done
-    git commit -m "Updated poms to version $(increment_version "${TRAVIS_TAG%%/*}")-SNAPSHOT/$(increment_version "${TRAVIS_TAG##*/}")-SNAPSHOT"
-
-    #push poms (authentication via GH_TOKEN)
-    git remote add deployment "https://$GH_USER:$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git"
-    git push --quiet --set-upstream deployment "$branch"
+    git commit -m "Updated poms to version $(increment_version "${BASH_REMATCH[@]:1:1}")-SNAPSHOT/$(increment_version "${BASH_REMATCH[@]:2:2}")-SNAPSHOT"
+    git push
   else
     echo "Nothing to push - this is not a release!"
   fi

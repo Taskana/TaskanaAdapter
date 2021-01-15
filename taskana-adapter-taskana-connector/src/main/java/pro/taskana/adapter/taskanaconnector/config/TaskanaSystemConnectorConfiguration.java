@@ -61,14 +61,15 @@ public class TaskanaSystemConnectorConfiguration {
 
   @Bean
   @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
-  public TaskanaEngine taskanaEngine(TaskanaEngineConfiguration taskanaEngineConfiguration) {
+  public TaskanaEngine taskanaEngine(TaskanaEngineConfiguration taskanaEngineConfiguration)
+      throws SQLException {
     return taskanaEngineConfiguration.buildTaskanaEngine();
   }
 
   @Bean
   @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
   public SpringTaskanaEngineConfiguration taskanaEngineConfiguration(
-      @Qualifier("taskanaDataSource") DataSource taskanaDataSource) throws SQLException {
+      @Qualifier("taskanaDataSource") DataSource taskanaDataSource) {
     return new SpringTaskanaEngineConfiguration(taskanaDataSource, true, true, taskanaSchemaName);
   }
 }
