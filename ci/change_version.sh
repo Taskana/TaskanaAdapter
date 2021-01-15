@@ -2,13 +2,13 @@
 set -e #fail fast
 
 #H Usage:
-#H change_version.sh -h | change_version.sh --help
+#H %FILE% -h | %FILE% --help
 #H
 #H prints this help and exits
 #H
-#H change_version.sh <-m modules...> [-i]
+#H %FILE% <-m modules...> [-i]
 #H
-#H   if a release version exists (extracted from TRAVIS_TAG)
+#H   if a release version exists (extracted from GITHUB_REF)
 #H   the maven versions of all modules will be changed to the given release version.
 #H
 #H module:
@@ -17,13 +17,13 @@ set -e #fail fast
 #H   increments version
 #H
 #H Environment variables:
-#H   - TRAVIS_TAG
-#H       if this is a tagged build then TRAVIS_TAG contains the version number.
-#H       pattern: v[DIGIT].[DIGIT].[DIGIT]
+#H   - GITHUB_REF
+#H       if this is a tagged build then GITHUB_REF contains the version number.
+#H       pattern: refs/tags/[DIGIT].[DIGIT].[DIGIT]/[DIGIT].[DIGIT].[DIGIT]
 # Arguments:
 #   $1: exitcode
 function helpAndExit() {
-  cat "$0" | grep "^#H" | cut -c4-
+  cat "$0" | grep "^#H" | cut -c4- | sed -e "s/%FILE%/$(basename "$0")/g"
   exit "$1"
 }
 
@@ -92,9 +92,9 @@ function main() {
     helpAndExit 1
   fi
 
-  if [[ "$TRAVIS_TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    version=$([[ -n "$INCREMENT" ]] && echo $(increment_version "${TRAVIS_TAG%%/*}")-SNAPSHOT || echo "${TRAVIS_TAG%%/*}")
-    prop_version=$([[ -n "$INCREMENT" ]] && echo $(increment_version "${TRAVIS_TAG##*/}")-SNAPSHOT || echo "${TRAVIS_TAG##*/}")
+  if [[ "$GITHUB_REF" =~ ^refs/tags/([0-9]+\.[0-9]+\.[0-9]+)/([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+    version=$([[ -n "$INCREMENT" ]] && echo $(increment_version "${BASH_REMATCH[@]:1:1}")-SNAPSHOT || echo "${BASH_REMATCH[@]:1:1}")
+    prop_version=$([[ -n "$INCREMENT" ]] && echo $(increment_version "${BASH_REMATCH[@]:2:2}")-SNAPSHOT || echo "${BASH_REMATCH[@]:2:2}")
     for dir in ${MODULES[@]}; do
       change_version "$dir" "$version"
       change_version_of_property "$dir" "version.taskana" "$prop_version"
