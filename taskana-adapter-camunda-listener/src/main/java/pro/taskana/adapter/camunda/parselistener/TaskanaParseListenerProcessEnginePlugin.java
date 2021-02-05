@@ -16,9 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pro.taskana.adapter.camunda.CamundaListenerConfiguration;
+import pro.taskana.adapter.camunda.exceptions.SystemException;
 import pro.taskana.adapter.camunda.schemacreator.DB;
 import pro.taskana.adapter.camunda.schemacreator.TaskanaOutboxSchemaCreator;
-import pro.taskana.common.api.exceptions.SystemException;
 
 /**
  * Camunda engine plugin responsible for adding the TaskanaParseListener to the
