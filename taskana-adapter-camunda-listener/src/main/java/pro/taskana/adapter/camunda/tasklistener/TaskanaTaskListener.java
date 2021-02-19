@@ -1,7 +1,5 @@
 package pro.taskana.adapter.camunda.tasklistener;
 
-import static pro.taskana.adapter.camunda.util.PrimitiveWrapperChecker.isPrimitiveWrapper;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Connection;
@@ -21,6 +19,7 @@ import java.util.stream.Collectors;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperties;
@@ -273,7 +272,7 @@ public class TaskanaTaskListener implements TaskListener {
       StringBuilder processVariablesBuilder,
       String nameOfprocessVariableToAdd) {
 
-    Object processVariable = delegateTask.getVariable(nameOfprocessVariableToAdd);
+    TypedValue processVariable = delegateTask.getVariableTyped(nameOfprocessVariableToAdd);
 
     if (processVariable != null) {
 
@@ -300,31 +299,26 @@ public class TaskanaTaskListener implements TaskListener {
   }
 
   private VariableValueDto determineProcessVariableTypeAndCreateVariableValueDto(
-      Object processVariable, ObjectMapper objectMapper) throws JsonProcessingException {
+      TypedValue processVariable, ObjectMapper objectMapper) throws JsonProcessingException {
 
     VariableValueDto variableValueDto = new VariableValueDto();
 
-    String type = "Object";
+    if (processVariable.getType().isPrimitiveValueType()) {
 
-    Map<String, Object> valueInfo = new HashMap<>();
-    valueInfo.put("objectTypeName", processVariable.getClass());
-
-    if (processVariable.getClass().isPrimitive()
-        || isPrimitiveWrapper((processVariable.getClass()))
-            && !processVariable.getClass().getTypeName().equals("String")) {
-
-      type = processVariable.getClass().getSimpleName();
-
-      variableValueDto.setType(type);
-      variableValueDto.setValue(processVariable);
-      variableValueDto.setValueInfo(valueInfo);
+      variableValueDto.setType(processVariable.getType().getName());
+      variableValueDto.setValue(processVariable.getValue());
 
     } else {
 
-      String processVariableJsonString = objectMapper.writeValueAsString(processVariable);
-      valueInfo.put("serializationDataFormat", "application/json");
-      variableValueDto.setType(type);
+      variableValueDto.setType(processVariable.getType().getName());
+
+      String processVariableJsonString =
+          objectMapper.writeValueAsString(processVariable.getValue());
       variableValueDto.setValue(processVariableJsonString);
+
+      Map<String, Object> valueInfo = new HashMap<>();
+      valueInfo.put("serializationDataFormat", "application/json");
+      valueInfo.put("objectTypeName", processVariable.getValue().getClass());
       variableValueDto.setValueInfo(valueInfo);
     }
 

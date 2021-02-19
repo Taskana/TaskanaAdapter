@@ -188,7 +188,7 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
 
     newProcessVariables.put(
         "camunda:attribute1",
-        "{\"type\":\"Object\","
+        "{\"type\":\"object\","
             + "\"value\":\"{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab "
             + "\\\\\\\\Backslash \\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\","
             + "\\\"intField\\\":1,\\\"doubleField\\\":1.1,\\\"booleanField\\\":false,"
@@ -201,11 +201,11 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
     newProcessVariables.put(
         "camunda:attribute2",
         "{\"valueInfo\":{\"objectTypeName\":\"java.lang.Boolean\"},"
-            + "\"type\":\"Boolean\",\"value\":true}");
+            + "\"type\":\"boolean\",\"value\":true}");
     newProcessVariables.put(
         "attribute3",
         "{\"valueInfo\":{\"objectTypeName\":\"java.lang.Integer\"},"
-            + "\"type\":\"Integer\",\"value\":5}");
+            + "\"type\":\"integer\",\"value\":5}");
 
     Task taskanaTask = this.taskService.getTask(taskanaTasks.get(0).getId());
     taskanaTask.setCustomAttributeMap(newProcessVariables);
