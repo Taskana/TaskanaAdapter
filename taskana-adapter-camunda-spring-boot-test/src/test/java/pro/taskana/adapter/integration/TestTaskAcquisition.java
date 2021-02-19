@@ -55,7 +55,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
     String expectedComplexProcessVariable =
-        "{\"type\":\"Object\","
+        "{\"type\":\"object\","
             + "\"value\":\""
             + "{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab"
             + " \\\\\\\\Backslash \\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\","
@@ -69,12 +69,10 @@ class TestTaskAcquisition extends AbsIntegrationTest {
             + "\"serializationDataFormat\":\"application/json\"}}";
 
     String expectedPrimitiveProcessVariable1 =
-        "{\"type\":\"Integer\",\"value\":5,"
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Integer\"}}";
+        "{\"type\":\"integer\",\"value\":5," + "\"valueInfo\":null}";
 
     String expectedPrimitiveProcessVariable2 =
-        "{\"type\":\"Boolean\",\"value\":true,"
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Boolean\"}}";
+        "{\"type\":\"boolean\",\"value\":true," + "\"valueInfo\":null}";
 
     camundaTaskIds.forEach(
         camundaTaskId -> {
@@ -169,15 +167,10 @@ class TestTaskAcquisition extends AbsIntegrationTest {
 
     Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
-    String expectedPrimitiveVariable1 =
-        "{\"type\":\"Long\",\"value\":555,\"valueInfo\":"
-            + "{\"objectTypeName\":\"java.lang.Long\"}}";
+    String expectedPrimitiveVariable1 = "{\"type\":\"long\",\"value\":555,\"valueInfo\":null}";
 
     String expectedPrimitiveVariable2 =
-        "{\"type\":\"Object\","
-            + "\"value\":\"\\\"item-xyz\\\"\","
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.String\","
-            + "\"serializationDataFormat\":\"application/json\"}}";
+        "{\"type\":\"string\",\"value\":\"item-xyz\",\"valueInfo\":null}";
 
     camundaTaskIds.forEach(
         camundaTaskId -> {
@@ -256,7 +249,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     Thread.sleep(this.adapterTaskPollingInterval);
 
     String expectedComplexProcessVariable =
-        "{\"type\":\"Object\","
+        "{\"type\":\"object\","
             + "\"value\":\""
             + "{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab"
             + " \\\\\\\\Backslash \\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\","
@@ -270,12 +263,10 @@ class TestTaskAcquisition extends AbsIntegrationTest {
             + "\"serializationDataFormat\":\"application/json\"}}";
 
     String expectedPrimitiveProcessVariable1 =
-        "{\"type\":\"Integer\",\"value\":5,"
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Integer\"}}";
+        "{\"type\":\"integer\",\"value\":5," + "\"valueInfo\":null}";
 
     String expectedPrimitiveProcessVariable2 =
-        "{\"type\":\"Boolean\",\"value\":true,"
-            + "\"valueInfo\":{\"objectTypeName\":\"java.lang.Boolean\"}}";
+        "{\"type\":\"boolean\",\"value\":true," + "\"valueInfo\":null}";
     camundaTaskIds.forEach(
         camundaTaskId -> {
           Map<String, String> customAttributes =
