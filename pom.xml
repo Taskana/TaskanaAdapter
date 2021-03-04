@@ -60,7 +60,7 @@
     <version.spring.core>2.0.0.RELEASE</version.spring.core>
     <version.spring.boot>2.4.3</version.spring.boot>
 
-    <version.camunda>7.11.0</version.camunda>
+    <version.camunda>7.14.0</version.camunda>
     <version.camunda.bpm.spring.boot>3.3.10</version.camunda.bpm.spring.boot>
     <version.camunda.bpm.spring.boot.webapps>3.3.10</version.camunda.bpm.spring.boot.webapps>
     <version.camunda.bpm.spring.boot.test>3.3.10</version.camunda.bpm.spring.boot.test>
