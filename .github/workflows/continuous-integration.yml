@@ -39,7 +39,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
       - name: Cache maven dependencies
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-${{ env.CACHE_MAVEN_NAME }}-${{ hashFiles('**/pom.xml') }}
@@ -77,7 +77,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
       - name: Cache maven dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-${{ env.CACHE_MAVEN_NAME }}-${{ hashFiles('**/pom.xml') }}
@@ -128,13 +128,13 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
       - name: Cache SonarCloud packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2.1.4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-${{ env.CACHE_SONAR_NAME }}
           restore-keys: ${{ runner.os }}-${{ env.CACHE_SONAR_NAME }}
       - name: Cache maven dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-${{ env.CACHE_MAVEN_NAME }}-${{ hashFiles('**/pom.xml') }}
