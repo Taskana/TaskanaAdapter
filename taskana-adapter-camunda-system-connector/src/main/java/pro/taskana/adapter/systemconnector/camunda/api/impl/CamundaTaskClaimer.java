@@ -27,8 +27,16 @@ public class CamundaTaskClaimer {
   @Value("${taskana.adapter.camunda.claiming.enabled:true}")
   private boolean claimingEnabled;
 
+  private boolean claimConfigLogged = false;
+
   public SystemResponse claimCamundaTask(
       CamundaSystemUrls.SystemUrlInfo camundaSystemUrlInfo, ReferencedTask referencedTask) {
+
+    if (!claimConfigLogged) {
+      LOGGER.info(
+          "Synchronizing claim of tasks in TASKANA to Camunda is set to " + claimingEnabled);
+      claimConfigLogged = true;
+    }
 
     if (claimingEnabled) {
 
