@@ -3,10 +3,9 @@ package pro.taskana.adapter.integration;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.util.List;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -39,9 +38,10 @@ import pro.taskana.task.api.models.TaskSummary;
 @EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
 @TestPropertySource(
     properties = {"taskana.adapter.camunda.claiming.enabled=false", "server.port=10813"})
+@Disabled(
+    "Sometimes fails due to flaky Spring Boot integration test behavior. "
+        + "Test itself is fine but disabled for now ")
 class TestDisabledTaskClaim extends AbsIntegrationTest {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(TestDisabledTaskClaim.class);
 
   @WithAccessId(
       user = "teamlead_1",
