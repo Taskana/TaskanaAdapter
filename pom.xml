@@ -35,7 +35,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <version.taskana>4.4.1-SNAPSHOT</version.taskana>
+    <version.taskana>4.5.0</version.taskana>
 
     <!-- build dependencies -->
     <version.checkstyle>8.41</version.checkstyle>
