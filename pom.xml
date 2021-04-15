@@ -39,6 +39,7 @@
 
     <!-- build dependencies -->
     <version.checkstyle>8.41.1</version.checkstyle>
+    <version.google-java-format>1.10.0</version.google-java-format>
     <version.maven.jar>3.2.0</version.maven.jar>
     <version.maven-war-plugin>3.3.1</version.maven-war-plugin>
     <version.maven.source>3.2.1</version.maven.source>
@@ -66,7 +67,8 @@
     <version.camunda.bpm.spring.boot.test>3.3.10</version.camunda.bpm.spring.boot.test>
     <version.camunda.bpm.extensions>1.2</version.camunda.bpm.extensions>
     <version.camunda.spin.engine.plugin>7.11.0</version.camunda.spin.engine.plugin>
-    <version.camunda.spin.dataformat.json.jackson>1.10.1</version.camunda.spin.dataformat.json.jackson>
+    <version.camunda.spin.dataformat.json.jackson>1.10.1
+    </version.camunda.spin.dataformat.json.jackson>
     <version.camunda.spin>1.10.1</version.camunda.spin>
     <version.resteasy.spring.boot>4.8.0.Final</version.resteasy.spring.boot>
     <version.resteasy.jaxrs>3.0.12.Final</version.resteasy.jaxrs>
@@ -145,6 +147,12 @@
         <version>${version.spring.boot}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <!-- Only necessary to automatically update the version for the pre-commit hook -->
+      <dependency>
+        <groupId>com.google.googlejavaformat</groupId>
+        <artifactId>google-java-format</artifactId>
+        <version>${version.google-java-format}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
