@@ -49,7 +49,7 @@
     <version.maven.surefire.plugin>3.0.0-M5</version.maven.surefire.plugin>
     <version.maven.checkstyle>3.1.2</version.maven.checkstyle>
     <version.maven.spring-boot>2.4.5</version.maven.spring-boot>
-    <version.maven.sonar>3.8.0.2131</version.maven.sonar>
+    <version.maven.sonar>3.9.0.2155</version.maven.sonar>
 
     <version.mybatis>3.5.7</version.mybatis>
     <version.spring.mybatis>2.1.4</version.spring.mybatis>
