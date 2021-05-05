@@ -86,7 +86,7 @@
 
     <version.maven.gpg>1.6</version.maven.gpg>
     <version.sonatype>1.6.8</version.sonatype>
-    <version.jacoco>0.8.6</version.jacoco>
+    <version.jacoco>0.8.7</version.jacoco>
 
     <!-- sonar settings -->
     <!--suppress UnresolvedMavenProperty -->
