@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>pro.taskana</groupId>
   <artifactId>taskana-adapter-parent</artifactId>
-  <version>1.4.1-SNAPSHOT</version>
+  <version>1.5.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
@@ -35,7 +35,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <version.taskana>4.6.1-SNAPSHOT</version.taskana>
+    <version.taskana>4.7.1-SNAPSHOT</version.taskana>
 
     <!-- build dependencies -->
     <version.checkstyle>8.43</version.checkstyle>
