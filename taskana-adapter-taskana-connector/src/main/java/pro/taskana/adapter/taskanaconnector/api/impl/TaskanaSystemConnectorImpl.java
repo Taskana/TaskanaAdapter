@@ -14,19 +14,16 @@ import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
-import pro.taskana.classification.api.exceptions.ClassificationNotFoundException;
-import pro.taskana.common.api.exceptions.InvalidArgumentException;
 import pro.taskana.common.api.exceptions.NotAuthorizedException;
+import pro.taskana.common.api.exceptions.TaskanaException;
 import pro.taskana.task.api.CallbackState;
 import pro.taskana.task.api.TaskService;
 import pro.taskana.task.api.TaskState;
 import pro.taskana.task.api.exceptions.InvalidOwnerException;
 import pro.taskana.task.api.exceptions.InvalidStateException;
-import pro.taskana.task.api.exceptions.TaskAlreadyExistException;
 import pro.taskana.task.api.exceptions.TaskNotFoundException;
 import pro.taskana.task.api.models.Task;
 import pro.taskana.task.api.models.TaskSummary;
-import pro.taskana.workbasket.api.exceptions.WorkbasketNotFoundException;
 
 /** Implements TaskanaConnector. */
 @Component
@@ -115,11 +112,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
   public void createTaskanaTask(Task taskanaTask) throws TaskCreationFailedException {
     try {
       taskService.createTask(taskanaTask);
-    } catch (NotAuthorizedException
-        | InvalidArgumentException
-        | ClassificationNotFoundException
-        | WorkbasketNotFoundException
-        | TaskAlreadyExistException e) {
+    } catch (TaskanaException e) {
       LOGGER.error("Caught Exception {} when creating taskana task {} ", e, taskanaTask);
       throw new TaskCreationFailedException("Error when creating a taskana task " + taskanaTask, e);
     }
