@@ -345,6 +345,7 @@ public class TaskanaTaskListener implements TaskListener {
 
     List<CamundaProperty> processModelExtensionProperties =
         model.getModelElementsByType(CamundaProperty.class).stream()
+            .filter(camundaProperty -> camundaProperty.getCamundaName() != null)
             .filter(camundaProperty -> camundaProperty.getCamundaName().equals(propertyKey))
             .collect(Collectors.toList());
 
@@ -372,6 +373,7 @@ public class TaskanaTaskListener implements TaskListener {
 
       List<CamundaProperty> userTaskExtensionProperties =
           camundaProperties.getCamundaProperties().stream()
+              .filter(camundaProperty -> camundaProperty.getCamundaName() != null)
               .filter(camundaProperty -> camundaProperty.getCamundaName().equals(propertyKey))
               .collect(Collectors.toList());
 

@@ -123,6 +123,70 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       groups = {"taskadmin"})
   @Test
   void
+      user_task_process_instance_with_empty_extension_property_started_in_camunda_via_rest_should_result_in_taskanaTask()
+          throws Exception {
+
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_process_with_empty_extension_property", "");
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    for (String camundaTaskId : camundaTaskIds) {
+      List<TaskSummary> taskanaTasks =
+          this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
+      assertThat(taskanaTasks).hasSize(1);
+      TaskSummary taskanaTaskSummary = taskanaTasks.get(0);
+      String taskanaTaskExternalId = taskanaTaskSummary.getExternalId();
+      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
+      String businessProcessId = taskanaTaskSummary.getBusinessProcessId();
+      assertThat(processInstanceId).isEqualTo(businessProcessId);
+    }
+
+    String expectedComplexProcessVariable =
+        "{\"type\":\"object\","
+            + "\"value\":\""
+            + "{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab"
+            + " \\\\\\\\Backslash \\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\","
+            + "\\\"intField\\\":1,\\\"doubleField\\\":1.1,\\\"booleanField\\\":false,"
+            + "\\\"processVariableTestObjectTwoField\\\":["
+            + "{\\\"stringFieldObjectTwo\\\":\\\"stringValueObjectTwo\\\","
+            + "\\\"intFieldObjectTwo\\\":2,\\\"doubleFieldObjectTwo\\\":2.2,"
+            + "\\\"booleanFieldObjectTwo\\\":true,"
+            + "\\\"dateFieldObjectTwo\\\":\\\"1970-01-01 13:12:11\\\"}]}\","
+            + "\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\","
+            + "\"serializationDataFormat\":\"application/json\"}}";
+
+    String expectedPrimitiveProcessVariable1 =
+        "{\"type\":\"integer\",\"value\":5," + "\"valueInfo\":null}";
+
+    String expectedPrimitiveProcessVariable2 =
+        "{\"type\":\"boolean\",\"value\":true," + "\"valueInfo\":null}";
+    
+    camundaTaskIds.forEach(
+        camundaTaskId -> {
+          Map<String, String> customAttributes =
+              retrieveCustomAttributesFromNewTaskanaTask(camundaTaskId);
+
+          assertThat(
+              expectedComplexProcessVariable,
+              SameJSONAs.sameJSONAs(customAttributes.get("camunda:attribute1")));
+          assertThat(
+              expectedPrimitiveProcessVariable1,
+              SameJSONAs.sameJSONAs(customAttributes.get("camunda:attribute2")));
+          assertThat(
+              expectedPrimitiveProcessVariable2,
+              SameJSONAs.sameJSONAs(customAttributes.get("camunda:attribute3")));
+        });
+  }
+
+  @WithAccessId(
+      user = "teamlead_1",
+      groups = {"taskadmin"})
+  @Test
+  void
       multiple_user_task_process_instances_started_in_camunda_via_rest_should_result_in_multiple_taskanaTasks()
           throws Exception {
 
