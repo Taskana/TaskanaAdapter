@@ -2,7 +2,6 @@ package pro.taskana.adapter.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.fail;
 
 import java.time.Instant;
 import java.util.List;
@@ -19,7 +18,7 @@ import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
 import pro.taskana.common.test.security.JaasExtension;
 import pro.taskana.common.test.security.WithAccessId;
 import pro.taskana.task.api.TaskState;
-import pro.taskana.task.api.exceptions.InvalidStateException;
+import pro.taskana.task.api.exceptions.InvalidCallbackStateException;
 import pro.taskana.task.api.exceptions.TaskNotFoundException;
 import pro.taskana.task.api.models.TaskSummary;
 
@@ -62,13 +61,13 @@ class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       // complete taskana-task and wait
       this.taskService.claim(taskanaTaskId);
       this.taskService.completeTask(taskanaTaskId);
-      try {
-        this.taskService.deleteTask(taskanaTaskId);
-        fail("expected an InvalidStateExcpetion but no Exception was thrown");
-      } catch (InvalidStateException e) {
-        assertThat(e.getMessage())
-            .endsWith("cannot be deleted because its callback is not yet processed");
-      }
+      assertThatThrownBy(() -> taskService.deleteTask(taskanaTaskId))
+          .isInstanceOf(InvalidCallbackStateException.class)
+          .hasMessageContaining(
+              "Expected callback state of Task with id '%s' "
+                  + "to be: '[NONE, CLAIMED, CALLBACK_PROCESSING_COMPLETED]', "
+                  + "but found 'CALLBACK_PROCESSING_REQUIRED'",
+              taskanaTaskId);
       Thread.sleep((long) (this.adapterCancelPollingInterval * 1.2));
 
       // assert camunda task was deleted

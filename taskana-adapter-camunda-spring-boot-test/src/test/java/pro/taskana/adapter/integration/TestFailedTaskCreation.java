@@ -25,7 +25,6 @@ import pro.taskana.impl.configuration.DbCleaner.ApplicationDatabaseType;
 @AutoConfigureWebTestClient
 @ExtendWith(JaasExtension.class)
 @ContextConfiguration
-@SuppressWarnings("checkstyle:LineLength")
 class TestFailedTaskCreation extends AbsIntegrationTest {
 
   @AfterEach
@@ -105,7 +104,7 @@ class TestFailedTaskCreation extends AbsIntegrationTest {
         .extracting(CamundaTaskEvent::getError)
         .containsOnly(
             "pro.taskana.workbasket.api.exceptions.WorkbasketNotFoundException: "
-                + "Workbasket with key invalidWorkbasketKey and domain null was not found.");
+                + "Workbasket with key 'invalidWorkbasketKey' and domain 'null' was not found.");
   }
 
   @WithAccessId(
