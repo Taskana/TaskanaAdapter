@@ -114,7 +114,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
       taskService.createTask(taskanaTask);
     } catch (TaskanaException e) {
       LOGGER.error("Caught Exception {} when creating taskana task {} ", e, taskanaTask);
-      throw new TaskCreationFailedException("Error when creating a taskana task " + taskanaTask, e);
+      throw new TaskCreationFailedException(taskanaTask.getExternalId(), e);
     }
   }
 

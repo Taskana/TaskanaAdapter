@@ -12,14 +12,10 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 
 import pro.taskana.TaskanaEngineConfiguration;
 import pro.taskana.classification.api.ClassificationService;
-import pro.taskana.classification.api.exceptions.ClassificationAlreadyExistException;
 import pro.taskana.classification.api.exceptions.ClassificationNotFoundException;
 import pro.taskana.classification.api.models.Classification;
 import pro.taskana.common.api.TaskanaEngine;
 import pro.taskana.common.api.TaskanaEngine.ConnectionManagementMode;
-import pro.taskana.common.api.exceptions.DomainNotFoundException;
-import pro.taskana.common.api.exceptions.InvalidArgumentException;
-import pro.taskana.common.api.exceptions.NotAuthorizedException;
 import pro.taskana.common.test.security.JaasExtension;
 import pro.taskana.common.test.security.WithAccessId;
 import pro.taskana.impl.configuration.DbCleaner;
@@ -27,9 +23,6 @@ import pro.taskana.task.api.TaskService;
 import pro.taskana.workbasket.api.WorkbasketPermission;
 import pro.taskana.workbasket.api.WorkbasketService;
 import pro.taskana.workbasket.api.WorkbasketType;
-import pro.taskana.workbasket.api.exceptions.InvalidWorkbasketException;
-import pro.taskana.workbasket.api.exceptions.WorkbasketAccessItemAlreadyExistException;
-import pro.taskana.workbasket.api.exceptions.WorkbasketAlreadyExistException;
 import pro.taskana.workbasket.api.exceptions.WorkbasketNotFoundException;
 import pro.taskana.workbasket.api.models.Workbasket;
 import pro.taskana.workbasket.api.models.WorkbasketAccessItem;
@@ -144,9 +137,7 @@ public abstract class AbsIntegrationTest {
   }
 
   public void createWorkbasket(TaskanaEngine engine, String workbasketKey, String domain)
-      throws NotAuthorizedException, DomainNotFoundException, InvalidWorkbasketException,
-          WorkbasketAlreadyExistException, WorkbasketNotFoundException, InvalidArgumentException,
-          WorkbasketAccessItemAlreadyExistException {
+      throws Exception {
     WorkbasketService workbasketService = engine.getWorkbasketService();
     Workbasket wb;
     try {
@@ -161,9 +152,7 @@ public abstract class AbsIntegrationTest {
     }
   }
 
-  private void createWorkbasketAccessList(TaskanaEngine engine, Workbasket wb)
-      throws WorkbasketNotFoundException, InvalidArgumentException, NotAuthorizedException,
-          WorkbasketAccessItemAlreadyExistException {
+  private void createWorkbasketAccessList(TaskanaEngine engine, Workbasket wb) throws Exception {
     WorkbasketService workbasketService = engine.getWorkbasketService();
     WorkbasketAccessItem workbasketAccessItem =
         workbasketService.newWorkbasketAccessItem(wb.getId(), wb.getOwner());
@@ -177,9 +166,7 @@ public abstract class AbsIntegrationTest {
   }
 
   private Classification createClassification(
-      TaskanaEngine engine, String classificationKey, String domain)
-      throws DomainNotFoundException, ClassificationAlreadyExistException, NotAuthorizedException,
-          InvalidArgumentException {
+      TaskanaEngine engine, String classificationKey, String domain) throws Exception {
     ClassificationService myClassificationService = engine.getClassificationService();
 
     Classification classification;

@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import pro.taskana.adapter.exceptions.ReferencedTaskDoesNotExistInExternalSystemException;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
@@ -86,14 +85,9 @@ public class TaskanaTaskStarter {
       throws TaskCreationFailedException {
     LOGGER.trace("TaskanaTaskStarter.createTaskanaTask ENTRY ");
     referencedTask.setSystemUrl(systemConnector.getSystemUrl());
-    try {
-      addVariablesToReferencedTask(referencedTask, systemConnector);
-      Task taskanaTask = connector.convertToTaskanaTask(referencedTask);
-      connector.createTaskanaTask(taskanaTask);
-    } catch (ReferencedTaskDoesNotExistInExternalSystemException e) {
-      LOGGER.warn(
-          "While attempting to retrieve variables for task {} caught ", referencedTask.getId(), e);
-    }
+    addVariablesToReferencedTask(referencedTask, systemConnector);
+    Task taskanaTask = connector.convertToTaskanaTask(referencedTask);
+    connector.createTaskanaTask(taskanaTask);
 
     LOGGER.trace("TaskanaTaskStarter.createTaskanaTask EXIT ");
   }
