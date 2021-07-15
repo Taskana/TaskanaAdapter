@@ -74,7 +74,7 @@ public class CamundaTaskClaimer {
             httpHeaderProvider, restTemplate, camundaSystemUrlInfo, referencedTask.getId())) {
           return new SystemResponse(HttpStatus.OK, null);
         } else {
-          LOGGER.warn("Caught Exception when trying to complete camunda task", e);
+          LOGGER.warn("Caught Exception when trying to claim camunda task", e);
           throw e;
         }
       }
