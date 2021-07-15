@@ -34,7 +34,9 @@ public class CamundaTaskEventErrorHandler {
         "{\"taskEventId\":"
             + referencedTask.getOutboxEventId()
             + ",\"errorLog\":\""
-            + e.getCause()
+            + e.getCause().getClass().getName()
+            + ": "
+            + e.getCause().getMessage()
             + "\"}";
 
     LOGGER.debug("decreaseRemainingRetriesAndLogError Events url {} ", requestUrl);

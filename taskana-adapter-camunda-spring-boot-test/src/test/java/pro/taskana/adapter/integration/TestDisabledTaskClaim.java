@@ -47,12 +47,11 @@ class TestDisabledTaskClaim extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_NotClaimCamundaTask_When_ClaimingTaskanaTaskAndCamundaClaimingDisabled()
-      throws Exception {
+  void should_NotClaimOrCancelClaimCamundaTask_When_CamundaClaimingDisabled() throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
-            "simple_user_task_process", "");
+            "simple_user_task_with_assignee_process", "");
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
@@ -69,10 +68,10 @@ class TestDisabledTaskClaim extends AbsIntegrationTest {
     String taskanaTaskExternalId = taskanaTask.getExternalId();
     assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
 
-    // verify that no assignee for camunda task is set yet
-    boolean noAssigneeSet =
-        this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, null);
-    assertThat(noAssigneeSet).isTrue();
+    // verify that assignee is already set
+    boolean assigneeAlreadySet =
+        this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, "someAssignee");
+    assertThat(assigneeAlreadySet).isTrue();
 
     // verify that TaskState of taskana task is 'READY' first
     String taskanaTaskId = taskanaTask.getId();
@@ -87,7 +86,17 @@ class TestDisabledTaskClaim extends AbsIntegrationTest {
     Thread.sleep((long) (this.adapterClaimPollingInterval * 1.3));
     // verify assignee for camunda task did not get updated
     boolean assigneeNotUpdated =
-        this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, null);
+        this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, "someAssignee");
+    assertThat(assigneeNotUpdated).isTrue();
+
+    // cancel claim TASKANA task
+    taskService.forceCancelClaim(task.getId());
+
+    Thread.sleep((long) (this.adapterClaimPollingInterval * 1.3));
+
+    // verify assignee for camunda task did not get updated
+    assigneeNotUpdated =
+        this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, "someAssignee");
     assertThat(assigneeNotUpdated).isTrue();
   }
 }
