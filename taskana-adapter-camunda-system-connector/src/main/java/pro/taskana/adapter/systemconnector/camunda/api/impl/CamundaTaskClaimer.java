@@ -24,7 +24,7 @@ public class CamundaTaskClaimer {
   @Autowired HttpHeaderProvider httpHeaderProvider;
   @Autowired private RestTemplate restTemplate;
 
-  @Value("${taskana.adapter.camunda.claiming.enabled:true}")
+  @Value("${taskana.adapter.camunda.claiming.enabled:false}")
   private boolean claimingEnabled;
 
   private boolean claimConfigLogged = false;
