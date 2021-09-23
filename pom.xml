@@ -80,7 +80,7 @@
     <version.jboss-as-maven-plugin>7.9.Final</version.jboss-as-maven-plugin>
 
     <version.assertj>3.20.2</version.assertj>
-    <version.junit.jupiter>5.8.0</version.junit.jupiter>
+    <version.junit.jupiter>5.8.1</version.junit.jupiter>
     <version.hamcrest.json>0.2</version.hamcrest.json>
 
     <version.maven.gpg>3.0.1</version.maven.gpg>
