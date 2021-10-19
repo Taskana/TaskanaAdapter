@@ -55,7 +55,7 @@
     <version.spring.mybatis>2.2.0</version.spring.mybatis>
     <version.h2database>1.4.200</version.h2database>
     <version.db2>11.1.1.1</version.db2>
-    <version.postgres>42.2.24</version.postgres>
+    <version.postgres>42.3.0</version.postgres>
 
     <version.spring>5.0.5.RELEASE</version.spring>
     <version.spring.core>2.0.0.RELEASE</version.spring.core>
