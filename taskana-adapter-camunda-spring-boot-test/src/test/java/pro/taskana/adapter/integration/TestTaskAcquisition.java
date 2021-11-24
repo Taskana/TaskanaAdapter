@@ -164,7 +164,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
 
     String expectedPrimitiveProcessVariable2 =
         "{\"type\":\"boolean\",\"value\":true," + "\"valueInfo\":null}";
-    
+
     camundaTaskIds.forEach(
         camundaTaskId -> {
           Map<String, String> customAttributes =
