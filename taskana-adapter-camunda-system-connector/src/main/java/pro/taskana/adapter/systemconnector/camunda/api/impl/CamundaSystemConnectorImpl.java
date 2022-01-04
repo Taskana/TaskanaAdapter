@@ -108,4 +108,9 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
     taskEventErrorHandler.decreaseRemainingRetriesAndLogErrorForReferencedTask(
         referencedTask, e, camundaSystemUrl.getSystemTaskEventUrl());
   }
+
+  @Override
+  public String toString() {
+    return "CamundaSystemConnectorImpl [camundaSystemUrl=" + camundaSystemUrl + "]";
+  }
 }

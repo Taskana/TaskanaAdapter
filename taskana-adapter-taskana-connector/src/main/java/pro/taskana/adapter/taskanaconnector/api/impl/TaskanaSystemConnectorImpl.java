@@ -186,4 +186,9 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
 
     return result;
   }
+
+  @Override
+  public String toString() {
+    return "TaskanaSystemConnectorImpl [taskService=" + taskService + "]";
+  }
 }

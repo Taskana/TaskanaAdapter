@@ -58,11 +58,12 @@ public class AdapterManager {
         ServiceLoader.load(SystemConnectorProvider.class);
     for (SystemConnectorProvider provider : loader) {
       List<SystemConnector> connectors = provider.create();
-      if (LOGGER.isInfoEnabled()) {
-        LOGGER.info("initialized system connectors {} ", connectors);
-      }
       for (SystemConnector conn : connectors) {
         systemConnectors.put(conn.getSystemUrl(), conn);
+        if (LOGGER.isInfoEnabled()) {
+          LOGGER.info(
+              "initialized system connectors {} for system_url {}", conn, conn.getSystemUrl());
+        }
       }
     }
   }
