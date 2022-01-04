@@ -59,7 +59,7 @@
     <version.maven.sonar>3.9.1.2184</version.maven.sonar>
 
     <version.mybatis>3.5.9</version.mybatis>
-    <version.spring.mybatis>2.2.0</version.spring.mybatis>
+    <version.spring.mybatis>2.2.1</version.spring.mybatis>
     <version.h2database>1.4.200</version.h2database>
     <version.db2>11.1.1.1</version.db2>
     <version.postgres>42.3.1</version.postgres>
