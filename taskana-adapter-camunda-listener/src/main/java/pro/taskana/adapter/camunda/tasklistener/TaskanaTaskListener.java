@@ -45,7 +45,7 @@ public class TaskanaTaskListener implements TaskListener {
   private static final String DEFAULT_SCHEMA = "taskana_tables";
   private static final String SQL_INSERT_EVENT =
       "INSERT INTO event_store (TYPE,CREATED,PAYLOAD,REMAINING_RETRIES,"
-          + "BLOCKED_UNTIL,CAMUNDA_TASK_ID) VALUES (?,?,?,?,?,?)";
+          + "BLOCKED_UNTIL,CAMUNDA_TASK_ID, SYSTEM_ENGINE_IDENTIFIER) VALUES (?,?,?,?,?,?,?)";
   private static TaskanaTaskListener instance = null;
 
   private final ObjectMapper objectMapper = JacksonConfigurator.createAndConfigureObjectMapper();
@@ -73,6 +73,15 @@ public class TaskanaTaskListener implements TaskListener {
                   "TaskanaTaskListener activated successfully, connected to %s",
                   connection.getMetaData().getURL()));
         }
+      }
+
+      String engineName = delegateTask.getProcessEngine().getName();
+      if (engineName.length() > 128) {
+        throw new SystemException(
+            "The configured process engine name "
+                + engineName
+                + " is too long. "
+                + "Length must not exceed 128 characters.");
       }
 
       switch (delegateTask.getEventName()) {
@@ -190,6 +199,7 @@ public class TaskanaTaskListener implements TaskListener {
       preparedStatement.setInt(4, initialRetries);
       preparedStatement.setTimestamp(5, eventCreationTimestamp);
       preparedStatement.setString(6, delegateTask.getId());
+      preparedStatement.setString(7, delegateTask.getProcessEngine().getName());
 
       preparedStatement.execute();
     }

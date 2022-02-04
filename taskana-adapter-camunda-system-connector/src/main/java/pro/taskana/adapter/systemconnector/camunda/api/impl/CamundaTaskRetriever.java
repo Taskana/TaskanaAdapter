@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,8 @@ public class CamundaTaskRetriever {
   @Autowired private ObjectMapper objectMapper;
   @Autowired private RestTemplate restTemplate;
 
-  public List<ReferencedTask> retrieveNewStartedCamundaTasks(String camundaSystemTaskEventUrl) {
+  public List<ReferencedTask> retrieveNewStartedCamundaTasks(
+      String camundaSystemTaskEventUrl, String camundaSystemEngineIdentifier) {
 
     LOGGER.debug("entry to retrieveNewStartedCamundaTasks.");
 
@@ -37,7 +39,7 @@ public class CamundaTaskRetriever {
             camundaSystemTaskEventUrl, CamundaSystemConnectorImpl.URL_GET_CAMUNDA_CREATE_EVENTS);
 
     List<ReferencedTask> referencedTasks =
-        getReferencedTasksFromCamundaTaskEvents(camundaTaskEvents);
+        getReferencedTasksFromCamundaTaskEvents(camundaTaskEvents, camundaSystemEngineIdentifier);
 
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("exit from retrieveActiveCamundaTasks. Retrieved Tasks: {}", referencedTasks);
@@ -45,7 +47,8 @@ public class CamundaTaskRetriever {
     return referencedTasks;
   }
 
-  public List<ReferencedTask> retrieveFinishedCamundaTasks(String camundaSystemUrl) {
+  public List<ReferencedTask> retrieveFinishedCamundaTasks(
+      String camundaSystemUrl, String camundaSystemEngineIdentifier) {
     LOGGER.debug("entry to retrieveFinishedCamundaTasks. CamundSystemURL = {} ", camundaSystemUrl);
 
     List<CamundaTaskEvent> camundaTaskEvents =
@@ -53,7 +56,7 @@ public class CamundaTaskRetriever {
             camundaSystemUrl, CamundaSystemConnectorImpl.URL_GET_CAMUNDA_FINISHED_EVENTS);
 
     List<ReferencedTask> referencedTasks =
-        getReferencedTasksFromCamundaTaskEvents(camundaTaskEvents);
+        getReferencedTasksFromCamundaTaskEvents(camundaTaskEvents, camundaSystemEngineIdentifier);
 
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("exit from retrieveFinishedCamundaTasks. Retrieved Tasks: {}", referencedTasks);
@@ -100,33 +103,37 @@ public class CamundaTaskRetriever {
   }
 
   private List<ReferencedTask> getReferencedTasksFromCamundaTaskEvents(
-      List<CamundaTaskEvent> camundaTaskEvents) {
+      List<CamundaTaskEvent> camundaTaskEvents, String systemEngineIdentifier) {
 
     List<ReferencedTask> referencedTasks = new ArrayList<>();
 
     for (CamundaTaskEvent camundaTaskEvent : camundaTaskEvents) {
 
-      String referencedTaskJson = camundaTaskEvent.getPayload();
+      if (systemEngineIdentifier == null
+          || Objects.equals(camundaTaskEvent.getSystemEngineIdentifier(), systemEngineIdentifier)) {
 
-      try {
+        String referencedTaskJson = camundaTaskEvent.getPayload();
 
-        ReferencedTask referencedTask =
-            objectMapper.readValue(referencedTaskJson, ReferencedTask.class);
-        referencedTask.setOutboxEventId(String.valueOf(camundaTaskEvent.getId()));
-        referencedTask.setOutboxEventType(String.valueOf(camundaTaskEvent.getType()));
-        referencedTasks.add(referencedTask);
+        try {
 
-      } catch (IOException e) {
+          ReferencedTask referencedTask =
+              objectMapper.readValue(referencedTaskJson, ReferencedTask.class);
+          referencedTask.setOutboxEventId(String.valueOf(camundaTaskEvent.getId()));
+          referencedTask.setOutboxEventType(String.valueOf(camundaTaskEvent.getType()));
+          referencedTasks.add(referencedTask);
 
-        LOGGER.warn(
-            "Caught {} while trying to create ReferencedTasks "
-                + " out of CamundaTaskEventResources. RefTaskJson = {}",
-            e,
-            referencedTaskJson);
+        } catch (IOException e) {
+
+          LOGGER.warn(
+              "Caught {} while trying to create ReferencedTasks "
+                  + " out of CamundaTaskEventResources. RefTaskJson = {}",
+              e,
+              referencedTaskJson);
+        }
       }
-    }
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("retrieved reference tasks {}", referencedTasks);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("retrieved reference tasks {}", referencedTasks);
+      }
     }
     return referencedTasks;
   }

@@ -9,39 +9,46 @@ import org.springframework.stereotype.Component;
 @Component
 public class CamundaSystemUrls {
 
-  Set<SystemUrlInfo> theCamundaSystemUrls = new HashSet<>();
+  Set<SystemUrlInfo> camundaSystemUrls = new HashSet<>();
 
   public CamundaSystemUrls(String strUrls) {
     if (strUrls != null) {
       StringTokenizer systemTokenizer = new StringTokenizer(strUrls, ",");
       while (systemTokenizer.hasMoreTokens()) {
-        String currentUrlPair = systemTokenizer.nextToken().trim();
+        String currentSystemConfigs = systemTokenizer.nextToken().trim();
+        StringTokenizer systemConfigParts = new StringTokenizer(currentSystemConfigs, "|");
         SystemUrlInfo urlInfo = new SystemUrlInfo();
-        urlInfo.setSystemRestUrl(currentUrlPair.substring(0, currentUrlPair.indexOf('|')).trim());
-        urlInfo.setSystemTaskEventUrl(
-            currentUrlPair
-                .substring(currentUrlPair.indexOf('|') + 1, currentUrlPair.length())
-                .trim());
 
-        theCamundaSystemUrls.add(urlInfo);
+        urlInfo.setSystemRestUrl(systemConfigParts.nextToken().trim());
+        urlInfo.setSystemTaskEventUrl(systemConfigParts.nextToken().trim());
+
+        if (systemConfigParts.countTokens() == 1) {
+          urlInfo.setCamundaEngineIdentifier(systemConfigParts.nextToken().trim());
+        }
+
+        camundaSystemUrls.add(urlInfo);
       }
     }
   }
 
   public Set<SystemUrlInfo> getUrls() {
-    return theCamundaSystemUrls;
+    return camundaSystemUrls;
   }
 
   @Override
   public String toString() {
-    return "CamundaSystemUrls [camundaSystemUrls=" + theCamundaSystemUrls + "]";
+    return "CamundaSystemUrls [camundaSystemUrls=" + camundaSystemUrls + "]";
   }
 
-  /** Holds the URS (Camunda REST Api and outbox REST) of a specific camunda system. */
+  /**
+   * Holds the URS (Camunda REST Api and outbox REST) of a specific camunda system as well as an
+   * optional identfier for the responsible camunda engine.
+   */
   public static class SystemUrlInfo {
 
     private String systemRestUrl;
     private String systemTaskEventUrl;
+    private String camundaEngineIdentifier;
 
     public String getSystemRestUrl() {
       return systemRestUrl;
@@ -59,12 +66,22 @@ public class CamundaSystemUrls {
       this.systemTaskEventUrl = systemTaskEventUrl;
     }
 
+    public String getCamundaEngineIdentifier() {
+      return camundaEngineIdentifier;
+    }
+
+    public void setCamundaEngineIdentifier(String camundaEngineIdentifier) {
+      this.camundaEngineIdentifier = camundaEngineIdentifier;
+    }
+
     @Override
     public String toString() {
       return "SystemUrlInfo [systemRestUrl="
           + systemRestUrl
           + ", systemTaskEventUrl="
           + systemTaskEventUrl
+          + ", camundaEngineIdentifier="
+          + camundaEngineIdentifier
           + "]";
     }
   }

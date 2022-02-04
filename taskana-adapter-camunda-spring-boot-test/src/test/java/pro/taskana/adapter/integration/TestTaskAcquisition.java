@@ -8,16 +8,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
+import pro.taskana.adapter.manager.AdapterManager;
+import pro.taskana.adapter.systemconnector.api.SystemConnector;
+import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaSystemConnectorImpl;
+import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemUrls.SystemUrlInfo;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
 import pro.taskana.common.api.exceptions.NotAuthorizedException;
 import pro.taskana.common.test.security.JaasExtension;
@@ -37,6 +44,10 @@ import pro.taskana.task.api.models.TaskSummary;
 class TestTaskAcquisition extends AbsIntegrationTest {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TestTaskAcquisition.class);
+  @Autowired AdapterManager adapterManager;
+
+  @Value("${taskana-system-connector-camundaSystemURLs}")
+  private String configuredSystemConnectorUrls;
 
   @WithAccessId(
       user = "teamlead_1",
@@ -371,6 +382,93 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
       assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
     }
+  }
+
+  @WithAccessId(
+      user = "teamlead_1",
+      groups = {"taskadmin"})
+  @Test
+  void should_createTaskanaTask_When_SystemConnectorHasCorrectSystemEngineIdentifier()
+      throws Exception {
+
+    final Map<String, SystemConnector> originalSystemConnectors =
+        new HashMap<>(adapterManager.getSystemConnectors());
+
+    setSystemConnector("default");
+
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_process", "");
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    for (String camundaTaskId : camundaTaskIds) {
+      List<TaskSummary> taskanaTasks =
+          this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
+      assertThat(taskanaTasks).hasSize(1);
+      TaskSummary taskanaTaskSummary = taskanaTasks.get(0);
+      String taskanaTaskExternalId = taskanaTaskSummary.getExternalId();
+      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
+      String businessProcessId = taskanaTaskSummary.getBusinessProcessId();
+      assertThat(processInstanceId).isEqualTo(businessProcessId);
+    }
+
+    adapterManager.getSystemConnectors().clear();
+    adapterManager.getSystemConnectors().putAll(originalSystemConnectors);
+  }
+
+  @WithAccessId(
+      user = "teamlead_1",
+      groups = {"taskadmin"})
+  @Test
+  void should_notCreateTaskanaTask_When_SystemConnectorHasIncorrectSystemEngineIdentifier()
+      throws Exception {
+
+    final Map<String, SystemConnector> originalSystemConnectors =
+        new HashMap<>(adapterManager.getSystemConnectors());
+
+    setSystemConnector("wrongIdentifier");
+
+    assertThat(taskanaOutboxRequester.getAllEvents()).isEmpty();
+
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_process", "");
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    assertThat(taskanaOutboxRequester.getAllEvents()).hasSize(1);
+
+    Thread.sleep((this.adapterTaskPollingInterval * 2));
+
+    for (String camundaTaskId : camundaTaskIds) {
+      List<TaskSummary> taskanaTasks =
+          this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
+      assertThat(taskanaTasks).isEmpty();
+    }
+
+    assertThat(taskanaOutboxRequester.getAllEvents()).hasSize(1);
+
+    adapterManager.getSystemConnectors().clear();
+    adapterManager.getSystemConnectors().putAll(originalSystemConnectors);
+  }
+
+  private void setSystemConnector(String systemEngineIdentifier) {
+
+    StringTokenizer systemConfigParts = new StringTokenizer(configuredSystemConnectorUrls, "|");
+    SystemUrlInfo systemUrlInfo = new SystemUrlInfo();
+    systemUrlInfo.setCamundaEngineIdentifier(systemEngineIdentifier);
+    systemUrlInfo.setSystemRestUrl(systemConfigParts.nextToken().trim());
+    systemUrlInfo.setSystemTaskEventUrl(systemConfigParts.nextToken().trim());
+
+    SystemConnector systemConnector = new CamundaSystemConnectorImpl(systemUrlInfo);
+
+    Map<String, SystemConnector> systemConnectors = adapterManager.getSystemConnectors();
+    systemConnectors.clear();
+
+    systemConnectors.put(systemUrlInfo.getSystemRestUrl(), systemConnector);
   }
 
   private Map<String, String> retrieveCustomAttributesFromNewTaskanaTask(String camundaTaskId) {

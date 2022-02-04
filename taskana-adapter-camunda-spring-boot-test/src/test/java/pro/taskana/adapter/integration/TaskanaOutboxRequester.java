@@ -64,6 +64,19 @@ public class TaskanaOutboxRequester {
     return answer.getBody().getCamundaTaskEvents();
   }
 
+
+  public List<CamundaTaskEvent> getAllEvents() {
+
+    String url = BASIC_OUTBOX_PATH;
+
+    HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
+    ResponseEntity<CamundaTaskEventListResource> answer =
+        this.restTemplate.exchange(
+            url, HttpMethod.GET, requestEntity, CamundaTaskEventListResource.class);
+
+    return answer.getBody().getCamundaTaskEvents();
+  }
+
   public boolean setRemainingRetries(int id, int newRetries) throws JSONException {
 
     String url = BASIC_OUTBOX_PATH + "/" + id;

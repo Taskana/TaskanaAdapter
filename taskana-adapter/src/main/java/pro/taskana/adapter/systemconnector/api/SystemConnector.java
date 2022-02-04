@@ -77,6 +77,13 @@ public interface SystemConnector {
   String getSystemUrl();
 
   /**
+   * Get the system identifier of the external system this connector connects to.
+   *
+   * @return the system identifier of the connected external system.
+   */
+  String getSystemIdentifier();
+
+  /**
    * With this call the Adapter notifies the SystemConnector that a TASKANA task has failed to be
    * created. Depending on the implementation of the SystemConnector, it may ignore this call.
    *

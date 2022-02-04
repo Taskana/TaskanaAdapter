@@ -55,7 +55,8 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
 
   @Override
   public List<ReferencedTask> retrieveNewStartedReferencedTasks() {
-    return taskRetriever.retrieveNewStartedCamundaTasks(camundaSystemUrl.getSystemTaskEventUrl());
+    return taskRetriever.retrieveNewStartedCamundaTasks(
+        camundaSystemUrl.getSystemTaskEventUrl(), camundaSystemUrl.getCamundaEngineIdentifier());
   }
 
   @Override
@@ -67,7 +68,8 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
 
   @Override
   public List<ReferencedTask> retrieveFinishedReferencedTasks() {
-    return taskRetriever.retrieveFinishedCamundaTasks(camundaSystemUrl.getSystemTaskEventUrl());
+    return taskRetriever.retrieveFinishedCamundaTasks(
+        camundaSystemUrl.getSystemTaskEventUrl(), camundaSystemUrl.getCamundaEngineIdentifier());
   }
 
   @Override
@@ -100,6 +102,11 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
   @Override
   public String getSystemUrl() {
     return camundaSystemUrl.getSystemRestUrl();
+  }
+
+  @Override
+  public String getSystemIdentifier() {
+    return camundaSystemUrl.getCamundaEngineIdentifier();
   }
 
   @Override
