@@ -75,6 +75,7 @@ public class RetrieveCamundaTaskAccTest {
             + " {\n"
             + "   \"id\": 1,\n"
             + "   \"type\": \"create\",\n"
+            + "   \"systemEngineIdentifier\": \"default\",\n"
             + "   \"created\": \"1970-01-01T10:48:16.436+0100\",\n"
             + "   \"payload\": "
             + " \"{\\\"id\\\":\\\"801aca2e-1b25-11e9-b283-94819a5b525c\\\","
@@ -87,13 +88,14 @@ public class RetrieveCamundaTaskAccTest {
             + "            \\\"taskDefinitionKey\\\":\\\"Task_0yogl0i\\\", "
             + "            \\\"classificationKey\\\":\\\"Schaden_1\\\","
             + "            \\\"domain\\\":\\\"DOMAIN_B\\\""
-            + "           }\"\n"
+            + "           },\"\n"
             + " }\n"
             + "]"
             + "}";
 
     String camundaSystemUrl = "http://localhost:8080/";
     String requestUrl = camundaSystemUrl + "events?type=create";
+    String systemEngineIdentifier = "default";
 
     mockServer
         .expect(requestTo(requestUrl))
@@ -103,7 +105,8 @@ public class RetrieveCamundaTaskAccTest {
 
     List<ReferencedTask> actualResult = null;
     try {
-      actualResult = taskRetriever.retrieveNewStartedCamundaTasks(camundaSystemUrl);
+      actualResult =
+          taskRetriever.retrieveNewStartedCamundaTasks(camundaSystemUrl, systemEngineIdentifier);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -128,6 +131,7 @@ public class RetrieveCamundaTaskAccTest {
             + "    {\n"
             + "        \"id\": 16,\n"
             + "        \"type\": \"complete\",\n"
+            + "        \"systemEngineIdentifier\": \"default\",\n"
             + "        \"created\": \"2019-11-26T16:55:52.460+0100\",\n"
             + "        \"payload\": \"{\\\"id\\\":\\\"2275fb87-1065-11ea-a7a0-02004c4f4f50\\\"}\"\n"
             + "    }\n"
@@ -135,6 +139,7 @@ public class RetrieveCamundaTaskAccTest {
             + "}";
 
     String camundaSystemUrl = "http://localhost:8080";
+    String camundaSystemEngineIdentifier = "default";
     mockServer
         .expect(requestTo(camundaSystemUrl + "/events?type=complete&type=delete"))
         .andExpect(method(HttpMethod.GET))
@@ -142,7 +147,7 @@ public class RetrieveCamundaTaskAccTest {
         .andRespond(withSuccess(expectedReplyBody, MediaType.APPLICATION_JSON));
 
     List<ReferencedTask> actualResult =
-        taskRetriever.retrieveFinishedCamundaTasks(camundaSystemUrl);
+        taskRetriever.retrieveFinishedCamundaTasks(camundaSystemUrl, camundaSystemEngineIdentifier);
 
     assertNotNull(actualResult);
     assertEquals(expectedTask, actualResult.get(0));

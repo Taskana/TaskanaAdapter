@@ -26,7 +26,7 @@ import pro.taskana.adapter.camunda.schemacreator.TaskanaOutboxSchemaCreator;
  */
 public class TaskanaParseListenerProcessEnginePlugin extends AbstractProcessEnginePlugin {
 
-  private static final String OUTBOX_SCHEMA_VERSION = "1.0.0";
+  private static final String OUTBOX_SCHEMA_VERSION = "1.11.0";
   private static final Logger LOGGER =
       LoggerFactory.getLogger(TaskanaParseListenerProcessEnginePlugin.class);
 

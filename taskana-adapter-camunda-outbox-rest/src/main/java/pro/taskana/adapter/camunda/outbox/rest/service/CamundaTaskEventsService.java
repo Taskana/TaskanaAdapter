@@ -435,6 +435,8 @@ public class CamundaTaskEventsService {
       camundaTaskEvent.setBlockedUntil(createEventsResultSet.getString(6));
       camundaTaskEvent.setError(createEventsResultSet.getString(7));
       camundaTaskEvent.setCamundaTaskId(createEventsResultSet.getString(8));
+      camundaTaskEvent.setSystemEngineIdentifier(createEventsResultSet.getString(9));
+
 
       camundaTaskEvents.add(camundaTaskEvent);
     }
