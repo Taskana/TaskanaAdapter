@@ -2,20 +2,19 @@ package pro.taskana.adapter.integration;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
+import java.lang.reflect.Field;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.context.annotation.EnableMBeanExport;
-import org.springframework.jmx.support.RegistrationPolicy;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 
+import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskClaimCanceler;
+import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskClaimer;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
 import pro.taskana.common.test.security.JaasExtension;
 import pro.taskana.common.test.security.WithAccessId;
@@ -24,30 +23,26 @@ import pro.taskana.task.api.models.Task;
 import pro.taskana.task.api.models.TaskSummary;
 
 @SpringBootTest(
-    properties = {
-      "camunda.bpm.generate-unique-process-engine-name=true",
-      "camunda.bpm.generate-unique-process-application-name=true",
-      "spring.datasource.generate-unique-name=true",
-    },
     classes = TaskanaAdapterTestApplication.class,
     webEnvironment = WebEnvironment.DEFINED_PORT)
 @AutoConfigureWebTestClient
 @ContextConfiguration
 @ExtendWith(JaasExtension.class)
-@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
-@EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
-@TestPropertySource(
-    properties = {"taskana.adapter.camunda.claiming.enabled=false", "server.port=10813"})
-@Disabled(
-    "Sometimes fails due to flaky Spring Boot integration test behavior. "
-        + "Test itself is fine but disabled for now ")
 class TestDisabledTaskClaim extends AbsIntegrationTest {
+
+  @Autowired CamundaTaskClaimer camundaTaskClaimer;
+  @Autowired CamundaTaskClaimCanceler camundaTaskClaimCanceler;
+
+  @Value("${taskana.adapter.camunda.claiming.enabled}")
+  private boolean claimingEnabled;
 
   @WithAccessId(
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
   void should_NotClaimOrCancelClaimCamundaTask_When_CamundaClaimingDisabled() throws Exception {
+
+    setClaimingEnabled(false);
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -98,5 +93,18 @@ class TestDisabledTaskClaim extends AbsIntegrationTest {
     assigneeNotUpdated =
         this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, "someAssignee");
     assertThat(assigneeNotUpdated).isTrue();
+
+    setClaimingEnabled(claimingEnabled);
+  }
+
+  private void setClaimingEnabled(boolean claimingEnbaled) throws Exception {
+
+    Field claimingEnabled = camundaTaskClaimer.getClass().getDeclaredField("claimingEnabled");
+    claimingEnabled.setAccessible(true);
+    claimingEnabled.setBoolean(camundaTaskClaimer, claimingEnbaled);
+    Field cancelClaimingEnabled =
+        camundaTaskClaimCanceler.getClass().getDeclaredField("claimingEnabled");
+    cancelClaimingEnabled.setAccessible(true);
+    cancelClaimingEnabled.setBoolean(camundaTaskClaimCanceler, claimingEnbaled);
   }
 }
