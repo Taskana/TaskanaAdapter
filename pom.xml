@@ -74,7 +74,7 @@
     <version.camunda.bpm.spring.boot.test>3.3.10</version.camunda.bpm.spring.boot.test>
     <version.camunda.bpm.extensions>1.2</version.camunda.bpm.extensions>
     <version.camunda.spin.engine.plugin>7.11.0</version.camunda.spin.engine.plugin>
-    <version.camunda.spin.dataformat.json.jackson>1.13.0</version.camunda.spin.dataformat.json.jackson>
+    <version.camunda.spin.dataformat.json.jackson>1.13.1</version.camunda.spin.dataformat.json.jackson>
     <version.camunda.spin>1.13.0</version.camunda.spin>
     <version.resteasy.spring.boot>5.0.0.Final</version.resteasy.spring.boot>
     <version.resteasy.jaxrs>3.0.12.Final</version.resteasy.jaxrs>
