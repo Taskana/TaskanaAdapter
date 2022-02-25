@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 /** Class to assist with building requests against the Camunda REST API. */
 public class CamundaProcessengineRequester {
 
-  private static final String BASIC_ENGINE_PATH = "/rest/engine/";
+  private static final String BASIC_ENGINE_PATH = "/engine-rest/engine/";
   private static final String COMPLETE_TASK_PATH = "/complete";
   private static final String HISTORY_PATH = "/history";
   private static final String PROCESS_DEFINITION_KEY_PATH = "/process-definition/key/";

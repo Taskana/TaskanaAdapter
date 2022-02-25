@@ -2,6 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
   <parent>
     <artifactId>taskana-adapter-parent</artifactId>
     <groupId>pro.taskana</groupId>
@@ -35,7 +36,7 @@
     <dependency>
       <groupId>org.camunda.bpm.springboot</groupId>
       <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
-      <version>${version.camunda.bpm.spring.boot}</version>
+      <version>${version.camunda}</version>
       <exclusions>
         <exclusion>
           <groupId>org.skyscreamer</groupId>
@@ -48,18 +49,18 @@
     <dependency>
       <groupId>org.camunda.bpm.springboot</groupId>
       <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
-      <version>${version.camunda.bpm.spring.boot}</version>
+      <version>${version.camunda}</version>
     </dependency>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-plugin-spin</artifactId>
+      <version>${version.camunda}</version>
       <scope>compile</scope>
-      <version>${version.camunda.spin.engine.plugin}</version>
     </dependency>
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
-      <version>${version.camunda.spin.dataformat.json.jackson}</version>
+      <version>${version.camunda.spin}</version>
     </dependency>
 
     <!-- outbox-rest-spring-boot-starter-->
