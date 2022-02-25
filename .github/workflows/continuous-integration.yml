@@ -15,7 +15,7 @@ on:
 env:
   JAVA_VERSION: 11
 
-  CACHE_MAVEN_NAME: maven
+  CACHE_MAVEN_NAME: ma2aen
   CACHE_SONAR_NAME: sonar
 
   ARTIFACTS_JACOCO_REPORTS_NAME: jacoco-reports
