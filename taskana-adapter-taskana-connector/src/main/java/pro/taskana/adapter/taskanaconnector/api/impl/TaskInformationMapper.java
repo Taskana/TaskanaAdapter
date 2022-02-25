@@ -187,13 +187,9 @@ public class TaskInformationMapper {
   }
 
   private ObjectReference createObjectReference() {
-    ObjectReference objRef = new ObjectReference();
-    objRef.setCompany(defaultCompany);
-    objRef.setSystem(defaultSystem);
-    objRef.setSystemInstance(defaultSystemInstance);
-    objRef.setType(defaultType);
-    objRef.setValue(defaultValue);
-    return objRef;
+
+    return taskService.newObjectReference(
+        defaultCompany, defaultSystem, defaultSystemInstance, defaultType, defaultValue);
   }
 
   @Override
