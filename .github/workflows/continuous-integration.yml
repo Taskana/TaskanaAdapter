@@ -53,6 +53,8 @@ jobs:
           name: ${{ env.ARTIFACTS_JACOCO_REPORTS_NAME }}
           path: ${{ env.ARTIFACTS_JACOCO_REPORTS_PATH }}
           if-no-files-found: ignore
+      - name: Remove taskana artifacts from cache
+        run: rm -rf ~/.m2/repository/pro/taskana
 
   release_artifacts:
     runs-on: ubuntu-20.04
@@ -110,6 +112,8 @@ jobs:
         env:
           GH_EMAIL: ${{ secrets.GH_EMAIL }}
           GH_USERNAME: ${{ secrets.GH_USERNAME }}
+      - name: Remove taskana artifacts from cache
+        run: rm -rf ~/.m2/repository/pro/taskana
       - name: Cancel workflow
         if: failure()
         uses: andymckay/cancel-action@0.2
@@ -155,6 +159,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
           SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
+      - name: Remove taskana artifacts from cache
+        run: rm -rf ~/.m2/repository/pro/taskana
       - name: Cancel workflow
         if: failure()
         uses: andymckay/cancel-action@0.2
