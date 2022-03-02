@@ -32,7 +32,7 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Git checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v2
         with:
@@ -67,7 +67,7 @@ jobs:
       GPG_TTY: $(tty)
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0 # necessary for push back
           # NOTE @v2 uses the token as an auth http header. Set it to
@@ -126,7 +126,7 @@ jobs:
     needs: [ compile_and_test ]
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up JDK ${{ env.JAVA_VERSION }}
