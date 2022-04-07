@@ -231,36 +231,41 @@ public class TaskanaTaskListener implements TaskListener {
 
   private String getProcessVariables(DelegateTask delegateTask) {
 
-    StringBuilder processVariablesBuilder = new StringBuilder();
+    StringBuilder variablesBuilder = new StringBuilder();
+    List<String> variableNames;
 
-    String processVariablesConcatenated =
-        getProcessModelExtensionProperty(delegateTask, "taskana-attributes");
+    // Get Task Variables
+    String taskVariablesConcatenated =
+        getUserTaskExtensionProperty(delegateTask, "taskana-attributes");
 
-    if (processVariablesConcatenated != null) {
-      List<String> processVariablenames =
-          splitProcessVariableNamesString(processVariablesConcatenated);
+    if (taskVariablesConcatenated != null) {
+      variableNames = splitVariableNamesString(taskVariablesConcatenated);
 
-      processVariablenames.forEach(
-          nameOfProcessVariableToAdd ->
-              addToProcessVariablesBuilder(
-                  delegateTask, objectMapper, processVariablesBuilder, nameOfProcessVariableToAdd));
-
-      // check if someone sets the taskana-attributes extension property, but enters no values
-      if (processVariablesBuilder.length() > 0) {
-        processVariablesBuilder.deleteCharAt(processVariablesBuilder.length() - 1).append("}");
-        processVariablesBuilder.insert(0, "{");
+    } else {
+      String processVariablesConcatenated =
+          getProcessModelExtensionProperty(delegateTask, "taskana-attributes");
+      if (processVariablesConcatenated != null) {
+        variableNames = splitVariableNamesString(processVariablesConcatenated);
       } else {
         return "{}";
       }
+    }
 
+    variableNames.forEach(
+        nameOfVariableToAdd ->
+            addToVariablesBuilder(
+                delegateTask, objectMapper, variablesBuilder, nameOfVariableToAdd));
+
+    if (variablesBuilder.length() > 0) {
+      variablesBuilder.deleteCharAt(variablesBuilder.length() - 1).append("}");
+      variablesBuilder.insert(0, "{");
     } else {
       return "{}";
     }
-
-    return processVariablesBuilder.toString();
+    return variablesBuilder.toString();
   }
 
-  private void addToProcessVariablesBuilder(
+  private void addToVariablesBuilder(
       DelegateTask delegateTask,
       ObjectMapper objectMapper,
       StringBuilder processVariablesBuilder,
@@ -325,8 +330,8 @@ public class TaskanaTaskListener implements TaskListener {
     return variableValueDto;
   }
 
-  private List<String> splitProcessVariableNamesString(String processVariableNamesConcatenated) {
-    return Arrays.asList(processVariableNamesConcatenated.trim().split("\\s*,\\s*"));
+  private List<String> splitVariableNamesString(String variableNamesConcatenated) {
+    return Arrays.asList(variableNamesConcatenated.trim().split("\\s*,\\s*"));
   }
 
   private String getWorkbasketKey(DelegateTask delegateTask) {
