@@ -147,7 +147,7 @@ jobs:
           key: ${{ runner.os }}-${{ env.CACHE_MAVEN_NAME }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-${{ env.CACHE_MAVEN_NAME }}
       - name: Download JaCoCo reports
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ env.ARTIFACTS_JACOCO_REPORTS_NAME }}
       - name: Install taskana adapter
