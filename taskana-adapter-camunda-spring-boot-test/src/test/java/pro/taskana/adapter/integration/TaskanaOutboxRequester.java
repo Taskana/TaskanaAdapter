@@ -64,7 +64,6 @@ public class TaskanaOutboxRequester {
     return answer.getBody().getCamundaTaskEvents();
   }
 
-
   public List<CamundaTaskEvent> getAllEvents() {
 
     String url = BASIC_OUTBOX_PATH;

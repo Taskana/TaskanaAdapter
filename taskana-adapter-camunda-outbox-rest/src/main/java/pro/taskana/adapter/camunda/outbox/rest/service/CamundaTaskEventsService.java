@@ -437,7 +437,6 @@ public class CamundaTaskEventsService {
       camundaTaskEvent.setCamundaTaskId(createEventsResultSet.getString(8));
       camundaTaskEvent.setSystemEngineIdentifier(createEventsResultSet.getString(9));
 
-
       camundaTaskEvents.add(camundaTaskEvent);
     }
 
