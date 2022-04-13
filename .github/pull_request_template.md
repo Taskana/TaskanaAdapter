@@ -10,7 +10,7 @@
 - [ ] I put the ticket in review
 
 ### Verified by the reviewer:
-- [ ] Commit message format → TSK-XXX: Your commit message.
+- [ ] Commit message format → ADPT-XXX: Your commit message.
 - [ ] Submitter's update to [documentation](https://taskana.atlassian.net/wiki/spaces/TAS/overview) is sufficient
 - [ ] SonarCloud analysis meets our standards
 - [ ] Update of the [current release notes](https://taskana.atlassian.net/wiki/spaces/TAS/pages/1281392672/Current+Release+Notes+Taskana) reflects changes
