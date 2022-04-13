@@ -53,7 +53,7 @@
     <version.maven.compiler>3.10.1</version.maven.compiler>
     <version.maven.javadoc>3.3.2</version.maven.javadoc>
     <version.maven.failsafe.plugin>3.0.0-M6</version.maven.failsafe.plugin>
-    <version.maven.surefire.plugin>3.0.0-M5</version.maven.surefire.plugin>
+    <version.maven.surefire.plugin>3.0.0-M6</version.maven.surefire.plugin>
     <version.maven.checkstyle>3.1.2</version.maven.checkstyle>
     <version.maven.spring-boot>2.6.6</version.maven.spring-boot>
     <version.maven.sonar>3.9.1.2184</version.maven.sonar>
