@@ -221,12 +221,20 @@ public class TaskanaTaskListener implements TaskListener {
     referencedTask.setBusinessProcessId(delegateTask.getProcessInstanceId());
     referencedTask.setClassificationKey(
         getUserTaskExtensionProperty(delegateTask, "taskana.classification-key"));
-    referencedTask.setDomain(getProcessModelExtensionProperty(delegateTask, "taskana.domain"));
+    referencedTask.setDomain(getDomainVariable(delegateTask));
     referencedTask.setWorkbasketKey(getWorkbasketKey(delegateTask));
     referencedTask.setVariables(getProcessVariables(delegateTask));
     String referencedTaskJson = objectMapper.writeValueAsString(referencedTask);
     LOGGER.debug("Exit from getReferencedTaskJson. Returning {}.", referencedTaskJson);
     return referencedTaskJson;
+  }
+
+  private String getDomainVariable(DelegateTask delegateTask) {
+    String taskDomain = getUserTaskExtensionProperty(delegateTask, "taskana.domain");
+    if (taskDomain != null) {
+      return taskDomain;
+    }
+    return getProcessModelExtensionProperty(delegateTask, "taskana.domain");
   }
 
   private String getProcessVariables(DelegateTask delegateTask) {
