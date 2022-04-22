@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaSystemConnect
 import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemUrls.SystemUrlInfo;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
 import pro.taskana.common.api.exceptions.NotAuthorizedException;
+import pro.taskana.common.internal.util.Pair;
 import pro.taskana.common.test.security.JaasExtension;
 import pro.taskana.common.test.security.WithAccessId;
 import pro.taskana.task.api.exceptions.TaskNotFoundException;
@@ -417,6 +419,51 @@ class TestTaskAcquisition extends AbsIntegrationTest {
 
     adapterManager.getSystemConnectors().clear();
     adapterManager.getSystemConnectors().putAll(originalSystemConnectors);
+  }
+
+  @WithAccessId(
+      user = "teamlead_1",
+      groups = {"taskadmin"})
+  @Test
+  void process_with_different_domains_in_tasks_should_result_in_taskanaTasks_with_those_domains()
+      throws Exception {
+
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_process_with_different_domains", "");
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+    assertThat(camundaTaskIds).hasSize(3);
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    List<Pair<String, String>> variablesToTaskList =
+        Arrays.asList(
+            Pair.of("DOMAIN_A", camundaTaskIds.get(0)),
+            Pair.of("DOMAIN_A", camundaTaskIds.get(1)),
+            Pair.of("DOMAIN_B", camundaTaskIds.get(2)));
+
+    for (Pair<String, String> variablesToTask : variablesToTaskList) {
+      List<TaskSummary> taskanaTaskSummaryList =
+          this.taskService.createTaskQuery().externalIdIn(variablesToTask.getRight()).list();
+      assertThat(taskanaTaskSummaryList).hasSize(1);
+      TaskSummary taskanaTaskSummary = taskanaTaskSummaryList.get(0);
+
+      Task taskanaTask = taskService.getTask(taskanaTaskSummary.getId());
+      assertThat(taskanaTask.getDomain()).isEqualTo(variablesToTask.getLeft());
+    }
+
+    this.camundaProcessengineRequester.completeTaskWithId(camundaTaskIds.get(2));
+    camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+    assertThat(camundaTaskIds).hasSize(3);
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    List<TaskSummary> taskanaTaskSummaryList =
+        this.taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(2)).list();
+    assertThat(taskanaTaskSummaryList).hasSize(1);
+    TaskSummary taskanaTaskSummary = taskanaTaskSummaryList.get(0);
+    Task taskanaTask = taskService.getTask(taskanaTaskSummary.getId());
+    assertThat(taskanaTask.getDomain()).isEqualTo("DOMAIN_A");
   }
 
   @WithAccessId(
