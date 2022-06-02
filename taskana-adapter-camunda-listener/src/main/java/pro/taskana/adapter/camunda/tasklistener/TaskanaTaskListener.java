@@ -214,6 +214,7 @@ public class TaskanaTaskListener implements TaskListener {
     referencedTask.setPriority(String.valueOf(delegateTask.getPriority()));
     referencedTask.setName(delegateTask.getName());
     referencedTask.setAssignee(delegateTask.getAssignee());
+    referencedTask.setPlanned(formatDate(delegateTask.getFollowUpDate()));
     referencedTask.setDue(formatDate(delegateTask.getDueDate()));
     referencedTask.setDescription(delegateTask.getDescription());
     referencedTask.setOwner(delegateTask.getOwner());

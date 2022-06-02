@@ -7,11 +7,10 @@ import org.junit.jupiter.api.Test;
 /** Acceptance test for ReferencedTask setters and getters. */
 public class ReferencedTaskTest {
 
+  private final String theValue = "blablabla";
   private ReferencedTask theTask;
-  private String theValue;
 
   public ReferencedTaskTest() {
-    theValue = "blablabla";
     theTask = new ReferencedTask();
     theTask.setAssignee("1");
     theTask.setBusinessProcessId("2");
@@ -19,12 +18,13 @@ public class ReferencedTaskTest {
     theTask.setDescription("bla");
     theTask.setCreated("4");
     theTask.setDomain("5");
-    theTask.setDue("6");
-    theTask.setId("7");
-    theTask.setName("8");
-    theTask.setOutboxEventId("9");
-    theTask.setOutboxEventType("10");
-    theTask.setOwner("11");
+    theTask.setPlanned("6");
+    theTask.setDue("7");
+    theTask.setId("8");
+    theTask.setName("9");
+    theTask.setOutboxEventId("10");
+    theTask.setOutboxEventType("11");
+    theTask.setOwner("12");
   }
 
   @Test
@@ -73,6 +73,13 @@ public class ReferencedTaskTest {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setCreated(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getCreated());
+  }
+
+  @Test
+  void should_returnFollowUp_when_FollowUpWasSet() {
+    ReferencedTask referencedTask = new ReferencedTask();
+    referencedTask.setDue(theValue);
+    assertThat(theValue).isEqualTo(referencedTask.getDue());
   }
 
   @Test
@@ -178,13 +185,14 @@ public class ReferencedTaskTest {
     theTask.setDescription("bla");
     theTask.setCreated("4");
     theTask.setDomain("5");
-    theTask.setDue("6");
-    theTask.setId("7");
-    theTask.setName("8");
-    theTask.setOutboxEventId("9");
-    theTask.setOutboxEventType("10");
-    theTask.setOwner("11");
-    theTask.setWorkbasketKey("12");
+    theTask.setPlanned("6");
+    theTask.setDue("7");
+    theTask.setId("8");
+    theTask.setName("9");
+    theTask.setOutboxEventId("10");
+    theTask.setOutboxEventType("11");
+    theTask.setOwner("12");
+    theTask.setWorkbasketKey("13");
 
     refTask2 = new ReferencedTask();
     refTask2.setAssignee("1");
@@ -193,14 +201,17 @@ public class ReferencedTaskTest {
     refTask2.setDescription("bla");
     refTask2.setCreated("4");
     refTask2.setDomain("5");
-    refTask2.setDue("6");
-    refTask2.setId("7");
-    refTask2.setName("8");
-    refTask2.setOutboxEventId("9");
-    refTask2.setOutboxEventType("10");
-    refTask2.setOwner("11");
-    refTask2.setWorkbasketKey("anotherOne");
+    refTask2.setPlanned("6");
+    refTask2.setDue("7");
+    refTask2.setId("8");
+    refTask2.setName("9");
+    refTask2.setOutboxEventId("10");
+    refTask2.setOutboxEventType("11");
+    refTask2.setOwner("12");
+    refTask2.setWorkbasketKey("13");
 
+    assertThat(refTask2).isEqualTo(theTask);
+    refTask2.setWorkbasketKey("anotherOne");
     assertThat(refTask2).isNotEqualTo(theTask);
   }
 }

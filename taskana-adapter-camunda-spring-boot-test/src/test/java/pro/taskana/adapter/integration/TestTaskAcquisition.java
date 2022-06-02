@@ -4,12 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -552,6 +554,54 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     assertThat(taskanaTask.getCustomAttributeMap().keySet())
         .containsExactlyInAnyOrderElementsOf(
             Arrays.asList("camunda:attribute1", "camunda:attribute2"));
+  }
+
+  @WithAccessId(
+      user = "teamlead_1",
+      groups = {"admin"})
+  @Test
+  void should_SetPlannedDateInTaskanaTask_When_CamundaTaskHasFollowUpDate() throws Exception {
+    final Instant now = Instant.now();
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_process_with_plannedDate", "");
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
+
+    // Make sure we only have one Camunda Task, so we don't need a for-loop
+    assertThat(camundaTaskIds.size()).isEqualTo(1);
+    String camundaTaskId = camundaTaskIds.get(0);
+    // retrieve and check taskanaTaskId
+    List<TaskSummary> taskanaTaskSummaryList =
+        this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
+    assertThat(taskanaTaskSummaryList.size()).isEqualTo(1);
+    String taskanaTaskExternalId = taskanaTaskSummaryList.get(0).getExternalId();
+    assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
+    String taskanaTaskId = taskanaTaskSummaryList.get(0).getId();
+    Task taskanaTask = this.taskService.getTask(taskanaTaskId);
+    // Check if followUp Date from Camunda task is equal to plannedDate from Taskana task
+    Instant expectedDate = DateTimeUtil.parseDateTime("2015-06-26T09:54:00").toDate().toInstant();
+    assertThat(taskanaTask.getPlanned()).isEqualTo(expectedDate);
+
+    this.camundaProcessengineRequester.completeTaskWithId(camundaTaskId);
+    camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    // Make sure we only have one Camunda Task, so we don't need a for-loop
+    assertThat(camundaTaskIds).hasSize(1);
+    camundaTaskId = camundaTaskIds.get(0);
+    taskanaTaskSummaryList = this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
+    assertThat(taskanaTaskSummaryList.size()).isEqualTo(1);
+    taskanaTaskExternalId = taskanaTaskSummaryList.get(0).getExternalId();
+    assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
+    taskanaTaskId = taskanaTaskSummaryList.get(0).getId();
+    taskanaTask = this.taskService.getTask(taskanaTaskId);
+    // Check if plannedDate was set to Instant.now during setTimestampsInTaskanaTask() method call.
+    // This is the desired behaviour since no followUpDate is set in this Camunda Task.
+    assertThat(taskanaTask.getPlanned()).isAfter(now);
   }
 
   private void setSystemConnector(String systemEngineIdentifier) {
