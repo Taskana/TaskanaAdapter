@@ -160,6 +160,8 @@ public class TaskInformationMapper {
     } else {
       taskanaTask.setDue(convertStringToInstant(camundaTask.getDue(), now));
     }
+    Instant planned = convertStringToInstant(camundaTask.getPlanned(), now);
+    taskanaTask.setPlanned(planned);
   }
 
   private Instant convertStringToInstant(String strTimestamp, Instant defaultTimestamp) {

@@ -11,6 +11,7 @@ public class ReferencedTask {
   private String name;
   private String assignee;
   private String created;
+  private String planned;
   private String due;
   private String description;
   private String owner;
@@ -80,6 +81,14 @@ public class ReferencedTask {
 
   public void setCreated(String created) {
     this.created = created;
+  }
+
+  public String getPlanned() {
+    return planned;
+  }
+
+  public void setPlanned(String planned) {
+    this.planned = planned;
   }
 
   public String getDue() {
