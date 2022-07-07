@@ -70,7 +70,7 @@
 
     <version.camunda>7.16.0</version.camunda>
     <version.camunda.bpm.extensions>1.2</version.camunda.bpm.extensions>
-    <version.camunda.spin>1.16.0</version.camunda.spin>
+    <version.camunda.spin>1.17.0</version.camunda.spin>
     <version.resteasy.spring.boot>5.0.0.Final</version.resteasy.spring.boot>
     <version.resteasy.jaxrs>3.0.12.Final</version.resteasy.jaxrs>
     <version.javax.servlet.api>4.0.1</version.javax.servlet.api>
