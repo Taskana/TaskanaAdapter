@@ -268,6 +268,51 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
+  void task_with_manual_priority_should_result_in_taskanaTask_with_this_manual_priority()
+      throws Exception {
+
+    String variables =
+        "\"variables\": {\"taskana.manual-priority\": {\"value\":\"555\", "
+            + "\"type\":\"string\"}}";
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_process", variables);
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    TaskSummary taskanaTask =
+        taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(0)).single();
+
+    assertThat(taskanaTask.getManualPriority()).isEqualTo(555);
+  }
+
+  @WithAccessId(
+      user = "teamlead_1",
+      groups = {"taskadmin"})
+  @Test
+  void task_without_manual_priority_should_result_in_taskanaTask_with_default_manual_priority()
+      throws Exception {
+
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_process", "");
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    TaskSummary taskanaTask =
+        taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(0)).single();
+
+    assertThat(taskanaTask.getManualPriority()).isEqualTo(-1);
+  }
+
+  @WithAccessId(
+      user = "teamlead_1",
+      groups = {"taskadmin"})
+  @Test
   void
       task_with_big_complex_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
           throws Exception {

@@ -16,6 +16,7 @@ public class ReferencedTask {
   private String description;
   private String owner;
   private String priority;
+  private String manualPriority;
   private String suspended;
   private String systemUrl;
   private String taskDefinitionKey;
@@ -123,6 +124,14 @@ public class ReferencedTask {
     this.priority = priority;
   }
 
+  public String getManualPriority() {
+    return manualPriority;
+  }
+
+  public void setManualPriority(String manualPriority) {
+    this.manualPriority = manualPriority;
+  }
+
   public String getSuspended() {
     return suspended;
   }
@@ -200,6 +209,7 @@ public class ReferencedTask {
         description,
         owner,
         priority,
+        manualPriority,
         suspended,
         systemUrl,
         taskDefinitionKey,
@@ -233,6 +243,7 @@ public class ReferencedTask {
         && Objects.equals(description, other.description)
         && Objects.equals(owner, other.owner)
         && Objects.equals(priority, other.priority)
+        && Objects.equals(manualPriority, other.manualPriority)
         && Objects.equals(suspended, other.suspended)
         && Objects.equals(systemUrl, other.systemUrl)
         && Objects.equals(taskDefinitionKey, other.taskDefinitionKey)
@@ -258,6 +269,8 @@ public class ReferencedTask {
         + assignee
         + ", created="
         + created
+        + ", planned="
+        + planned
         + ", due="
         + due
         + ", description="
@@ -266,6 +279,8 @@ public class ReferencedTask {
         + owner
         + ", priority="
         + priority
+        + ", manualPriority="
+        + manualPriority
         + ", suspended="
         + suspended
         + ", systemUrl="

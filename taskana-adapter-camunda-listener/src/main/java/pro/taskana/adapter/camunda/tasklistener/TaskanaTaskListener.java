@@ -224,6 +224,7 @@ public class TaskanaTaskListener implements TaskListener {
         getUserTaskExtensionProperty(delegateTask, "taskana.classification-key"));
     referencedTask.setDomain(getDomainVariable(delegateTask));
     referencedTask.setWorkbasketKey(getWorkbasketKey(delegateTask));
+    referencedTask.setManualPriority(getManualPriority(delegateTask));
     referencedTask.setVariables(getProcessVariables(delegateTask));
     String referencedTaskJson = objectMapper.writeValueAsString(referencedTask);
     LOGGER.debug("Exit from getReferencedTaskJson. Returning {}.", referencedTaskJson);
@@ -341,6 +342,24 @@ public class TaskanaTaskListener implements TaskListener {
 
   private List<String> splitVariableNamesString(String variableNamesConcatenated) {
     return Arrays.asList(variableNamesConcatenated.trim().split("\\s*,\\s*"));
+  }
+
+  private String getManualPriority(DelegateTask delegateTask) {
+    String manualPriority = "-1";
+    try {
+      Object manualPriorityObj = delegateTask.getVariable("taskana.manual-priority");
+      if (manualPriorityObj instanceof String) {
+        manualPriority = (String) manualPriorityObj;
+      }
+    } catch (Exception e) {
+      LOGGER.warn(
+          "Caught exception while trying to retrieve taskana.manual-priority "
+              + "for task {} in ProcessDefinition {}",
+          delegateTask.getName(),
+          delegateTask.getProcessDefinitionId(),
+          e);
+    }
+    return manualPriority;
   }
 
   private String getWorkbasketKey(DelegateTask delegateTask) {
