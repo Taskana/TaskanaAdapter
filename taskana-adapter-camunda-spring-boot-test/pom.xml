@@ -119,8 +119,8 @@
     </dependency>
     <!-- Database Drivers -->
     <dependency>
-      <groupId>com.ibm.db2.jcc</groupId>
-      <artifactId>db2jcc4</artifactId>
+      <groupId>com.ibm.db2</groupId>
+      <artifactId>jcc</artifactId>
       <version>${version.db2}</version>
       <scope>test</scope>
     </dependency>
@@ -180,34 +180,27 @@
     </plugins>
   </build>
 
-  <!-- this repository is needed to fetch com.ibm.db2.jcc -->
+  <!--
   <repositories>
     <repository>
-      <id>novatec public</id>
-      <name>novatec-repository</name>
-      <url>https://repository.novatec-gmbh.de/content/repositories/novatec/</url>
+      <id>maven.oracle.com</id>
+      <url>https://maven.oracle.com</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <layout>default</layout>
     </repository>
-    <!--
-            <repository>
-                   <id>maven.oracle.com</id>
-                   <releases>
-                   <enabled>true</enabled>
-                   </releases>
-                   <snapshots>
-                     <enabled>false</enabled>
-                   </snapshots>
-                   <url>https://maven.oracle.com</url>
-                   <layout>default</layout>
-           </repository>
-   -->
   </repositories>
-  <!--
-      <pluginRepositories>
-           <pluginRepository>
-                 <id>maven.oracle.com</id>
-                 <url>https://maven.oracle.com</url>
-          </pluginRepository>
-     </pluginRepositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>maven.oracle.com</id>
+      <url>https://maven.oracle.com</url>
+    </pluginRepository>
+  </pluginRepositories>
   -->
 
 </project>
