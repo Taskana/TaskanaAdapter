@@ -1,16 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>taskana-adapter-camunda-wildfly-example</artifactId>
+  <packaging>war</packaging>
+
+  <name>${project.groupId}:${project.artifactId}</name>
+
   <parent>
-    <artifactId>taskana-adapter-parent</artifactId>
     <groupId>pro.taskana</groupId>
+    <artifactId>taskana-adapter-parent</artifactId>
     <version>1.13.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>taskana-adapter-camunda-wildfly-example</artifactId>
-  <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>war</packaging>
 
   <properties>
     <failOnMissingWebXml>false</failOnMissingWebXml>
@@ -22,8 +24,8 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
         <version>${version.spring.boot}</version>
-        <type>pom</type>
         <scope>import</scope>
+        <type>pom</type>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -38,7 +40,6 @@
           <artifactId>spring-boot-starter-tomcat</artifactId>
         </exclusion>
       </exclusions>
-
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -70,7 +71,6 @@
       <artifactId>taskana-spring</artifactId>
       <version>${version.taskana}</version>
     </dependency>
-
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
@@ -81,7 +81,6 @@
       <artifactId>h2</artifactId>
       <version>${version.h2database}</version>
     </dependency>
-
     <dependency>
       <groupId>org.springframework.plugin</groupId>
       <artifactId>spring-plugin-core</artifactId>
@@ -93,7 +92,6 @@
       <version>${version.javax.servlet.api}</version>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
@@ -126,7 +124,6 @@
         <activatedProperties>postgres</activatedProperties>
       </properties>
     </profile>
-
     <profile>
       <id>h2</id>
       <activation>
@@ -172,6 +169,7 @@
       </plugin>
     </plugins>
   </build>
+
   <!--
     this repository is needed to fetch com.ibm.db2.jcc
   -->

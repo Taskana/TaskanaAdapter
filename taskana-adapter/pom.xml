@@ -1,19 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-  <parent>
-    <artifactId>taskana-adapter-parent</artifactId>
-    <groupId>pro.taskana</groupId>
-    <version>1.13.1-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
-
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>taskana-adapter</artifactId>
   <packaging>jar</packaging>
+
   <name>${project.groupId}:${project.artifactId}</name>
   <description>Taskana Adapter for executing tasks from external systems</description>
+
+  <parent>
+    <groupId>pro.taskana</groupId>
+    <artifactId>taskana-adapter-parent</artifactId>
+    <version>1.13.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
   <dependencies>
     <dependency>
@@ -21,7 +21,6 @@
       <artifactId>spring-boot-starter</artifactId>
       <version>${version.spring.boot}</version>
     </dependency>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
@@ -30,20 +29,20 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-configuration-processor</artifactId>
-      <optional>true</optional>
       <version>${version.spring.boot}</version>
+      <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>pro.taskana</groupId>
+      <artifactId>taskana-spring</artifactId>
+      <version>${version.taskana}</version>
+    </dependency>
+    <!-- test dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <version>${version.spring.boot}</version>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>pro.taskana</groupId>
-      <artifactId>taskana-spring</artifactId>
-      <version>${version.taskana}</version>
     </dependency>
   </dependencies>
 

@@ -1,19 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-  <parent>
-    <artifactId>taskana-adapter-parent</artifactId>
-    <groupId>pro.taskana</groupId>
-    <version>1.13.1-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
-
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>taskana-adapter-taskana-connector</artifactId>
   <packaging>jar</packaging>
+
   <name>${project.groupId}:${project.artifactId}</name>
   <description>Connector between taskana-adapter and Taskana</description>
+
+  <parent>
+    <groupId>pro.taskana</groupId>
+    <artifactId>taskana-adapter-parent</artifactId>
+    <version>1.13.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
   <dependencies>
     <dependency>
@@ -21,7 +21,6 @@
       <artifactId>spring-boot-starter</artifactId>
       <version>${version.spring.boot}</version>
     </dependency>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
@@ -30,8 +29,8 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-configuration-processor</artifactId>
-      <optional>true</optional>
       <version>${version.spring.boot}</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -44,39 +43,33 @@
       <version>${version.h2database}</version>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>com.ibm.db2.jcc</groupId>
       <artifactId>db2jcc4</artifactId>
       <version>${version.db2}</version>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <version>${version.postgres}</version>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>pro.taskana</groupId>
       <artifactId>taskana-spring</artifactId>
       <version>${version.taskana}</version>
     </dependency>
-
     <dependency>
       <groupId>pro.taskana</groupId>
       <artifactId>taskana-adapter</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.mybatis.spring.boot</groupId>
       <artifactId>mybatis-spring-boot-starter</artifactId>
       <version>${version.spring.mybatis}</version>
     </dependency>
-
   </dependencies>
 
   <!-- this repository is needed to fetch com.ibm.db2.jcc -->
@@ -87,4 +80,5 @@
       <url>https://repository.novatec-gmbh.de/content/repositories/novatec/</url>
     </repository>
   </repositories>
+  
 </project>
