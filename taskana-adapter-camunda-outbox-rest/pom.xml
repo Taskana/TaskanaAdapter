@@ -1,49 +1,33 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-  <parent>
-    <artifactId>taskana-adapter-parent</artifactId>
-    <groupId>pro.taskana</groupId>
-    <version>1.13.1-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
-
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>taskana-adapter-camunda-outbox-rest</artifactId>
   <packaging>war</packaging>
+
   <name>${project.groupId}:${project.artifactId}</name>
   <description>Provides access to Camunda Task Events via REST Api for the Adapter</description>
 
-
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>${version.maven-war-plugin}</version>
-        <configuration>
-          <attachClasses>true</attachClasses>
-          <failOnMissingWebXml>false</failOnMissingWebXml>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
+  <parent>
+    <groupId>pro.taskana</groupId>
+    <artifactId>taskana-adapter-parent</artifactId>
+    <version>1.13.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.camunda.spin</groupId>
         <artifactId>camunda-spin-bom</artifactId>
+        <version>${version.camunda.spin}</version>
         <scope>import</scope>
         <type>pom</type>
-        <version>${version.camunda.spin}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
-
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-core</artifactId>
@@ -72,5 +56,17 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>${version.maven-war-plugin}</version>
+        <configuration>
+          <attachClasses>true</attachClasses>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

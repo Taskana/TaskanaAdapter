@@ -1,6 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>taskana-adapter-camunda-system-connector</artifactId>
+  <packaging>jar</packaging>
+
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>System connector between taskana-adapter and Camunda</description>
 
   <parent>
     <groupId>pro.taskana</groupId>
@@ -9,22 +15,12 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>taskana-adapter-camunda-system-connector</artifactId>
-  <packaging>jar</packaging>
-
-  <name>${project.groupId}:${project.artifactId}</name>
-  <description>System connector between taskana-adapter and Camunda</description>
-
-
   <dependencies>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
       <version>${version.spring.boot}</version>
     </dependency>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
@@ -38,6 +34,7 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
+      <version>${version.spring.boot}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -45,16 +42,13 @@
           <artifactId>android-json</artifactId>
         </exclusion>
       </exclusions>
-      <version>${version.spring.boot}</version>
     </dependency>
-
     <dependency>
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
       <version>${version.junit.jupiter}</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -65,9 +59,11 @@
         <version>${version.maven.failsafe.plugin}</version>
         <configuration>
           <classpathDependencyExcludes>
-            <classpathDependencyExcludes>com.googlecode.json-simple:json-simple
+            <classpathDependencyExcludes>
+              com.googlecode.json-simple:json-simple
             </classpathDependencyExcludes>
-            <classpathDependencyExcludes>com.vaadin.external.google:android-json
+            <classpathDependencyExcludes>
+              com.vaadin.external.google:android-json
             </classpathDependencyExcludes>
           </classpathDependencyExcludes>
         </configuration>
