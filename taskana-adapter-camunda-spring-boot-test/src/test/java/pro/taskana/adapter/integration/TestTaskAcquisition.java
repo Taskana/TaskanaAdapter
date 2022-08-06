@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import pro.taskana.common.api.exceptions.NotAuthorizedException;
 import pro.taskana.common.internal.util.Pair;
 import pro.taskana.common.test.security.JaasExtension;
 import pro.taskana.common.test.security.WithAccessId;
+import pro.taskana.task.api.TaskCustomIntField;
 import pro.taskana.task.api.exceptions.TaskNotFoundException;
 import pro.taskana.task.api.models.Task;
 import pro.taskana.task.api.models.TaskSummary;
@@ -313,6 +315,71 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
+  void should_SetCustomIntegersInTaskanaTask_When_CamundaTaskHasCustomIntegers() throws Exception {
+    String variables =
+        "\"variables\": {"
+            + "\"taskana.custom-int-1\": {\"value\":\"1\", \"type\":\"string\"},"
+            + "\"taskana.custom-int-2\": {\"value\":\"2\", \"type\":\"string\"},"
+            + "\"taskana.custom-int-3\": {\"value\":\"3\", \"type\":\"string\"},"
+            + "\"taskana.custom-int-4\": {\"value\":\"4\", \"type\":\"string\"},"
+            + "\"taskana.custom-int-5\": {\"value\":\"5\", \"type\":\"string\"},"
+            + "\"taskana.custom-int-6\": {\"value\":\"6\", \"type\":\"string\"},"
+            + "\"taskana.custom-int-7\": {\"value\":\"7\", \"type\":\"string\"},"
+            + "\"taskana.custom-int-8\": {\"value\":\"8\", \"type\":\"string\"}"
+            + "}";
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_process", variables);
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    TaskSummary taskanaTask =
+        taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(0)).single();
+
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_1)).isEqualTo(1);
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_2)).isEqualTo(2);
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_3)).isEqualTo(3);
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_4)).isEqualTo(4);
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_5)).isEqualTo(5);
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_6)).isEqualTo(6);
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_7)).isEqualTo(7);
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_8)).isEqualTo(8);
+  }
+
+  @WithAccessId(
+      user = "teamlead_1",
+      groups = {"taskadmin"})
+  @Test
+  void should_SetDefaultCustomIntegerInTaskanaTask_When_CamundaTaskHasDefaultCustomInteger()
+      throws Exception {
+
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_process", "");
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    TaskSummary taskanaTask =
+        taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(0)).single();
+
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_1)).isNull();
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_2)).isNull();
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_3)).isNull();
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_4)).isNull();
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_5)).isNull();
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_6)).isNull();
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_7)).isNull();
+    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_8)).isNull();
+  }
+
+  @WithAccessId(
+      user = "teamlead_1",
+      groups = {"taskadmin"})
+  @Test
   void
       task_with_big_complex_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
           throws Exception {
@@ -567,7 +634,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
 
     List<Pair<List<String>, String>> variablesToTaskList =
         Arrays.asList(
-            Pair.of(Arrays.asList("camunda:attribute1"), camundaTaskIds.get(0)),
+            Pair.of(Collections.singletonList("camunda:attribute1"), camundaTaskIds.get(0)),
             Pair.of(
                 Arrays.asList("camunda:attribute1", "camunda:attribute2"), camundaTaskIds.get(1)),
             Pair.of(

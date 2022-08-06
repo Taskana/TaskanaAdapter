@@ -87,6 +87,8 @@ public class TaskInformationMapper {
 
     taskanaTask.setManualPriority(Integer.parseInt(referencedTask.getManualPriority()));
 
+    setCustomIntegers(referencedTask, taskanaTask);
+
     return taskanaTask;
   }
 
@@ -108,6 +110,33 @@ public class TaskInformationMapper {
     referencedTask.setDescription(taskanaTask.getDescription());
     referencedTask.setAssignee(taskanaTask.getOwner());
     return referencedTask;
+  }
+
+  private void setCustomIntegers(ReferencedTask referencedTask, TaskImpl taskanaTask) {
+    if (referencedTask.getCustomInt1() != null && !referencedTask.getCustomInt1().isEmpty()) {
+      taskanaTask.setCustomInt1(Integer.parseInt(referencedTask.getCustomInt1()));
+    }
+    if (referencedTask.getCustomInt2() != null && !referencedTask.getCustomInt2().isEmpty()) {
+      taskanaTask.setCustomInt2(Integer.parseInt(referencedTask.getCustomInt2()));
+    }
+    if (referencedTask.getCustomInt3() != null && !referencedTask.getCustomInt3().isEmpty()) {
+      taskanaTask.setCustomInt3(Integer.parseInt(referencedTask.getCustomInt3()));
+    }
+    if (referencedTask.getCustomInt4() != null && !referencedTask.getCustomInt4().isEmpty()) {
+      taskanaTask.setCustomInt4(Integer.parseInt(referencedTask.getCustomInt4()));
+    }
+    if (referencedTask.getCustomInt5() != null && !referencedTask.getCustomInt5().isEmpty()) {
+      taskanaTask.setCustomInt5(Integer.parseInt(referencedTask.getCustomInt5()));
+    }
+    if (referencedTask.getCustomInt6() != null && !referencedTask.getCustomInt6().isEmpty()) {
+      taskanaTask.setCustomInt6(Integer.parseInt(referencedTask.getCustomInt6()));
+    }
+    if (referencedTask.getCustomInt7() != null && !referencedTask.getCustomInt7().isEmpty()) {
+      taskanaTask.setCustomInt7(Integer.parseInt(referencedTask.getCustomInt7()));
+    }
+    if (referencedTask.getCustomInt8() != null && !referencedTask.getCustomInt8().isEmpty()) {
+      taskanaTask.setCustomInt8(Integer.parseInt(referencedTask.getCustomInt8()));
+    }
   }
 
   private String getProcessVariablesFromCustomAttributes(Map<String, String> customAttributes) {
