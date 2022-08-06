@@ -66,6 +66,14 @@ public class RetrieveCamundaTaskAccTest {
     expectedTask.setTaskDefinitionKey("Task_0yogl0i");
     expectedTask.setClassificationKey("Schaden_1");
     expectedTask.setDomain("DOMAIN_B");
+    expectedTask.setCustomInt1("1");
+    expectedTask.setCustomInt2("2");
+    expectedTask.setCustomInt3("3");
+    expectedTask.setCustomInt4("4");
+    expectedTask.setCustomInt5("5");
+    expectedTask.setCustomInt6("6");
+    expectedTask.setCustomInt7("7");
+    expectedTask.setCustomInt8("8");
 
     String expectedReplyBody =
         "{"
@@ -85,9 +93,17 @@ public class RetrieveCamundaTaskAccTest {
             + "            \\\"assignee\\\":\\\"admin\\\","
             + "            \\\"description\\\":\\\"blabla\\\","
             + "            \\\"owner\\\":\\\"admin\\\","
-            + "            \\\"taskDefinitionKey\\\":\\\"Task_0yogl0i\\\", "
+            + "            \\\"taskDefinitionKey\\\":\\\"Task_0yogl0i\\\","
             + "            \\\"classificationKey\\\":\\\"Schaden_1\\\","
-            + "            \\\"domain\\\":\\\"DOMAIN_B\\\""
+            + "            \\\"domain\\\":\\\"DOMAIN_B\\\","
+            + "            \\\"customInt1\\\":\\\"1\\\","
+            + "            \\\"customInt2\\\":\\\"2\\\","
+            + "            \\\"customInt3\\\":\\\"3\\\","
+            + "            \\\"customInt4\\\":\\\"4\\\","
+            + "            \\\"customInt5\\\":\\\"5\\\","
+            + "            \\\"customInt6\\\":\\\"6\\\","
+            + "            \\\"customInt7\\\":\\\"7\\\","
+            + "            \\\"customInt8\\\":\\\"8\\\""
             + "           },\"\n"
             + " }\n"
             + "]"

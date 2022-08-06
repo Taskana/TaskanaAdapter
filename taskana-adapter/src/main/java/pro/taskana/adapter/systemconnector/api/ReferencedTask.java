@@ -27,6 +27,14 @@ public class ReferencedTask {
   private String domain;
   private String classificationKey;
   private String workbasketKey;
+  private String customInt1;
+  private String customInt2;
+  private String customInt3;
+  private String customInt4;
+  private String customInt5;
+  private String customInt6;
+  private String customInt7;
+  private String customInt8;
 
   public String getBusinessProcessId() {
     return businessProcessId;
@@ -196,6 +204,70 @@ public class ReferencedTask {
     this.workbasketKey = workbasketKey;
   }
 
+  public String getCustomInt1() {
+    return customInt1;
+  }
+
+  public void setCustomInt1(String customInt1) {
+    this.customInt1 = customInt1;
+  }
+
+  public String getCustomInt2() {
+    return customInt2;
+  }
+
+  public void setCustomInt2(String customInt2) {
+    this.customInt2 = customInt2;
+  }
+
+  public String getCustomInt3() {
+    return customInt3;
+  }
+
+  public void setCustomInt3(String customInt3) {
+    this.customInt3 = customInt3;
+  }
+
+  public String getCustomInt4() {
+    return customInt4;
+  }
+
+  public void setCustomInt4(String customInt4) {
+    this.customInt4 = customInt4;
+  }
+
+  public String getCustomInt5() {
+    return customInt5;
+  }
+
+  public void setCustomInt5(String customInt5) {
+    this.customInt5 = customInt5;
+  }
+
+  public String getCustomInt6() {
+    return customInt6;
+  }
+
+  public void setCustomInt6(String customInt6) {
+    this.customInt6 = customInt6;
+  }
+
+  public String getCustomInt7() {
+    return customInt7;
+  }
+
+  public void setCustomInt7(String customInt7) {
+    this.customInt7 = customInt7;
+  }
+
+  public String getCustomInt8() {
+    return customInt8;
+  }
+
+  public void setCustomInt8(String customInt8) {
+    this.customInt8 = customInt8;
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(
@@ -218,7 +290,15 @@ public class ReferencedTask {
         taskState,
         domain,
         classificationKey,
-        workbasketKey);
+        workbasketKey,
+        customInt1,
+        customInt2,
+        customInt3,
+        customInt4,
+        customInt5,
+        customInt6,
+        customInt7,
+        customInt8);
   }
 
   @Override
@@ -252,7 +332,15 @@ public class ReferencedTask {
         && Objects.equals(taskState, other.taskState)
         && Objects.equals(domain, other.domain)
         && Objects.equals(classificationKey, other.classificationKey)
-        && Objects.equals(workbasketKey, other.workbasketKey);
+        && Objects.equals(workbasketKey, other.workbasketKey)
+        && Objects.equals(customInt1, other.customInt1)
+        && Objects.equals(customInt2, other.customInt2)
+        && Objects.equals(customInt3, other.customInt3)
+        && Objects.equals(customInt4, other.customInt4)
+        && Objects.equals(customInt5, other.customInt5)
+        && Objects.equals(customInt6, other.customInt6)
+        && Objects.equals(customInt7, other.customInt7)
+        && Objects.equals(customInt8, other.customInt8);
   }
 
   @Override
@@ -297,6 +385,22 @@ public class ReferencedTask {
         + classificationKey
         + ", workbasketKey="
         + workbasketKey
+        + ", customInt1="
+        + customInt1
+        + ", customInt2="
+        + customInt2
+        + ", customInt3="
+        + customInt3
+        + ", customInt4="
+        + customInt4
+        + ", customInt5="
+        + customInt5
+        + ", customInt6="
+        + customInt6
+        + ", customInt7="
+        + customInt7
+        + ", customInt8="
+        + customInt8
         + "]";
   }
 }

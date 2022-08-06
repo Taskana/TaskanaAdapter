@@ -223,8 +223,16 @@ public class TaskanaTaskListener implements TaskListener {
     referencedTask.setClassificationKey(
         getUserTaskExtensionProperty(delegateTask, "taskana.classification-key"));
     referencedTask.setDomain(getDomainVariable(delegateTask));
-    referencedTask.setWorkbasketKey(getWorkbasketKey(delegateTask));
-    referencedTask.setManualPriority(getManualPriority(delegateTask));
+    referencedTask.setWorkbasketKey(getVariable(delegateTask, "taskana.workbasket-key", null));
+    referencedTask.setManualPriority(getVariable(delegateTask, "taskana.manual-priority", "-1"));
+    referencedTask.setCustomInt1(getVariable(delegateTask, "taskana.custom-int-1", null));
+    referencedTask.setCustomInt2(getVariable(delegateTask, "taskana.custom-int-2", null));
+    referencedTask.setCustomInt3(getVariable(delegateTask, "taskana.custom-int-3", null));
+    referencedTask.setCustomInt4(getVariable(delegateTask, "taskana.custom-int-4", null));
+    referencedTask.setCustomInt5(getVariable(delegateTask, "taskana.custom-int-5", null));
+    referencedTask.setCustomInt6(getVariable(delegateTask, "taskana.custom-int-6", null));
+    referencedTask.setCustomInt7(getVariable(delegateTask, "taskana.custom-int-7", null));
+    referencedTask.setCustomInt8(getVariable(delegateTask, "taskana.custom-int-8", null));
     referencedTask.setVariables(getProcessVariables(delegateTask));
     String referencedTaskJson = objectMapper.writeValueAsString(referencedTask);
     LOGGER.debug("Exit from getReferencedTaskJson. Returning {}.", referencedTaskJson);
@@ -237,6 +245,25 @@ public class TaskanaTaskListener implements TaskListener {
       return taskDomain;
     }
     return getProcessModelExtensionProperty(delegateTask, "taskana.domain");
+  }
+
+  private String getVariable(
+      DelegateTask delegateTask, String variableReference, String defaultValue) {
+    String variable = defaultValue;
+    try {
+      Object variableObj = delegateTask.getVariable(variableReference);
+      if (variableObj instanceof String) {
+        variable = (String) variableObj;
+      }
+    } catch (Exception e) {
+      LOGGER.warn(
+          "Caught exception while trying to retrieve {} " + "for task {} in ProcessDefinition {}",
+          variableReference,
+          delegateTask.getName(),
+          delegateTask.getProcessDefinitionId(),
+          e);
+    }
+    return variable;
   }
 
   private String getProcessVariables(DelegateTask delegateTask) {
@@ -342,42 +369,6 @@ public class TaskanaTaskListener implements TaskListener {
 
   private List<String> splitVariableNamesString(String variableNamesConcatenated) {
     return Arrays.asList(variableNamesConcatenated.trim().split("\\s*,\\s*"));
-  }
-
-  private String getManualPriority(DelegateTask delegateTask) {
-    String manualPriority = "-1";
-    try {
-      Object manualPriorityObj = delegateTask.getVariable("taskana.manual-priority");
-      if (manualPriorityObj instanceof String) {
-        manualPriority = (String) manualPriorityObj;
-      }
-    } catch (Exception e) {
-      LOGGER.warn(
-          "Caught exception while trying to retrieve taskana.manual-priority "
-              + "for task {} in ProcessDefinition {}",
-          delegateTask.getName(),
-          delegateTask.getProcessDefinitionId(),
-          e);
-    }
-    return manualPriority;
-  }
-
-  private String getWorkbasketKey(DelegateTask delegateTask) {
-    String workbasketKey = null;
-    try {
-      Object workbasketKeyObj = delegateTask.getVariable("taskana.workbasket-key");
-      if (workbasketKeyObj instanceof String) {
-        workbasketKey = (String) workbasketKeyObj;
-      }
-    } catch (Exception e) {
-      LOGGER.warn(
-          "Caught exception while trying to retrieve taskana.workbasket-key "
-              + "for task {} in ProcessDefinition {}",
-          delegateTask.getName(),
-          delegateTask.getProcessDefinitionId(),
-          e);
-    }
-    return workbasketKey;
   }
 
   private String getProcessModelExtensionProperty(DelegateTask delegateTask, String propertyKey) {

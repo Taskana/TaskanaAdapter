@@ -2,6 +2,8 @@ package pro.taskana.adapter.systemconnector.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 /** Acceptance test for ReferencedTask setters and getters. */
@@ -25,6 +27,14 @@ public class ReferencedTaskTest {
     theTask.setOutboxEventId("9");
     theTask.setOutboxEventType("10");
     theTask.setOwner("11");
+    theTask.setCustomInt1("12");
+    theTask.setCustomInt2("13");
+    theTask.setCustomInt3("14");
+    theTask.setCustomInt4("15");
+    theTask.setCustomInt5("16");
+    theTask.setCustomInt6("17");
+    theTask.setCustomInt7("18");
+    theTask.setCustomInt8("19");
   }
 
   @Test
@@ -153,6 +163,32 @@ public class ReferencedTaskTest {
   }
 
   @Test
+  void should_returnCustomIntegers_when_CustomIntegersWereSet() {
+    ReferencedTask referencedTask = new ReferencedTask();
+    referencedTask.setCustomInt1(theValue);
+    referencedTask.setCustomInt2(theValue);
+    referencedTask.setCustomInt3(theValue);
+    referencedTask.setCustomInt4(theValue);
+    referencedTask.setCustomInt5(theValue);
+    referencedTask.setCustomInt6(theValue);
+    referencedTask.setCustomInt7(theValue);
+    referencedTask.setCustomInt8(theValue);
+
+    ArrayList<String> customIntegers =
+        new ArrayList<>(
+            Arrays.asList(
+                referencedTask.getCustomInt1(),
+                referencedTask.getCustomInt2(),
+                referencedTask.getCustomInt3(),
+                referencedTask.getCustomInt4(),
+                referencedTask.getCustomInt5(),
+                referencedTask.getCustomInt6(),
+                referencedTask.getCustomInt7(),
+                referencedTask.getCustomInt8()));
+    assertThat(customIntegers).containsOnly(theValue);
+  }
+
+  @Test
   void should_returnHashCode_when_askedToDoSo() {
     assertThat(theTask.hashCode()).isNotNull();
   }
@@ -185,6 +221,14 @@ public class ReferencedTaskTest {
     theTask.setOutboxEventType("10");
     theTask.setOwner("11");
     theTask.setWorkbasketKey("12");
+    theTask.setCustomInt1("13");
+    theTask.setCustomInt2("14");
+    theTask.setCustomInt3("15");
+    theTask.setCustomInt4("16");
+    theTask.setCustomInt5("17");
+    theTask.setCustomInt6("18");
+    theTask.setCustomInt7("19");
+    theTask.setCustomInt8("20");
 
     refTask2 = new ReferencedTask();
     refTask2.setAssignee("1");
@@ -199,7 +243,15 @@ public class ReferencedTaskTest {
     refTask2.setOutboxEventId("9");
     refTask2.setOutboxEventType("10");
     refTask2.setOwner("11");
-    refTask2.setWorkbasketKey("anotherOne");
+    refTask2.setWorkbasketKey("12");
+    theTask.setCustomInt1("13");
+    theTask.setCustomInt2("14");
+    theTask.setCustomInt3("15");
+    theTask.setCustomInt4("16");
+    theTask.setCustomInt5("17");
+    theTask.setCustomInt6("18");
+    theTask.setCustomInt7("19");
+    theTask.setCustomInt8("anotherOne");
 
     assertThat(refTask2).isNotEqualTo(theTask);
   }
