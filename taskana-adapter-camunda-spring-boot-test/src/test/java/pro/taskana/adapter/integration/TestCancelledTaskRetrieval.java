@@ -40,7 +40,7 @@ class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"admin"})
   @Test
-  void deletion_of_taskana_task_should_delete_camunda_task_and_process() throws Exception {
+  void should_DeleteCamundaTaskAndProcess_When_DeleteTaskanaTask() throws Exception {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", "");
@@ -88,7 +88,7 @@ class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void deletion_of_camunda_process_instance_should_terminate_taskana_task() throws Exception {
+  void should_TerminateTaskanaTask_When_DeleteCamundaProcessInstance() throws Exception {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", "");
@@ -132,8 +132,7 @@ class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"admin"})
   @Test
-  void deletion_of_taskana_task_with_deleted_camunda_task_should_be_handled_gracefully()
-      throws Exception {
+  void should_BeAbleToDeleteTaskanaTask_When_DeleteCamundaTask() throws Exception {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", "");
@@ -170,7 +169,7 @@ class TestCancelledTaskRetrieval extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void interruption_of_camunda_task_by_timer_should_cancel_taskana_task() throws Exception {
+  void should_CancelTaskanaTask_When_InterruptionByTimerOfCamundaTaskOccurs() throws Exception {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_timed_user_task_process", "");

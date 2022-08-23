@@ -47,7 +47,7 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"admin"})
   @Test
-  void completion_of_taskana_task_should_complete_camunda_task() throws Exception {
+  void should_CompleteCamundaTask_When_CompleteTaskanaTask() throws Exception {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", "");
@@ -85,8 +85,7 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void forced_completion_of_taskana_task_should_set_assignee_and_complete_camunda_task()
-      throws Exception {
+  void should_SetAssigneeAndCompleteCamundaTask_When_ForceCompleteTaskanaTask() throws Exception {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", "");
@@ -128,7 +127,7 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void completion_of_camunda_task_should_complete_taskana_task() throws Exception {
+  void should_CompleteTaskanaTask_When_CompleteCamundaTask() throws Exception {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", "");
@@ -165,7 +164,7 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void completion_of_taskana_task_with_new_process_variables_should_set_these_variables_in_camunda()
+  void should_SetVariablesInCamunda_When_CompleteTaskanaTaskWithTheseNewProcessVariables()
       throws Exception {
 
     String processInstanceId =
@@ -273,7 +272,7 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void completion_of_taskana_task_with_updated_process_variables_should_update_camunda_variables()
+  void should_UpdateCamundaVariables_When_CompleteTaskanaTaskWithTheseUpdatedProcessVariables()
       throws Exception {
 
     String processInstanceId =
@@ -353,7 +352,7 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_preventLoopFromScheduledMethod_When_TryingToCompleteNotAnymoreExistingCamundaTask()
+  void should_PreventLoopFromScheduledMethod_When_TryingToCompleteNoLongerExistingCamundaTask()
       throws Exception {
 
     Logger camundaUtilRequesterLogger =
