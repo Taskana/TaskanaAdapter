@@ -59,8 +59,8 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  public void
-      task_with_complex_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
+  void
+      should_CreateTaskanaTasksWithVariablesInCustomAttributes_When_StartCamundaTaskWithTheseComplexVariables()
           throws Exception {
 
     String processInstanceId =
@@ -112,8 +112,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void user_task_process_instance_started_in_camunda_via_rest_should_result_in_taskanaTask()
-      throws Exception {
+  void should_CreateTaskanaTask_When_StartUserTaskProcessInstanceInCamunda() throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -140,7 +139,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       groups = {"taskadmin"})
   @Test
   void
-      user_task_process_instance_with_empty_extension_property_started_in_camunda_via_rest_should_result_in_taskanaTask()
+      should_CreateTaskanaTask_When_StartUserTaskProcessInstanceWithEmptyExtensionPropertyInCamunda()
           throws Exception {
 
     String processInstanceId =
@@ -203,9 +202,8 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void
-      multiple_user_task_process_instances_started_in_camunda_via_rest_should_result_in_multiple_taskanaTasks()
-          throws Exception {
+  void should_CreateMultipleTaskanaTasks_When_StartMultipleUserTaskProcessInstanceInCamunda()
+      throws Exception {
 
     int numberOfProcesses = 10;
     List<List<String>> camundaTaskIdsList = new ArrayList<>();
@@ -233,9 +231,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void
-      task_with_primitive_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
-          throws Exception {
+  void should_CreateTaskanaTask_When_StartCamundaTaskWithPrimitiveVariables() throws Exception {
 
     String variables =
         "\"variables\": {\"amount\": {\"value\":555, "
@@ -270,7 +266,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void task_with_manual_priority_should_result_in_taskanaTask_with_this_manual_priority()
+  void should_CreateTaskanaTaskWithManualPriority_When_StartCamundaTaskWithThisManualPriority()
       throws Exception {
 
     String variables =
@@ -294,8 +290,9 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void task_without_manual_priority_should_result_in_taskanaTask_with_default_manual_priority()
-      throws Exception {
+  void
+      should_CreateTaskanaTaskWithDefaultManualPriority_When_StartCamundaTaskWithoutManualPriority()
+          throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -381,7 +378,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       groups = {"taskadmin"})
   @Test
   void
-      task_with_big_complex_variables_should_result_in_taskanaTask_with_those_variables_in_custom_attributes()
+      should_CreateTaskanaTaskWithComplexVariablesInCustomAttributes_When_StartCamundaTaskWithTheseVariables()
           throws Exception {
 
     String processInstanceId =
@@ -413,7 +410,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       groups = {"taskadmin"})
   @Test
   void
-      task_with_complex_variables_from_parent_execution_should_result_in_taskanaTasks_with_those_variables_in_custom_attributes()
+      should_CreateTaskanaTasksWithComplexVariablesInCustomAttributes_When_ParentExecutionOfCamundaTasksStarted()
           throws Exception {
 
     String processInstanceId =
@@ -479,7 +476,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void process_instance_with_multiple_executions_should_result_in_multiple_taskanaTasks()
+  void should_CreateMultipleTaskanaTasks_When_StartProcessInstanceWithMultipleExecutionsInCamunda()
       throws Exception {
 
     String processInstanceId =
@@ -504,7 +501,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_createTaskanaTask_When_SystemConnectorHasCorrectSystemEngineIdentifier()
+  void should_CreateTaskanaTask_When_SystemConnectorHasCorrectSystemEngineIdentifier()
       throws Exception {
 
     final Map<String, SystemConnector> originalSystemConnectors =
@@ -539,8 +536,9 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void process_with_different_domains_in_tasks_should_result_in_taskanaTasks_with_those_domains()
-      throws Exception {
+  void
+      should_CreateTaskanaTasksWithDifferentDomains_When_StartProcessWithDifferentDomainsInCamunda()
+          throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -584,7 +582,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_notCreateTaskanaTask_When_SystemConnectorHasIncorrectSystemEngineIdentifier()
+  void should_NotCreateTaskanaTask_When_SystemConnectorHasIncorrectSystemEngineIdentifier()
       throws Exception {
 
     final Map<String, SystemConnector> originalSystemConnectors =
@@ -621,7 +619,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       groups = {"taskadmin"})
   @Test
   void
-      process_with_different_variables_in_tasks_should_result_in_taskanaTasks_with_those_variables_in_custom_attributes()
+      should_CreateTaskanaTasksWithVariablesInCustomAttributes_When_StartProcessWithTheseDifferentVariablesInCamunda()
           throws Exception {
 
     String processInstanceId =
@@ -672,7 +670,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"admin"})
   @Test
-  void should_SetPlannedDateInTaskanaTask_When_CamundaTaskHasFollowUpDate() throws Exception {
+  void should_SetPlannedDateInTaskanaTask_When_StartCamundaTaskWithFollowUpDate() throws Exception {
     final Instant now = Instant.now();
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(

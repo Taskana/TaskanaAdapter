@@ -40,7 +40,7 @@ class TestTaskClaim extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void claim_of_taskana_task_should_claim_unclaimed_camunda_task() throws Exception {
+  void should_ClaimUnclaimedCamundaTask_When_ClaimTaskanaTask() throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -87,7 +87,7 @@ class TestTaskClaim extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void claim_of_taskana_task_should_claim_already_claimed_camunda_task() throws Exception {
+  void should_ClaimAlreadyClaimedCamundaTaska_When_ClaimTaskanaTask() throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -134,7 +134,7 @@ class TestTaskClaim extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void cancel_claim_of_taskana_task_should_cancel_claim_of_camunda_task() throws Exception {
+  void should_CancelClaimCamundaTask_When_CancelClaimTaskanaTask() throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -188,8 +188,7 @@ class TestTaskClaim extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void claim_of_taskana_task_after_cancel_claim_should_claim_task_in_camunda_again()
-      throws Exception {
+  void should_ClaimCamundaTaskAgain_When_ClaimTaskanaTaskAfterCancelClaim() throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -255,7 +254,7 @@ class TestTaskClaim extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_preventLoopFromScheduledMethod_When_TryingToClaimNotAnymoreExistingCamundaTask()
+  void should_ReventLoopFromScheduledMethod_When_TryingToClaimNotAnymoreExistingCamundaTask()
       throws Exception {
 
     Logger camundaUtilRequesterLogger =
@@ -314,7 +313,7 @@ class TestTaskClaim extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_preventLoopFromScheduledMethod_When_TryingToCancelClaimNotAnymoreExistingCamundaTask()
+  void should_PreventLoopFromScheduledMethod_When_TryingToCancelClaimNotAnymoreExistingCamundaTask()
       throws Exception {
 
     Logger camundaUtilRequesterLogger =

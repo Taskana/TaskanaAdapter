@@ -49,7 +49,7 @@ public class RetrieveCamundaTaskAccTest {
   }
 
   @Test
-  public void testGetActiveCamundaTasks() {
+  public void should_GetActiveCamundaTask() {
 
     String timeStamp = "2019-01-14T15:22:30.811+0000";
 
@@ -132,7 +132,7 @@ public class RetrieveCamundaTaskAccTest {
   }
 
   @Test
-  public void testGetFinishedCamundaTasks() {
+  public void should_GetFinishedCamundaTask() {
 
     ReferencedTask expectedTask = new ReferencedTask();
     expectedTask.setId("2275fb87-1065-11ea-a7a0-02004c4f4f50");

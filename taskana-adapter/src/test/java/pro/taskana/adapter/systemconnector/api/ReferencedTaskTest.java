@@ -38,125 +38,125 @@ public class ReferencedTaskTest {
   }
 
   @Test
-  void should_returnBusinessProcessId_when_BusinessProcessIdWasSet() {
+  void should_ReturnBusinessProcessId_When_BusinessProcessIdWasSet() {
     theTask.setBusinessProcessId(theValue);
     assertThat(theValue).isEqualTo(theTask.getBusinessProcessId());
   }
 
   @Test
-  void should_returnId_when_IdWasSet() {
+  void should_ReturnId_When_IdWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setId(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getId());
   }
 
   @Test
-  void should_returnOutboxEventId_when_OutboxEventIdWasSet() {
+  void should_ReturnOutboxEventId_When_OutboxEventIdWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setOutboxEventId(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getOutboxEventId());
   }
 
   @Test
-  void should_returnOutboxEventType_when_OutboxEventTypeWasSet() {
+  void should_ReturnOutboxEventType_When_OutboxEventTypeWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setOutboxEventType(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getOutboxEventType());
   }
 
   @Test
-  void should_returnName_when_NameWasSet() {
+  void should_ReturnName_When_NameWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setName(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getName());
   }
 
   @Test
-  void should_returnAssignee_when_AssigneeWasSet() {
+  void should_ReturnAssignee_When_AssigneeWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setAssignee(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getAssignee());
   }
 
   @Test
-  void should_returnCreated_when_CreatedWasSet() {
+  void should_ReturnCreated_When_CreatedWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setCreated(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getCreated());
   }
 
   @Test
-  void should_returnDue_when_DueWasSet() {
+  void should_ReturnDue_When_DueWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setDue(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getDue());
   }
 
   @Test
-  void should_returnDescription_when_DescriptionWasSet() {
+  void should_ReturnDescription_When_DescriptionWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setDescription(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getDescription());
   }
 
   @Test
-  void should_returnOwner_when_OwnerWasSet() {
+  void should_ReturnOwner_When_OwnerWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setOwner(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getOwner());
   }
 
   @Test
-  void should_returnPriority_when_PriorityWasSet() {
+  void should_ReturnPriority_When_PriorityWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setPriority(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getPriority());
   }
 
   @Test
-  void should_returnSuspended_when_SuspendedWasSet() {
+  void should_ReturnSuspended_When_SuspendedWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setSuspended(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getSuspended());
   }
 
   @Test
-  void should_returnSystemUrl_when_SystemUrlWasSet() {
+  void should_ReturnSystemUrl_When_SystemUrlWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setSystemUrl(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getSystemUrl());
   }
 
   @Test
-  void should_returnTaskDefinitionKey_when_TaskDefinitionKeyWasSet() {
+  void should_ReturnTaskDefinitionKey_When_TaskDefinitionKeyWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setTaskDefinitionKey(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getTaskDefinitionKey());
   }
 
   @Test
-  void should_returnVariables_when_VariablesWasSet() {
+  void should_ReturnVariables_When_VariablesWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setVariables(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getVariables());
   }
 
   @Test
-  void should_returnDomain_when_DomainWasSet() {
+  void should_ReturnDomain_When_DomainWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setDomain(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getDomain());
   }
 
   @Test
-  void should_returnClassificationKey_when_ClassificationKeyWasSet() {
+  void should_ReturnClassificationKey_When_ClassificationKeyWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setClassificationKey(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getClassificationKey());
   }
 
   @Test
-  void should_returnWorkbasketKey_when_WorkbasketKeyWasSet() {
+  void should_ReturnWorkbasketKey_When_WorkbasketKeyWasSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setWorkbasketKey(theValue);
     assertThat(theValue).isEqualTo(referencedTask.getWorkbasketKey());
@@ -189,17 +189,17 @@ public class ReferencedTaskTest {
   }
 
   @Test
-  void should_returnHashCode_when_askedToDoSo() {
+  void should_ReturnHashCode_When_AskedToDoSo() {
     assertThat(theTask.hashCode()).isNotNull();
   }
 
   @Test
-  void should_returnString_when_toStringIsCalled() {
+  void should_ReturnString_When_ToStringIsCalled() {
     assertThat(theTask.toString()).isNotNull();
   }
 
   @Test
-  void should_checkEquality_when_equalsIsCalled() {
+  void should_CheckEquality_When_EqualsIsCalled() {
     ReferencedTask refTask2 = theTask;
     refTask2.setWorkbasketKey("nochnkey");
     assertThat(refTask2).isEqualTo(theTask);
