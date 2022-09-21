@@ -83,7 +83,7 @@
 
     <version.archunit>0.23.1</version.archunit>
     <version.assertj>3.23.1</version.assertj>
-    <version.junit.jupiter>5.9.0</version.junit.jupiter>
+    <version.junit.jupiter>5.9.1</version.junit.jupiter>
     <version.hamcrest.json>0.2</version.hamcrest.json>
 
     <version.maven.gpg>3.0.1</version.maven.gpg>
