@@ -81,7 +81,7 @@
     <version.wildfly.maven.plugin>3.0.2.Final</version.wildfly.maven.plugin>
     <version.jboss-as-maven-plugin>7.9.Final</version.jboss-as-maven-plugin>
 
-    <version.archunit>0.23.1</version.archunit>
+    <version.archunit>1.0.0</version.archunit>
     <version.assertj>3.23.1</version.assertj>
     <version.junit.jupiter>5.9.1</version.junit.jupiter>
     <version.hamcrest.json>0.2</version.hamcrest.json>
