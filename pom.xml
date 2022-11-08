@@ -60,7 +60,7 @@
 
     <version.mybatis>3.5.11</version.mybatis>
     <version.spring.mybatis>2.2.2</version.spring.mybatis>
-    <version.h2database>1.4.200</version.h2database>
+    <version.h2database>2.1.214</version.h2database>
 
     <version.spring>5.0.5.RELEASE</version.spring>
     <version.spring.core>2.0.0.RELEASE</version.spring.core>
