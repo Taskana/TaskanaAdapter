@@ -85,7 +85,13 @@ public class TaskInformationMapper {
 
     taskanaTask.setPrimaryObjRef(createObjectReference());
 
-    taskanaTask.setManualPriority(Integer.parseInt(referencedTask.getManualPriority()));
+    if (referencedTask.getManualPriority() == null
+        || referencedTask.getManualPriority().isEmpty()
+        || "null".equals(referencedTask.getManualPriority())) {
+      taskanaTask.setManualPriority(-1);
+    } else {
+      taskanaTask.setManualPriority(Integer.parseInt(referencedTask.getManualPriority()));
+    }
 
     setCustomIntegers(referencedTask, taskanaTask);
 
