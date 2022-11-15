@@ -12,9 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.stream.Stream;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.ThrowingConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -704,7 +708,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     assertThat(camundaTaskIds).hasSize(1);
     camundaTaskId = camundaTaskIds.get(0);
     taskanaTaskSummaryList = this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-    assertThat(taskanaTaskSummaryList.size()).isEqualTo(1);
+    assertThat(taskanaTaskSummaryList).hasSize(1);
     taskanaTaskExternalId = taskanaTaskSummaryList.get(0).getExternalId();
     assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
     taskanaTaskId = taskanaTaskSummaryList.get(0).getId();
@@ -712,6 +716,51 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     // Check if plannedDate was set to Instant.now during setTimestampsInTaskanaTask() method call.
     // This is the desired behaviour since no followUpDate is set in this Camunda Task.
     assertThat(taskanaTask.getPlanned()).isAfter(now);
+  }
+
+  @WithAccessId(
+      user = "teamlead_1",
+      groups = {"taskadmin"})
+  @TestFactory
+  Stream<DynamicTest> should_CreateTaskanaTask_When_StartCamundaTaskWithManualPriorityNull() {
+    Stream<Pair<String, String>> input =
+        Stream.of(
+            Pair.of(
+                "manual priority is empty",
+                "\"variables\": {\"taskana.manual-priority\": {\"value\":\"\", "
+                    + "\"type\":\"string\"}}"),
+            Pair.of(
+                "manual priority is null",
+                "\"variables\": {\"taskana.manual-priority\": {\"value\":\"null\", "
+                    + "\"type\":\"string\"}}"),
+            Pair.of("manual priority does not exist", "\"variables\": {}"));
+
+    ThrowingConsumer<Pair<String, String>> test =
+        p -> {
+          String variables = p.getRight();
+          String processInstanceId =
+              this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+                  "simple_user_task_process", variables);
+          List<String> camundaTaskIds =
+              this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+
+          Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
+
+          // Make sure we only have one Camunda Task, so we don't need a for-loop
+          assertThat(camundaTaskIds).hasSize(1);
+          String camundaTaskId = camundaTaskIds.get(0);
+          // retrieve and check taskanaTaskId
+          List<TaskSummary> taskanaTaskSummaryList =
+              this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
+          assertThat(taskanaTaskSummaryList).hasSize(1);
+          String taskanaTaskExternalId = taskanaTaskSummaryList.get(0).getExternalId();
+          assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
+          String taskanaTaskId = taskanaTaskSummaryList.get(0).getId();
+          Task taskanaTask = this.taskService.getTask(taskanaTaskId);
+          assertThat(taskanaTask.getManualPriority()).isEqualTo(-1);
+        };
+
+    return DynamicTest.stream(input, Pair::getLeft, test);
   }
 
   private void setSystemConnector(String systemEngineIdentifier) {
