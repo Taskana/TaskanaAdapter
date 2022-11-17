@@ -63,7 +63,7 @@
     <version.h2database>1.4.200</version.h2database>
 
     <version.spring>5.0.5.RELEASE</version.spring>
-    <version.spring.core>2.0.0.RELEASE</version.spring.core>
+    <version.spring.core>3.0.0</version.spring.core>
     <version.spring.boot>2.7.5</version.spring.boot>
 
     <version.camunda>7.16.0</version.camunda>
