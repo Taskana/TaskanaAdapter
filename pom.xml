@@ -72,7 +72,7 @@
     <version.resteasy.spring.boot>5.0.0.Final</version.resteasy.spring.boot>
     <version.resteasy.jaxrs>3.0.12.Final</version.resteasy.jaxrs>
     <version.javax.ws.rs.api>2.1.1</version.javax.ws.rs.api>
-    <version.org.webjars.bootstrap>5.2.2</version.org.webjars.bootstrap>
+    <version.org.webjars.bootstrap>5.2.3</version.org.webjars.bootstrap>
     <version.org.jboss.spec>3.0.3.Final</version.org.jboss.spec>
     <version.wildfly>11.0.0.Final</version.wildfly>
     <version.wildfly.maven.plugin>4.0.0.Final</version.wildfly.maven.plugin>
