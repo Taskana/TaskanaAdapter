@@ -540,8 +540,54 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
+  void should_CreateTaskanaTasksWithCorrectDomains_When_StartProcessWithDomainsInProcessVariables()
+      throws Exception {
+    String processInstanceId =
+        this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
+            "simple_user_task_process_with_different_domains",
+            "\"variables\": "
+                + "{\"taskana.domain\": {\"value\":\"DOMAIN_B\", \"type\":\"string\"}}");
+    List<String> camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+    assertThat(camundaTaskIds).hasSize(3);
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    List<Pair<String, String>> variablesToTaskList =
+        Arrays.asList(
+            Pair.of("DOMAIN_B", camundaTaskIds.get(0)),
+            Pair.of("DOMAIN_B", camundaTaskIds.get(1)),
+            Pair.of("DOMAIN_B", camundaTaskIds.get(2)));
+
+    for (Pair<String, String> variablesToTask : variablesToTaskList) {
+      List<TaskSummary> taskanaTaskSummaryList =
+          this.taskService.createTaskQuery().externalIdIn(variablesToTask.getRight()).list();
+      assertThat(taskanaTaskSummaryList).hasSize(1);
+      TaskSummary taskanaTaskSummary = taskanaTaskSummaryList.get(0);
+
+      Task taskanaTask = taskService.getTask(taskanaTaskSummary.getId());
+      assertThat(taskanaTask.getDomain()).isEqualTo(variablesToTask.getLeft());
+    }
+
+    this.camundaProcessengineRequester.completeTaskWithId(camundaTaskIds.get(2));
+    camundaTaskIds =
+        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+    assertThat(camundaTaskIds).hasSize(3);
+    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+
+    List<TaskSummary> taskanaTaskSummaryList =
+        this.taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(2)).list();
+    assertThat(taskanaTaskSummaryList).hasSize(1);
+    TaskSummary taskanaTaskSummary = taskanaTaskSummaryList.get(0);
+    Task taskanaTask = taskService.getTask(taskanaTaskSummary.getId());
+    assertThat(taskanaTask.getDomain()).isEqualTo("DOMAIN_B");
+  }
+
+  @WithAccessId(
+      user = "teamlead_1",
+      groups = {"taskadmin"})
+  @Test
   void
-      should_CreateTaskanaTasksWithDifferentDomains_When_StartProcessWithDifferentDomainsInCamunda()
+      should_CreateTaskanaTasksWithCorrectDomains_When_StartProcessWithDomainsInExtensionProperties()
           throws Exception {
 
     String processInstanceId =
