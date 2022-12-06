@@ -240,7 +240,11 @@ public class TaskanaTaskListener implements TaskListener {
   }
 
   private String getDomainVariable(DelegateTask delegateTask) {
-    String taskDomain = getUserTaskExtensionProperty(delegateTask, "taskana.domain");
+    String taskDomain = getVariable(delegateTask, "taskana.domain", null);
+    if (taskDomain != null) {
+      return taskDomain;
+    }
+    taskDomain = getUserTaskExtensionProperty(delegateTask, "taskana.domain");
     if (taskDomain != null) {
       return taskDomain;
     }
