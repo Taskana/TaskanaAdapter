@@ -1,5 +1,7 @@
 package pro.taskana.adapter.systemconnector.camunda.api.impl;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,9 @@ import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 @Component
 public class CamundaTaskEventErrorHandler {
 
+  public static final int EVENT_STORE_ERROR_COLUMN_LIMIT = 1000;
+  public static final String CAUSE_TREE_CUTOFF_TEXT = "...";
+  public static final int COMMA_LENGTH = 1;
   private static final Logger LOGGER = LoggerFactory.getLogger(CamundaTaskEventErrorHandler.class);
   @Autowired HttpHeaderProvider httpHeaderProvider;
   @Autowired private RestTemplate restTemplate;
@@ -21,23 +26,20 @@ public class CamundaTaskEventErrorHandler {
       ReferencedTask referencedTask, Exception e, String camundaSystemTaskEventUrl) {
 
     LOGGER.debug(
-        "entry to decreaseRemainingRetriesAndLogErrorForReferencedTasks, CamundSystemURL = {}",
+        "entry to decreaseRemainingRetriesAndLogErrorForReferencedTasks, CamundaSystemURL = {}",
         camundaSystemTaskEventUrl);
 
-    String decreaseRemainingRetriesUrl =
+    final String decreaseRemainingRetriesUrl =
         String.format(
             CamundaSystemConnectorImpl.URL_CAMUNDA_EVENT_DECREASE_REMAINING_RETRIES,
             Integer.valueOf(referencedTask.getOutboxEventId()));
-    String requestUrl = camundaSystemTaskEventUrl + decreaseRemainingRetriesUrl;
+    final String requestUrl = camundaSystemTaskEventUrl + decreaseRemainingRetriesUrl;
+
+    JSONObject errorLog = createErrorLog(e);
 
     String failedTaskEventIdAndErrorLog =
-        "{\"taskEventId\":"
-            + referencedTask.getOutboxEventId()
-            + ",\"errorLog\":\""
-            + e.getCause().getClass().getName()
-            + ": "
-            + e.getCause().getMessage()
-            + "\"}";
+        String.format(
+            "{\"taskEventId\":%s,\"errorLog\":%s}", referencedTask.getOutboxEventId(), errorLog);
 
     LOGGER.debug("decreaseRemainingRetriesAndLogError Events url {} ", requestUrl);
 
@@ -46,6 +48,41 @@ public class CamundaTaskEventErrorHandler {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("exit from decreaseRemainingRetriesAndLogErrorForReferencedTasks.");
     }
+  }
+
+  private static JSONObject createErrorLog(Exception e) {
+    JSONObject errorLog =
+        new JSONObject()
+            .put(
+                "exception",
+                new JSONObject()
+                    .put("name", e.getClass().getName())
+                    .put("message", e.getMessage()));
+
+    JSONArray causeTree = new JSONArray();
+    errorLog.put("cause", causeTree);
+    // we don't want to compute the errorLog String length in every iteration (due to performance).
+    // Therefore, we "count" the length manually.
+    int errorLogStringLength = errorLog.toString().length();
+    Throwable exceptionCause = e.getCause();
+    while (exceptionCause != null) {
+      JSONObject exceptionCauseJson =
+          new JSONObject()
+              .put("name", exceptionCause.getClass().getName())
+              .put("message", exceptionCause.getMessage());
+      int newErrorLogStringLength =
+          errorLogStringLength + COMMA_LENGTH + exceptionCauseJson.toString().length();
+      if (newErrorLogStringLength
+          > EVENT_STORE_ERROR_COLUMN_LIMIT - COMMA_LENGTH - CAUSE_TREE_CUTOFF_TEXT.length() - 2) {
+        causeTree.put(CAUSE_TREE_CUTOFF_TEXT);
+        break;
+      }
+      causeTree.put(exceptionCauseJson);
+      errorLogStringLength = newErrorLogStringLength;
+      exceptionCause = exceptionCause.getCause();
+    }
+
+    return errorLog;
   }
 
   private void decreaseRemainingRetriesAndLogError(

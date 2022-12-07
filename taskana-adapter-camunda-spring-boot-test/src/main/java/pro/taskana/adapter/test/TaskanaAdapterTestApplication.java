@@ -12,7 +12,7 @@ import pro.taskana.adapter.test.configuration.CamundaConfiguration;
 
 /** Application to test the integration of Camunda BPM with REST API with the TASKANA Adapter. */
 @EnableScheduling
-@ComponentScan(basePackages = {"pro.taskana.adapter", "pro.taskana.adapter.test"})
+@ComponentScan("pro.taskana.adapter")
 @Import({AdapterConfiguration.class, CamundaConfiguration.class})
 @SpringBootApplication
 @EnableProcessApplication
