@@ -102,9 +102,14 @@ class TestFailedTaskCreation extends AbsIntegrationTest {
 
     assertThat(failedEvents)
         .extracting(CamundaTaskEvent::getError)
-        .containsOnly(
-            "pro.taskana.workbasket.api.exceptions.WorkbasketNotFoundException: "
-                + "Workbasket with key 'invalidWorkbasketKey' and domain 'null' was not found.");
+        .allMatch(
+            error ->
+                error.contains(
+                    "{\"name\":"
+                        + "\"pro.taskana.workbasket.api.exceptions.WorkbasketNotFoundException\","
+                        + "\"message\":"
+                        + "\"Workbasket with key 'invalidWorkbasketKey' "
+                        + "and domain 'null' was not found.\"}"));
   }
 
   @WithAccessId(

@@ -156,7 +156,7 @@ public class CamundaTaskEventsService {
 
       Instant blockedUntil = getBlockedUntil();
       preparedStatement.setTimestamp(1, Timestamp.from(blockedUntil));
-      preparedStatement.setString(2, errorLog.asText());
+      preparedStatement.setString(2, errorLog.toString());
       preparedStatement.setInt(3, id.asInt());
       preparedStatement.execute();
 
