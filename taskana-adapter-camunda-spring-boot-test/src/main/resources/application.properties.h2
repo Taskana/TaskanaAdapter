@@ -38,8 +38,8 @@ taskana-system-connector-camundaSystemURLs=http://localhost:${server.port}/engin
 ####################################################################################
 #
 # Datasource for Taskana DB (used by taskana-connector and taskana lib)
-# taskana.datasource.jdbcUrl = jdbc:h2:tcp://localhost:8092/mem:taskana;IGNORECASE=TRUE;LOCK_MODE=0;INIT=CREATE SCHEMA IF NOT EXISTS TASKANA
-taskana.datasource.jdbcUrl=jdbc:h2:mem:taskana;IGNORECASE=TRUE;LOCK_MODE=0;DB_CLOSE_ON_EXIT=FALSE
+# taskana.datasource.jdbcUrl = jdbc:h2:tcp://localhost:8092/mem:taskana;NON_KEYWORDS=KEY,VALUE;IGNORECASE=TRUE;LOCK_MODE=0;INIT=CREATE SCHEMA IF NOT EXISTS TASKANA
+taskana.datasource.jdbcUrl=jdbc:h2:mem:taskana;NON_KEYWORDS=KEY,VALUE;IGNORECASE=TRUE;LOCK_MODE=0;DB_CLOSE_ON_EXIT=FALSE
 taskana.datasource.driverClassName = org.h2.Driver
 taskana.datasource.username = sa
 taskana.datasource.password = sa
@@ -66,9 +66,9 @@ taskana.adapter.mapping.default.objectreference.value=DEFAULT_VALUE
 ## Camunda properties
 
 #H2
-#camunda.datasource.jdbcUrl= jdbc:h2:./camunda-db;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE
-#camunda.datasource.jdbcUrl=jdbc:h2:mem:camunda;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-camunda.datasource.jdbcUrl=jdbc:h2:mem:camunda;IGNORECASE=TRUE;LOCK_MODE=0;DB_CLOSE_ON_EXIT=FALSE;DB_CLOSE_DELAY=-1
+#camunda.datasource.jdbcUrl= jdbc:h2:./camunda-db;NON_KEYWORDS=KEY,VALUE;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE
+#camunda.datasource.jdbcUrl=jdbc:h2:mem:camunda;NON_KEYWORDS=KEY,VALUE;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+camunda.datasource.jdbcUrl=jdbc:h2:mem:camunda;NON_KEYWORDS=KEY,VALUE;IGNORECASE=TRUE;LOCK_MODE=0;DB_CLOSE_ON_EXIT=FALSE;DB_CLOSE_DELAY=-1
 camunda.datasource.driverClassName=org.h2.Driver
 camunda.datasource.username=sa
 camunda.datasource.password=sa
