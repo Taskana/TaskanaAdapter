@@ -100,7 +100,6 @@
       <!-- Needed for InMemoryH2Test -->
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>${version.h2database}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
