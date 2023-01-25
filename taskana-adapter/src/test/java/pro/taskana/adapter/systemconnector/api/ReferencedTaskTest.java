@@ -189,11 +189,6 @@ public class ReferencedTaskTest {
   }
 
   @Test
-  void should_ReturnHashCode_When_AskedToDoSo() {
-    assertThat(theTask.hashCode()).isNotNull();
-  }
-
-  @Test
   void should_ReturnString_When_ToStringIsCalled() {
     assertThat(theTask.toString()).isNotNull();
   }

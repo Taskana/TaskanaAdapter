@@ -3,6 +3,7 @@ package pro.taskana.adapter.systemconnector.camunda.api.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.slf4j.Logger;
@@ -87,6 +88,14 @@ public class CamundaTaskRetriever {
 
       camundaTaskEventListResource = responseEntity.getBody();
 
+      List<CamundaTaskEvent> retrievedEvents = camundaTaskEventListResource.getCamundaTaskEvents();
+
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("retrieved camunda task events {}", retrievedEvents);
+      }
+
+      return retrievedEvents;
+
     } catch (Exception e) {
       LOGGER.error(
           "Caught exception while trying to retrieve CamundaTaskEvents from system with URL "
@@ -94,12 +103,7 @@ public class CamundaTaskRetriever {
           e);
     }
 
-    List<CamundaTaskEvent> retrievedEvents = camundaTaskEventListResource.getCamundaTaskEvents();
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("retrieved camunda task events {}", retrievedEvents);
-    }
-
-    return retrievedEvents;
+    return Collections.emptyList();
   }
 
   private List<ReferencedTask> getReferencedTasksFromCamundaTaskEvents(
