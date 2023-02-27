@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import pro.taskana.TaskanaEngineConfiguration;
+import pro.taskana.TaskanaConfiguration;
 import pro.taskana.classification.api.ClassificationService;
 import pro.taskana.classification.api.exceptions.ClassificationNotFoundException;
 import pro.taskana.classification.api.models.Classification;
@@ -80,13 +80,19 @@ public abstract class AbsIntegrationTest {
   public void setUp() throws Exception {
     // set up database connection staticly and only once.
     if (!isInitialised) {
+      String schema =
+          ((HikariDataSource) taskanaDataSource).getSchema() == null
+              ? "TASKANA"
+              : ((HikariDataSource) taskanaDataSource).getSchema();
       // setup Taskana engine and clear Taskana database
-      TaskanaEngineConfiguration taskanaEngineConfiguration =
-          new TaskanaEngineConfiguration(
-              this.taskanaDataSource, false, ((HikariDataSource) taskanaDataSource).getSchema());
+      TaskanaConfiguration taskanaConfiguration =
+          new TaskanaConfiguration.Builder(this.taskanaDataSource, false, schema)
+              .initTaskanaProperties()
+              .build();
 
-      taskanaEngine = taskanaEngineConfiguration.buildTaskanaEngine();
-      taskanaEngine.setConnectionManagementMode(ConnectionManagementMode.AUTOCOMMIT);
+      taskanaEngine =
+          TaskanaEngine.buildTaskanaEngine(
+              taskanaConfiguration, ConnectionManagementMode.AUTOCOMMIT);
 
       DbCleaner cleaner = new DbCleaner();
       cleaner.clearDb(taskanaDataSource, DbCleaner.ApplicationDatabaseType.TASKANA);
@@ -116,15 +122,17 @@ public abstract class AbsIntegrationTest {
     // create workbaskets and classifications needed by the test cases.
     // since this is no testcase we cannot set a JAAS context. To be able to create workbaskets
     // and classifications anyway we use for this purpose an engine with security disabled ...
-    TaskanaEngineConfiguration taskanaEngineConfiguration =
-        new TaskanaEngineConfiguration(
-            this.taskanaDataSource,
-            false,
-            true,
-            ((HikariDataSource) taskanaDataSource).getSchema());
+    String schema =
+        ((HikariDataSource) taskanaDataSource).getSchema() == null
+            ? "TASKANA"
+            : ((HikariDataSource) taskanaDataSource).getSchema();
+    TaskanaConfiguration taskanaConfiguration =
+        new TaskanaConfiguration.Builder(this.taskanaDataSource, false, schema)
+            .initTaskanaProperties()
+            .build();
 
-    TaskanaEngine taskanaEngineUnsecure = taskanaEngineConfiguration.buildTaskanaEngine();
-    taskanaEngineUnsecure.setConnectionManagementMode(ConnectionManagementMode.AUTOCOMMIT);
+    TaskanaEngine taskanaEngineUnsecure =
+        TaskanaEngine.buildTaskanaEngine(taskanaConfiguration, ConnectionManagementMode.AUTOCOMMIT);
 
     createWorkbasket(taskanaEngineUnsecure, "GPK_KSC", "DOMAIN_A");
     createWorkbasket(taskanaEngineUnsecure, "GPK_B_KSC", "DOMAIN_B");

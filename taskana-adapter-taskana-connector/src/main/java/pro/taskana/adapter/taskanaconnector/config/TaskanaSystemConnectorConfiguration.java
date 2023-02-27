@@ -14,8 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
-import pro.taskana.SpringTaskanaEngineConfiguration;
-import pro.taskana.TaskanaEngineConfiguration;
+import pro.taskana.TaskanaConfiguration;
 import pro.taskana.classification.api.ClassificationService;
 import pro.taskana.common.api.TaskanaEngine;
 import pro.taskana.task.api.TaskService;
@@ -60,15 +59,29 @@ public class TaskanaSystemConnectorConfiguration {
 
   @Bean
   @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
-  public TaskanaEngine taskanaEngine(TaskanaEngineConfiguration taskanaEngineConfiguration)
+  public TaskanaEngine taskanaEngine(TaskanaConfiguration taskanaConfiguration)
       throws SQLException {
-    return taskanaEngineConfiguration.buildTaskanaEngine();
+    return TaskanaEngine.buildTaskanaEngine(taskanaConfiguration);
   }
 
   @Bean
   @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
-  public SpringTaskanaEngineConfiguration taskanaEngineConfiguration(
-      @Qualifier("taskanaDataSource") DataSource taskanaDataSource) {
-    return new SpringTaskanaEngineConfiguration(taskanaDataSource, true, true, taskanaSchemaName);
+  public TaskanaConfiguration taskanaConfiguration(
+      @Qualifier("taskanaDataSource") DataSource taskanaDataSource,
+      @Qualifier("taskanaPropertiesFileName") String propertiesFileName,
+      @Qualifier("taskanaPropertiesDelimiter") String delimiter) {
+    return new TaskanaConfiguration.Builder(taskanaDataSource, true, taskanaSchemaName, true)
+        .initTaskanaProperties(propertiesFileName, delimiter)
+        .build();
+  }
+
+  @Bean
+  public String taskanaPropertiesFileName() {
+    return "/taskana.properties";
+  }
+
+  @Bean
+  public String taskanaPropertiesDelimiter() {
+    return "|";
   }
 }
