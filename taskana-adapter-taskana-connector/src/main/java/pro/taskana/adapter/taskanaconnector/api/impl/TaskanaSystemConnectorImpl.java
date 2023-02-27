@@ -19,10 +19,11 @@ import pro.taskana.task.api.CallbackState;
 import pro.taskana.task.api.TaskService;
 import pro.taskana.task.api.TaskState;
 import pro.taskana.task.api.exceptions.InvalidOwnerException;
-import pro.taskana.task.api.exceptions.InvalidStateException;
+import pro.taskana.task.api.exceptions.InvalidTaskStateException;
 import pro.taskana.task.api.exceptions.TaskNotFoundException;
 import pro.taskana.task.api.models.Task;
 import pro.taskana.task.api.models.TaskSummary;
+import pro.taskana.workbasket.api.exceptions.NotAuthorizedOnWorkbasketException;
 
 /** Implements TaskanaConnector. */
 @Component
@@ -155,7 +156,10 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
       }
     } catch (TaskNotFoundException e1) {
       LOGGER.debug("Nothing to do in terminateTaskanaTask. Task {} is already gone", taskId);
-    } catch (InvalidOwnerException | InvalidStateException | NotAuthorizedException e2) {
+    } catch (InvalidOwnerException
+        | NotAuthorizedException
+        | NotAuthorizedOnWorkbasketException
+        | InvalidTaskStateException e2) {
       if (TaskState.COMPLETED.equals(taskSummary.getState())) {
         LOGGER.debug("Nothing to do in terminateTaskanaTask. Task {} is already completed", taskId);
       } else {
@@ -178,7 +182,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
             && callbackInfo.get(SYSTEM_URL) != null) {
           result.add(taskInformationMapper.convertToReferencedTask(taskanaTask));
         }
-      } catch (TaskNotFoundException | NotAuthorizedException e) {
+      } catch (TaskNotFoundException | NotAuthorizedOnWorkbasketException e) {
         LOGGER.error("Caught {} when trying to retrieve requested taskana tasks.", e, e);
       }
     }
