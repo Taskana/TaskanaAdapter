@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.web.client.RestTemplate;
-
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskClaimCanceler;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskClaimer;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskCompleter;

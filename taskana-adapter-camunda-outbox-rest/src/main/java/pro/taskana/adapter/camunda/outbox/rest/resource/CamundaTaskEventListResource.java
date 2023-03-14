@@ -2,7 +2,6 @@ package pro.taskana.adapter.camunda.outbox.rest.resource;
 
 import java.io.Serializable;
 import java.util.List;
-
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
 
 /**

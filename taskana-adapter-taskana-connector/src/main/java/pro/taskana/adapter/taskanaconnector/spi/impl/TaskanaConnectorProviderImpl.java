@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import pro.taskana.adapter.configuration.AdapterSpringContextProvider;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.adapter.taskanaconnector.spi.TaskanaConnectorProvider;

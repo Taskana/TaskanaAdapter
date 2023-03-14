@@ -8,7 +8,6 @@ import java.util.ServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 import pro.taskana.adapter.systemconnector.spi.SystemConnectorProvider;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;

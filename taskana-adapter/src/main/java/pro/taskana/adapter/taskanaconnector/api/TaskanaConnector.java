@@ -1,7 +1,6 @@
 package pro.taskana.adapter.taskanaconnector.api;
 
 import java.util.List;
-
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;

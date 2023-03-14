@@ -15,7 +15,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
 import pro.taskana.adapter.camunda.outbox.rest.CamundaTaskEvent;
 import pro.taskana.adapter.camunda.outbox.rest.CamundaTaskEventListResource;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;

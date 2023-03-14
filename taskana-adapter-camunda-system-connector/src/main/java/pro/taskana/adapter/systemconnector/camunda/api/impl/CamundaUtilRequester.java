@@ -7,7 +7,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-
 import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemUrls;
 
 /** Util class for camunda requests used in multiple components of CamundaSystemConnectorImpl. */

@@ -6,7 +6,6 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
 import pro.taskana.adapter.configuration.AdapterConfiguration;
 import pro.taskana.adapter.systemconnector.camunda.config.CamundaSystemConnectorConfiguration;
 import pro.taskana.adapter.taskanaconnector.config.TaskanaSystemConnectorConfiguration;

@@ -1,7 +1,6 @@
 package pro.taskana.adapter.systemconnector.spi;
 
 import java.util.List;
-
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 
 /** The interface for the SystemConnector provider. */

@@ -10,7 +10,6 @@ import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import pro.taskana.adapter.camunda.tasklistener.TaskanaTaskListener;
 
 /** This class is responsible for adding the TaskanaTaskListener to all user tasks. */

@@ -21,8 +21,6 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
-
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaUtilRequester;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
 import pro.taskana.common.test.security.JaasExtension;
@@ -30,6 +28,7 @@ import pro.taskana.common.test.security.WithAccessId;
 import pro.taskana.task.api.TaskState;
 import pro.taskana.task.api.models.Task;
 import pro.taskana.task.api.models.TaskSummary;
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 /**
  * Test class to test the completion of camunda tasks upon completion of taskana tasks and vice
