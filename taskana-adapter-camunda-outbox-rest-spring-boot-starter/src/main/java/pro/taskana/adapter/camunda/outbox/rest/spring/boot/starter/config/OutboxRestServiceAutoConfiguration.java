@@ -4,7 +4,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import pro.taskana.adapter.camunda.outbox.rest.config.OutboxRestServiceConfig;
 import pro.taskana.adapter.camunda.outbox.rest.controller.CamundaTaskEventsController;
 import pro.taskana.adapter.camunda.parselistener.TaskanaParseListenerProcessEnginePlugin;

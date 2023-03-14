@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
-
 import pro.taskana.adapter.camunda.outbox.rest.controller.CamundaTaskEventsController;
 import pro.taskana.adapter.camunda.outbox.rest.exception.CamundaTaskEventNotFoundExceptionMapper;
 import pro.taskana.adapter.camunda.outbox.rest.exception.InvalidArgumentExceptionMapper;

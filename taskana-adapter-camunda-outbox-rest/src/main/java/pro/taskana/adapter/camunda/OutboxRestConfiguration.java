@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import pro.taskana.common.api.exceptions.SystemException;
 
 public class OutboxRestConfiguration {

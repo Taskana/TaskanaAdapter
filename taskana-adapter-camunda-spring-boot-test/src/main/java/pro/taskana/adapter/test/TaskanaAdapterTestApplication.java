@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
 import pro.taskana.adapter.configuration.AdapterConfiguration;
 import pro.taskana.adapter.test.configuration.CamundaConfiguration;
 

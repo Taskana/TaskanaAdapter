@@ -2,7 +2,6 @@ package pro.taskana.adapter.systemconnector.camunda.spi.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import pro.taskana.adapter.configuration.AdapterSpringContextProvider;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaSystemConnectorImpl;

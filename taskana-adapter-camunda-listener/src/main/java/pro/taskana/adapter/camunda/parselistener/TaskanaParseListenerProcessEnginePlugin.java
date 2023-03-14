@@ -14,7 +14,6 @@ import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import pro.taskana.adapter.camunda.CamundaListenerConfiguration;
 import pro.taskana.adapter.camunda.exceptions.SystemException;
 import pro.taskana.adapter.camunda.schemacreator.DB;

@@ -9,7 +9,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
 import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventListResource;
 

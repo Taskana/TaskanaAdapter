@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaUtilRequester;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
 import pro.taskana.common.test.security.JaasExtension;

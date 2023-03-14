@@ -15,10 +15,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import spinjar.com.fasterxml.jackson.core.JsonProcessingException;
-import spinjar.com.fasterxml.jackson.core.type.TypeReference;
-import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
-
 import pro.taskana.adapter.camunda.outbox.rest.exception.CamundaTaskEventNotFoundException;
 import pro.taskana.adapter.camunda.outbox.rest.exception.InvalidArgumentException;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
@@ -28,6 +24,9 @@ import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventListReso
 import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventResource;
 import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventResourceAssembler;
 import pro.taskana.adapter.camunda.outbox.rest.service.CamundaTaskEventsService;
+import spinjar.com.fasterxml.jackson.core.JsonProcessingException;
+import spinjar.com.fasterxml.jackson.core.type.TypeReference;
+import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
 
 /** Controller for the Outbox REST service. */
 @Path(Mapping.URL_EVENTS)

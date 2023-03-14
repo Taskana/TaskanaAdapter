@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
 import pro.taskana.adapter.impl.ReferencedTaskClaimCanceler;
 import pro.taskana.adapter.impl.ReferencedTaskClaimer;
 import pro.taskana.adapter.impl.ReferencedTaskCompleter;

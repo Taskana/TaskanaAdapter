@@ -25,13 +25,12 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spinjar.com.fasterxml.jackson.databind.JsonNode;
-import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
-
 import pro.taskana.adapter.camunda.OutboxRestConfiguration;
 import pro.taskana.adapter.camunda.outbox.rest.exception.CamundaTaskEventNotFoundException;
 import pro.taskana.adapter.camunda.outbox.rest.exception.InvalidArgumentException;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
+import spinjar.com.fasterxml.jackson.databind.JsonNode;
+import spinjar.com.fasterxml.jackson.databind.ObjectMapper;
 
 /** Implementation of the Outbox REST service. */
 public class CamundaTaskEventsService {

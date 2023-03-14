@@ -2,7 +2,6 @@ package pro.taskana.adapter.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import pro.taskana.adapter.exceptions.AssertionViolationException;
 
 /** utility class that allows to assert specific conditions. */

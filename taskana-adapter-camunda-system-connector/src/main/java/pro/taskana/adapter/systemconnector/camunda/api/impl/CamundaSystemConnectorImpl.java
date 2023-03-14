@@ -1,7 +1,6 @@
 package pro.taskana.adapter.systemconnector.camunda.api.impl;
 
 import java.util.List;
-
 import pro.taskana.adapter.configuration.AdapterSpringContextProvider;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;

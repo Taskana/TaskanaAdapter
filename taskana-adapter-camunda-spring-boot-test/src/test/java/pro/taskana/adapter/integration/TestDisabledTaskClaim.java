@@ -12,7 +12,6 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
-
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskClaimCanceler;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskClaimer;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
