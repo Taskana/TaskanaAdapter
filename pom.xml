@@ -36,13 +36,13 @@
   </licenses>
 
   <properties>
-    <java.version>11</java.version>
+    <java.version>17</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <version.taskana>6.2.1-SNAPSHOT</version.taskana>
+    <version.taskana>7.0.0</version.taskana>
 
     <!-- build dependencies -->
     <version.checkstyle>10.9.3</version.checkstyle>
