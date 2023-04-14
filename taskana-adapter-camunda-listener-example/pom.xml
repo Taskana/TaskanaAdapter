@@ -149,6 +149,11 @@
           </tasks>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>${version.maven-war-plugin}</version>
+      </plugin>
+
     </plugins>
   </build>
 
