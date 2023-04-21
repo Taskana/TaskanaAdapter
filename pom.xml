@@ -63,7 +63,7 @@
 
     <version.spring>5.3.26.RELEASE</version.spring>
     <version.spring.core>3.0.0</version.spring.core>
-    <version.spring.boot>2.7.10</version.spring.boot>
+    <version.spring.boot>3.0.6</version.spring.boot>
 
     <version.camunda>7.17.0</version.camunda>
     <version.camunda.bpm.extensions>1.2</version.camunda.bpm.extensions>
