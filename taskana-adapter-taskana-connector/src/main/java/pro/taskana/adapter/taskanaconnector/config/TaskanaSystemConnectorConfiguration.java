@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +21,9 @@ import pro.taskana.common.api.TaskanaEngine;
 import pro.taskana.task.api.TaskService;
 import pro.taskana.workbasket.api.WorkbasketService;
 
-/** Configuration for TASKANA task system connector. */
+/**
+ * Configuration for TASKANA task system connector.
+ */
 @Configuration
 @DependsOn(value = {"adapterSpringContextProvider"})
 public class TaskanaSystemConnectorConfiguration {
@@ -65,6 +68,7 @@ public class TaskanaSystemConnectorConfiguration {
   }
 
   @Bean
+  @ConditionalOnMissingBean(TaskanaConfiguration.class)
   @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
   public TaskanaConfiguration taskanaConfiguration(
       @Qualifier("taskanaDataSource") DataSource taskanaDataSource,
