@@ -49,7 +49,7 @@
     <version.google-java-format>1.16.0</version.google-java-format>
     <version.maven.jar>3.3.0</version.maven.jar>
     <version.maven-war-plugin>3.4.0</version.maven-war-plugin>
-    <version.maven.source>3.2.1</version.maven.source>
+    <version.maven.source>3.3.0</version.maven.source>
     <version.maven.compiler>3.11.0</version.maven.compiler>
     <version.maven.javadoc>3.5.0</version.maven.javadoc>
     <version.maven.failsafe.plugin>3.0.0</version.maven.failsafe.plugin>
