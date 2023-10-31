@@ -45,18 +45,18 @@
     <version.taskana>7.0.1-SNAPSHOT</version.taskana>
 
     <!-- build dependencies -->
-    <version.checkstyle>10.9.3</version.checkstyle>
+    <version.checkstyle>10.12.4</version.checkstyle>
     <version.google-java-format>1.16.0</version.google-java-format>
     <version.maven.jar>3.3.0</version.maven.jar>
     <version.maven-war-plugin>3.4.0</version.maven-war-plugin>
     <version.maven.source>3.3.0</version.maven.source>
     <version.maven.compiler>3.11.0</version.maven.compiler>
-    <version.maven.javadoc>3.5.0</version.maven.javadoc>
-    <version.maven.failsafe.plugin>3.1.2</version.maven.failsafe.plugin>
-    <version.maven.surefire.plugin>3.1.2</version.maven.surefire.plugin>
-    <version.maven.checkstyle>3.3.0</version.maven.checkstyle>
+    <version.maven.javadoc>3.6.0</version.maven.javadoc>
+    <version.maven.failsafe.plugin>3.2.1</version.maven.failsafe.plugin>
+    <version.maven.surefire.plugin>3.2.1</version.maven.surefire.plugin>
+    <version.maven.checkstyle>3.3.1</version.maven.checkstyle>
     <version.maven.spring-boot>2.7.9</version.maven.spring-boot>
-    <version.maven.sonar>3.9.1.2184</version.maven.sonar>
+    <version.maven.sonar>3.10.0.2594</version.maven.sonar>
 
     <version.mybatis>3.5.13</version.mybatis>
     <version.spring.mybatis>2.2.2</version.spring.mybatis>
@@ -82,7 +82,7 @@
 
     <version.maven.gpg>3.1.0</version.maven.gpg>
     <version.sonatype>1.6.13</version.sonatype>
-    <version.jacoco>0.8.9</version.jacoco>
+    <version.jacoco>0.8.11</version.jacoco>
 
     <!-- sonar settings -->
     <!--suppress UnresolvedMavenProperty -->
