@@ -37,6 +37,11 @@
       <artifactId>taskana-spring</artifactId>
       <version>${version.taskana}</version>
     </dependency>
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
+      <version>${version.jakarta.annotation}</version>
+    </dependency>
     <!-- test dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>

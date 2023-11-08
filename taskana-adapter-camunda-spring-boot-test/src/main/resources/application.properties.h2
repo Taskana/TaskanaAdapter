@@ -1,6 +1,10 @@
 server.port= 10020
 spring.main.allow-bean-definition-overriding=true
 
+# properties for resteasy-servlet-spring-boot-starter
+# without these 2 propertiers the camunda-context is registered twice
+resteasy.jaxrs.app.registration=property
+resteasy.jaxrs.app.classes=pro.taskana.adapter.camunda.outbox.rest.config.OutboxRestServiceConfig
 
 ######################################################################################
 ## Adapter properties

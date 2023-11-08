@@ -81,11 +81,12 @@
     <dependency>
       <groupId>org.springframework.plugin</groupId>
       <artifactId>spring-plugin-core</artifactId>
-      <version>${version.spring.core}</version>
+      <version>${version.spring.plugin.core}</version>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>${version.jakarta.servlet}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
