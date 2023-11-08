@@ -1,10 +1,13 @@
 package pro.taskana.adapter.systemconnector.camunda.config;
 
+import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskClaimCanceler;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskClaimer;
@@ -16,10 +19,16 @@ import pro.taskana.adapter.systemconnector.camunda.api.impl.HttpHeaderProvider;
 /** Configures the camunda system connector. */
 @Configuration
 @DependsOn(value = {"adapterSpringContextProvider"})
+@EnableConfigurationProperties(OkHttpProperties.class)
 public class CamundaSystemConnectorConfiguration {
+
   @Bean
-  public RestTemplate restTemplate(RestTemplateBuilder builder) {
-    return builder.build();
+  RestTemplate restTemplate(RestTemplateBuilder builder, OkHttpProperties okHttpProperties) {
+    return builder
+        .setConnectTimeout(Duration.ofMillis(okHttpProperties.getConnectionTimeout()))
+        .setReadTimeout(Duration.ofMillis(okHttpProperties.getReadTimeout()))
+        .requestFactory(OkHttp3ClientHttpRequestFactory.class)
+        .build();
   }
 
   @Bean

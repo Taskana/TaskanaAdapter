@@ -9,7 +9,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import pro.taskana.TaskanaConfiguration;
+import pro.taskana.adapter.systemconnector.camunda.api.impl.HttpHeaderProvider;
 import pro.taskana.classification.api.ClassificationService;
 import pro.taskana.classification.api.exceptions.ClassificationNotFoundException;
 import pro.taskana.classification.api.models.Classification;
@@ -35,6 +39,8 @@ public abstract class AbsIntegrationTest {
 
   private static boolean isInitialised = false;
 
+  @LocalServerPort private Integer port;
+
   @Value("${taskana.adapter.scheduler.run.interval.for.start.taskana.tasks.in.milliseconds}")
   protected long adapterTaskPollingInterval;
 
@@ -42,8 +48,7 @@ public abstract class AbsIntegrationTest {
   protected long adapterCompletionPollingInterval;
 
   @Value(
-      "${taskana.adapter.scheduler.run.interval.for.check.finished.referenced."
-          + "tasks.in.milliseconds}")
+      "${taskana.adapter.scheduler.run.interval.for.check.finished.referenced.tasks.in.milliseconds}")
   protected long adapterCancelledClaimPollingInterval;
 
   @Value("${taskana.adapter.scheduler.run.interval.for.claim.referenced.tasks.in.milliseconds}")
@@ -69,8 +74,11 @@ public abstract class AbsIntegrationTest {
   @Resource(name = "camundaBpmDataSource")
   protected DataSource camundaBpmDataSource;
 
-  @Autowired private TestRestTemplate restTemplate;
+  private TestRestTemplate restTemplate;
+
   @Autowired private ProcessEngineConfiguration processEngineConfiguration;
+
+  @Autowired private HttpHeaderProvider httpHeaderProvider;
 
   @Resource(name = "taskanaDataSource")
   private DataSource taskanaDataSource;
@@ -101,11 +109,19 @@ public abstract class AbsIntegrationTest {
       isInitialised = true;
     }
 
+    this.restTemplate =
+        new TestRestTemplate(
+            new RestTemplateBuilder()
+                .rootUri("http://localhost:" + port)
+                .requestFactory(OkHttp3ClientHttpRequestFactory.class));
     // set up camunda requester and taskanaEngine-Taskservice
     this.camundaProcessengineRequester =
         new CamundaProcessengineRequester(
-            this.processEngineConfiguration.getProcessEngineName(), this.restTemplate);
-    this.taskanaOutboxRequester = new TaskanaOutboxRequester(this.restTemplate);
+            this.processEngineConfiguration.getProcessEngineName(),
+            this.restTemplate,
+            this.httpHeaderProvider);
+    this.taskanaOutboxRequester =
+        new TaskanaOutboxRequester(this.restTemplate, this.httpHeaderProvider);
     this.taskService = taskanaEngine.getTaskService();
 
     // adjust polling interval, give adapter a little more time

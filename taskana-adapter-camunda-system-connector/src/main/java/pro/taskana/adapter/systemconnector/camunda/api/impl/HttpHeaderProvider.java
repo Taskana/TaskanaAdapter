@@ -43,8 +43,23 @@ public class HttpHeaderProvider {
     }
   }
 
-  HttpEntity<String> prepareEntityFromBodyForCamundaRestApi(String requestBody) {
+  public HttpEntity<Void> prepareNewEntityForCamundaRestApi() {
     HttpHeaders headers = getHttpHeadersForCamundaRestApi();
+    return new HttpEntity<>(headers);
+  }
+
+  public HttpEntity<String> prepareNewEntityForCamundaRestApi(String requestBody) {
+    HttpHeaders headers = getHttpHeadersForCamundaRestApi();
+    return new HttpEntity<>(requestBody, headers);
+  }
+
+  public HttpEntity<Void> prepareNewEntityForOutboxRestApi() {
+    HttpHeaders headers = getHttpHeadersForOutboxRestApi();
+    return new HttpEntity<>(headers);
+  }
+
+  public HttpEntity<String> prepareNewEntityForOutboxRestApi(String requestBody) {
+    HttpHeaders headers = getHttpHeadersForOutboxRestApi();
     return new HttpEntity<>(requestBody, headers);
   }
 
