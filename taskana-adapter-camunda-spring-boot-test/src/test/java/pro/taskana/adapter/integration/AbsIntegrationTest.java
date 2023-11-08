@@ -1,7 +1,7 @@
 package pro.taskana.adapter.integration;
 
 import com.zaxxer.hikari.HikariDataSource;
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import javax.sql.DataSource;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.junit.jupiter.api.BeforeEach;

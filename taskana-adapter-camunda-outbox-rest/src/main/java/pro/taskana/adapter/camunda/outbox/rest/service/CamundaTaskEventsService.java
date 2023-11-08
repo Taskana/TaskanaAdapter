@@ -2,6 +2,7 @@ package pro.taskana.adapter.camunda.outbox.rest.service;
 
 import static java.util.stream.Collectors.toList;
 
+import jakarta.ws.rs.core.MultivaluedMap;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,7 +22,6 @@ import java.util.stream.Stream;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import javax.ws.rs.core.MultivaluedMap;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

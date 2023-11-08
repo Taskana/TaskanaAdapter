@@ -39,10 +39,9 @@
       <version>${version.camunda.spin}</version>
     </dependency>
     <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>jaxrs-api</artifactId>
-      <version>${version.resteasy.jaxrs}</version>
-      <scope>provided</scope>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+      <version>${version.jakarta-ws-rs-api}</version>
     </dependency>
     <dependency>
       <groupId>org.mybatis</groupId>
