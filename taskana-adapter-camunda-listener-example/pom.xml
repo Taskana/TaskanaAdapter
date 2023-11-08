@@ -33,9 +33,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
-      <version>${version.javax.ws.rs.api}</version>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+      <version>${version.jakarta-ws-rs-api}</version>
     </dependency>
     <!-- Jersey 2.19 -->
     <dependency>
@@ -54,13 +54,6 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-cdi</artifactId>
     </dependency>
-    <dependency>
-      <!-- AssertJ Testing Library -->
-      <groupId>org.camunda.bpm.extension</groupId>
-      <artifactId>camunda-bpm-assert</artifactId>
-      <version>${version.camunda.bpm.extensions}</version>
-      <scope>test</scope>
-    </dependency>
     <!-- Required to use Spin dataformat support in unit tests -->
     <dependency>
       <groupId>org.camunda.spin</groupId>
@@ -76,12 +69,14 @@
     <dependency>
       <groupId>org.camunda.template-engines</groupId>
       <artifactId>camunda-template-engines-freemarker</artifactId>
-      <scope>provided</scope>
+      <version>2.2.0</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.camunda.template-engines</groupId>
       <artifactId>camunda-template-engines-velocity</artifactId>
-      <scope>provided</scope>
+      <version>2.1.0</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <!-- Bootstrap for styling via Webjars project -->
