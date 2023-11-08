@@ -7,11 +7,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import pro.taskana.adapter.systemconnector.camunda.api.impl.HttpHeaderProvider;
 
 /** Class to assist with building requests against the Camunda REST API. */
 public class CamundaProcessengineRequester {
@@ -28,25 +27,33 @@ public class CamundaProcessengineRequester {
 
   private final String processEngineKey;
 
+  private final HttpHeaderProvider httpHeaderProvider;
+
   /**
    * Constructor for setting up a requester for a process engine with a key other than "default".
    *
    * @param processEngineKey the key of the camunda process engine to be called.
    * @param restTemplate the {@link TestRestTemplate} to be used for the REST calls.
+   * @param httpHeaderProvider httpHeaderProvider to set correct headers on HTTP Request
    */
-  public CamundaProcessengineRequester(String processEngineKey, TestRestTemplate restTemplate) {
+  public CamundaProcessengineRequester(
+      String processEngineKey,
+      TestRestTemplate restTemplate,
+      HttpHeaderProvider httpHeaderProvider) {
     this.processEngineKey = processEngineKey;
     this.restTemplate = restTemplate;
+    this.httpHeaderProvider = httpHeaderProvider;
   }
 
   /**
    * Default constructor to use the default process engine with its key "default".
    *
    * @param restTemplate the {@link TestRestTemplate} to be used for the REST calls.
+   * @param httpHeaderProvider httpHeaderProvider to set correct headers on HTTP Request
    */
-  public CamundaProcessengineRequester(TestRestTemplate restTemplate) {
-    this.processEngineKey = "default";
-    this.restTemplate = restTemplate;
+  public CamundaProcessengineRequester(
+      TestRestTemplate restTemplate, HttpHeaderProvider httpHeaderProvider) {
+    this("default", restTemplate, httpHeaderProvider);
   }
 
   /**
@@ -66,7 +73,8 @@ public class CamundaProcessengineRequester {
             + PROCESS_DEFINITION_KEY_PATH
             + processKey
             + PROCESS_DEFINITION_START_PATH;
-    HttpEntity<String> requestEntity = prepareEntityFromBody("{" + variables + "}");
+    HttpEntity<String> requestEntity =
+        httpHeaderProvider.prepareNewEntityForCamundaRestApi("{" + variables + "}");
 
     ResponseEntity<String> answer =
         restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
@@ -89,7 +97,7 @@ public class CamundaProcessengineRequester {
     List<String> returnList = new ArrayList<String>();
 
     String url = BASIC_ENGINE_PATH + this.processEngineKey + TASK_PATH;
-    HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
+    HttpEntity<Void> requestEntity = httpHeaderProvider.prepareNewEntityForCamundaRestApi();
 
     ResponseEntity<String> answer =
         this.restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
@@ -120,7 +128,8 @@ public class CamundaProcessengineRequester {
             + "/"
             + camundaTaskId
             + COMPLETE_TASK_PATH;
-    HttpEntity<String> requestEntity = this.prepareEntityFromBody("{}");
+    HttpEntity<String> requestEntity =
+        httpHeaderProvider.prepareNewEntityForCamundaRestApi("{}");
     ResponseEntity<String> answer =
         this.restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
     if (answer.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
@@ -145,7 +154,7 @@ public class CamundaProcessengineRequester {
    */
   public boolean getTaskFromTaskId(String camundaTaskId) throws JSONException {
     String url = BASIC_ENGINE_PATH + this.processEngineKey + TASK_PATH + "/" + camundaTaskId;
-    HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
+    HttpEntity<Void> requestEntity = httpHeaderProvider.prepareNewEntityForCamundaRestApi();
     ResponseEntity<String> response =
         restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
     JSONObject taskRetrievalAnswerJson = new JSONObject(response.getBody());
@@ -170,7 +179,7 @@ public class CamundaProcessengineRequester {
             + TASK_PATH
             + "/?taskId="
             + camundaTaskId;
-    HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
+    HttpEntity<Void> requestEntity = httpHeaderProvider.prepareNewEntityForCamundaRestApi();
     ResponseEntity<String> response =
         restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
     // no task found will only show in empty body
@@ -196,7 +205,7 @@ public class CamundaProcessengineRequester {
             + TASK_PATH
             + "/?taskId="
             + camundaTaskId;
-    HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
+    HttpEntity<Void> requestEntity = httpHeaderProvider.prepareNewEntityForCamundaRestApi();
     ResponseEntity<String> response =
         restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
     // no task found will only show in empty body
@@ -228,7 +237,8 @@ public class CamundaProcessengineRequester {
     if (skipCustomListeners) {
       url += "?skipCustomListeners=true";
     }
-    HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
+    HttpEntity<String> requestEntity =
+        httpHeaderProvider.prepareNewEntityForCamundaRestApi("{}");
     ResponseEntity<String> answer =
         this.restTemplate.exchange(url, HttpMethod.DELETE, requestEntity, String.class);
     if (HttpStatus.NO_CONTENT.equals(answer.getStatusCode())) {
@@ -254,7 +264,7 @@ public class CamundaProcessengineRequester {
   public boolean isCorrectAssignee(String camundaTaskId, String assigneeValueToVerify) {
 
     String requestUrl = BASIC_ENGINE_PATH + this.processEngineKey + TASK_PATH + "/" + camundaTaskId;
-    HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
+    HttpEntity<Void> requestEntity = httpHeaderProvider.prepareNewEntityForCamundaRestApi();
     ResponseEntity<String> responseEntity =
         restTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, String.class);
     JSONObject taskRetrievalAnswerJson = new JSONObject(responseEntity.getBody());
@@ -272,17 +282,5 @@ public class CamundaProcessengineRequester {
     }
 
     return false;
-  }
-
-  /**
-   * Helper method to create an HttpEntity from a provided body in JSON-format.
-   *
-   * @param jsonBody the body of the HttpEntity
-   * @return the created HttpEntity
-   */
-  private HttpEntity<String> prepareEntityFromBody(String jsonBody) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    return new HttpEntity<String>(jsonBody, headers);
   }
 }

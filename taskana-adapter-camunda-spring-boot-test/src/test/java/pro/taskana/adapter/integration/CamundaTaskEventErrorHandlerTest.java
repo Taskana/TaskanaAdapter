@@ -7,22 +7,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.ContextConfiguration;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
-import pro.taskana.adapter.impl.ReferencedTaskClaimCanceler;
-import pro.taskana.adapter.impl.ReferencedTaskClaimer;
-import pro.taskana.adapter.impl.ReferencedTaskCompleter;
-import pro.taskana.adapter.impl.TaskanaTaskStarter;
-import pro.taskana.adapter.impl.TaskanaTaskTerminator;
 import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
 import pro.taskana.common.test.security.JaasExtension;
@@ -35,14 +27,7 @@ import pro.taskana.impl.configuration.DbCleaner.ApplicationDatabaseType;
     webEnvironment = WebEnvironment.DEFINED_PORT)
 @AutoConfigureWebTestClient
 @ExtendWith(JaasExtension.class)
-// Disable Schedulers so tasks stay in OutboxDB
-@MockBean(ReferencedTaskCompleter.class)
-@MockBean(ReferencedTaskClaimer.class)
-@MockBean(ReferencedTaskClaimCanceler.class)
-@MockBean(TaskanaTaskStarter.class)
-@MockBean(TaskanaTaskTerminator.class)
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-@Disabled
+@ContextConfiguration
 public class CamundaTaskEventErrorHandlerTest extends AbsIntegrationTest {
 
   @Autowired private AdapterManager adapterManager;

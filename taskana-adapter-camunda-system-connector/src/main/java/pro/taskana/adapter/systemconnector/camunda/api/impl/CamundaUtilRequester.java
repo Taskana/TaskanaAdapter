@@ -29,8 +29,7 @@ public class CamundaUtilRequester {
             .append(camundaTaskId)
             .toString();
 
-    HttpEntity<String> requestEntity =
-        httpHeaderProvider.prepareEntityFromBodyForCamundaRestApi("{}");
+    HttpEntity<Void> requestEntity = httpHeaderProvider.prepareNewEntityForCamundaRestApi();
     try {
       restTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, String.class);
     } catch (HttpStatusCodeException ex) {

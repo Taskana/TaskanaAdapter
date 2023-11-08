@@ -4,13 +4,12 @@ import java.util.List;
 import org.json.JSONException;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
 import pro.taskana.adapter.camunda.outbox.rest.resource.CamundaTaskEventListResource;
+import pro.taskana.adapter.systemconnector.camunda.api.impl.HttpHeaderProvider;
 
 /** Class to assist with building requests against the TASKNA Outbox REST API. */
 public class TaskanaOutboxRequester {
@@ -19,15 +18,20 @@ public class TaskanaOutboxRequester {
 
   private final TestRestTemplate restTemplate;
 
-  public TaskanaOutboxRequester(TestRestTemplate restTemplate) {
+  private final HttpHeaderProvider httpHeaderProvider;
+
+  public TaskanaOutboxRequester(
+      TestRestTemplate restTemplate, HttpHeaderProvider httpHeaderProvider) {
     this.restTemplate = restTemplate;
+    this.httpHeaderProvider = httpHeaderProvider;
   }
 
   public boolean deleteFailedEvent(int id) throws JSONException {
 
     String url = BASIC_OUTBOX_PATH + "/" + id;
 
-    HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
+    HttpEntity<String> requestEntity =
+        httpHeaderProvider.prepareNewEntityForOutboxRestApi("{}");
     ResponseEntity<String> answer =
         this.restTemplate.exchange(url, HttpMethod.DELETE, requestEntity, String.class);
 
@@ -41,7 +45,8 @@ public class TaskanaOutboxRequester {
 
     String url = BASIC_OUTBOX_PATH + "/delete-failed-events";
 
-    HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
+    HttpEntity<String> requestEntity =
+        httpHeaderProvider.prepareNewEntityForOutboxRestApi("{}");
     ResponseEntity<String> answer =
         this.restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 
@@ -55,7 +60,7 @@ public class TaskanaOutboxRequester {
 
     String url = BASIC_OUTBOX_PATH + "?retries=0";
 
-    HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
+    HttpEntity<Void> requestEntity = httpHeaderProvider.prepareNewEntityForOutboxRestApi();
     ResponseEntity<CamundaTaskEventListResource> answer =
         this.restTemplate.exchange(
             url, HttpMethod.GET, requestEntity, CamundaTaskEventListResource.class);
@@ -67,7 +72,7 @@ public class TaskanaOutboxRequester {
 
     String url = BASIC_OUTBOX_PATH;
 
-    HttpEntity<String> requestEntity = prepareEntityFromBody("{}");
+    HttpEntity<Void> requestEntity = httpHeaderProvider.prepareNewEntityForOutboxRestApi();
     ResponseEntity<CamundaTaskEventListResource> answer =
         this.restTemplate.exchange(
             url, HttpMethod.GET, requestEntity, CamundaTaskEventListResource.class);
@@ -80,7 +85,8 @@ public class TaskanaOutboxRequester {
     String url = BASIC_OUTBOX_PATH + "/" + id;
 
     HttpEntity<String> requestEntity =
-        prepareEntityFromBody("{\"remainingRetries\":" + newRetries + "}");
+        httpHeaderProvider.prepareNewEntityForOutboxRestApi(
+            "{\"remainingRetries\":" + newRetries + "}");
     ResponseEntity<String> answer =
         this.restTemplate.exchange(url, HttpMethod.PATCH, requestEntity, String.class);
 
@@ -95,7 +101,8 @@ public class TaskanaOutboxRequester {
     String url = BASIC_OUTBOX_PATH + "?retries=0";
 
     HttpEntity<String> requestEntity =
-        prepareEntityFromBody("{\"remainingRetries\":" + newRetries + "}");
+        httpHeaderProvider.prepareNewEntityForOutboxRestApi(
+            "{\"remainingRetries\":" + newRetries + "}");
     ResponseEntity<String> answer =
         this.restTemplate.exchange(url, HttpMethod.PATCH, requestEntity, String.class);
 
@@ -103,17 +110,5 @@ public class TaskanaOutboxRequester {
       return true;
     }
     return false;
-  }
-
-  /**
-   * Helper method to create an HttpEntity from a provided body in JSON-format.
-   *
-   * @param jsonBody the body of the HttpEntity
-   * @return the created HttpEntity
-   */
-  private HttpEntity<String> prepareEntityFromBody(String jsonBody) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    return new HttpEntity<String>(jsonBody, headers);
   }
 }
