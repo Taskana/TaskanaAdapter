@@ -61,7 +61,7 @@ public class CamundaTaskCompleter {
         CamundaSystemConnectorImpl.BODY_SET_ASSIGNEE + "\"" + referencedTask.getAssignee() + "\"}";
 
     HttpEntity<String> requestEntity =
-        httpHeaderProvider.prepareEntityFromBodyForCamundaRestApi(requestBody);
+        httpHeaderProvider.prepareNewEntityForCamundaRestApi(requestBody);
     ResponseEntity<String> responseEntity =
         this.restTemplate.exchange(
             requestUrlBuilder.toString(), HttpMethod.POST, requestEntity, String.class);
@@ -87,7 +87,7 @@ public class CamundaTaskCompleter {
         .append(COMPLETED_BY_TASKANA_ADAPTER_LOCAL_VARIABLE);
 
     HttpEntity<String> requestEntity =
-        httpHeaderProvider.prepareEntityFromBodyForCamundaRestApi(
+        httpHeaderProvider.prepareNewEntityForCamundaRestApi(
             "{\"value\" : true, \"type\": \"Boolean\"}");
 
     ResponseEntity<String> responseEntity =
@@ -117,7 +117,7 @@ public class CamundaTaskCompleter {
         "completing camunda task {}  with request body {}", camundaTask.getId(), requestBody);
 
     HttpEntity<String> entity =
-        httpHeaderProvider.prepareEntityFromBodyForCamundaRestApi(requestBody);
+        httpHeaderProvider.prepareNewEntityForCamundaRestApi(requestBody);
 
     try {
       ResponseEntity<String> responseEntity =
