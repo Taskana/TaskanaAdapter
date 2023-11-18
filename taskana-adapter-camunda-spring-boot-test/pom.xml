@@ -15,49 +15,16 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>${version.spring.boot}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <!-- Camunda BPM -->
     <dependency>
       <groupId>org.camunda.bpm.springboot</groupId>
       <artifactId>camunda-bpm-spring-boot-starter</artifactId>
-      <version>${version.camunda}</version>
     </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm.springboot</groupId>
-      <artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
-      <version>${version.camunda}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <!--
-        <dependency>
-               <groupId>com.oracle.jdbc</groupId>
-               <artifactId>ojdbc8</artifactId>
-               <version>19.3.0.0</version>
-               <scope>test</scope>
-        </dependency>
-    -->
     <!-- Camunda REST Api -->
     <dependency>
       <groupId>org.camunda.bpm.springboot</groupId>
       <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
-      <version>${version.camunda}</version>
       <exclusions>
         <exclusion>
           <groupId>org.skyscreamer</groupId>
@@ -69,18 +36,14 @@
     <dependency>
       <groupId>org.camunda.bpm.springboot</groupId>
       <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
-      <version>${version.camunda}</version>
     </dependency>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-plugin-spin</artifactId>
-      <version>${version.camunda}</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
-      <version>${version.camunda.spin}</version>
     </dependency>
     <!-- Adapter modules -->
     <dependency>
@@ -103,12 +66,6 @@
       <artifactId>taskana-adapter-camunda-listener</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- taskana-common-test classes -->
-    <dependency>
-      <groupId>pro.taskana</groupId>
-      <artifactId>taskana-common-test</artifactId>
-      <version>${version.taskana}</version>
-    </dependency>
     <!-- needed for test coverage -->
     <dependency>
       <groupId>pro.taskana</groupId>
@@ -122,6 +79,24 @@
       <artifactId>resteasy-servlet-spring-boot-starter</artifactId>
       <version>${version.resteasy.spring.boot}</version>
     </dependency>
+    <!-- testing dependencies -->
+    <dependency>
+      <groupId>pro.taskana</groupId>
+      <artifactId>taskana-common-test</artifactId>
+      <version>${version.taskana}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm.springboot</groupId>
+      <artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <!-- Database Drivers -->
     <dependency>
       <groupId>com.ibm.db2</groupId>
