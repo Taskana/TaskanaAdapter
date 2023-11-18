@@ -47,22 +47,22 @@
     <!-- build dependencies -->
     <version.checkstyle>10.12.4</version.checkstyle>
     <version.google-java-format>1.16.0</version.google-java-format>
-    <version.maven.jar>3.3.0</version.maven.jar>
-    <version.maven-war-plugin>3.4.0</version.maven-war-plugin>
-    <version.maven.source>3.3.0</version.maven.source>
-    <version.maven.compiler>3.11.0</version.maven.compiler>
-    <version.maven.javadoc>3.6.0</version.maven.javadoc>
-    <version.maven.failsafe.plugin>3.2.1</version.maven.failsafe.plugin>
-    <version.maven.surefire.plugin>3.2.1</version.maven.surefire.plugin>
     <version.maven.checkstyle>3.3.1</version.maven.checkstyle>
-    <version.maven.spring-boot>2.7.9</version.maven.spring-boot>
-    <version.maven.sonar>3.10.0.2594</version.maven.sonar>
-    <version.wildfly.maven.plugin>4.0.0.Final</version.wildfly.maven.plugin>
-    <version.jboss-as-maven-plugin>7.9.Final</version.jboss-as-maven-plugin>
-    <version.maven.resources>3.3.1</version.maven.resources>
+    <version.maven.compiler>3.11.0</version.maven.compiler>
     <version.maven.dependency>3.6.1</version.maven.dependency>
+    <version.maven.failsafe.plugin>3.2.1</version.maven.failsafe.plugin>
+    <version.maven.jar>3.3.0</version.maven.jar>
+    <version.maven.javadoc>3.6.0</version.maven.javadoc>
+    <version.maven.jboss-as.plugin>7.9.Final</version.maven.jboss-as.plugin>
+    <version.maven.resources>3.3.1</version.maven.resources>
+    <version.maven.sonar>3.10.0.2594</version.maven.sonar>
+    <version.maven.source>3.3.0</version.maven.source>
+    <version.maven.spring-boot>2.7.9</version.maven.spring-boot>
+    <version.maven.surefire.plugin>3.2.1</version.maven.surefire.plugin>
+    <version.maven-war-plugin>3.4.0</version.maven-war-plugin>
+    <version.maven.wildfly.plugin>4.0.0.Final</version.maven.wildfly.plugin>
 
-    <version.mybatis>3.5.13</version.mybatis>
+    <version.mybatis>3.5.14</version.mybatis>
     <version.spring.mybatis>3.0.2</version.spring.mybatis>
 
     <version.spring.plugin.core>3.0.0</version.spring.plugin.core>
@@ -70,14 +70,14 @@
 
     <version.camunda>7.20.0</version.camunda>
     <version.camunda.spin>1.22.0</version.camunda.spin>
+    <version.camunda.template-engines-freemarker>2.2.0</version.camunda.template-engines-freemarker>
+    <version.camunda.template-engines-velocity>2.1.0</version.camunda.template-engines-velocity>
 
     <version.jakarta.annotation>2.1.1</version.jakarta.annotation>
     <version.jakarta.servlet>6.0.0</version.jakarta.servlet>
     <version.jakarta-ws-rs-api>3.1.0</version.jakarta-ws-rs-api>
 
     <version.resteasy.spring.boot>6.0.4.Final</version.resteasy.spring.boot>
-    <version.resteasy.jaxrs>3.0.12.Final</version.resteasy.jaxrs>
-    <version.javax.ws.rs.api>2.1.1</version.javax.ws.rs.api>
     <version.org.webjars.bootstrap>5.3.1</version.org.webjars.bootstrap>
     <version.org.jboss.spec>3.0.3.Final</version.org.jboss.spec>
 
@@ -86,8 +86,8 @@
     <version.arquillian.managed.wildfly>5.0.1.Final</version.arquillian.managed.wildfly>
 
 
-    <version.archunit>1.0.1</version.archunit>
-    <version.hamcrest.json>0.2</version.hamcrest.json>
+    <version.archunit>1.2.0</version.archunit>
+    <version.hamcrest.json>0.3</version.hamcrest.json>
 
     <version.maven.gpg>3.1.0</version.maven.gpg>
     <version.sonatype>1.6.13</version.sonatype>
@@ -127,6 +127,13 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-bom</artifactId>
+        <version>${version.camunda}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
         <version>${version.spring.boot}</version>
@@ -143,16 +150,6 @@
   </dependencyManagement>
 
   <profiles>
-    <profile>
-      <id>jdk8-compatibility</id>
-      <activation>
-        <jdk>[9,)</jdk>
-      </activation>
-      <properties>
-        <maven.compiler.release>8</maven.compiler.release>
-        <maven.compiler.testRelease>${java.version}</maven.compiler.testRelease>
-      </properties>
-    </profile>
     <profile>
       <id>snapshot</id>
       <build>
@@ -373,6 +370,24 @@
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
+    </repository>
+    <repository>
+      <id>camunda-bpm-nexus</id>
+      <name>Camunda Maven Repository</name>
+      <url>https://app.camunda.com/nexus/content/groups/public</url>
+    </repository>
+    <!-- enable this for EE dependencies (requires credentials in ~/.m2/settings.xml) -->
+    <!--
+    <repository>
+      <id>camunda-bpm-nexus-ee</id>
+      <name>Camunda Enterprise Maven Repository</name>
+      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-ee</url>
+    </repository>
+    -->
+    <repository>
+      <id>jboss-public-repository</id>
+      <name>JBoss Repository</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public</url>
     </repository>
   </repositories>
 </project>

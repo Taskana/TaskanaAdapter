@@ -15,28 +15,14 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.camunda.spin</groupId>
-        <artifactId>camunda-spin-bom</artifactId>
-        <version>${version.camunda.spin}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-core</artifactId>
-      <version>${version.camunda.spin}</version>
     </dependency>
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-all</artifactId>
-      <version>${version.camunda.spin}</version>
     </dependency>
     <dependency>
       <groupId>jakarta.ws.rs</groupId>

@@ -21,13 +21,6 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>${version.spring.boot}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-      <dependency>
         <groupId>org.wildfly.bom</groupId>
         <artifactId>wildfly-ee</artifactId>
         <version>${version.wildfly}</version>
@@ -239,7 +232,7 @@
       <plugin>
         <groupId>org.wildfly.plugins</groupId>
         <artifactId>wildfly-maven-plugin</artifactId>
-        <version>${version.wildfly.maven.plugin}</version>
+        <version>${version.maven.wildfly.plugin}</version>
         <configuration>
           <version>${version.wildfly}</version>
           <javaOpts>-Djboss.http.port=8089</javaOpts>

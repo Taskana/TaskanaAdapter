@@ -19,18 +19,6 @@
     <failOnMissingWebXml>false</failOnMissingWebXml>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-bom</artifactId>
-        <version>${version.camunda}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>jakarta.ws.rs</groupId>
@@ -58,24 +46,24 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-all</artifactId>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-plugin-spin</artifactId>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
     <!-- Required to use Templates in unit tests -->
     <dependency>
       <groupId>org.camunda.template-engines</groupId>
       <artifactId>camunda-template-engines-freemarker</artifactId>
-      <version>2.2.0</version>
+      <version>${version.camunda.template-engines-freemarker}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.camunda.template-engines</groupId>
       <artifactId>camunda-template-engines-velocity</artifactId>
-      <version>2.1.0</version>
+      <version>${version.camunda.template-engines-velocity}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -83,13 +71,6 @@
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap</artifactId>
       <version>${version.org.webjars.bootstrap}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.spec</groupId>
-      <artifactId>jboss-javaee-6.0</artifactId>
-      <version>${version.org.jboss.spec}</version>
-      <scope>provided</scope>
-      <type>pom</type>
     </dependency>
     <dependency>
       <!-- Needed for InMemoryH2Test -->
@@ -132,52 +113,18 @@
         <!-- Deploy to JBoss AS7: mvn clean jboss-as:deploy See also: https://docs.jboss.org/jbossas/7/plugins/maven/latest/examples/deployment-example.html -->
         <groupId>org.jboss.as.plugins</groupId>
         <artifactId>jboss-as-maven-plugin</artifactId>
-        <version>${version.jboss-as-maven-plugin}</version>
+        <version>${version.maven.jboss-as.plugin}</version>
       </plugin>
       <plugin>
         <!-- Deploy to Wildfly: mvn clean wildfly:deploy See also: https://docs.jboss.org/wildfly/plugins/maven/latest/examples/deployment-example.html -->
         <groupId>org.wildfly.plugins</groupId>
         <artifactId>wildfly-maven-plugin</artifactId>
-        <version>${version.wildfly.maven.plugin}</version>
-      </plugin>
-      <plugin>
-        <!-- Deploy to JBoss using: mvn clean package antrun:run Follow the instructions in build.properties.example to make it work!-->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <configuration>
-          <tasks>
-            <ant antfile="${basedir}/build.xml">
-              <target name="copy.war.into.jboss"/>
-            </ant>
-          </tasks>
-        </configuration>
+        <version>${version.maven.wildfly.plugin}</version>
       </plugin>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <version>${version.maven-war-plugin}</version>
       </plugin>
-
     </plugins>
   </build>
-
-  <repositories>
-    <repository>
-      <id>camunda-bpm-nexus</id>
-      <name>Camunda Maven Repository</name>
-      <url>https://app.camunda.com/nexus/content/groups/public</url>
-    </repository>
-    <!-- enable this for EE dependencies (requires credentials in ~/.m2/settings.xml) -->
-    <!--
-    <repository>
-      <id>camunda-bpm-nexus-ee</id>
-      <name>Camunda Enterprise Maven Repository</name>
-      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-ee</url>
-    </repository>
-    -->
-    <repository>
-      <id>jboss-public-repository</id>
-      <name>JBoss Repository</name>
-      <url>http://repository.jboss.org/nexus/content/groups/public</url>
-    </repository>
-  </repositories>
 </project>
