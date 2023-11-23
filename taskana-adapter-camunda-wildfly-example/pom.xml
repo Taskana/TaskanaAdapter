@@ -131,11 +131,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.junit.vintage</groupId>
-      <artifactId>junit-vintage-engine</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
       <scope>test</scope>
@@ -146,8 +141,14 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.arquillian.junit</groupId>
-      <artifactId>arquillian-junit-container</artifactId>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit</artifactId>
+      <version>${version.archunit}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.arquillian.junit5</groupId>
+      <artifactId>arquillian-junit5-container</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -5,17 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.ActiveProfiles;
 
-// DirtiesContext is required to make the integration tests run with embedded LDAP.
-// Otherwise the LDAP server is not shut down correctly and will not come up again. (socket busy)
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-@ActiveProfiles({"test"})
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AbstractAccTest {
+abstract class AbstractAccTest {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAccTest.class);
 
@@ -75,7 +66,7 @@ public class AbstractAccTest {
     }
   }
 
-  protected String parseServerLog() throws Exception {
+  String parseServerLog() throws Exception {
 
     // TO-DO: make log4j log into rollingFile from log4j.xml
     File file = new File("target/wildfly-27.0.1.Final/standalone/log/server.log");

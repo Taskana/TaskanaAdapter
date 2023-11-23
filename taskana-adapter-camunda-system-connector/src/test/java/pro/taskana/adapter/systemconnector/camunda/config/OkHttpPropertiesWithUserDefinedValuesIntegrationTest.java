@@ -11,16 +11,16 @@ import pro.taskana.adapter.systemconnector.camunda.config.OkHttpPropertiesWithUs
 @SpringBootTest(
     classes = {OkHttpPropertiesWithUserDefinedValuesIntegrationTestConfiguration.class},
     properties = {"okhttp.connection-timeout=1000", "okhttp.read-timeout=10000"})
-public class OkHttpPropertiesWithUserDefinedValuesIntegrationTest {
+class OkHttpPropertiesWithUserDefinedValuesIntegrationTest {
 
   @Test
-  void default_Value_for_connection_Timeout_is_1000_milliseconds(
+  void should_HaveConnectionTimeout1000ms_When_PropertyOkHttpConnectionTimeoutIsSet(
       @Autowired OkHttpProperties okHttpProperties) {
     assertThat(okHttpProperties.getConnectionTimeout()).isEqualTo(1_000);
   }
 
   @Test
-  void default_Value_for_read_Timeout_is_10000_milliseconds(
+  void should_HaveReadTimeout10000ms_When_PropertyOkHttpReadTimeoutIsSet(
       @Autowired OkHttpProperties okHttpProperties) {
     assertThat(okHttpProperties.getReadTimeout()).isEqualTo(10_000);
   }

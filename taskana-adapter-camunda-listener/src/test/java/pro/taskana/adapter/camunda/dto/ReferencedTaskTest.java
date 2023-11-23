@@ -5,12 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 /** Acceptance test for ReferencedTask setters and getters. */
-public class ReferencedTaskTest {
+class ReferencedTaskTest {
 
   private final String theValue = "blablabla";
   private ReferencedTask theTask;
 
-  public ReferencedTaskTest() {
+  ReferencedTaskTest() {
     theTask = new ReferencedTask();
     theTask.setAssignee("1");
     theTask.setBusinessProcessId("2");

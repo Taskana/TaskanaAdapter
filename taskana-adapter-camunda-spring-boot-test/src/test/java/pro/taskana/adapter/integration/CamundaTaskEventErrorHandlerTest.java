@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ContextConfiguration;
 import pro.taskana.adapter.camunda.outbox.rest.model.CamundaTaskEvent;
 import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
@@ -27,8 +26,7 @@ import pro.taskana.impl.configuration.DbCleaner.ApplicationDatabaseType;
     webEnvironment = WebEnvironment.DEFINED_PORT)
 @AutoConfigureWebTestClient
 @ExtendWith(JaasExtension.class)
-@ContextConfiguration
-public class CamundaTaskEventErrorHandlerTest extends AbsIntegrationTest {
+class CamundaTaskEventErrorHandlerTest extends AbsIntegrationTest {
 
   @Autowired private AdapterManager adapterManager;
 
@@ -67,7 +65,6 @@ public class CamundaTaskEventErrorHandlerTest extends AbsIntegrationTest {
     // Start process with task to have an entry in OutboxDB
     this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
         "simple_user_task_process", "");
-    System.out.println("Systemconnectors: " + this.adapterManager.getSystemConnectors().toString());
     this.adapterManager
         .getSystemConnectors()
         .forEach(

@@ -1,14 +1,41 @@
 package pro.taskana.adapter;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.lang.reflect.Field;
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import pro.taskana.common.api.TaskanaEngine;
+import pro.taskana.spi.routing.api.TaskRoutingProvider;
+import pro.taskana.spi.routing.internal.TaskRoutingManager;
+import pro.taskana.taskrouting.ExampleTaskRouter;
 
 @SpringBootTest(classes = TaskanaAdapterApplication.class)
 class TaskanaAdapterApplicationTest {
 
+  private final List<TaskRoutingProvider> taskRoutingProviders;
+
+  TaskanaAdapterApplicationTest(@Autowired TaskanaEngine taskanaEngine) throws Exception {
+    TaskRoutingManager taskRoutingManager =
+        (TaskRoutingManager) getValueFromPrivateField(taskanaEngine, "taskRoutingManager");
+    this.taskRoutingProviders =
+        (List<TaskRoutingProvider>)
+            getValueFromPrivateField(taskRoutingManager, "taskRoutingProviders");
+  }
+
   @Test
-  void module_context_can_be_started_and_outbox_rest_events_are_fetched() {
-    // there is no test code here,
-    // because creating the configuration to run this method is the actual test
+  void should_AutowireExampleTaskRouter_When_ApplicationIsStarting() {
+    assertThat(taskRoutingProviders).isNotNull().hasSize(1);
+    assertThat(taskRoutingProviders.get(0)).isInstanceOf(ExampleTaskRouter.class);
+  }
+
+  private Object getValueFromPrivateField(Object obj, String fieldName)
+      throws NoSuchFieldException, IllegalAccessException {
+    Field nameField = obj.getClass().getDeclaredField(fieldName);
+    nameField.setAccessible(true);
+
+    return nameField.get(obj);
   }
 }

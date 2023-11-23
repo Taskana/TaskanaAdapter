@@ -33,7 +33,7 @@ import pro.taskana.workbasket.api.models.WorkbasketAccessItem;
 /** Parent class for integrationtests for the TASKANA-Adapter. */
 @ExtendWith(JaasExtension.class)
 @SuppressWarnings("checkstyle:LineLength")
-public abstract class AbsIntegrationTest {
+abstract class AbsIntegrationTest {
 
   protected static TaskanaEngine taskanaEngine;
 
@@ -85,7 +85,7 @@ public abstract class AbsIntegrationTest {
 
   @BeforeEach
   @WithAccessId(user = "admin")
-  public void setUp() throws Exception {
+  void setUp() throws Exception {
     // set up database connection staticly and only once.
     if (!isInitialised) {
       String schema =
@@ -134,7 +134,7 @@ public abstract class AbsIntegrationTest {
     initInfrastructure();
   }
 
-  public void initInfrastructure() throws Exception {
+  void initInfrastructure() throws Exception {
     // create workbaskets and classifications needed by the test cases.
     // since this is no testcase we cannot set a JAAS context. To be able to create workbaskets
     // and classifications anyway we use for this purpose an engine with security disabled ...
@@ -159,7 +159,7 @@ public abstract class AbsIntegrationTest {
     createClassification(taskanaEngineUnsecure, "L1050", "DOMAIN_B");
   }
 
-  public void createWorkbasket(TaskanaEngine engine, String workbasketKey, String domain)
+  void createWorkbasket(TaskanaEngine engine, String workbasketKey, String domain)
       throws Exception {
     WorkbasketService workbasketService = engine.getWorkbasketService();
     Workbasket wb;

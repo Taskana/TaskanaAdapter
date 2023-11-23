@@ -7,12 +7,12 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 /** Acceptance test for ReferencedTask setters and getters. */
-public class ReferencedTaskTest {
+class ReferencedTaskTest {
 
   private ReferencedTask theTask;
   private String theValue;
 
-  public ReferencedTaskTest() {
+  ReferencedTaskTest() {
     theValue = "blablabla";
     theTask = new ReferencedTask();
     theTask.setAssignee("1");
@@ -163,7 +163,7 @@ public class ReferencedTaskTest {
   }
 
   @Test
-  void should_returnCustomIntegers_when_CustomIntegersWereSet() {
+  void should_ReturnCustomIntegers_When_CustomIntegersWereSet() {
     ReferencedTask referencedTask = new ReferencedTask();
     referencedTask.setCustomInt1(theValue);
     referencedTask.setCustomInt2(theValue);
