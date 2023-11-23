@@ -1,7 +1,6 @@
 package pro.taskana.camunda.camundasystemconnector.acceptance;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -9,15 +8,13 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
@@ -29,10 +26,9 @@ import pro.taskana.camunda.camundasystemconnector.configuration.CamundaConnector
  *
  * @author bbr
  */
-@RunWith(SpringRunner.class) // SpringRunner is an alias for the SpringJUnit4ClassRunner
 @ContextConfiguration(classes = {CamundaConnectorTestConfiguration.class})
 @SpringBootTest
-public class RetrieveCamundaTaskAccTest {
+class RetrieveCamundaTaskAccTest {
 
   @Autowired RestTemplate restTemplate;
 
@@ -42,13 +38,13 @@ public class RetrieveCamundaTaskAccTest {
 
   private MockRestServiceServer mockServer;
 
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     mockServer = MockRestServiceServer.createServer(restTemplate);
   }
 
   @Test
-  public void should_GetActiveCamundaTask() {
+  void should_GetActiveCamundaTask() {
 
     String timeStamp = "2019-01-14T15:22:30.811+0000";
 
@@ -126,12 +122,12 @@ public class RetrieveCamundaTaskAccTest {
       e.printStackTrace();
     }
 
-    assertNotNull(actualResult);
-    assertEquals(expectedTask, actualResult.get(0));
+    assertThat(actualResult).isNotEmpty();
+    assertThat(actualResult.get(0)).isEqualTo(expectedTask);
   }
 
   @Test
-  public void should_GetFinishedCamundaTask() {
+  void should_GetFinishedCamundaTask() {
 
     ReferencedTask expectedTask = new ReferencedTask();
     expectedTask.setId("2275fb87-1065-11ea-a7a0-02004c4f4f50");
@@ -164,7 +160,7 @@ public class RetrieveCamundaTaskAccTest {
     List<ReferencedTask> actualResult =
         taskRetriever.retrieveFinishedCamundaTasks(camundaSystemUrl, camundaSystemEngineIdentifier);
 
-    assertNotNull(actualResult);
-    assertEquals(expectedTask, actualResult.get(0));
+    assertThat(actualResult).isNotEmpty();
+    assertThat(actualResult.get(0)).isEqualTo(expectedTask);
   }
 }

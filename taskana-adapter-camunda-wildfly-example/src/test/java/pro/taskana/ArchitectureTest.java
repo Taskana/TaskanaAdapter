@@ -1,4 +1,4 @@
-package pro.taskana.adapter.integration;
+package pro.taskana;
 
 import static com.tngtech.archunit.core.domain.JavaCall.Predicates.target;
 import static com.tngtech.archunit.core.domain.properties.CanBeAnnotated.Predicates.annotatedWith;
@@ -12,7 +12,6 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption.OnlyIncludeTests;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.TestTemplate;
@@ -65,7 +64,14 @@ class ArchitectureTest {
         .check(IMPORTED_TEST_CLASSES);
   }
 
-  @Disabled("so long disabled until all tests using awaitibility")
+  @Test
+  void noMethodsShouldUsePrintln() {
+    noClasses()
+        .should()
+        .callMethodWhere(target(nameMatching("println")))
+        .check(IMPORTED_CLASSES);
+  }
+
   @Test
   void noMethodsShouldUseThreadSleep() {
     noClasses()
@@ -73,14 +79,6 @@ class ArchitectureTest {
         .callMethod(Thread.class, "sleep", long.class)
         .orShould()
         .callMethod(Thread.class, "sleep", long.class, int.class)
-        .check(IMPORTED_CLASSES);
-  }
-
-  @Test
-  void noMethodsShouldUsePrintln() {
-    noClasses()
-        .should()
-        .callMethodWhere(target(nameMatching("println")))
         .check(IMPORTED_CLASSES);
   }
 

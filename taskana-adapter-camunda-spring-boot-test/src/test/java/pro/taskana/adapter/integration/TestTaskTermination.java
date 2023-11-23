@@ -23,7 +23,7 @@ import pro.taskana.task.api.models.TaskSummary;
 @AutoConfigureWebTestClient
 @ExtendWith(JaasExtension.class)
 @ContextConfiguration
-public class TestTaskTermination extends AbsIntegrationTest {
+class TestTaskTermination extends AbsIntegrationTest {
 
   @Autowired private JobExecutor jobExecutor;
 
