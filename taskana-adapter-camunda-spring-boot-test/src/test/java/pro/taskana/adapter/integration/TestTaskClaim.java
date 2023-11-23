@@ -1,9 +1,6 @@
 package pro.taskana.adapter.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -54,31 +51,31 @@ class TestTaskClaim extends AbsIntegrationTest {
       // retrieve and check taskanaTaskId
       List<TaskSummary> taskanaTasks =
           this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-      assertEquals(taskanaTaskExternalId, camundaTaskId);
+      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
       String taskanaTaskId = taskanaTasks.get(0).getId();
 
       // verify that no assignee for camunda task is set yet
       boolean noAssigneeSet =
           this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, null);
-      assertTrue(noAssigneeSet);
+      assertThat(noAssigneeSet).isTrue();
 
       // verify that TaskState of taskana task is 'READY' first
       Task task = this.taskService.getTask(taskanaTaskId);
-      assertEquals(TaskState.READY, task.getState());
+      assertThat(task.getState()).isEqualTo(TaskState.READY);
 
       // claim task in taskana and verify updated TaskState to be 'CLAIMED'
       this.taskService.claim(taskanaTaskId);
       Task updatedTask = this.taskService.getTask(taskanaTaskId);
-      assertEquals(TaskState.CLAIMED, updatedTask.getState());
+      assertThat(updatedTask.getState()).isEqualTo(TaskState.CLAIMED);
 
       Thread.sleep((long) (this.adapterClaimPollingInterval * 1.2));
 
       // verify updated assignee for camunda task
       boolean assigneeSetSuccessfully =
           this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, "teamlead_1");
-      assertTrue(assigneeSetSuccessfully);
+      assertThat(assigneeSetSuccessfully).isTrue();
     }
   }
 
@@ -101,31 +98,31 @@ class TestTaskClaim extends AbsIntegrationTest {
       // retrieve and check taskanaTaskId
       List<TaskSummary> taskanaTasks =
           this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-      assertEquals(taskanaTaskExternalId, camundaTaskId);
+      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
       String taskanaTaskId = taskanaTasks.get(0).getId();
 
       // verify that an assignee for camunda task is already set
       boolean noAssigneeSet =
           this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, null);
-      assertFalse(noAssigneeSet);
+      assertThat(noAssigneeSet).isFalse();
 
       // verify that TaskState of taskana task is 'READY' first
       Task task = this.taskService.getTask(taskanaTaskId);
-      assertEquals(TaskState.READY, task.getState());
+      assertThat(task.getState()).isEqualTo(TaskState.READY);
 
       // claim task in taskana and verify updated TaskState to be 'CLAIMED'
       this.taskService.claim(taskanaTaskId);
       Task updatedTask = this.taskService.getTask(taskanaTaskId);
-      assertEquals(TaskState.CLAIMED, updatedTask.getState());
+      assertThat(updatedTask.getState()).isEqualTo(TaskState.CLAIMED);
 
       Thread.sleep((long) (this.adapterClaimPollingInterval * 1.2));
 
       // verify updated assignee for camunda task
       boolean assigneeSetSuccessfully =
           this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, "teamlead_1");
-      assertTrue(assigneeSetSuccessfully);
+      assertThat(assigneeSetSuccessfully).isTrue();
     }
   }
 
@@ -148,38 +145,38 @@ class TestTaskClaim extends AbsIntegrationTest {
       // retrieve and check taskanaTaskId
       List<TaskSummary> taskanaTasks =
           this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-      assertEquals(taskanaTaskExternalId, camundaTaskId);
+      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
       String taskanaTaskId = taskanaTasks.get(0).getId();
 
       // verify that TaskState of taskana task is 'READY' first
       Task task = this.taskService.getTask(taskanaTaskId);
-      assertEquals(TaskState.READY, task.getState());
+      assertThat(task.getState()).isEqualTo(TaskState.READY);
 
       // claim task in taskana and verify updated TaskState to be 'CLAIMED'
       this.taskService.claim(taskanaTaskId);
       Task updatedTask = this.taskService.getTask(taskanaTaskId);
-      assertEquals(TaskState.CLAIMED, updatedTask.getState());
+      assertThat(updatedTask.getState()).isEqualTo(TaskState.CLAIMED);
 
       Thread.sleep((long) (this.adapterClaimPollingInterval * 1.2));
 
       // verify updated assignee for camunda task
       boolean assigneeSetSuccessfully =
           this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, "teamlead_1");
-      assertTrue(assigneeSetSuccessfully);
+      assertThat(assigneeSetSuccessfully).isTrue();
 
       // cancel claim taskana task and verify updated TaskState to be 'READY'
       this.taskService.cancelClaim(taskanaTaskId);
       Task taskWithCancelledClaim = this.taskService.getTask(taskanaTaskId);
-      assertEquals(TaskState.READY, taskWithCancelledClaim.getState());
+      assertThat(taskWithCancelledClaim.getState()).isEqualTo(TaskState.READY);
 
       Thread.sleep((long) (this.adapterClaimPollingInterval * 1.2));
 
       // verify that the assignee for camunda task is no longer set
       boolean noAssigneeSet =
           this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, null);
-      assertTrue(noAssigneeSet);
+      assertThat(noAssigneeSet).isTrue();
     }
   }
 
@@ -202,50 +199,50 @@ class TestTaskClaim extends AbsIntegrationTest {
       // retrieve and check taskanaTaskId
       List<TaskSummary> taskanaTasks =
           this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-      assertEquals(taskanaTaskExternalId, camundaTaskId);
+      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
       String taskanaTaskId = taskanaTasks.get(0).getId();
 
       // verify that TaskState of taskana task is 'READY' first
       Task task = this.taskService.getTask(taskanaTaskId);
-      assertEquals(TaskState.READY, task.getState());
+      assertThat(task.getState()).isEqualTo(TaskState.READY);
 
       // claim task in taskana and verify updated TaskState to be 'CLAIMED'
       this.taskService.claim(taskanaTaskId);
       Task updatedTask = this.taskService.getTask(taskanaTaskId);
-      assertEquals(TaskState.CLAIMED, updatedTask.getState());
+      assertThat(updatedTask.getState()).isEqualTo(TaskState.CLAIMED);
 
       Thread.sleep((long) (this.adapterClaimPollingInterval * 1.2));
 
       // verify updated assignee for camunda task
       boolean assigneeSetSuccessfully =
           this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, "teamlead_1");
-      assertTrue(assigneeSetSuccessfully);
+      assertThat(assigneeSetSuccessfully).isTrue();
 
       // cancel claim taskana task and verify updated TaskState to be 'READY'
       this.taskService.cancelClaim(taskanaTaskId);
       Task taskWithCancelledClaim = this.taskService.getTask(taskanaTaskId);
-      assertEquals(TaskState.READY, taskWithCancelledClaim.getState());
+      assertThat(taskWithCancelledClaim.getState()).isEqualTo(TaskState.READY);
 
       Thread.sleep((long) (this.adapterClaimPollingInterval * 1.2));
 
       // verify that the assignee for camunda task is no longer set
       boolean noAssigneeSet =
           this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, null);
-      assertTrue(noAssigneeSet);
+      assertThat(noAssigneeSet).isTrue();
 
       // claim task in taskana and verify updated TaskState to be 'CLAIMED' again
       this.taskService.claim(taskanaTaskId);
       Task updatedTaskAfterAnotherClaim = this.taskService.getTask(taskanaTaskId);
-      assertEquals(TaskState.CLAIMED, updatedTaskAfterAnotherClaim.getState());
+      assertThat(updatedTaskAfterAnotherClaim.getState()).isEqualTo(TaskState.CLAIMED);
 
       Thread.sleep((long) (this.adapterClaimPollingInterval * 1.2));
 
       // verify updated assignee for camunda task again
       boolean assigneeSetSuccessfullyAgain =
           this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, "teamlead_1");
-      assertTrue(assigneeSetSuccessfullyAgain);
+      assertThat(assigneeSetSuccessfullyAgain).isTrue();
     }
   }
 

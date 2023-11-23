@@ -2,9 +2,6 @@ package pro.taskana.adapter.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -59,9 +56,9 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
       // retrieve and check taskanaTaskId
       List<TaskSummary> taskanaTasks =
           this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-      assertEquals(taskanaTaskExternalId, camundaTaskId);
+      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
       String taskanaTaskId = taskanaTasks.get(0).getId();
 
       // claim and complete taskanaTask and wait
@@ -73,10 +70,10 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
       // history
       boolean taskRetrievalSuccessful =
           this.camundaProcessengineRequester.getTaskFromTaskId(camundaTaskId);
-      assertFalse(taskRetrievalSuccessful);
+      assertThat(taskRetrievalSuccessful).isFalse();
       boolean taskRetrievalFromHistorySuccessful =
           this.camundaProcessengineRequester.getTaskFromHistoryFromTaskId(camundaTaskId);
-      assertTrue(taskRetrievalFromHistorySuccessful);
+      assertThat(taskRetrievalFromHistorySuccessful).isTrue();
     }
   }
 
@@ -98,15 +95,15 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
       // retrieve and check taskanaTaskId
       List<TaskSummary> taskanaTasks =
           this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-      assertEquals(taskanaTaskExternalId, camundaTaskId);
+      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
       String taskanaTaskId = taskanaTasks.get(0).getId();
 
       // verify that assignee is not yet set for camunda task
       boolean assigneeNotYetSet =
           this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, null);
-      assertTrue(assigneeNotYetSet);
+      assertThat(assigneeNotYetSet).isTrue();
 
       // force complete taskanaTask and wait
       this.taskService.forceCompleteTask(taskanaTaskId);
@@ -118,7 +115,7 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
       boolean assigneeUpdatedSuccessfully =
           this.camundaProcessengineRequester.isCorrectAssigneeFromHistory(
               camundaTaskId, taskanaTask.getOwner());
-      assertTrue(assigneeUpdatedSuccessfully);
+      assertThat(assigneeUpdatedSuccessfully).isTrue();
     }
   }
 
@@ -139,23 +136,23 @@ class TestCompletedTaskRetrieval extends AbsIntegrationTest {
       // retrieve and check taskanaTaskId
       List<TaskSummary> taskanaTasks =
           this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-      assertEquals(taskanaTaskExternalId, camundaTaskId);
+      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
 
       // complete camunda task and wait
       boolean camundaTaskCompletionSucessful =
           this.camundaProcessengineRequester.completeTaskWithId(camundaTaskId);
-      assertTrue(camundaTaskCompletionSucessful);
+      assertThat(camundaTaskCompletionSucessful).isTrue();
       Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
 
       // assert taskana task was completed and still exists
       taskanaTasks = this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertEquals(1, taskanaTasks.size());
+      assertThat(taskanaTasks).hasSize(1);
       Instant taskanaTaskCompletion = taskanaTasks.get(0).getCompleted();
       Instant taskanaTaskCreation = taskanaTasks.get(0).getCreated();
-      assertFalse(taskanaTaskCompletion == null);
-      assertEquals(1, taskanaTaskCompletion.compareTo(taskanaTaskCreation));
+      assertThat(taskanaTaskCompletion).isNotNull();
+      assertThat(taskanaTaskCompletion).isAfter(taskanaTaskCreation);
     }
   }
 

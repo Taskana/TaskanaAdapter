@@ -12,14 +12,14 @@ import pro.taskana.adapter.systemconnector.camunda.config.OkHttpPropertiesWithDe
 class OkHttpPropertiesWithDefaultValuesIntegrationTest {
 
   @Test
-  void default_Value_for_connection_Timeout_is_2000_milliseconds(
+  void should_HaveDefaultConnectionTimeout2000ms_When_NoPropertyOkHttpConnectionTimeoutIsSet(
       @Autowired OkHttpProperties okHttpProperties
   ) {
     assertThat(okHttpProperties.getConnectionTimeout()).isEqualTo(2_000);
   }
 
   @Test
-  void default_Value_for_read_Timeout_is_5000_milliseconds(
+  void should_HaveDefaultReadTimeout5000ms_When_NoPropertyOkHttpReadTimeoutIsSet(
       @Autowired OkHttpProperties okHttpProperties
   ) {
     assertThat(okHttpProperties.getReadTimeout()).isEqualTo(5_000);
