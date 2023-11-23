@@ -1,1 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=pro.taskana.adapter.camunda.outbox.rest.spring.boot.starter.config.OutboxRestServiceAutoConfiguration
