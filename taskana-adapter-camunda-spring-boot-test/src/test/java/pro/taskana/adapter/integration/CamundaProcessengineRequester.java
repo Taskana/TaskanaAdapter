@@ -210,14 +210,10 @@ public class CamundaProcessengineRequester {
         restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
     // no task found will only show in empty body
     JSONArray taskHistoryRetrievalAnswerJson = new JSONArray(response.getBody());
-    if (taskHistoryRetrievalAnswerJson.length() == 0) {
-      return false;
-    } else {
-      String camundaTaskAssignee =
-          (String) ((JSONObject) taskHistoryRetrievalAnswerJson.get(0)).get("assignee");
-      if (assignee.equals(camundaTaskAssignee)) {
-        return true;
-      }
+    if (!taskHistoryRetrievalAnswerJson.isEmpty()) {
+      JSONObject jsonObject = (JSONObject) taskHistoryRetrievalAnswerJson.get(0);
+      Object jsonObjectAssignee = jsonObject.get("assignee");
+      return assignee.equals(jsonObjectAssignee);
     }
     return false;
   }

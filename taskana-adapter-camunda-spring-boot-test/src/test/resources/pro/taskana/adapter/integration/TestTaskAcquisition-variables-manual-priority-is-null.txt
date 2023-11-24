@@ -1,0 +1,6 @@
+"variables": {
+  "taskana.manual-priority": {
+    "value": null,
+    "type": "string"
+  }
+}

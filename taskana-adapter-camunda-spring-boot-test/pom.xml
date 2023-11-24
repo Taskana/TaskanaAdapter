@@ -120,6 +120,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
       <scope>test</scope>
@@ -142,7 +147,24 @@
       <artifactId>okhttp</artifactId>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>io.github.logrecorder</groupId>
+      <artifactId>logrecorder-junit5</artifactId>
+      <version>2.9.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.github.logrecorder</groupId>
+      <artifactId>logrecorder-logback</artifactId>
+      <version>2.9.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.github.logrecorder</groupId>
+      <artifactId>logrecorder-assertions</artifactId>
+      <version>2.9.1</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

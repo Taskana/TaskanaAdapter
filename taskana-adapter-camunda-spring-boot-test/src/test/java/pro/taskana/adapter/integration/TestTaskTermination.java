@@ -1,8 +1,8 @@
 package pro.taskana.adapter.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static pro.taskana.utils.AwaitilityUtils.getTaskSummary;
 
-import java.util.List;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +15,7 @@ import pro.taskana.adapter.test.TaskanaAdapterTestApplication;
 import pro.taskana.common.test.security.JaasExtension;
 import pro.taskana.common.test.security.WithAccessId;
 import pro.taskana.task.api.models.TaskSummary;
+import pro.taskana.utils.AwaitilityUtils;
 
 /** Test class to test the completion of camunda tasks upon termination of taskana tasks. */
 @SpringBootTest(
@@ -37,27 +38,23 @@ class TestTaskTermination extends AbsIntegrationTest {
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", "");
 
-    List<String> camundaTaskIds =
-        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+    String camundaTaskId =
+        this.camundaProcessengineRequester
+            .getTaskIdsFromProcessInstanceId(processInstanceId)
+            .get(0);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    // retrieve and check taskanaTaskId
+    TaskSummary taskanaTaskSummary =
+        getTaskSummary(
+            adapterTaskPollingInterval,
+            () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list());
 
-    for (String camundaTaskId : camundaTaskIds) {
-      // retrieve and check taskanaTaskId
-      List<TaskSummary> taskanaTasks =
-          this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertThat(taskanaTasks).hasSize(1);
-      String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-      assertThat(camundaTaskId).isEqualTo(taskanaTaskExternalId);
+    assertThat(camundaTaskId).isEqualTo(taskanaTaskSummary.getExternalId());
 
-      taskService.terminateTask(taskanaTasks.get(0).getId());
+    taskService.terminateTask(taskanaTaskSummary.getId());
 
-      Thread.sleep(1000 + (long) (this.jobExecutor.getMaxWait() * 1.2));
-
-      // check if camunda task got completed and therefore doesn't exist anymore
-      boolean taskRetrievalSuccessful =
-          this.camundaProcessengineRequester.getTaskFromTaskId(camundaTaskId);
-      assertThat(taskRetrievalSuccessful).isFalse();
-    }
+    // check if camunda task got completed and therefore doesn't exist anymore
+    AwaitilityUtils.checkCamundaTaskIsCompleted(
+        jobExecutor, camundaProcessengineRequester, camundaTaskId);
   }
 }

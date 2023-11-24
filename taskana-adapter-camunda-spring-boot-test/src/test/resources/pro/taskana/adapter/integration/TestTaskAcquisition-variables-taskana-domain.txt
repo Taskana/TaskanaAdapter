@@ -1,0 +1,6 @@
+"variables": {
+  "taskana.domain": {
+    "value": "DOMAIN_B",
+    "type": "string"
+  }
+}

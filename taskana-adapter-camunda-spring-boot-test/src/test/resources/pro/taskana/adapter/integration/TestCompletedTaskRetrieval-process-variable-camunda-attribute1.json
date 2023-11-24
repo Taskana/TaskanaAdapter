@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "value": "{\"stringField\":\"\\fForm feed \\b Backspace \\t Tab \\\\Backslash \\n newLine \\r Carriage return \\\" DoubleQuote\",\"intField\":1,\"doubleField\":1.1,\"booleanField\":false,\"processVariableTestObjectTwoField\":[{\"stringFieldObjectTwo\":\"stringValueObjectTwo\",\"intFieldObjectTwo\":2,\"doubleFieldObjectTwo\":2.2,\"booleanFieldObjectTwo\":true,\"dateFieldObjectTwo\":null}]}",
+  "valueInfo": {
+    "objectTypeName": "pro.taskana.impl.ProcessVariableTestObject",
+    "serializationDataFormat": "application/json"
+  }
+}

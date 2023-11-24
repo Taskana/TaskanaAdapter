@@ -1,7 +1,13 @@
 package pro.taskana.adapter.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static pro.taskana.utils.AwaitilityUtils.getDuration;
+import static pro.taskana.utils.AwaitilityUtils.getTaskSummary;
+import static pro.taskana.utils.ResourceUtils.getResourcesAsString;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -61,9 +67,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void
-      should_CreateTaskanaTasksWithVariablesInCustomAttributes_When_StartCamundaTaskWithTheseComplexVariables()
-          throws Exception {
+  void should_CreateTaskanaTasksWithVariablesInCustomAttributes_When_StartCamundaTaskWithTheseComplexVariables() {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -71,27 +75,14 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
-
     String expectedComplexProcessVariable =
-        "{\"type\":\"object\","
-            + "\"value\":\""
-            + "{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab"
-            + " \\\\\\\\Backslash \\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\","
-            + "\\\"intField\\\":1,\\\"doubleField\\\":1.1,\\\"booleanField\\\":false,"
-            + "\\\"processVariableTestObjectTwoField\\\":["
-            + "{\\\"stringFieldObjectTwo\\\":\\\"stringValueObjectTwo\\\","
-            + "\\\"intFieldObjectTwo\\\":2,\\\"doubleFieldObjectTwo\\\":2.2,"
-            + "\\\"booleanFieldObjectTwo\\\":true,"
-            + "\\\"dateFieldObjectTwo\\\":\\\"1970-01-01 13:12:11\\\"}]}\","
-            + "\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\","
-            + "\"serializationDataFormat\":\"application/json\"}}";
+        getResourcesAsString(this.getClass(), "process-variable-camunda-attribute1.json");
 
     String expectedPrimitiveProcessVariable1 =
-        "{\"type\":\"integer\",\"value\":5," + "\"valueInfo\":null}";
+        getResourcesAsString(this.getClass(), "process-variable-camunda-attribute2.json");
 
     String expectedPrimitiveProcessVariable2 =
-        "{\"type\":\"boolean\",\"value\":true," + "\"valueInfo\":null}";
+        getResourcesAsString(this.getClass(), "process-variable-camunda-attribute3.json");
 
     camundaTaskIds.forEach(
         camundaTaskId -> {
@@ -114,7 +105,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_CreateTaskanaTask_When_StartUserTaskProcessInstanceInCamunda() throws Exception {
+  void should_CreateTaskanaTask_When_StartUserTaskProcessInstanceInCamunda() {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -122,27 +113,24 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    camundaTaskIds.forEach(
+        camundaTaskId -> {
+          // retrieve and check taskanaTaskId
+          TaskSummary taskanaTask = getTaskSummary(
+              adapterTaskPollingInterval,
+              () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list()
+          );
 
-    for (String camundaTaskId : camundaTaskIds) {
-      List<TaskSummary> taskanaTasks =
-          this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertThat(taskanaTasks).hasSize(1);
-      TaskSummary taskanaTaskSummary = taskanaTasks.get(0);
-      String taskanaTaskExternalId = taskanaTaskSummary.getExternalId();
-      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
-      String businessProcessId = taskanaTaskSummary.getBusinessProcessId();
-      assertThat(processInstanceId).isEqualTo(businessProcessId);
-    }
+          assertThat(camundaTaskId).isEqualTo(taskanaTask.getExternalId());
+          assertThat(processInstanceId).isEqualTo(taskanaTask.getBusinessProcessId());
+        });
   }
 
   @WithAccessId(
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void
-      should_CreateTaskanaTask_When_StartUserTaskProcessInstanceWithEmptyExtensionPropertyInCamunda()
-          throws Exception {
+  void should_CreateTaskanaTask_When_StartUserTaskProcessInstanceWithEmptyExtensionPropertyInCamunda() {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -150,38 +138,26 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    camundaTaskIds.forEach(
+        camundaTaskId -> {
+          // retrieve and check taskanaTaskId
+          TaskSummary taskanaTask = getTaskSummary(
+              adapterTaskPollingInterval,
+              () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list()
+          );
 
-    for (String camundaTaskId : camundaTaskIds) {
-      List<TaskSummary> taskanaTasks =
-          this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertThat(taskanaTasks).hasSize(1);
-      TaskSummary taskanaTaskSummary = taskanaTasks.get(0);
-      String taskanaTaskExternalId = taskanaTaskSummary.getExternalId();
-      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
-      String businessProcessId = taskanaTaskSummary.getBusinessProcessId();
-      assertThat(processInstanceId).isEqualTo(businessProcessId);
-    }
+          assertThat(camundaTaskId).isEqualTo(taskanaTask.getExternalId());
+          assertThat(processInstanceId).isEqualTo(taskanaTask.getBusinessProcessId());
+        });
 
     String expectedComplexProcessVariable =
-        "{\"type\":\"object\","
-            + "\"value\":\""
-            + "{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab"
-            + " \\\\\\\\Backslash \\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\","
-            + "\\\"intField\\\":1,\\\"doubleField\\\":1.1,\\\"booleanField\\\":false,"
-            + "\\\"processVariableTestObjectTwoField\\\":["
-            + "{\\\"stringFieldObjectTwo\\\":\\\"stringValueObjectTwo\\\","
-            + "\\\"intFieldObjectTwo\\\":2,\\\"doubleFieldObjectTwo\\\":2.2,"
-            + "\\\"booleanFieldObjectTwo\\\":true,"
-            + "\\\"dateFieldObjectTwo\\\":\\\"1970-01-01 13:12:11\\\"}]}\","
-            + "\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\","
-            + "\"serializationDataFormat\":\"application/json\"}}";
+        getResourcesAsString(this.getClass(), "process-variable-camunda-attribute1.json");
 
     String expectedPrimitiveProcessVariable1 =
-        "{\"type\":\"integer\",\"value\":5," + "\"valueInfo\":null}";
+        getResourcesAsString(this.getClass(), "process-variable-camunda-attribute2.json");
 
     String expectedPrimitiveProcessVariable2 =
-        "{\"type\":\"boolean\",\"value\":true," + "\"valueInfo\":null}";
+        getResourcesAsString(this.getClass(), "process-variable-camunda-attribute3.json");
 
     camundaTaskIds.forEach(
         camundaTaskId -> {
@@ -204,8 +180,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_CreateMultipleTaskanaTasks_When_StartMultipleUserTaskProcessInstanceInCamunda()
-      throws Exception {
+  void should_CreateMultipleTaskanaTasks_When_StartMultipleUserTaskProcessInstanceInCamunda() {
 
     int numberOfProcesses = 10;
     List<List<String>> camundaTaskIdsList = new ArrayList<>();
@@ -216,40 +191,49 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       camundaTaskIdsList.add(
           this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId));
     }
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
-    for (List<String> camundaTaskIds : camundaTaskIdsList) {
-      for (String camundaTaskId : camundaTaskIds) {
-        List<TaskSummary> taskanaTasks =
-            this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-        assertThat(taskanaTasks).hasSize(1);
-        String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-        assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
-      }
-    }
+    camundaTaskIdsList.forEach(
+        camundaTaskIds ->
+            camundaTaskIds.forEach(
+                camundaTaskId -> {
+                  // retrieve and check taskanaTaskId
+                  TaskSummary taskanaTask = getTaskSummary(
+                      adapterTaskPollingInterval,
+                      () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list()
+                  );
+
+                  assertThat(camundaTaskId).isEqualTo(taskanaTask.getExternalId());
+                }));
   }
 
   @WithAccessId(
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_CreateTaskanaTask_When_StartCamundaTaskWithPrimitiveVariables() throws Exception {
+  void should_CreateTaskanaTask_When_StartCamundaTaskWithPrimitiveVariables() {
 
     String variables =
-        "\"variables\": {\"amount\": {\"value\":555, "
-            + "\"type\":\"long\"},\"item\": {\"value\": \"item-xyz\"}}";
+        """
+            "variables": {
+              "amount": {
+                "value":555,
+                "type":"long"
+              },
+              "item": {
+                "value": "item-xyz"
+              }
+            }""";
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", variables);
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
-
-    String expectedPrimitiveVariable1 = "{\"type\":\"long\",\"value\":555,\"valueInfo\":null}";
+    String expectedPrimitiveVariable1 =
+        getResourcesAsString(this.getClass(), "process-variable-camunda-amount.json");
 
     String expectedPrimitiveVariable2 =
-        "{\"type\":\"string\",\"value\":\"item-xyz\",\"valueInfo\":null}";
+        getResourcesAsString(this.getClass(), "process-variable-camunda-item.json");
 
     camundaTaskIds.forEach(
         camundaTaskId -> {
@@ -268,33 +252,41 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_CreateTaskanaTaskWithManualPriority_When_StartCamundaTaskWithThisManualPriority()
-      throws Exception {
+  void should_CreateTaskanaTaskWithManualPriority_When_StartCamundaTaskWithThisManualPriority() {
 
     String variables =
-        "\"variables\": {\"taskana.manual-priority\": {\"value\":\"555\", "
-            + "\"type\":\"string\"}}";
+        """
+            "variables": {
+              "taskana.manual-priority": {
+                "value":"555",
+                "type":"string"
+              }
+            }""";
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", variables);
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    camundaTaskIds.forEach(
+        camundaTaskId -> {
+          // retrieve and check taskanaTaskId
+          TaskSummary taskanaTask = getTaskSummary(
+              adapterTaskPollingInterval,
+              () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list()
+          );
 
-    TaskSummary taskanaTask =
-        taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(0)).single();
-
-    assertThat(taskanaTask.getManualPriority()).isEqualTo(555);
+          assertThat(camundaTaskId).isEqualTo(taskanaTask.getExternalId());
+          assertThat(processInstanceId).isEqualTo(taskanaTask.getBusinessProcessId());
+          assertThat(taskanaTask.getManualPriority()).isEqualTo(555);
+        });
   }
 
   @WithAccessId(
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void
-      should_CreateTaskanaTaskWithDefaultManualPriority_When_StartCamundaTaskWithoutManualPriority()
-          throws Exception {
+  void should_CreateTaskanaTaskWithDefaultManualPriority_When_StartCamundaTaskWithoutManualPriority() {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -302,57 +294,58 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    camundaTaskIds.forEach(
+        camundaTaskId -> {
+          // retrieve and check taskanaTaskId
+          TaskSummary taskanaTask = getTaskSummary(
+              adapterTaskPollingInterval,
+              () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list()
+          );
 
-    TaskSummary taskanaTask =
-        taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(0)).single();
-
-    assertThat(taskanaTask.getManualPriority()).isEqualTo(-1);
+          assertThat(camundaTaskId).isEqualTo(taskanaTask.getExternalId());
+          assertThat(processInstanceId).isEqualTo(taskanaTask.getBusinessProcessId());
+          assertThat(taskanaTask.getManualPriority()).isEqualTo(-1);
+        });
   }
 
   @WithAccessId(
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_SetCustomIntegersInTaskanaTask_When_CamundaTaskHasCustomIntegers() throws Exception {
-    String variables =
-        "\"variables\": {"
-            + "\"taskana.custom-int-1\": {\"value\":\"1\", \"type\":\"string\"},"
-            + "\"taskana.custom-int-2\": {\"value\":\"2\", \"type\":\"string\"},"
-            + "\"taskana.custom-int-3\": {\"value\":\"3\", \"type\":\"string\"},"
-            + "\"taskana.custom-int-4\": {\"value\":\"4\", \"type\":\"string\"},"
-            + "\"taskana.custom-int-5\": {\"value\":\"5\", \"type\":\"string\"},"
-            + "\"taskana.custom-int-6\": {\"value\":\"6\", \"type\":\"string\"},"
-            + "\"taskana.custom-int-7\": {\"value\":\"7\", \"type\":\"string\"},"
-            + "\"taskana.custom-int-8\": {\"value\":\"8\", \"type\":\"string\"}"
-            + "}";
+  void should_SetCustomIntegersInTaskanaTask_When_CamundaTaskHasCustomIntegers() {
+    String variables = getResourcesAsString(this.getClass(), "variables-custom-integer.txt");
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process", variables);
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    camundaTaskIds.forEach(
+        camundaTaskId -> {
+          // retrieve and check taskanaTaskId
+          TaskSummary taskanaTask = getTaskSummary(
+              adapterTaskPollingInterval,
+              () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list()
+          );
 
-    TaskSummary taskanaTask =
-        taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(0)).single();
-
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_1)).isOne();
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_2)).isEqualTo(2);
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_3)).isEqualTo(3);
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_4)).isEqualTo(4);
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_5)).isEqualTo(5);
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_6)).isEqualTo(6);
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_7)).isEqualTo(7);
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_8)).isEqualTo(8);
+          assertThat(camundaTaskId).isEqualTo(taskanaTask.getExternalId());
+          assertThat(processInstanceId).isEqualTo(taskanaTask.getBusinessProcessId());
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_1)).isOne();
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_2)).isEqualTo(2);
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_3)).isEqualTo(3);
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_4)).isEqualTo(4);
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_5)).isEqualTo(5);
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_6)).isEqualTo(6);
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_7)).isEqualTo(7);
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_8)).isEqualTo(8);
+        });
   }
 
   @WithAccessId(
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_SetDefaultCustomIntegerInTaskanaTask_When_CamundaTaskHasDefaultCustomInteger()
-      throws Exception {
+  void should_SetDefaultCustomIntegerInTaskanaTask_When_CamundaTaskHasDefaultCustomInteger() {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -360,44 +353,50 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    camundaTaskIds.forEach(
+        camundaTaskId -> {
+          // retrieve and check taskanaTaskId
+          TaskSummary taskanaTask = getTaskSummary(
+              adapterTaskPollingInterval,
+              () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list()
+          );
 
-    TaskSummary taskanaTask =
-        taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(0)).single();
-
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_1)).isNull();
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_2)).isNull();
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_3)).isNull();
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_4)).isNull();
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_5)).isNull();
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_6)).isNull();
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_7)).isNull();
-    assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_8)).isNull();
+          assertThat(camundaTaskId).isEqualTo(taskanaTask.getExternalId());
+          assertThat(processInstanceId).isEqualTo(taskanaTask.getBusinessProcessId());
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_1)).isNull();
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_2)).isNull();
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_3)).isNull();
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_4)).isNull();
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_5)).isNull();
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_6)).isNull();
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_7)).isNull();
+          assertThat(taskanaTask.getCustomIntField(TaskCustomIntField.CUSTOM_INT_8)).isNull();
+        });
   }
 
   @WithAccessId(
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void
-      should_CreateTaskanaTaskWithComplexVariablesInCustomAttributes_When_StartCamundaTaskWithTheseVariables()
-          throws Exception {
+  void should_CreateTaskanaTaskWithComplexVariablesInCustomAttributes_When_StartCamundaTaskWithTheseVariables()
+      throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_with_big_complex_variables_process", "");
-    List<String> camundaTaskIds =
-        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    String camundaTaskId =
+        this.camundaProcessengineRequester
+            .getTaskIdsFromProcessInstanceId(processInstanceId)
+            .get(0);
 
-    List<TaskSummary> taskanaTasks =
-        this.taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(0)).list();
-    assertThat(taskanaTasks).hasSize(1);
+    // retrieve and check taskanaTaskId
+    TaskSummary taskanaTaskSummary = getTaskSummary(
+        adapterTaskPollingInterval,
+        () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list()
+    );
 
-    TaskSummary taskanaTaskSummary = taskanaTasks.get(0);
-    String taskanaTaskExternalId = taskanaTaskSummary.getExternalId();
-    assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskIds.get(0));
+    assertThat(camundaTaskId).isEqualTo(taskanaTaskSummary.getExternalId());
 
     Task taskanaTask = this.taskService.getTask(taskanaTaskSummary.getId());
     Map<String, String> taskanaTaskCustomAttributes = taskanaTask.getCustomAttributeMap();
@@ -411,9 +410,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void
-      should_CreateTaskanaTasksWithComplexVariablesInCustomAttributes_When_ParentExecutionOfCamundaTasksStarted()
-          throws Exception {
+  void should_CreateTaskanaTasksWithComplexVariablesInCustomAttributes_When_ParentExecutionOfCamundaTasksStarted() {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -422,41 +419,38 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
-    Thread.sleep(this.adapterTaskPollingInterval);
-
     assertThat(camundaTaskIds).hasSize(3);
 
-    // complete first 3 parallel tasks, one of which starts another task after completion that will
-    // be checked for the process variables
     camundaTaskIds.forEach(
-        camundaTaskId -> this.camundaProcessengineRequester.completeTaskWithId(camundaTaskId));
+        camundaTaskId -> {
+          // retrieve and check taskanaTaskId
+          TaskSummary taskanaTask = getTaskSummary(
+              adapterTaskPollingInterval,
+              () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list()
+          );
+
+          assertThat(camundaTaskId).isEqualTo(taskanaTask.getExternalId());
+          assertThat(processInstanceId).isEqualTo(taskanaTask.getBusinessProcessId());
+
+          // complete first 3 parallel tasks, one of which starts another task after completion that
+          // will be checked for the process variables
+          this.camundaProcessengineRequester.completeTaskWithId(camundaTaskId);
+        });
 
     camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
     assertThat(camundaTaskIds).hasSize(1);
 
-    Thread.sleep(this.adapterTaskPollingInterval);
-
     String expectedComplexProcessVariable =
-        "{\"type\":\"object\","
-            + "\"value\":\""
-            + "{\\\"stringField\\\":\\\"\\\\fForm feed \\\\b Backspace \\\\t Tab"
-            + " \\\\\\\\Backslash \\\\n newLine \\\\r Carriage return \\\\\\\" DoubleQuote\\\","
-            + "\\\"intField\\\":1,\\\"doubleField\\\":1.1,\\\"booleanField\\\":false,"
-            + "\\\"processVariableTestObjectTwoField\\\":["
-            + "{\\\"stringFieldObjectTwo\\\":\\\"stringValueObjectTwo\\\","
-            + "\\\"intFieldObjectTwo\\\":2,\\\"doubleFieldObjectTwo\\\":2.2,"
-            + "\\\"booleanFieldObjectTwo\\\":true,"
-            + "\\\"dateFieldObjectTwo\\\":\\\"1970-01-01 13:12:11\\\"}]}\","
-            + "\"valueInfo\":{\"objectTypeName\":\"pro.taskana.impl.ProcessVariableTestObject\","
-            + "\"serializationDataFormat\":\"application/json\"}}";
+        getResourcesAsString(this.getClass(), "process-variable-camunda-attribute1.json");
 
     String expectedPrimitiveProcessVariable1 =
-        "{\"type\":\"integer\",\"value\":5," + "\"valueInfo\":null}";
+        getResourcesAsString(this.getClass(), "process-variable-camunda-attribute2.json");
 
     String expectedPrimitiveProcessVariable2 =
-        "{\"type\":\"boolean\",\"value\":true," + "\"valueInfo\":null}";
+        getResourcesAsString(this.getClass(), "process-variable-camunda-attribute3.json");
+
     camundaTaskIds.forEach(
         camundaTaskId -> {
           Map<String, String> customAttributes =
@@ -478,8 +472,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_CreateMultipleTaskanaTasks_When_StartProcessInstanceWithMultipleExecutionsInCamunda()
-      throws Exception {
+  void should_CreateMultipleTaskanaTasks_When_StartProcessInstanceWithMultipleExecutionsInCamunda() {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -488,23 +481,24 @@ class TestTaskAcquisition extends AbsIntegrationTest {
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
     assertThat(camundaTaskIds).hasSize(3);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    camundaTaskIds.forEach(
+        camundaTaskId -> {
+          // retrieve and check taskanaTaskId
+          TaskSummary taskanaTask = getTaskSummary(
+              adapterTaskPollingInterval,
+              () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list()
+          );
 
-    for (String camundaTaskId : camundaTaskIds) {
-      List<TaskSummary> taskanaTasks =
-          this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertThat(taskanaTasks).hasSize(1);
-      String taskanaTaskExternalId = taskanaTasks.get(0).getExternalId();
-      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
-    }
+          assertThat(camundaTaskId).isEqualTo(taskanaTask.getExternalId());
+          assertThat(processInstanceId).isEqualTo(taskanaTask.getBusinessProcessId());
+        });
   }
 
   @WithAccessId(
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_CreateTaskanaTask_When_SystemConnectorHasCorrectSystemEngineIdentifier()
-      throws Exception {
+  void should_CreateTaskanaTask_When_SystemConnectorHasCorrectSystemEngineIdentifier() {
 
     final Map<String, SystemConnector> originalSystemConnectors =
         new HashMap<>(adapterManager.getSystemConnectors());
@@ -517,18 +511,17 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    camundaTaskIds.forEach(
+        camundaTaskId -> {
+          // retrieve and check taskanaTaskId
+          TaskSummary taskanaTask = getTaskSummary(
+              adapterTaskPollingInterval,
+              () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list()
+          );
 
-    for (String camundaTaskId : camundaTaskIds) {
-      List<TaskSummary> taskanaTasks =
-          this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertThat(taskanaTasks).hasSize(1);
-      TaskSummary taskanaTaskSummary = taskanaTasks.get(0);
-      String taskanaTaskExternalId = taskanaTaskSummary.getExternalId();
-      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
-      String businessProcessId = taskanaTaskSummary.getBusinessProcessId();
-      assertThat(processInstanceId).isEqualTo(businessProcessId);
-    }
+          assertThat(camundaTaskId).isEqualTo(taskanaTask.getExternalId());
+          assertThat(processInstanceId).isEqualTo(taskanaTask.getBusinessProcessId());
+        });
 
     adapterManager.getSystemConnectors().clear();
     adapterManager.getSystemConnectors().putAll(originalSystemConnectors);
@@ -543,12 +536,10 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_process_with_different_domains",
-            "\"variables\": "
-                + "{\"taskana.domain\": {\"value\":\"DOMAIN_B\", \"type\":\"string\"}}");
+            getResourcesAsString(this.getClass(), "variables-taskana-domain.txt"));
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
     assertThat(camundaTaskIds).hasSize(3);
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
     List<Pair<String, String>> variablesToTaskList =
         Arrays.asList(
@@ -557,25 +548,25 @@ class TestTaskAcquisition extends AbsIntegrationTest {
             Pair.of("DOMAIN_B", camundaTaskIds.get(2)));
 
     for (Pair<String, String> variablesToTask : variablesToTaskList) {
-      List<TaskSummary> taskanaTaskSummaryList =
-          this.taskService.createTaskQuery().externalIdIn(variablesToTask.getRight()).list();
-      assertThat(taskanaTaskSummaryList).hasSize(1);
-      TaskSummary taskanaTaskSummary = taskanaTaskSummaryList.get(0);
+      TaskSummary taskanaTaskSummary = getTaskSummary(
+          adapterTaskPollingInterval,
+          () -> this.taskService.createTaskQuery().externalIdIn(variablesToTask.getRight()).list()
+      );
 
       Task taskanaTask = taskService.getTask(taskanaTaskSummary.getId());
       assertThat(taskanaTask.getDomain()).isEqualTo(variablesToTask.getLeft());
     }
 
     this.camundaProcessengineRequester.completeTaskWithId(camundaTaskIds.get(2));
-    camundaTaskIds =
+    List<String> camundaTaskIds2 =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
-    assertThat(camundaTaskIds).hasSize(3);
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    assertThat(camundaTaskIds2).hasSize(3);
 
-    List<TaskSummary> taskanaTaskSummaryList =
-        this.taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(2)).list();
-    assertThat(taskanaTaskSummaryList).hasSize(1);
-    TaskSummary taskanaTaskSummary = taskanaTaskSummaryList.get(0);
+    TaskSummary taskanaTaskSummary = getTaskSummary(
+        adapterTaskPollingInterval,
+        () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskIds2.get(2)).list()
+    );
+
     Task taskanaTask = taskService.getTask(taskanaTaskSummary.getId());
     assertThat(taskanaTask.getDomain()).isEqualTo("DOMAIN_B");
   }
@@ -584,9 +575,8 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void
-      should_CreateTaskanaTasksWithCorrectDomains_When_StartProcessWithDomainsInExtensionProperties()
-          throws Exception {
+  void should_CreateTaskanaTasksWithCorrectDomains_When_StartProcessWithDomainsInExtensionProperties()
+      throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -594,7 +584,6 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
     assertThat(camundaTaskIds).hasSize(3);
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
     List<Pair<String, String>> variablesToTaskList =
         Arrays.asList(
@@ -603,25 +592,24 @@ class TestTaskAcquisition extends AbsIntegrationTest {
             Pair.of("DOMAIN_B", camundaTaskIds.get(2)));
 
     for (Pair<String, String> variablesToTask : variablesToTaskList) {
-      List<TaskSummary> taskanaTaskSummaryList =
-          this.taskService.createTaskQuery().externalIdIn(variablesToTask.getRight()).list();
-      assertThat(taskanaTaskSummaryList).hasSize(1);
-      TaskSummary taskanaTaskSummary = taskanaTaskSummaryList.get(0);
-
+      TaskSummary taskanaTaskSummary = getTaskSummary(
+          adapterTaskPollingInterval,
+          () -> this.taskService.createTaskQuery().externalIdIn(variablesToTask.getRight()).list()
+      );
       Task taskanaTask = taskService.getTask(taskanaTaskSummary.getId());
       assertThat(taskanaTask.getDomain()).isEqualTo(variablesToTask.getLeft());
     }
 
     this.camundaProcessengineRequester.completeTaskWithId(camundaTaskIds.get(2));
-    camundaTaskIds =
+    List<String> camundaTaskIds2 =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
-    assertThat(camundaTaskIds).hasSize(3);
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    assertThat(camundaTaskIds2).hasSize(3);
 
-    List<TaskSummary> taskanaTaskSummaryList =
-        this.taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(2)).list();
-    assertThat(taskanaTaskSummaryList).hasSize(1);
-    TaskSummary taskanaTaskSummary = taskanaTaskSummaryList.get(0);
+    TaskSummary taskanaTaskSummary = getTaskSummary(
+        adapterTaskPollingInterval,
+        () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskIds2.get(2)).list()
+    );
+
     Task taskanaTask = taskService.getTask(taskanaTaskSummary.getId());
     assertThat(taskanaTask.getDomain()).isEqualTo("DOMAIN_A");
   }
@@ -630,8 +618,7 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_NotCreateTaskanaTask_When_SystemConnectorHasIncorrectSystemEngineIdentifier()
-      throws Exception {
+  void should_NotCreateTaskanaTask_When_SystemConnectorHasIncorrectSystemEngineIdentifier() {
 
     final Map<String, SystemConnector> originalSystemConnectors =
         new HashMap<>(adapterManager.getSystemConnectors());
@@ -648,13 +635,16 @@ class TestTaskAcquisition extends AbsIntegrationTest {
 
     assertThat(taskanaOutboxRequester.getAllEvents()).hasSize(1);
 
-    Thread.sleep((this.adapterTaskPollingInterval * 2));
-
-    for (String camundaTaskId : camundaTaskIds) {
-      List<TaskSummary> taskanaTasks =
-          this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertThat(taskanaTasks).isEmpty();
-    }
+    camundaTaskIds.forEach(
+        camundaTaskId -> {
+          await()
+              .with()
+              .pollInterval(ONE_HUNDRED_MILLISECONDS)
+              .pollDelay(getDuration(adapterTaskPollingInterval))
+              .until(
+                  () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list(),
+                  hasSize(0));
+        });
 
     assertThat(taskanaOutboxRequester.getAllEvents()).hasSize(1);
 
@@ -666,9 +656,8 @@ class TestTaskAcquisition extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void
-      should_CreateTaskanaTasksWithVariablesInCustomAttributes_When_StartProcessWithTheseDifferentVariablesInCamunda()
-          throws Exception {
+  void should_CreateTaskanaTasksWithVariablesInCustomAttributes_When_StartProcessWithTheseDifferentVariablesInCamunda()
+      throws Exception {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -676,7 +665,6 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
     assertThat(camundaTaskIds).hasSize(3);
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
     List<Pair<List<String>, String>> variablesToTaskList =
         Arrays.asList(
@@ -688,10 +676,11 @@ class TestTaskAcquisition extends AbsIntegrationTest {
                 camundaTaskIds.get(2)));
 
     for (Pair<List<String>, String> variablesToTask : variablesToTaskList) {
-      List<TaskSummary> taskanaTaskSummaryList =
-          this.taskService.createTaskQuery().externalIdIn(variablesToTask.getRight()).list();
-      assertThat(taskanaTaskSummaryList).hasSize(1);
-      TaskSummary taskanaTaskSummary = taskanaTaskSummaryList.get(0);
+
+      TaskSummary taskanaTaskSummary = getTaskSummary(
+          adapterTaskPollingInterval,
+          () -> this.taskService.createTaskQuery().externalIdIn(variablesToTask.getRight()).list()
+      );
 
       Task taskanaTask = taskService.getTask(taskanaTaskSummary.getId());
       assertThat(taskanaTask.getCustomAttributeMap().keySet())
@@ -699,15 +688,15 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     }
 
     this.camundaProcessengineRequester.completeTaskWithId(camundaTaskIds.get(2));
-    camundaTaskIds =
+    List<String> camundaTaskIds2 =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
     assertThat(camundaTaskIds).hasSize(3);
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
 
-    List<TaskSummary> taskanaTaskSummaryList =
-        this.taskService.createTaskQuery().externalIdIn(camundaTaskIds.get(2)).list();
-    assertThat(taskanaTaskSummaryList).hasSize(1);
-    TaskSummary taskanaTaskSummary = taskanaTaskSummaryList.get(0);
+    TaskSummary taskanaTaskSummary = getTaskSummary(
+        adapterTaskPollingInterval,
+        () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskIds2.get(2)).list()
+    );
+
     Task taskanaTask = taskService.getTask(taskanaTaskSummary.getId());
     assertThat(taskanaTask.getCustomAttributeMap().keySet())
         .containsExactlyInAnyOrderElementsOf(
@@ -725,38 +714,34 @@ class TestTaskAcquisition extends AbsIntegrationTest {
             "simple_user_task_process_with_plannedDate", "");
     List<String> camundaTaskIds =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
-
-    Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
-
     // Make sure we only have one Camunda Task, so we don't need a for-loop
     assertThat(camundaTaskIds).hasSize(1);
     String camundaTaskId = camundaTaskIds.get(0);
+
     // retrieve and check taskanaTaskId
-    List<TaskSummary> taskanaTaskSummaryList =
-        this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-    assertThat(taskanaTaskSummaryList).hasSize(1);
-    String taskanaTaskExternalId = taskanaTaskSummaryList.get(0).getExternalId();
-    assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
-    String taskanaTaskId = taskanaTaskSummaryList.get(0).getId();
-    Task taskanaTask = this.taskService.getTask(taskanaTaskId);
+    TaskSummary taskanaTaskSummary = getTaskSummary(
+        adapterTaskPollingInterval,
+        () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list()
+    );
+    assertThat(taskanaTaskSummary.getExternalId()).isEqualTo(camundaTaskId);
+    Task taskanaTask = taskService.getTask(taskanaTaskSummary.getId());
+
     // Check if followUp Date from Camunda task is equal to plannedDate from Taskana task
     Instant expectedDate = DateTimeUtil.parseDateTime("2015-06-26T09:54:00").toDate().toInstant();
     assertThat(taskanaTask.getPlanned()).isEqualTo(expectedDate);
 
     this.camundaProcessengineRequester.completeTaskWithId(camundaTaskId);
-    camundaTaskIds =
+    List<String> camundaTaskIds2 =
         this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
-
     // Make sure we only have one Camunda Task, so we don't need a for-loop
-    assertThat(camundaTaskIds).hasSize(1);
-    camundaTaskId = camundaTaskIds.get(0);
-    taskanaTaskSummaryList = this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-    assertThat(taskanaTaskSummaryList).hasSize(1);
-    taskanaTaskExternalId = taskanaTaskSummaryList.get(0).getExternalId();
-    assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
-    taskanaTaskId = taskanaTaskSummaryList.get(0).getId();
-    taskanaTask = this.taskService.getTask(taskanaTaskId);
+    assertThat(camundaTaskIds2).hasSize(1);
+    String camundaTaskId2 = camundaTaskIds2.get(0);
+    TaskSummary taskanaTaskSummary2 = getTaskSummary(
+        adapterTaskPollingInterval,
+        () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId2).list()
+    );
+    assertThat(taskanaTaskSummary2.getExternalId()).isEqualTo(camundaTaskId2);
+    taskanaTask = this.taskService.getTask(taskanaTaskSummary2.getId());
     // Check if plannedDate was set to Instant.now during setTimestampsInTaskanaTask() method call.
     // This is the desired behaviour since no followUpDate is set in this Camunda Task.
     assertThat(taskanaTask.getPlanned()).isAfter(now);
@@ -771,13 +756,14 @@ class TestTaskAcquisition extends AbsIntegrationTest {
         Stream.of(
             Pair.of(
                 "manual priority is empty",
-                "\"variables\": {\"taskana.manual-priority\": {\"value\":\"\", "
-                    + "\"type\":\"string\"}}"),
+                getResourcesAsString(this.getClass(), "variables-manual-priority-is-empty.txt")),
             Pair.of(
                 "manual priority is null",
-                "\"variables\": {\"taskana.manual-priority\": {\"value\":\"null\", "
-                    + "\"type\":\"string\"}}"),
-            Pair.of("manual priority does not exist", "\"variables\": {}"));
+                getResourcesAsString(this.getClass(), "variables-manual-priority-is-null.txt")),
+            Pair.of(
+                "manual priority does not exist",
+                getResourcesAsString(
+                    this.getClass(), "variables-manual-priority-does-not-exists.txt")));
 
     ThrowingConsumer<Pair<String, String>> test =
         p -> {
@@ -788,19 +774,17 @@ class TestTaskAcquisition extends AbsIntegrationTest {
           List<String> camundaTaskIds =
               this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
 
-          Thread.sleep((long) (this.adapterCompletionPollingInterval * 1.2));
-
           // Make sure we only have one Camunda Task, so we don't need a for-loop
           assertThat(camundaTaskIds).hasSize(1);
           String camundaTaskId = camundaTaskIds.get(0);
+
           // retrieve and check taskanaTaskId
-          List<TaskSummary> taskanaTaskSummaryList =
-              this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-          assertThat(taskanaTaskSummaryList).hasSize(1);
-          String taskanaTaskExternalId = taskanaTaskSummaryList.get(0).getExternalId();
-          assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
-          String taskanaTaskId = taskanaTaskSummaryList.get(0).getId();
-          Task taskanaTask = this.taskService.getTask(taskanaTaskId);
+          TaskSummary taskanaTaskSummary = getTaskSummary(
+              adapterTaskPollingInterval,
+              () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list()
+          );
+          assertThat(taskanaTaskSummary.getExternalId()).isEqualTo(camundaTaskId);
+          Task taskanaTask = taskService.getTask(taskanaTaskSummary.getId());
           assertThat(taskanaTask.getManualPriority()).isEqualTo(-1);
         };
 
@@ -828,12 +812,13 @@ class TestTaskAcquisition extends AbsIntegrationTest {
     Map<String, String> customAttributes = new HashMap<>();
     try {
 
-      List<TaskSummary> taskanaTasks =
-          this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list();
-      assertThat(taskanaTasks).hasSize(1);
-      TaskSummary taskanaTaskSummary = taskanaTasks.get(0);
-      String taskanaTaskExternalId = taskanaTaskSummary.getExternalId();
-      assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
+      // retrieve and check taskanaTaskId
+      TaskSummary taskanaTaskSummary = getTaskSummary(
+          adapterTaskPollingInterval,
+          () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list()
+      );
+
+      assertThat(taskanaTaskSummary.getExternalId()).isEqualTo(camundaTaskId);
 
       // get the actual task instead of summary to access custom attributes
       Task taskanaTask = this.taskService.getTask(taskanaTaskSummary.getId());
