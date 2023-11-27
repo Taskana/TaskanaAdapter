@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Git checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v3
         with:
@@ -67,7 +67,7 @@ jobs:
       GPG_TTY: $(tty)
     steps:
       - name: Git checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0 # necessary for push back
           # NOTE @v2 uses the token as an auth http header. Set it to
@@ -126,7 +126,7 @@ jobs:
     needs: [ compile_and_test ]
     steps:
       - name: Git checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up JDK ${{ env.JAVA_VERSION }}
