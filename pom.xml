@@ -45,7 +45,7 @@
     <version.taskana>8.0.1-SNAPSHOT</version.taskana>
 
     <!-- build dependencies -->
-    <version.checkstyle>10.12.4</version.checkstyle>
+    <version.checkstyle>10.12.5</version.checkstyle>
     <version.google-java-format>1.16.0</version.google-java-format>
     <version.maven.checkstyle>3.3.1</version.maven.checkstyle>
     <version.maven.compiler>3.11.0</version.maven.compiler>
