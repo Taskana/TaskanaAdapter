@@ -45,25 +45,25 @@
     <version.taskana>8.0.1-SNAPSHOT</version.taskana>
 
     <!-- build dependencies -->
-    <version.checkstyle>10.12.4</version.checkstyle>
+    <version.checkstyle>10.12.7</version.checkstyle>
     <version.google-java-format>1.16.0</version.google-java-format>
     <version.maven.checkstyle>3.3.1</version.maven.checkstyle>
     <version.maven.compiler>3.11.0</version.maven.compiler>
     <version.maven.dependency>3.6.1</version.maven.dependency>
-    <version.maven.failsafe.plugin>3.2.2</version.maven.failsafe.plugin>
+    <version.maven.failsafe.plugin>3.2.5</version.maven.failsafe.plugin>
     <version.maven.jar>3.3.0</version.maven.jar>
-    <version.maven.javadoc>3.6.2</version.maven.javadoc>
+    <version.maven.javadoc>3.6.3</version.maven.javadoc>
     <version.maven.jboss-as.plugin>7.9.Final</version.maven.jboss-as.plugin>
     <version.maven.resources>3.3.1</version.maven.resources>
     <version.maven.sonar>3.10.0.2594</version.maven.sonar>
     <version.maven.source>3.3.0</version.maven.source>
-    <version.maven.spring-boot>3.1.6</version.maven.spring-boot>
+    <version.maven.spring-boot>3.1.7</version.maven.spring-boot>
     <version.maven.surefire.plugin>3.2.1</version.maven.surefire.plugin>
     <version.maven-war-plugin>3.4.0</version.maven-war-plugin>
     <version.maven.wildfly.plugin>4.2.1.Final</version.maven.wildfly.plugin>
 
-    <version.mybatis>3.5.14</version.mybatis>
-    <version.spring.mybatis>3.0.2</version.spring.mybatis>
+    <version.mybatis>3.5.15</version.mybatis>
+    <version.spring.mybatis>3.0.3</version.spring.mybatis>
 
     <version.spring.plugin.core>3.0.0</version.spring.plugin.core>
     <version.spring.boot>3.1.6</version.spring.boot>
@@ -86,7 +86,7 @@
     <version.arquillian.managed.wildfly>5.0.1.Final</version.arquillian.managed.wildfly>
 
 
-    <version.archunit>1.2.0</version.archunit>
+    <version.archunit>1.2.1</version.archunit>
     <version.hamcrest.json>0.3</version.hamcrest.json>
 
     <version.maven.gpg>3.1.0</version.maven.gpg>
