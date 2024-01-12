@@ -47,22 +47,19 @@ abstract class AbsIntegrationTest {
   @Value("${taskana.adapter.scheduler.run.interval.for.complete.referenced.tasks.in.milliseconds}")
   protected long adapterCompletionPollingInterval;
 
-  @Value(
-      "${taskana.adapter.scheduler.run.interval.for.check.finished.referenced.tasks.in.milliseconds}")
+  @Value("${taskana.adapter.scheduler.run.interval.for.check.finished.referenced.tasks.in.milliseconds}")
   protected long adapterCancelledClaimPollingInterval;
 
   @Value("${taskana.adapter.scheduler.run.interval.for.claim.referenced.tasks.in.milliseconds}")
   protected long adapterClaimPollingInterval;
 
-  @Value(
-      "${taskana.adapter.scheduler.run.interval.for.cancel.claim.referenced.tasks.in.milliseconds}")
+  @Value("${taskana.adapter.scheduler.run.interval.for.cancel.claim.referenced.tasks.in.milliseconds}")
   protected long adapterCancelPollingInterval;
 
   @Value("${adapter.polling.inverval.adjustment.factor}")
   protected double adapterPollingInvervalAdjustmentFactor;
 
-  @Value(
-      "${taskana.adapter.scheduler.run.interval.for.retries.and.blocking.taskevents.in.milliseconds}")
+  @Value("${taskana.adapter.scheduler.run.interval.for.retries.and.blocking.taskevents.in.milliseconds}")
   protected long adapterRetryAndBlockingInterval;
 
   protected CamundaProcessengineRequester camundaProcessengineRequester;

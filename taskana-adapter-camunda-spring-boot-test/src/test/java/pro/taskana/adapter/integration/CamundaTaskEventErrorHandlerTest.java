@@ -1,8 +1,13 @@
 package pro.taskana.adapter.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
+import static org.awaitility.Durations.ONE_SECOND;
+import static org.awaitility.Durations.TWO_HUNDRED_MILLISECONDS;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hamcrest.Matchers;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
@@ -76,12 +81,14 @@ class CamundaTaskEventErrorHandlerTest extends AbsIntegrationTest {
                             connector.taskanaTaskFailedToBeCreatedForNewReferencedTask(
                                 referencedTask, testException)));
 
-    try {
-      Thread.sleep(100);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-    CamundaTaskEvent camundaTaskEvent = taskanaOutboxRequester.getAllEvents().get(0);
+    CamundaTaskEvent camundaTaskEvent = await()
+        .atMost(ONE_SECOND)
+        .with()
+        .pollInterval(ONE_HUNDRED_MILLISECONDS)
+        .pollDelay(TWO_HUNDRED_MILLISECONDS)
+        .until(
+            () -> taskanaOutboxRequester.getAllEvents(),
+            Matchers.hasSize(1)).get(0);
     JSONObject errorJson = new JSONObject(camundaTaskEvent.getError());
 
     assertThat(errorJson).hasToString(expectedErrorJson.toString());

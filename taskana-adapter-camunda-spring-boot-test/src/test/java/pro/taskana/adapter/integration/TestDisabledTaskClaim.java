@@ -1,9 +1,13 @@
 package pro.taskana.adapter.integration;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static pro.taskana.utils.AwaitilityUtils.getTaskSummary;
+import static pro.taskana.utils.AwaitilityUtils.verifyLogMessage;
 
+import io.github.logrecorder.api.LogRecord;
+import io.github.logrecorder.junit5.RecordLoggers;
 import java.lang.reflect.Field;
-import java.util.List;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +31,8 @@ import pro.taskana.task.api.models.TaskSummary;
 @AutoConfigureWebTestClient
 @ContextConfiguration
 @ExtendWith(JaasExtension.class)
+// This Test must be executed at the beginning, so that the logger test is working as expected
+@Order(1)
 class TestDisabledTaskClaim extends AbsIntegrationTest {
 
   @Autowired CamundaTaskClaimer camundaTaskClaimer;
@@ -39,28 +45,28 @@ class TestDisabledTaskClaim extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_NotClaimOrCancelClaimCamundaTask_When_CamundaClaimingDisabled() throws Exception {
-
+  @RecordLoggers({CamundaTaskClaimer.class, CamundaTaskClaimCanceler.class})
+  void should_NotClaimOrCancelClaimCamundaTask_When_CamundaClaimingDisabled(LogRecord log)
+      throws Exception {
     setClaimingEnabled(false);
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
             "simple_user_task_with_assignee_process", "");
-    List<String> camundaTaskIds =
-        this.camundaProcessengineRequester.getTaskIdsFromProcessInstanceId(processInstanceId);
+    String camundaTaskId =
+        this.camundaProcessengineRequester
+            .getTaskIdsFromProcessInstanceId(processInstanceId)
+            .get(0);
 
-    // check that one new UserTask was started
-    assertThat(camundaTaskIds).hasSize(1);
+    // retrieve and check taskanaTaskId
+    TaskSummary taskanaTaskSummary =
+        getTaskSummary(
+            adapterTaskPollingInterval,
+            () -> this.taskService.createTaskQuery().externalIdIn(camundaTaskId).list());
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
+    assertThat(camundaTaskId).isEqualTo(taskanaTaskSummary.getExternalId());
 
-    // retrieve and check external task id of created taskana task
-    String camundaTaskId = camundaTaskIds.get(0);
-    TaskSummary taskanaTask =
-        this.taskService.createTaskQuery().externalIdIn(camundaTaskId).single();
-
-    String taskanaTaskExternalId = taskanaTask.getExternalId();
-    assertThat(taskanaTaskExternalId).isEqualTo(camundaTaskId);
+    String taskanaTaskId = taskanaTaskSummary.getId();
 
     // verify that assignee is already set
     boolean assigneeAlreadySet =
@@ -68,7 +74,6 @@ class TestDisabledTaskClaim extends AbsIntegrationTest {
     assertThat(assigneeAlreadySet).isTrue();
 
     // verify that TaskState of taskana task is 'READY' first
-    String taskanaTaskId = taskanaTask.getId();
     Task task = this.taskService.getTask(taskanaTaskId);
     assertThat(task.getState()).isEqualTo(TaskState.READY);
 
@@ -77,7 +82,11 @@ class TestDisabledTaskClaim extends AbsIntegrationTest {
     Task updatedTask = this.taskService.getTask(taskanaTaskId);
     assertThat(updatedTask.getState()).isEqualTo(TaskState.CLAIMED);
 
-    Thread.sleep((long) (this.adapterClaimPollingInterval * 1.3));
+    verifyLogMessage(
+        adapterClaimPollingInterval,
+        log,
+        "Synchronizing claim of tasks in TASKANA to Camunda is set to false");
+
     // verify assignee for camunda task did not get updated
     boolean assigneeNotUpdated =
         this.camundaProcessengineRequester.isCorrectAssignee(camundaTaskId, "someAssignee");
@@ -86,7 +95,10 @@ class TestDisabledTaskClaim extends AbsIntegrationTest {
     // cancel claim TASKANA task
     taskService.forceCancelClaim(task.getId());
 
-    Thread.sleep((long) (this.adapterClaimPollingInterval * 1.3));
+    verifyLogMessage(
+        adapterCancelledClaimPollingInterval,
+        log,
+        "Synchronizing CancelClaim of Tasks in TASKANA to Camunda is set to false");
 
     // verify assignee for camunda task did not get updated
     assigneeNotUpdated =

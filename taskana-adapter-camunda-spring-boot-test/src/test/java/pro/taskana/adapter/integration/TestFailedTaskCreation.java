@@ -1,6 +1,10 @@
 package pro.taskana.adapter.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
+import static org.hamcrest.Matchers.hasSize;
+import static pro.taskana.utils.AwaitilityUtils.getDuration;
 
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -24,6 +28,7 @@ import pro.taskana.impl.configuration.DbCleaner.ApplicationDatabaseType;
 @AutoConfigureWebTestClient
 @ExtendWith(JaasExtension.class)
 @ContextConfiguration
+@SuppressWarnings("checkstyle:LineLength")
 class TestFailedTaskCreation extends AbsIntegrationTest {
 
   @AfterEach
@@ -37,8 +42,7 @@ class TestFailedTaskCreation extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_CountDownRetriesAndAddToFailedEvents_When_TaskCreationFailedInTaskana()
-      throws Exception {
+  void should_CountDownRetriesAndAddToFailedEvents_When_TaskCreationFailedInTaskana() {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -49,27 +53,27 @@ class TestFailedTaskCreation extends AbsIntegrationTest {
 
     assertThat(camundaTaskIds).hasSize(3);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
-
     // retries still above 0
-
-    List<CamundaTaskEvent> failedEvents = taskanaOutboxRequester.getFailedEvents();
-
-    assertThat(failedEvents).isEmpty();
+    await()
+        .with()
+        .pollInterval(ONE_HUNDRED_MILLISECONDS)
+        .pollDelay(getDuration(adapterTaskPollingInterval))
+        .until(() -> taskanaOutboxRequester.getFailedEvents(), hasSize(0));
 
     // adapter makes retries
-    Thread.sleep(this.adapterRetryAndBlockingInterval);
-
-    failedEvents = taskanaOutboxRequester.getFailedEvents();
     // retries = 0, no retries left
-    assertThat(failedEvents).hasSize(3);
+    await()
+        .atMost(getDuration(adapterRetryAndBlockingInterval))
+        .with()
+        .pollInterval(ONE_HUNDRED_MILLISECONDS)
+        .until(() -> taskanaOutboxRequester.getFailedEvents(), hasSize(3));
   }
 
   @WithAccessId(
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_LogError_When_TaskCreationFailedInTaskana() throws Exception {
+  void should_LogError_When_TaskCreationFailedInTaskana() {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -80,20 +84,21 @@ class TestFailedTaskCreation extends AbsIntegrationTest {
 
     assertThat(camundaTaskIds).hasSize(3);
 
-    Thread.sleep((long) (this.adapterTaskPollingInterval * 1.2));
-
-    List<CamundaTaskEvent> failedEvents = taskanaOutboxRequester.getFailedEvents();
-
     // retries still above 0
-    assertThat(failedEvents).isEmpty();
+    await()
+        .with()
+        .pollInterval(ONE_HUNDRED_MILLISECONDS)
+        .pollDelay(getDuration(adapterTaskPollingInterval))
+        .until(() -> taskanaOutboxRequester.getFailedEvents(), hasSize(0));
 
     // adapter makes retries
-    Thread.sleep(this.adapterRetryAndBlockingInterval);
-
-    failedEvents = taskanaOutboxRequester.getFailedEvents();
     // retries = 0, no retries left
-
-    assertThat(failedEvents).hasSize(3);
+    List<CamundaTaskEvent> failedEvents =
+        await()
+            .atMost(getDuration(adapterRetryAndBlockingInterval))
+            .with()
+            .pollInterval(ONE_HUNDRED_MILLISECONDS)
+            .until(() -> taskanaOutboxRequester.getFailedEvents(), hasSize(3));
 
     assertThat(failedEvents)
         .extracting(CamundaTaskEvent::getCamundaTaskId)
@@ -115,7 +120,7 @@ class TestFailedTaskCreation extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_DeleteFailedEvent_When_CallingDeleteEndpoint() throws Exception {
+  void should_DeleteFailedEvent_When_CallingDeleteEndpoint() {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -127,13 +132,12 @@ class TestFailedTaskCreation extends AbsIntegrationTest {
     assertThat(camundaTaskIds).hasSize(3);
 
     // adapter makes retries
-    Thread.sleep(
-        (long) (this.adapterTaskPollingInterval * 1.2 + this.adapterRetryAndBlockingInterval));
-
-    // retries = 0, no retries left
-    List<CamundaTaskEvent> failedEvents = taskanaOutboxRequester.getFailedEvents();
-
-    assertThat(failedEvents).hasSize(3);
+    List<CamundaTaskEvent> failedEvents =
+        await()
+            .atMost(getDuration((long) (adapterTaskPollingInterval * 1.2 + adapterRetryAndBlockingInterval)))
+            .with()
+            .pollInterval(ONE_HUNDRED_MILLISECONDS)
+            .until(() -> taskanaOutboxRequester.getFailedEvents(), hasSize(3));
 
     boolean eventDeleted = taskanaOutboxRequester.deleteFailedEvent(failedEvents.get(0).getId());
 
@@ -146,7 +150,7 @@ class TestFailedTaskCreation extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_DeleteAllFailedEvents_When_CallingDeleteAllFailedEndpoint() throws Exception {
+  void should_DeleteAllFailedEvents_When_CallingDeleteAllFailedEndpoint() {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -157,28 +161,25 @@ class TestFailedTaskCreation extends AbsIntegrationTest {
 
     assertThat(camundaTaskIds).hasSize(3);
 
-    Thread.sleep(
-        (long) (this.adapterTaskPollingInterval * 1.2 + this.adapterRetryAndBlockingInterval));
-
-    // retries = 0, no retries left
-
-    List<CamundaTaskEvent> failedEvents = taskanaOutboxRequester.getFailedEvents();
-    assertThat(failedEvents).hasSize(3);
+    // adapter makes retries
+    await()
+        .atMost(getDuration((long) (adapterTaskPollingInterval * 1.2 + adapterRetryAndBlockingInterval)))
+        .with()
+        .pollInterval(ONE_HUNDRED_MILLISECONDS)
+        .until(() -> taskanaOutboxRequester.getFailedEvents(), hasSize(3));
 
     boolean eventsDeleted = taskanaOutboxRequester.deleteAllFailedEvents();
 
     assertThat(eventsDeleted).isTrue();
 
-    failedEvents = taskanaOutboxRequester.getFailedEvents();
-
-    assertThat(failedEvents).isEmpty();
+    assertThat(taskanaOutboxRequester.getFailedEvents()).isEmpty();
   }
 
   @WithAccessId(
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_SetRetryForFailedEvent_When_CallingSetRetriesEndpoint() throws Exception {
+  void should_SetRetryForFailedEvent_When_CallingSetRetriesEndpoint() {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -189,13 +190,13 @@ class TestFailedTaskCreation extends AbsIntegrationTest {
 
     assertThat(camundaTaskIds).hasSize(3);
 
-    Thread.sleep(
-        (long) (this.adapterTaskPollingInterval * 1.2 + this.adapterRetryAndBlockingInterval));
-
-    // retries = 0, no retries left
-    List<CamundaTaskEvent> failedEvents = taskanaOutboxRequester.getFailedEvents();
-
-    assertThat(failedEvents).hasSize(3);
+    // adapter makes retries
+    List<CamundaTaskEvent> failedEvents =
+        await()
+            .atMost(getDuration((long) (adapterTaskPollingInterval * 1.2 + adapterRetryAndBlockingInterval)))
+            .with()
+            .pollInterval(ONE_HUNDRED_MILLISECONDS)
+            .until(() -> taskanaOutboxRequester.getFailedEvents(), hasSize(3));
 
     // reset specific failedEvent
     boolean remainingRetriesSet =
@@ -212,8 +213,7 @@ class TestFailedTaskCreation extends AbsIntegrationTest {
       user = "teamlead_1",
       groups = {"taskadmin"})
   @Test
-  void should_SetRetryForAllFailedEvents_When_CallingSetRetriesForAllFailedEndpoint()
-      throws Exception {
+  void should_SetRetryForAllFailedEvents_When_CallingSetRetriesForAllFailedEndpoint() {
 
     String processInstanceId =
         this.camundaProcessengineRequester.startCamundaProcessAndReturnId(
@@ -224,21 +224,18 @@ class TestFailedTaskCreation extends AbsIntegrationTest {
 
     assertThat(camundaTaskIds).hasSize(3);
 
-    Thread.sleep(
-        (long) (this.adapterTaskPollingInterval * 1.2 + this.adapterRetryAndBlockingInterval));
-
-    // retries = 0, no retries left
-    List<CamundaTaskEvent> failedEvents = taskanaOutboxRequester.getFailedEvents();
-
-    assertThat(failedEvents).hasSize(3);
+    // adapter makes retries
+    await()
+        .atMost(getDuration((long) (adapterTaskPollingInterval * 1.2 + adapterRetryAndBlockingInterval)))
+        .with()
+        .pollInterval(ONE_HUNDRED_MILLISECONDS)
+        .until(() -> taskanaOutboxRequester.getFailedEvents(), hasSize(3));
 
     // reset specific failedEvent
     boolean remainingRetriesSet = taskanaOutboxRequester.setRemainingRetriesForAll(3);
 
     assertThat(remainingRetriesSet).isTrue();
 
-    failedEvents = taskanaOutboxRequester.getFailedEvents();
-
-    assertThat(failedEvents).isEmpty();
+    assertThat(taskanaOutboxRequester.getFailedEvents()).isEmpty();
   }
 }
