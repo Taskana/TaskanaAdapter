@@ -77,7 +77,7 @@
     <version.jakarta.servlet>6.0.0</version.jakarta.servlet>
     <version.jakarta-ws-rs-api>3.1.0</version.jakarta-ws-rs-api>
 
-    <version.resteasy.spring.boot>6.0.4.Final</version.resteasy.spring.boot>
+    <version.resteasy.spring.boot>6.1.0.Final</version.resteasy.spring.boot>
     <version.org.webjars.bootstrap>5.3.2</version.org.webjars.bootstrap>
     <version.org.jboss.spec>3.0.3.Final</version.org.jboss.spec>
 
