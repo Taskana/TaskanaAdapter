@@ -40,7 +40,8 @@ public class CamundaTaskEventsService {
   private static final String RETRIES = "retries";
   private static final String TYPE = "type";
 
-  private static final List<String> ALLOWED_PARAMS = Stream.of(TYPE, RETRIES).toList();
+  private static final List<String> ALLOWED_PARAMS = Stream.of(TYPE, RETRIES)
+      .collect(Collectors.toList());
 
   private static final String OUTBOX_SCHEMA = OutboxRestConfiguration.getOutboxSchema();
   private static final String SQL_GET_CREATE_EVENTS =
@@ -363,7 +364,7 @@ public class CamundaTaskEventsService {
     List<String> invalidParams =
         filterParams.keySet().stream()
             .filter(key -> !ALLOWED_PARAMS.contains(key))
-            .toList();
+            .collect(Collectors.toList());
 
     if (!invalidParams.isEmpty()) {
       throw new InvalidArgumentException("Provided invalid request params: " + invalidParams);
