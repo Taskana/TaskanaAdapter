@@ -14,7 +14,9 @@
     <version>3.0.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-
+  <properties>
+    <java.version>8</java.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.camunda.spin</groupId>
@@ -43,6 +45,22 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${version.maven.compiler}</version>
+        <configuration>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
+          <showWarnings>true</showWarnings>
+          <failOnWarning>true</failOnWarning>
+          <compilerArgs>
+            <arg>-Xlint:-serial</arg>
+            <arg>-proc:none</arg>
+            <arg>-Xbootclasspath:${env.JAVA_HOME_8_X64}/jre/lib/rt.jar</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <version>${version.maven-war-plugin}</version>
