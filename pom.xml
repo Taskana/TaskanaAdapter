@@ -81,7 +81,7 @@
     <version.org.webjars.bootstrap>5.3.2</version.org.webjars.bootstrap>
     <version.org.jboss.spec>3.0.3.Final</version.org.jboss.spec>
 
-    <version.wildfly>27.0.1.Final</version.wildfly>
+    <version.wildfly>31.0.1.Final</version.wildfly>
     <version.arquillian>1.8.0.Final</version.arquillian>
     <version.arquillian.managed.wildfly>5.0.1.Final</version.arquillian.managed.wildfly>
 
