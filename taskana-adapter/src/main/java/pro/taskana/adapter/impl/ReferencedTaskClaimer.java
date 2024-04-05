@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
@@ -15,7 +16,9 @@ import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
 import pro.taskana.common.api.exceptions.SystemException;
 import pro.taskana.task.api.CallbackState;
 
-/** Claims ReferencedTasks in external system that have been claimed in TASKANA. */
+/**
+ * Claims ReferencedTasks in external system that have been claimed in TASKANA.
+ */
 @Component
 public class ReferencedTaskClaimer {
 
@@ -30,6 +33,7 @@ public class ReferencedTaskClaimer {
       fixedRateString =
           "${taskana.adapter.scheduler.run.interval.for.claim.referenced.tasks."
               + "in.milliseconds:5000}")
+  @Transactional
   public void retrieveClaimedTaskanaTasksAndClaimCorrespondingReferencedTasks() {
 
     synchronized (ReferencedTaskClaimer.class) {
@@ -53,13 +57,11 @@ public class ReferencedTaskClaimer {
   }
 
   private void retrieveClaimedTaskanaTasksAndClaimCorrespondingReferencedTask() {
-
     LOGGER.trace(
         "ReferencedTaskClaimer."
             + "retrieveClaimedTaskanaTasksAndClaimCorrespondingReferencedTask ENTRY");
     try {
       TaskanaConnector taskanaSystemConnector = adapterManager.getTaskanaConnector();
-
       List<ReferencedTask> tasksClaimedByTaskana =
           taskanaSystemConnector.retrieveClaimedTaskanaTasksAsReferencedTasks();
       List<ReferencedTask> tasksClaimedInExternalSystem =
@@ -67,6 +69,7 @@ public class ReferencedTaskClaimer {
 
       taskanaSystemConnector.changeTaskCallbackState(
           tasksClaimedInExternalSystem, CallbackState.CLAIMED);
+
     } finally {
       LOGGER.trace(
           "ReferencedTaskClaimer."

@@ -52,7 +52,6 @@ public class CamundaTaskEventCleaner {
 
     HttpEntity<String> request =
         new HttpEntity<>(idsOfCamundaTaskEventsToDeleteFromOutbox, headers);
-
     restTemplate.postForObject(requestUrl, request, String.class);
   }
 

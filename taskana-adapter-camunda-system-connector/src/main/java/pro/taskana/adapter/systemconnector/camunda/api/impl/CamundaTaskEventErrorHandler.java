@@ -49,6 +49,33 @@ public class CamundaTaskEventErrorHandler {
     }
   }
 
+  public void unlockEvent(String eventId, String camundaSystemTaskEventUrl) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(
+          "entry to unlockEvent, CamundaSystemURL = {}",
+          camundaSystemTaskEventUrl);
+    }
+    final String unlockEventUrl =
+        String.format(
+            CamundaSystemConnectorImpl.URL_CAMUNDA_UNLOCK_EVENT,
+            Integer.valueOf(eventId));
+    final String requestUrl = camundaSystemTaskEventUrl + unlockEventUrl;
+
+    LOGGER.debug("decreaseRemainingRetriesAndLogError Events url {} ", requestUrl);
+
+    HttpHeaders headers = httpHeaderProvider.getHttpHeadersForOutboxRestApi();
+
+    HttpEntity<String> request = new HttpEntity<>(headers);
+    try {
+      restTemplate.postForObject(requestUrl, request, String.class);
+    } catch (Exception e) {
+      LOGGER.error("Caught exception while trying to unlock event", e);
+    }
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("exit from decreaseRemainingRetriesAndLogErrorForReferencedTasks.");
+    }
+  }
+
   private static JSONObject createErrorLog(Exception e) {
     JSONObject errorLog =
         new JSONObject()

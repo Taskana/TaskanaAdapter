@@ -21,7 +21,6 @@ import pro.taskana.task.api.models.Task;
 public class TaskanaTaskStarter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaTaskStarter.class);
-
   @Value("${taskana.adapter.run-as.user}")
   protected String runAsUser;
 
@@ -60,7 +59,6 @@ public class TaskanaTaskStarter {
         "TaskanaTaskStarter.retrieveReferencedTasksAndCreateCorrespondingTaskanaTasks ENTRY ");
     for (SystemConnector systemConnector : (adapterManager.getSystemConnectors().values())) {
       try {
-
         List<ReferencedTask> tasksToStart = systemConnector.retrieveNewStartedReferencedTasks();
 
         List<ReferencedTask> newCreatedTasksInTaskana =
@@ -107,6 +105,7 @@ public class TaskanaTaskStarter {
               referencedTask,
               e);
           systemConnector.taskanaTaskFailedToBeCreatedForNewReferencedTask(referencedTask, e);
+          systemConnector.unlockEvent(referencedTask.getOutboxEventId());
         }
       } catch (Exception e) {
         LOGGER.warn(
@@ -115,6 +114,7 @@ public class TaskanaTaskStarter {
             referencedTask,
             e);
         systemConnector.taskanaTaskFailedToBeCreatedForNewReferencedTask(referencedTask, e);
+        systemConnector.unlockEvent(referencedTask.getOutboxEventId());
       }
     }
     return newCreatedTasksInTaskana;

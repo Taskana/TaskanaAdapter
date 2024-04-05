@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import pro.taskana.adapter.configuration.AdapterConfiguration;
 import pro.taskana.adapter.test.configuration.CamundaConfiguration;
 
@@ -15,6 +16,7 @@ import pro.taskana.adapter.test.configuration.CamundaConfiguration;
 @Import({AdapterConfiguration.class, CamundaConfiguration.class})
 @SpringBootApplication
 @EnableProcessApplication
+@EnableTransactionManagement
 public class TaskanaAdapterTestApplication {
 
   public static void main(String... args) {

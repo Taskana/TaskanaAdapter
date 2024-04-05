@@ -13,6 +13,7 @@ public class CamundaTaskEventResource {
   private String blockedUntil;
   private String error;
   private String camundaTaskId;
+  private String lockExpiresAt;
 
   public int getId() {
     return id;
@@ -76,5 +77,13 @@ public class CamundaTaskEventResource {
 
   public void setCamundaTaskId(String camundaTaskId) {
     this.camundaTaskId = camundaTaskId;
+  }
+
+  public String getLockExpiresAt() {
+    return lockExpiresAt;
+  }
+
+  public void setLockExpiresAt(String lockExpiresAt) {
+    this.lockExpiresAt = lockExpiresAt;
   }
 }

@@ -117,7 +117,8 @@ class RetrieveCamundaTaskAccTest {
     List<ReferencedTask> actualResult = null;
     try {
       actualResult =
-          taskRetriever.retrieveNewStartedCamundaTasks(camundaSystemUrl, systemEngineIdentifier);
+          taskRetriever.retrieveNewStartedCamundaTasks(camundaSystemUrl, systemEngineIdentifier,
+              null);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -158,7 +159,8 @@ class RetrieveCamundaTaskAccTest {
         .andRespond(withSuccess(expectedReplyBody, MediaType.APPLICATION_JSON));
 
     List<ReferencedTask> actualResult =
-        taskRetriever.retrieveFinishedCamundaTasks(camundaSystemUrl, camundaSystemEngineIdentifier);
+        taskRetriever.retrieveFinishedCamundaTasks(camundaSystemUrl, camundaSystemEngineIdentifier,
+            null);
 
     assertThat(actualResult).isNotEmpty();
     assertThat(actualResult.get(0)).isEqualTo(expectedTask);

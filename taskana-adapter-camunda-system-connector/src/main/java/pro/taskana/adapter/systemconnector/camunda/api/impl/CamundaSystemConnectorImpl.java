@@ -1,5 +1,6 @@
 package pro.taskana.adapter.systemconnector.camunda.api.impl;
 
+import java.time.Duration;
 import java.util.List;
 import pro.taskana.adapter.configuration.AdapterSpringContextProvider;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
@@ -17,15 +18,16 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
   static final String URL_DELETE_CAMUNDA_EVENTS = "/events/delete-successful-events";
   static final String URL_CAMUNDA_EVENT_DECREASE_REMAINING_RETRIES =
       "/events/%d/decrease-remaining-retries";
-
+  static final String URL_CAMUNDA_UNLOCK_EVENT =
+      "/events/unlock-event/%d";
   static final String BODY_SET_CAMUNDA_VARIABLES = "{\"variables\":{";
   static final String LOCAL_VARIABLE_PATH = "/localVariables";
   static final String EMPTY_REQUEST_BODY = "{}";
 
-  static final String COMPLETE_TASK = "/complete/";
-  static final String SET_ASSIGNEE = "/assignee/";
+  static final String COMPLETE_TASK = "/complete";
+  static final String SET_ASSIGNEE = "/assignee";
   static final String BODY_SET_ASSIGNEE = "{\"userId\":";
-  static final String UNCLAIM_TASK = "/unclaim/";
+  static final String UNCLAIM_TASK = "/unclaim";
 
   private CamundaSystemUrls.SystemUrlInfo camundaSystemUrl;
 
@@ -41,6 +43,8 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
 
   private CamundaTaskEventErrorHandler taskEventErrorHandler;
 
+  private Duration lockDuration;
+
   public CamundaSystemConnectorImpl(CamundaSystemUrls.SystemUrlInfo camundaSystemUrl) {
     this.camundaSystemUrl = camundaSystemUrl;
     taskRetriever = AdapterSpringContextProvider.getBean(CamundaTaskRetriever.class);
@@ -50,12 +54,14 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
     taskEventCleaner = AdapterSpringContextProvider.getBean(CamundaTaskEventCleaner.class);
     taskEventErrorHandler =
         AdapterSpringContextProvider.getBean(CamundaTaskEventErrorHandler.class);
+    lockDuration = AdapterSpringContextProvider.getBean(Duration.class);
   }
 
   @Override
   public List<ReferencedTask> retrieveNewStartedReferencedTasks() {
     return taskRetriever.retrieveNewStartedCamundaTasks(
-        camundaSystemUrl.getSystemTaskEventUrl(), camundaSystemUrl.getCamundaEngineIdentifier());
+        camundaSystemUrl.getSystemTaskEventUrl(),
+        camundaSystemUrl.getCamundaEngineIdentifier(), lockDuration);
   }
 
   @Override
@@ -68,7 +74,8 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
   @Override
   public List<ReferencedTask> retrieveFinishedReferencedTasks() {
     return taskRetriever.retrieveFinishedCamundaTasks(
-        camundaSystemUrl.getSystemTaskEventUrl(), camundaSystemUrl.getCamundaEngineIdentifier());
+        camundaSystemUrl.getSystemTaskEventUrl(), camundaSystemUrl.getCamundaEngineIdentifier(),
+        lockDuration);
   }
 
   @Override
@@ -113,6 +120,12 @@ public class CamundaSystemConnectorImpl implements SystemConnector {
       ReferencedTask referencedTask, Exception e) {
     taskEventErrorHandler.decreaseRemainingRetriesAndLogErrorForReferencedTask(
         referencedTask, e, camundaSystemUrl.getSystemTaskEventUrl());
+  }
+
+  @Override
+  public void unlockEvent(
+      String eventId) {
+    taskEventErrorHandler.unlockEvent(eventId, camundaSystemUrl.getSystemTaskEventUrl());
   }
 
   @Override

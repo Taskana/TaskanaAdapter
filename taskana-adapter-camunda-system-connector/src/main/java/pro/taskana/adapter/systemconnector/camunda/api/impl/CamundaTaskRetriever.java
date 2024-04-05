@@ -2,6 +2,7 @@ package pro.taskana.adapter.systemconnector.camunda.api.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,13 +31,15 @@ public class CamundaTaskRetriever {
   @Autowired private RestTemplate restTemplate;
 
   public List<ReferencedTask> retrieveNewStartedCamundaTasks(
-      String camundaSystemTaskEventUrl, String camundaSystemEngineIdentifier) {
+      String camundaSystemTaskEventUrl, String camundaSystemEngineIdentifier,
+      Duration lockDuration) {
 
     LOGGER.debug("entry to retrieveNewStartedCamundaTasks.");
 
     List<CamundaTaskEvent> camundaTaskEvents =
         getCamundaTaskEvents(
-            camundaSystemTaskEventUrl, CamundaSystemConnectorImpl.URL_GET_CAMUNDA_CREATE_EVENTS);
+            camundaSystemTaskEventUrl, CamundaSystemConnectorImpl.URL_GET_CAMUNDA_CREATE_EVENTS,
+            lockDuration);
 
     List<ReferencedTask> referencedTasks =
         getReferencedTasksFromCamundaTaskEvents(camundaTaskEvents, camundaSystemEngineIdentifier);
@@ -48,12 +51,13 @@ public class CamundaTaskRetriever {
   }
 
   public List<ReferencedTask> retrieveFinishedCamundaTasks(
-      String camundaSystemUrl, String camundaSystemEngineIdentifier) {
+      String camundaSystemUrl, String camundaSystemEngineIdentifier, Duration lockDuration) {
     LOGGER.debug("entry to retrieveFinishedCamundaTasks. CamundSystemURL = {} ", camundaSystemUrl);
 
     List<CamundaTaskEvent> camundaTaskEvents =
         getCamundaTaskEvents(
-            camundaSystemUrl, CamundaSystemConnectorImpl.URL_GET_CAMUNDA_FINISHED_EVENTS);
+            camundaSystemUrl, CamundaSystemConnectorImpl.URL_GET_CAMUNDA_FINISHED_EVENTS,
+            lockDuration);
 
     List<ReferencedTask> referencedTasks =
         getReferencedTasksFromCamundaTaskEvents(camundaTaskEvents, camundaSystemEngineIdentifier);
@@ -65,9 +69,10 @@ public class CamundaTaskRetriever {
   }
 
   private List<CamundaTaskEvent> getCamundaTaskEvents(
-      String camundaSystemTaskEventUrl, String eventSelector) {
+      String camundaSystemTaskEventUrl, String eventSelector, Duration lockDuration) {
 
-    String requestUrl = camundaSystemTaskEventUrl + eventSelector;
+    String durationParameter = lockDuration == null ? "" : "&lock-for=" + lockDuration.toSeconds();
+    String requestUrl = camundaSystemTaskEventUrl + eventSelector + durationParameter;
 
     HttpHeaders headers = httpHeaderProvider.getHttpHeadersForOutboxRestApi();
     LOGGER.debug(

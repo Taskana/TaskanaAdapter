@@ -19,7 +19,8 @@ class TaskanaAdapterApplicationTest {
 
   TaskanaAdapterApplicationTest(@Autowired TaskanaEngine taskanaEngine) throws Exception {
     TaskRoutingManager taskRoutingManager =
-        (TaskRoutingManager) getValueFromPrivateField(taskanaEngine, "taskRoutingManager");
+        (TaskRoutingManager) getValueFromPrivateFieldOfSuperclass(taskanaEngine,
+            "taskRoutingManager");
     this.taskRoutingProviders =
         (List<TaskRoutingProvider>)
             getValueFromPrivateField(taskRoutingManager, "taskRoutingProviders");
@@ -34,6 +35,14 @@ class TaskanaAdapterApplicationTest {
   private Object getValueFromPrivateField(Object obj, String fieldName)
       throws NoSuchFieldException, IllegalAccessException {
     Field nameField = obj.getClass().getDeclaredField(fieldName);
+    nameField.setAccessible(true);
+
+    return nameField.get(obj);
+  }
+
+  private Object getValueFromPrivateFieldOfSuperclass(Object obj, String fieldName)
+      throws NoSuchFieldException, IllegalAccessException {
+    Field nameField = obj.getClass().getSuperclass().getDeclaredField(fieldName);
     nameField.setAccessible(true);
 
     return nameField.get(obj);

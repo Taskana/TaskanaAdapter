@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import pro.taskana.adapter.configuration.AdapterConfiguration;
 
 /** Application that provides an adapter between TASKANA and one or more external systems. */
@@ -12,6 +13,7 @@ import pro.taskana.adapter.configuration.AdapterConfiguration;
 @EnableScheduling
 @ComponentScan(basePackages = "pro.taskana.adapter")
 @Import({AdapterConfiguration.class})
+@EnableTransactionManagement
 public class TaskanaAdapterApplication {
 
   public static void main(String[] args) {
