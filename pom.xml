@@ -56,7 +56,7 @@
     <version.maven.jboss-as.plugin>7.9.Final</version.maven.jboss-as.plugin>
     <version.maven.resources>3.3.1</version.maven.resources>
     <version.maven.sonar>3.11.0.3922</version.maven.sonar>
-    <version.maven.source>3.3.0</version.maven.source>
+    <version.maven.source>3.3.1</version.maven.source>
     <version.maven.spring-boot>3.1.9</version.maven.spring-boot>
     <version.maven.surefire.plugin>3.2.1</version.maven.surefire.plugin>
     <version.maven-war-plugin>3.4.0</version.maven-war-plugin>
