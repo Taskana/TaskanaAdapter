@@ -1,0 +1,6 @@
+-- this script updates the tables OUTBOX_SCHEMA_VERSION and event_store.
+SET search_path TO %schemaName%;
+
+INSERT INTO OUTBOX_SCHEMA_VERSION (VERSION, CREATED) VALUES ('1.12.0', CURRENT_TIMESTAMP);
+
+ALTER TABLE event_store ADD COLUMN LOCK_EXPIRE TIMESTAMP NULL;

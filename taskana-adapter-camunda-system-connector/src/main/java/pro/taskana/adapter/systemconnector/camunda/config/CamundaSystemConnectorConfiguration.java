@@ -42,6 +42,18 @@ public class CamundaSystemConnectorConfiguration {
   }
 
   @Bean
+  Duration getLockDuration(
+      @Value("${taskana.adapter.events.lockDuration:#{0}}") final Long lockDuration) {
+    return Duration.ofSeconds(lockDuration);
+  }
+
+  @Bean
+  Integer getFromTaskanaToAdapterBatchSize(
+      @Value("${taskana.adapter.sync.taskana.batchSize:#{64}}") final Integer batchSize) {
+    return batchSize;
+  }
+
+  @Bean
   @DependsOn(value = {"httpHeaderProvider"})
   CamundaTaskRetriever camundaTaskRetriever() {
     return new CamundaTaskRetriever();

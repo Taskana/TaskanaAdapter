@@ -91,4 +91,11 @@ public interface SystemConnector {
    * @param e exception
    */
   void taskanaTaskFailedToBeCreatedForNewReferencedTask(ReferencedTask referencedTask, Exception e);
+
+  /**
+   * Instruct the external system to unlock the event.
+   *
+   * @param eventId the id of the event that needs to be unlocked
+   */
+  void unlockEvent(String eventId);
 }

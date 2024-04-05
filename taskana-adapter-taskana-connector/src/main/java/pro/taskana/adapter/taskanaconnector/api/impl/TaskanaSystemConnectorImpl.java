@@ -5,14 +5,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pro.taskana.adapter.configuration.AdapterSpringContextProvider;
 import pro.taskana.adapter.exceptions.TaskCreationFailedException;
 import pro.taskana.adapter.exceptions.TaskTerminationFailedException;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.taskanaconnector.api.TaskanaConnector;
+import pro.taskana.common.api.TaskanaEngine;
 import pro.taskana.common.api.exceptions.NotAuthorizedException;
 import pro.taskana.common.api.exceptions.TaskanaException;
 import pro.taskana.task.api.CallbackState;
@@ -37,14 +40,19 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskanaSystemConnectorImpl.class);
 
   @Autowired private TaskService taskService;
+  @Autowired private TaskanaEngine taskanaEngine;
 
   @Autowired private TaskInformationMapper taskInformationMapper;
+
+  @Autowired private DataSource taskanaDataSource;
+  Integer batchSize = AdapterSpringContextProvider.getBean(Integer.class);
 
   public List<ReferencedTask> retrieveFinishedTaskanaTasksAsReferencedTasks() {
 
     List<TaskSummary> finishedTasks =
         taskService
             .createTaskQuery()
+            .lockResultsEquals(batchSize)
             .stateIn(TaskState.COMPLETED, TaskState.CANCELLED, TaskState.TERMINATED)
             .callbackStateIn(CallbackState.CALLBACK_PROCESSING_REQUIRED, CallbackState.CLAIMED)
             .list();
@@ -64,6 +72,7 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
     List<TaskSummary> claimedTasks =
         taskService
             .createTaskQuery()
+            .lockResultsEquals(batchSize)
             .stateIn(TaskState.CLAIMED)
             .callbackStateIn(CallbackState.CALLBACK_PROCESSING_REQUIRED)
             .list();
@@ -84,9 +93,10 @@ public class TaskanaSystemConnectorImpl implements TaskanaConnector {
         taskService
             .createTaskQuery()
             .stateIn(TaskState.READY)
+            .lockResultsEquals(batchSize)
             .callbackStateIn(CallbackState.CLAIMED)
             .list();
-
+    
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug(
           "the claims of the following taskana tasks were cancelled {} and "

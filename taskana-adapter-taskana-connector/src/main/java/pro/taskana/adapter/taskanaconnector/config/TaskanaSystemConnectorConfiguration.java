@@ -15,9 +15,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import pro.taskana.TaskanaConfiguration;
 import pro.taskana.classification.api.ClassificationService;
 import pro.taskana.common.api.TaskanaEngine;
+import pro.taskana.common.internal.SpringTaskanaEngine;
 import pro.taskana.task.api.TaskService;
 import pro.taskana.workbasket.api.WorkbasketService;
 
@@ -26,6 +28,7 @@ import pro.taskana.workbasket.api.WorkbasketService;
  */
 @Configuration
 @DependsOn(value = {"adapterSpringContextProvider"})
+@EnableTransactionManagement
 public class TaskanaSystemConnectorConfiguration {
 
   @Value("${taskana.schemaName:TASKANA}")
@@ -62,9 +65,9 @@ public class TaskanaSystemConnectorConfiguration {
 
   @Bean
   @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
-  public TaskanaEngine taskanaEngine(TaskanaConfiguration taskanaConfiguration)
+  public SpringTaskanaEngine taskanaEngine(TaskanaConfiguration taskanaConfiguration)
       throws SQLException {
-    return TaskanaEngine.buildTaskanaEngine(taskanaConfiguration);
+    return SpringTaskanaEngine.buildTaskanaEngine(taskanaConfiguration);
   }
 
   @Bean

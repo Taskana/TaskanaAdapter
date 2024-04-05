@@ -87,6 +87,14 @@ public class TaskanaTaskTerminator {
               "attempted to terminate task with external Id {} and caught exception",
               referencedTask.getId(),
               ex);
+          systemConnector.unlockEvent(referencedTask.getOutboxEventId());
+        } catch (Exception e) {
+          LOGGER.warn(
+              "caught unexpected Exception when attempting to start TaskanaTask "
+                  + "for referencedTask {}",
+              referencedTask,
+              e);
+          systemConnector.unlockEvent(referencedTask.getOutboxEventId());
         }
       }
       systemConnector.taskanaTasksHaveBeenTerminatedForFinishedReferencedTasks(

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import pro.taskana.adapter.manager.AdapterManager;
 import pro.taskana.adapter.systemconnector.api.ReferencedTask;
 import pro.taskana.adapter.systemconnector.api.SystemConnector;
@@ -32,6 +33,7 @@ public class ReferencedTaskClaimCanceler {
       fixedRateString =
           "${taskana.adapter.scheduler.run.interval.for.cancel.claim.referenced.tasks."
               + "in.milliseconds:5000}")
+  @Transactional
   public void retrieveCancelledClaimTaskanaTasksAndCancelClaimCorrespondingReferencedTasks() {
 
     synchronized (ReferencedTaskClaimCanceler.class) {
