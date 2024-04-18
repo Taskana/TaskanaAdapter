@@ -42,23 +42,23 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <version.taskana>8.0.1-SNAPSHOT</version.taskana>
+    <version.taskana>8.1.0</version.taskana>
 
     <!-- build dependencies -->
     <version.checkstyle>10.14.0</version.checkstyle>
     <version.google-java-format>1.20.0</version.google-java-format>
     <version.maven.checkstyle>3.3.1</version.maven.checkstyle>
-    <version.maven.compiler>3.11.0</version.maven.compiler>
+    <version.maven.compiler>3.13.0</version.maven.compiler>
     <version.maven.dependency>3.6.1</version.maven.dependency>
     <version.maven.failsafe.plugin>3.2.5</version.maven.failsafe.plugin>
-    <version.maven.jar>3.3.0</version.maven.jar>
+    <version.maven.jar>3.4.0</version.maven.jar>
     <version.maven.javadoc>3.6.3</version.maven.javadoc>
     <version.maven.jboss-as.plugin>7.9.Final</version.maven.jboss-as.plugin>
     <version.maven.resources>3.3.1</version.maven.resources>
     <version.maven.sonar>3.11.0.3922</version.maven.sonar>
     <version.maven.source>3.3.1</version.maven.source>
     <version.maven.spring-boot>3.1.9</version.maven.spring-boot>
-    <version.maven.surefire.plugin>3.2.1</version.maven.surefire.plugin>
+    <version.maven.surefire.plugin>3.2.5</version.maven.surefire.plugin>
     <version.maven-war-plugin>3.4.0</version.maven-war-plugin>
     <version.maven.wildfly.plugin>4.2.2.Final</version.maven.wildfly.plugin>
 
@@ -66,10 +66,10 @@
     <version.spring.mybatis>3.0.3</version.spring.mybatis>
 
     <version.spring.plugin.core>3.0.0</version.spring.plugin.core>
-    <version.spring.boot>3.1.8</version.spring.boot>
+    <version.spring.boot>3.2.4</version.spring.boot>
 
-    <version.camunda>7.20.0</version.camunda>
-    <version.camunda.spin>1.22.0</version.camunda.spin>
+    <version.camunda>7.21.0</version.camunda>
+    <version.camunda.spin>1.23.0</version.camunda.spin>
     <version.camunda.template-engines-freemarker>2.2.0</version.camunda.template-engines-freemarker>
     <version.camunda.template-engines-velocity>2.1.0</version.camunda.template-engines-velocity>
 
@@ -81,7 +81,7 @@
     <version.org.webjars.bootstrap>5.3.3</version.org.webjars.bootstrap>
     <version.org.jboss.spec>3.0.3.Final</version.org.jboss.spec>
 
-    <version.wildfly>27.0.1.Final</version.wildfly>
+    <version.wildfly>31.0.1.Final</version.wildfly>
     <version.arquillian>1.8.0.Final</version.arquillian>
     <version.arquillian.managed.wildfly>5.0.1.Final</version.arquillian.managed.wildfly>
 

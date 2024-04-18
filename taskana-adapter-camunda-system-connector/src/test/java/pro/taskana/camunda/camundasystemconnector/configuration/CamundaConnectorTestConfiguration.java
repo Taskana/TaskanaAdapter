@@ -7,12 +7,12 @@ import org.springframework.boot.test.web.client.MockServerRestTemplateCustomizer
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskCompleter;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.CamundaTaskRetriever;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.HttpHeaderProvider;
-import pro.taskana.adapter.systemconnector.camunda.config.OkHttpProperties;
+import pro.taskana.adapter.systemconnector.camunda.config.HttpComponentsClientProperties;
 
 /**
  * Configuration for test of Camunda System Connector.
@@ -20,15 +20,16 @@ import pro.taskana.adapter.systemconnector.camunda.config.OkHttpProperties;
  * @author bbr
  */
 @Configuration
-@EnableConfigurationProperties(OkHttpProperties.class)
+@EnableConfigurationProperties(HttpComponentsClientProperties.class)
 public class CamundaConnectorTestConfiguration {
 
   @Bean
-  RestTemplate restTemplate(RestTemplateBuilder builder, OkHttpProperties okHttpProperties) {
+  RestTemplate restTemplate(
+      RestTemplateBuilder builder, HttpComponentsClientProperties httpComponentsClientProperties) {
     return builder
-        .setConnectTimeout(Duration.ofMillis(okHttpProperties.getConnectionTimeout()))
-        .setReadTimeout(Duration.ofMillis(okHttpProperties.getReadTimeout()))
-        .requestFactory(OkHttp3ClientHttpRequestFactory.class)
+        .setConnectTimeout(Duration.ofMillis(httpComponentsClientProperties.getConnectionTimeout()))
+        .setReadTimeout(Duration.ofMillis(httpComponentsClientProperties.getReadTimeout()))
+        .requestFactory(HttpComponentsClientHttpRequestFactory.class)
         .build();
   }
 

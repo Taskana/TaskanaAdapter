@@ -6,25 +6,25 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import pro.taskana.adapter.systemconnector.camunda.config.OkHttpPropertiesWithDefaultValuesIntegrationTest.OkHttpPropertiesWithDefaultValuesIntegrationTestConfiguration;
+import pro.taskana.adapter.systemconnector.camunda.config.HttpComponentsClientPropertiesWithDefaultValuesIntegrationTest.OkHttpPropertiesWithDefaultValuesIntegrationTestConfiguration;
 
 @SpringBootTest(classes = {OkHttpPropertiesWithDefaultValuesIntegrationTestConfiguration.class})
-class OkHttpPropertiesWithDefaultValuesIntegrationTest {
+class HttpComponentsClientPropertiesWithDefaultValuesIntegrationTest {
 
   @Test
   void should_HaveDefaultConnectionTimeout2000ms_When_NoPropertyOkHttpConnectionTimeoutIsSet(
-      @Autowired OkHttpProperties okHttpProperties
+      @Autowired HttpComponentsClientProperties httpComponentsClientProperties
   ) {
-    assertThat(okHttpProperties.getConnectionTimeout()).isEqualTo(2_000);
+    assertThat(httpComponentsClientProperties.getConnectionTimeout()).isEqualTo(2_000);
   }
 
   @Test
   void should_HaveDefaultReadTimeout5000ms_When_NoPropertyOkHttpReadTimeoutIsSet(
-      @Autowired OkHttpProperties okHttpProperties
+      @Autowired HttpComponentsClientProperties httpComponentsClientProperties
   ) {
-    assertThat(okHttpProperties.getReadTimeout()).isEqualTo(5_000);
+    assertThat(httpComponentsClientProperties.getReadTimeout()).isEqualTo(5_000);
   }
 
-  @EnableConfigurationProperties(OkHttpProperties.class)
+  @EnableConfigurationProperties(HttpComponentsClientProperties.class)
   static class OkHttpPropertiesWithDefaultValuesIntegrationTestConfiguration {}
 }

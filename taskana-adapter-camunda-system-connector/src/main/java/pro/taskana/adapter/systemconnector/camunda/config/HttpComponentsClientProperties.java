@@ -4,8 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "okhttp")
-public class OkHttpProperties {
+@ConfigurationProperties(prefix = "httpcomponentsclient")
+public class HttpComponentsClientProperties {
 
   private long connectionTimeout = 2_000;
 
