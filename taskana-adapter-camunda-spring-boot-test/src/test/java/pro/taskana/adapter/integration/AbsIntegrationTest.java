@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import pro.taskana.TaskanaConfiguration;
 import pro.taskana.adapter.systemconnector.camunda.api.impl.HttpHeaderProvider;
 import pro.taskana.classification.api.ClassificationService;
@@ -113,7 +113,7 @@ abstract class AbsIntegrationTest {
         new TestRestTemplate(
             new RestTemplateBuilder()
                 .rootUri("http://localhost:" + port)
-                .requestFactory(OkHttp3ClientHttpRequestFactory.class));
+                .requestFactory(HttpComponentsClientHttpRequestFactory.class));
     // set up camunda requester and taskanaEngine-Taskservice
     this.camundaProcessengineRequester =
         new CamundaProcessengineRequester(
