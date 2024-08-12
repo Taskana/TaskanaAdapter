@@ -48,13 +48,13 @@ function main() {
   H2)
     ;;
   POSTGRES|POSTGRES_14)
-    docker-compose -f $scriptDir/docker-compose.yml up -d "$(mapDBToDockerComposeServiceName "$1")"
+    docker compose -f $scriptDir/docker-compose.yml up -d "$(mapDBToDockerComposeServiceName "$1")"
     ;;
   stop)
     # this variable is necessary, so that the script can terminate properly
     # when the provided database name does not match. PLEASE DO NOT INLINE!
     local composeServiceName="$(mapDBToDockerComposeServiceName "$2")"
-    docker-compose -f $scriptDir/docker-compose.yml rm -f -s -v $composeServiceName
+    docker compose -f $scriptDir/docker-compose.yml rm -f -s -v $composeServiceName
     ;;
   *)
     echo "unknown database '$1'" >&2

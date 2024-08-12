@@ -24,13 +24,13 @@ abstract class AbstractAccTest {
         builder.command(
             "cmd.exe",
             "/c",
-            "docker-compose -f ../docker-databases/docker-compose.yml up -d "
+            "docker compose -f ../docker-databases/docker-compose.yml up -d "
                 + "taskana-postgres_14");
       } else {
         builder.command(
             "sh",
             "-c",
-            "docker-compose -f ../docker-databases/docker-compose.yml up -d "
+            "docker compose -f ../docker-databases/docker-compose.yml up -d "
                 + "taskana-postgres_14");
       }
       Process process = builder.start();
@@ -50,10 +50,10 @@ abstract class AbstractAccTest {
       ProcessBuilder builder = new ProcessBuilder();
       if (isWindows) {
         builder.command(
-            "cmd.exe", "/c", "docker-compose -f ../docker-databases/docker-compose.yml down -v");
+            "cmd.exe", "/c", "docker compose -f ../docker-databases/docker-compose.yml down -v");
       } else {
         builder.command(
-            "sh", "-c", "docker-compose -f ../docker-databases/docker-compose.yml down -v");
+            "sh", "-c", "docker compose -f ../docker-databases/docker-compose.yml down -v");
       }
       Process process = builder.start();
       LOGGER.info("Stopping POSTGRES...");
