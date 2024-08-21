@@ -50,7 +50,7 @@
     <version.maven.checkstyle>3.3.1</version.maven.checkstyle>
     <version.maven.compiler>3.13.0</version.maven.compiler>
     <version.maven.dependency>3.6.1</version.maven.dependency>
-    <version.maven.failsafe.plugin>3.2.5</version.maven.failsafe.plugin>
+    <version.maven.failsafe.plugin>3.4.0</version.maven.failsafe.plugin>
     <version.maven.jar>3.4.0</version.maven.jar>
     <version.maven.javadoc>3.6.3</version.maven.javadoc>
     <version.maven.jboss-as.plugin>7.9.Final</version.maven.jboss-as.plugin>
