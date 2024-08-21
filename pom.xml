@@ -86,7 +86,7 @@
     <version.arquillian.managed.wildfly>5.0.1.Final</version.arquillian.managed.wildfly>
 
 
-    <version.archunit>1.2.1</version.archunit>
+    <version.archunit>1.3.0</version.archunit>
     <version.hamcrest.json>0.3</version.hamcrest.json>
 
     <version.maven.gpg>3.2.5</version.maven.gpg>
