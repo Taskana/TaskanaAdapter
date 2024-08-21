@@ -90,7 +90,7 @@
     <version.hamcrest.json>0.3</version.hamcrest.json>
 
     <version.maven.gpg>3.2.5</version.maven.gpg>
-    <version.sonatype>1.6.13</version.sonatype>
+    <version.sonatype>1.7.0</version.sonatype>
     <version.jacoco>0.8.12</version.jacoco>
 
     <!-- sonar settings -->
