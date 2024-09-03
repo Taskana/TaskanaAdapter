@@ -97,7 +97,7 @@ function main() {
     prop_version=$([[ -n "$INCREMENT" ]] && echo $(increment_version "${BASH_REMATCH[@]:2:2}")-SNAPSHOT || echo "${BASH_REMATCH[@]:2:2}")
     for dir in ${MODULES[@]}; do
       change_version "$dir" "$version"
-      change_version_of_property "$dir" "version.taskana" "$prop_version"
+      change_version_of_property "$dir" "version.kadai" "$prop_version"
     done
   else
     echo "skipped version change because this is not a release build"

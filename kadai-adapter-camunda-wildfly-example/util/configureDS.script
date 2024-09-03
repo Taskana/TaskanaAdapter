@@ -1,0 +1,14 @@
+
+embed-server --std-out=echo --server-config=standalone.xml
+
+batch
+
+module add --name=org.postgres --resources=/Driver/postgresql-42.2.5.jar --dependencies=javax.api,javax.transaction.api
+
+/subsystem=datasources/jdbc-driver=postgres:add(driver-name="postgres",driver-module-name="org.postgres",driver-class-name=org.postgresql.Driver)
+
+/subsystem=datasources/data-source=KadaiDS/:add(connection-url=jdbc:postgresql://localhost:50102/postgres,driver-name=postgres,jndi-name=java:jboss/datasources/KadaiDS,initial-pool-size=4,max-pool-size=64,min-pool-size=4,password=postgres,user-name=postgres)
+
+/subsystem=datasources/data-source=KadaiAdapterDS/:add(connection-url=jdbc:postgresql://localhost:50102/postgres,driver-name=postgres,jndi-name=java:jboss/datasources/KadaiAdapterDS,initial-pool-size=4,max-pool-size=64,min-pool-size=4,password=postgres,user-name=postgres)
+
+run-batch

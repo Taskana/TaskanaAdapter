@@ -3,9 +3,9 @@
   <bpmn:process id="simple_user_task_process" name="Simple User Task Process" isExecutable="true">
     <bpmn:extensionElements>
       <camunda:properties>
-        <camunda:property name="taskana.domain" value="DOMAIN_A" />
-        <camunda:property name="taskana-attributes" value="amount,item" />
-        <camunda:property name="taskana.workbasket-key" value="someWbkey" />
+        <camunda:property name="kadai.domain" value="DOMAIN_A" />
+        <camunda:property name="kadai-attributes" value="amount,item" />
+        <camunda:property name="kadai.workbasket-key" value="someWbkey" />
       </camunda:properties>
     </bpmn:extensionElements>
     <bpmn:startEvent id="StartEvent_1" name="Request Received">
@@ -19,7 +19,7 @@
     <bpmn:userTask id="Task_0k5trao" name="Check&#10;Request">
       <bpmn:extensionElements>
         <camunda:properties>
-          <camunda:property name="taskana.classification-key" value="L1050" />
+          <camunda:property name="kadai.classification-key" value="L1050" />
         </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_1wir7ao</bpmn:incoming>

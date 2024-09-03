@@ -1,6 +1,6 @@
 version: '3'
 services:
-  taskana-postgres_14:
+  kadai-postgres_14:
     build: postgres_14
     ports:
       - 50102:5432
