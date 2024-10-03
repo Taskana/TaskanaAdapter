@@ -70,7 +70,7 @@
 
     <version.camunda>7.21.0</version.camunda>
     <version.camunda.spin>1.23.0</version.camunda.spin>
-    <version.camunda.template-engines-freemarker>2.2.0</version.camunda.template-engines-freemarker>
+    <version.camunda.template-engines-freemarker>7.22.0</version.camunda.template-engines-freemarker>
     <version.camunda.template-engines-velocity>2.1.0</version.camunda.template-engines-velocity>
 
     <version.jakarta.annotation>2.1.1</version.jakarta.annotation>
